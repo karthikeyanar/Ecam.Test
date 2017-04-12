@@ -1,0 +1,88 @@
+﻿@{ Layout = null; }<!-- ko if: grid() -->
+<div class="page-header">
+    <div class="row">
+        <div class="col-md-12">
+            <form id="frmExpertsRecommendSearch" class="form-inline form-validate" role="form" onsubmit="return false">
+                <div class="form-group" style="margin-right:30px;float:left;">
+                    <h1 class="page-title">Experts Recommend</h1>
+                </div>
+                <input type="hidden" name="experts_ids" />
+            </form>
+        </div>
+    </div>
+</div><div class="clearfix" style="height:5px">&nbsp;</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="row m-t-5 m-b-5">
+            <div class="col-md-12">
+                <div class="pull-left m-r-15" data-bind="visible:grid().total_pages()>1">
+                    <span class="pull-left p-t-5 p-r-10">Rows</span>
+                    <select id="rows" name="rows" data-bind="options:grid().row_sizes,value:grid().rows_per_page,valueAllowUnset:{}" class="pull-left form-control input-sm input-60"></select>
+                </div>
+                <div class="pull-left">
+                    <button id="add" class="btn btn-sm btn-success" data-bind="click: grid().add">Add</button>
+                </div>
+                <div class="pull-right" data-bind="visible:grid().total_pages()>1">
+                    <ul class="no-margin" data-bind="bsPagination: {'total_rows': grid().total_rows(),'page_index': grid().page_index(),'rows_per_page': grid().rows_per_page(),'onPageClick': grid().onPageClick,'onRender':grid().onRenderPagination}"></ul>
+                </div>
+            </div>
+        </div>
+        <table id="expertsRecommendTable" class="table table-striped table-bordered table-hover table-condensed table-gray" sortname="experts_name" sortorder="asc" data-bind="sortingTable: { 'onSorting': grid().changeSortOrder }">
+            <thead>
+                <tr>
+                    <th sortname="experts_name">
+                        Name
+                    </th>
+                    <th sortname="company_name">
+                        Company
+                    </th>
+                    <th sortname="record_date">
+                        Date
+                    </th>
+                    <th class="text-right" sortname="stop_loss">
+                        Stop Loss
+                    </th>
+                    <th class="text-right" sortname="target">
+                        Target
+                    </th>
+                    <th style="width: 50px">
+                    </th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach: grid().rows">
+                <tr>
+                    <td class="cursor-pointer" data-bind="text:experts_name,click:edit"></td>
+                    <td class="cursor-pointer" data-bind="text:company_name,click:edit"></td>
+                    <td class="cursor-pointer" data-bind="text:formatDate(record_date()),click:edit"></td>
+                    <td class="cursor-pointer text-right" data-bind="text:formatNumber(stop_loss()),click:edit"></td>
+                    <td class="cursor-pointer text-right" data-bind="text:formatNumber(target()),click:edit"></td>
+                    <td class="text-center">
+                        <a href="javascript:;" class="cursor-pointer fg-black" data-bind="jConfirm: {'ok': deleteExpertsRecommend}" data-placement="top"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="row">
+            <div class="col-md-4">
+                <span data-bind="text:grid().paging_status" class="pull-left m-t-5"></span>
+            </div>
+            <div class="col-md-8" data-bind="visible:grid().total_pages()>1">
+                <div class="pull-right">
+                    <ul class="no-margin" data-bind="bsPagination: {'total_rows': grid().total_rows(),'page_index': grid().page_index(),'rows_per_page': grid().rows_per_page(),'onPageClick': grid().onPageClick,'onRender':grid().onRenderPagination}"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-container">
+</div>
+<!-- /ko -->
+<script type="text/html" id="modal-template">
+    <div id="modal-${name}" class="modal {{if is_modal_full==true}}container{{/if}} {{if position=='top'}}modal-top{{/if}}" data-width="800" tabindex="-1" data-focus-on="input:first" style="display: none;">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">${title}</h4>
+        </div>
+        <div class="modal-body"></div>
+    </div>
+</script>

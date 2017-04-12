@@ -1,0 +1,152 @@
+﻿using Ecam.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Http;
+using System.Web.Mvc;
+using System.Web.Optimization;
+using System.Web.Routing;
+using System.Data.Entity;
+using System.Net.Http.Formatting;
+using Newtonsoft.Json;
+using Ecam.Models;
+using Microsoft.AspNet.WebApi.MessageHandlers.Compression;
+using Microsoft.AspNet.WebApi.MessageHandlers.Compression.Compressors;
+
+namespace Ecam.Views {
+    public class MvcApplication:System.Web.HttpApplication {
+        protected void Application_Start() {
+
+            JsonMediaTypeFormatter jsonFormatter = GlobalConfiguration.Configuration.Formatters.JsonFormatter;
+            JsonSerializerSettings jSettings = new Newtonsoft.Json.JsonSerializerSettings() {
+                Formatting = Formatting.Indented,
+                DateTimeZoneHandling = DateTimeZoneHandling.Utc
+            };
+            jSettings.Converters.Add(new DateTimeConverter());
+            jsonFormatter.SerializerSettings = jSettings;
+
+            GlobalConfiguration.Configuration.Formatters.Remove(GlobalConfiguration.Configuration.Formatters.XmlFormatter);
+
+            //AreaRegistration.RegisterAllAreas();
+            GlobalConfiguration.Configure(WebApiConfig.Register);
+            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            ModelBinders.Binders.Add(typeof(decimal),new DecimalModelBinder());
+            ModelBinders.Binders.Add(typeof(decimal?),new DecimalModelBinder());
+            ModelBinders.Binders.Add(typeof(Int16),new Int16ModelBinder());
+            ModelBinders.Binders.Add(typeof(Int16?),new Int16ModelBinder());
+            ModelBinders.Binders.Add(typeof(Int32),new Int32ModelBinder());
+            ModelBinders.Binders.Add(typeof(Int32?),new Int32ModelBinder());
+            // Attach simple post variable binding
+            //GlobalConfiguration.Configuration.ParameterBindingRules
+            //        .Insert(0, SimplePostVariableParameterBinding.HookupParameterBinding);
+
+            GlobalConfiguration.Configuration.MessageHandlers.Insert(0,new ServerCompressionHandler(new GZipCompressor(),new DeflateCompressor()));
+            BaseEntity.ConfigureServiceFactory(new ServiceFactory());
+
+            RegisterViewEngine(ViewEngines.Engines);
+        }
+
+        public static void RegisterViewEngine(ViewEngineCollection viewEngines) {
+            // We do not need the default view engine
+            viewEngines.Clear();
+
+
+            //var templateableRazorViewEngine = new TemplateRazorViewEngine {
+            //    CurrentTemplate = httpContext => (httpContext.Request.Url.ToString().ToLower().Contains("newgui.dvl.ecamshub.com") == true ? "ecam2" : DataTypeHelper.ConvertString(System.Configuration.ConfigurationManager.AppSettings["TemplateName"]))
+            //};
+
+            var templateableRazorViewEngine = new TemplateRazorViewEngine {
+                CurrentTemplate = httpContext => {
+                    string url = httpContext.Request.Url.ToString();
+                    string template = string.Empty;
+                    //Helper.Log("Global asax url=" + url + ",Condition=" + url.ToLower().Contains("newgui.dvl.ecamshub"));
+                    //if(url.ToLower().Contains("newgui.dvl.ecamshub")) {
+                    //    template = "ecam2";
+                    //}  
+                    //if(string.IsNullOrEmpty(template) == true) {
+                    //    template = DataTypeHelper.ConvertString(System.Configuration.ConfigurationManager.AppSettings["TemplateName"]);
+                    //}
+                    //Helper.Log("template=" + template);
+                    return template;
+                }
+            };
+
+            viewEngines.Add(templateableRazorViewEngine);
+        }
+
+        //protected void Application_BeginRequest(object sender,EventArgs e) {
+        //    if(Ecam.Framework.Helper.IsLocal != "true") {
+        //        string FromHomeURL = Ecam.Framework.Helper.ServerURL.Replace("http://www.","http://");
+        //        string ToHomeURL = Ecam.Framework.Helper.ServerURL;
+        //        //if(HttpContext.Current.Request.Url.ToString().ToLower().Contains(FromHomeURL)) {
+        //        //    HttpContext.Current.Response.Status = "301 Moved Permanently";
+        //        //    HttpContext.Current.Response.AddHeader("Location",Request.Url.ToString().ToLower().Replace(FromHomeURL,ToHomeURL));
+        //        //}
+        //    }
+        //}
+
+    }
+
+
+    /// <summary>
+    /// Attribute that can be added to controller methods to force content
+    /// to be GZip encoded if the client supports it
+    /// </summary>
+    public class CompressContentAttribute:ActionFilterAttribute {
+
+        /// <summary>
+        /// Override to compress the content that is generated by
+        /// an action method.
+        /// </summary>
+        /// <param name="filterContext"></param>
+        public override void OnActionExecuting(ActionExecutingContext filterContext) {
+            GZipEncodePage();
+        }
+
+        /// <summary>
+        /// Determines if GZip is supported
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsGZipSupported() {
+            string AcceptEncoding = HttpContext.Current.Request.Headers["Accept-Encoding"];
+            if(!string.IsNullOrEmpty(AcceptEncoding) &&
+                    (AcceptEncoding.Contains("gzip") || AcceptEncoding.Contains("deflate")))
+                return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Sets up the current page or handler to use GZip through a Response.Filter
+        /// IMPORTANT:  
+        /// You have to call this method before any output is generated!
+        /// </summary>
+        public static void GZipEncodePage() {
+            HttpResponse Response = HttpContext.Current.Response;
+
+            if(IsGZipSupported()) {
+                string AcceptEncoding = HttpContext.Current.Request.Headers["Accept-Encoding"];
+
+                if(AcceptEncoding.Contains("gzip")) {
+                    Response.Filter = new System.IO.Compression.GZipStream(Response.Filter,
+                                                System.IO.Compression.CompressionMode.Compress);
+                    Response.Headers.Remove("Content-Encoding");
+                    Response.AppendHeader("Content-Encoding","gzip");
+                } else {
+                    Response.Filter = new System.IO.Compression.DeflateStream(Response.Filter,
+                                                System.IO.Compression.CompressionMode.Compress);
+                    Response.Headers.Remove("Content-Encoding");
+                    Response.AppendHeader("Content-Encoding","deflate");
+                }
+
+
+            }
+
+            // Allow proxy servers to cache encoded and unencoded versions separately
+            Response.AppendHeader("Vary","Content-Encoding");
+        }
+    }
+}

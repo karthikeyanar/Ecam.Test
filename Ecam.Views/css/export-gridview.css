@@ -1,0 +1,51 @@
+ /* table - blue to gray */
+#targetTable .form-control.no-b {
+    background: #fff;
+    border: 1px solid #d7d7d7 !important;
+}
+
+.table > tbody > tr.select-row > td, #groupChildTable:first-child > tbody > tr.select-row > td {
+    background-color: #818181 /*f2dede*/ !important;
+    color: #fff !important;
+}
+
+.table.table-gray.table-bordered, .table.table-gray.table-bordered > tbody > tr {
+    border: 1px solid #ccc !important;
+}
+
+.table-bordered.table-gray.table > thead > tr > th {
+    background: #A5A5A5;
+    border-color: #A5A5A5;
+    color: #fff;
+    filter: none !important;
+}
+
+.table-gray.table-alternate > tbody > tr:nth-child(odd) > td,.table-gray.table-alternate > tbody > tr > th{
+    background:#F9F9F9;
+}
+.table-gray.table-alternate > tbody > tr:nth-child(even) > td,table#agentReportTable > tbody > tr:nth-child(even) > td.pin-col{
+    background:#fff;
+}
+.table-gray > tbody > tr > td:not(last-child), .table-gray > thead > tr > th:not(last-child), .table.table-gray.table-bordered {
+    border: none;
+}
+tr[id^="child_"] .table-gray > tbody > tr > td,tr[id^="child_"] .table-gray > tbody > tr > th{
+    border: 1px solid #ddd;
+}
+
+.table-gray > tbody > tr:hover > td.child-row-cnt:hover,tr[id^="child_"] .table-gray > tbody > tr:hover > td {
+    background: #f0f0f0 /*eaeff7*/ !important;
+    color: #000 !important;
+}
+
+.table-gray > tbody > tr:hover > td, table#agentReportTable > tbody > tr:hover > td.pin-col {
+    background: #f0f0f0 /*62b8ec*/;
+    color: #000 !important;
+}
+.table-gray > tbody > tr:hover > td > a,.table-gray > tbody > tr:hover > td > a > span, .table-gray > tbody > tr:hover > td > a > i, .table-gray > tbody > tr:hover > td > div > a > i, .table > tbody > tr.select-row > td > a > span, .table-gray > tbody > tr:hover > td > div > a.fg-black {
+    color: #000 !important;
+}
+
+.table-gray > tbody > tr:hover > td > a.tree-expand, tr > td > a.tree-expand, .table-gray > tbody > tr:hover > td.is-total-row a span, .pl-report-cnt .is-total-row, div.pl-report-cnt > div > table > tbody > tr > td.is-total-row {
+    color: #333 !important;
+}

@@ -1,0 +1,231 @@
+﻿body {
+    overflow: hidden;
+}
+
+.filter-box {
+    padding-right: 10px;
+}
+
+.form-inline.rep-fil-form .form-group {
+    float: left;
+    margin-right: 15px;
+}
+
+/*.page-header .page-title {
+    margin: 0;
+    font-size: 20px;
+    float: left;
+    font-weight: 400;
+}*/
+
+.filter-panel > .panel-heading {
+    padding: 7px;
+}
+
+.filter-panel > .panel-heading > .panel-title {
+    font-size: 13px;
+}
+
+.filter-panel > .panel-body {
+    padding: 7px;
+}
+
+.filter-panel .radio, .filter-panel .checkbox {
+    margin-bottom: 10px;
+    margin-top: 0;
+}
+
+.filter-panel .list-group {
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+.detail-mode .page-container > .page-content {
+    min-height: 0 !important;
+    padding-bottom: 0;
+}
+
+.detail-mode .detail-grid-box > .header-tool {
+    height: 7px;
+    background: #ddd;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.detail-mode .detail-grid-box > .header-tool > .close-btn {
+    background: #ddd;
+    position: relative;
+    text-align: center;
+    width: 50px;
+    height: 15px;
+    margin: 0 auto;
+    cursor: pointer;
+}
+
+.detail-mode .detail-grid-box > .header-tool > .close-btn > i {
+    font-size: 16px;
+    left: 20px;
+    position: absolute;
+    top: 0;
+}
+
+.summary-table-cnt {
+    height: 200px;
+    overflow: auto;
+    padding-right: 20px;
+    margin-bottom: 10px;
+}
+
+.detail-grid-box {
+    display: none;
+}
+
+.detail-mode .detail-grid-box {
+    display: block;
+}
+
+.detail-mode .detail-grid-box .detail-table-cnt {
+    height: 200px;
+    overflow: auto;
+    padding-right: 5px;
+    margin-bottom: 10px;
+}
+
+.key-col {
+    width: 30%;
+    overflow: hidden;
+}
+
+.amount-col {
+    width: 12%;
+    overflow: hidden;
+}
+
+.shipments-col {
+    width: 9%;
+    overflow: hidden;
+}
+
+.table > tbody > tr.select-row > td,
+.table > tbody > tr.select-row:hover > td,
+.table > tbody > tr.select-row:focus > td {
+    background: green;
+    color: white;
+}
+.child-row-cnt {
+    padding: 10px !important;
+}
+.child-row-cnt > .table {
+    margin: 0 !important;
+}
+.child-row-cnt > .table .amount-col {
+    width: 22.2%;
+}
+/*
+#groupChildTable {
+	border: 0 !important;
+	 margin-bottom: 0;
+}
+#groupChildTable > tbody > tr > td {
+	border-top: 0 !important;
+}
+#groupChildTable.table > tbody > tr > td {
+	border-top: 0;
+}
+#groupChildTable.table > tbody > tr > td {
+	border-right: solid 1px #ddd;
+}
+#groupChildTable.table > tbody > tr > td:last-child {
+	border-right: 0;
+}
+#groupChildTable > tbody > tr > td.date-col {
+	padding-left: 26px;
+}
+*/
+.img-compare {
+    background-image: url("../../img/compare.png");
+    background-repeat: no-repeat;
+    float: left;
+    height: 26px;
+    width: 26px;
+}
+
+.img-compare.check {
+    background-image: url(../../img/compare-orange.png);
+}
+
+@media (min-width: 992px) {
+    #groupkeylist.autofix_sb.bottom.fixed {
+        position: fixed;
+        top: 90px;
+        width: 170px;
+    }
+}
+
+.multiselect-container.dropdown-menu {
+    z-index: 999999999;
+}
+
+div.gro-gdiv {
+    position: relative;
+}
+
+div.gro-toggler {
+    background: #ffffff;
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNlNmU2ZTYiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background: -moz-linear-gradient(top, #ffffff 0%, #e6e6e6 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffffff), color-stop(100%, #e6e6e6));
+    background: -webkit-linear-gradient(top, #ffffff 0%, #e6e6e6 100%);
+    background: -o-linear-gradient(top, #ffffff 0%, #e6e6e6 100%);
+    background: -ms-linear-gradient(top, #ffffff 0%, #e6e6e6 100%);
+    background: linear-gradient(to bottom, #ffffff 0%, #e6e6e6 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#e6e6e6', GradientType=0);
+    border: 1px solid #ddd;
+    color: #857c7c;
+    display: none;
+    height: 30px;
+    padding-top: 6px;
+    position: absolute;
+    right: -6px;
+    text-align: center;
+    top: -7px;
+    width: 20px;
+    z-index: 1;
+    cursor: pointer;
+}
+
+div.gro-toggler > a {
+    display: block;
+    color: #333;
+}
+
+.gro-toggler > ul > li > a > i {
+    display: none;
+    float: left;
+    font-size: 12px;
+    margin-left: -14px;
+    margin-right: 3px;
+    margin-top: 3px;
+}
+
+.gro-toggler > ul > li > a.select > i {
+    display: block;
+}
+
+.gro-toggler .dropdown-menu {
+    margin: -3px 0 0 !important;
+}
+
+.gro-key-col {
+    width: 70%;
+}
+
+.gro-key-col > div,
+.gro-sum-col > div {
+    display: block;
+    width: 100%;
+}
+
+.gro-sum-col > div {
+    text-align: right;
+}

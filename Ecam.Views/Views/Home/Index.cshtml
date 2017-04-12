@@ -1,0 +1,5 @@
+﻿@{ ViewBag.Title = "Home Page"; }
+<!-- ko if: viewModel() -->
+<div class="page-model" data-bind="template: { name: viewModel().template, data: viewModel, afterRender: $root.initPage }">
+</div>
+<!-- /ko -->

@@ -1,0 +1,148 @@
+﻿@{ Layout = null; }
+<div class="modal modal-top" tabindex="-1" data-focus-on="input:first" data-width="600" style="display: none;">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Settings</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div role="tabpanel">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist" id="agent_tab_list">
+                        <li role="presentation" class="active"><a id="lnkChangeProfileTab" href="#changeProfileContent" aria-controls="changeProfileContent" role="tab" data-toggle="tab">Profile</a></li>
+                        <li role="presentation"><a id="lnkChangePasswordTab" href="#changePasswordContent" aria-controls="changePasswordContent" role="tab" data-toggle="tab">Change Password</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="changeProfileContent">
+                            <div class="clearfix">&nbsp;</div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <form id="frmChangeProfile" method="post" class="form-horizontal form-validate" role="form" onsubmit="return false" data-bind="formValidate:{}">
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">
+                                                Account No
+                                            </label>
+                                            <div class="col-md-7">
+                                                <p class="form-control-static" data-bind="text:user_name"></p>
+                                            </div>
+                                        </div>                                        
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">
+                                                Email
+                                            </label>
+                                            <div class="col-md-7">
+                                                @*<p class="form-control-static" data-bind="text:email"></p>*@
+                                                <input type="text" class="form-control input-sm" name="email" data-bind="value:email" placeholder="Email" data-rule-required="true" data-msg-required="Required" data-placement="bottom" />
+                                            </div>
+                                        </div>
+                                        <!-- ko if:(getAuth().role=='AA' || getAuth().role=='AM')  -->
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">
+                                                Profile Name
+                                            </label>
+                                            <div class="col-md-7">
+                                                <input type="text" class="form-control input-sm" name="first_name" data-bind="value:first_name" placeholder="First Name" data-rule-required="true" data-msg-required="Required" data-placement="bottom" />
+                                            </div>
+                                        </div>
+                                        <!-- /ko -->
+                                        <!-- ko if:(getAuth().role=='CA' || getAuth().role=='CM')  -->
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">
+                                                First Name
+                                            </label>
+                                            <div class="col-md-7">
+                                                <input type="text" class="form-control input-sm" name="first_name" data-bind="value:first_name" placeholder="First Name" data-rule-required="true" data-msg-required="Required" data-placement="bottom" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">
+                                                Last Name
+                                            </label>
+                                            <div class="col-md-7">
+                                                <input type="text" class="form-control input-sm" name="last_name" data-bind="value:last_name" placeholder="Last Name" data-rule-required="true" data-msg-required="Required" data-placement="bottom" />
+                                            </div>
+                                        </div>
+                                        <!-- /ko -->
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">
+                                                Photo
+                                            </label>
+                                            <div class="col-md-7">
+                                                <div id="userPhotoFileInput" class="fileinput" data-provides="fileinput" data-bind="css:{'fileinput-new':photo_file_name_medium_src()=='','fileinput-exists':photo_file_name_medium_src()!=''}">
+                                                    <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 150px; height: 100px;">
+                                                        <!-- ko if: photo_file_name_medium_src()!='' -->
+                                                        <img data-bind="attr:{'src':photo_file_name_medium_src()}" />
+                                                        <!-- /ko -->
+                                                    </div>
+                                                    <div>
+                                                        <span class="btn btn-default btn-sm btn-file m-r-15"><span class="fileinput-new">Select Image</span><span class="fileinput-exists">Change</span><input type="file" id="userPhotoFileUpload"></span><a href="javascript:;" class="btn btn-default btn-sm fileinput-exists" data-dismiss="fileinput">Remove</a>
+                                                    </div>
+                                                </div>
+                                                <input type="hidden" name="photo_file_id" data-bind="value:photo_file_id" />
+                                            </div>
+                                        </div>
+                                        <!-- ko if: errors() -->
+                                        <div class="form-group">
+                                            <div class="col-md-12">
+                                                @Html.Partial("_ErrorDisplay")
+                                            </div>
+                                        </div>
+                                        <!-- /ko -->
+                                        <div class="form-group">
+                                            <div class="col-md-offset-4 col-md-8">
+                                                <input type="hidden" name="id" data-bind="value:id" />
+                                                <button type="submit" id="save" class="btn btn-sm btn-primary" data-loading-text="Save">Save</button>
+                                                <button type="button" class="btn btn-sm btn-danger m-l-15" data-dismiss="modal">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="changePasswordContent">
+                            <div class="clearfix">&nbsp;</div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <form id="frmChangePassword" method="post" class="form-horizontal form-validate" role="form" onsubmit="return false" data-bind="formValidate:{}">
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">
+                                                Old Password
+                                            </label>
+                                            <div class="col-md-7">
+                                                <input type="password" class="form-control input-sm" name="old_password" placeholder="Old Password" data-rule-required="true" data-msg-required="Required" data-placement="bottom" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">
+                                                New Password
+                                            </label>
+                                            <div class="col-md-7">
+                                                <input type="password" class="form-control input-sm" name="new_password" placeholder="New Password" data-rule-required="true" data-msg-required="Required" data-placement="bottom" data-rule-minlength="6" />
+                                            </div>
+                                        </div>
+                                        <!-- ko if: errors() -->
+                                        <div class="form-group">
+                                            <div class="col-md-12">
+                                                @Html.Partial("_ErrorDisplay")
+                                            </div>
+                                        </div>
+                                        <!-- /ko -->
+                                        <div class="form-group">
+                                            <div class="col-md-offset-4 col-md-8">
+                                                <input type="hidden" name="id" data-bind="value:id" />
+                                                <input type="hidden" name="email" data-bind="value:user_name" />
+                                                <button type="submit" id="save" class="btn btn-sm btn-primary" data-loading-text="Save">Save</button>
+                                                <button type="button" class="btn btn-sm btn-danger m-l-15" data-dismiss="modal">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

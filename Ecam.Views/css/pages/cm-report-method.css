@@ -1,0 +1,20 @@
+﻿#cke_formula .cke_bottom.cke_reset_all,
+#cke_formula .cke_top.cke_reset_all {
+    display: none;
+}
+
+.sheet-tab-nav > li > a.btn-remove-sheet,
+.sheet-tab-nav > li > a.btn-remove-sheet:hover {
+    border: 0 none;
+    float: left;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    right: 12px;
+    top: 2px;
+    display: none;
+}
+
+.sheet-tab-nav > li.active:hover > a.btn-remove-sheet {
+    display: block;
+}

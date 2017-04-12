@@ -1,0 +1,205 @@
+﻿@using Ecam.Framework
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=11; IE=10; IE=9; IE=8; IE=7; IE=EDGE" />
+    <title data-bind="text:page_title()+' - @Ecam.Framework.Helper.ProjectName'"></title>
+    @{
+        string _Version = string.Empty;
+        string isLocal = Ecam.Framework.Helper.IsLocal;
+        string _IsUseMinifier = Ecam.Framework.Helper.IsUseMinifier;
+        if (isLocal == "false")
+        {
+            _Version = Ecam.Framework.Helper.Version;
+        }
+        else
+        {
+            _Version = DateTime.Now.ToString("yyyyMMddhhmmss");
+        }
+    }
+    <script>
+        var _Version = '@_Version'; var _IsUseMinifier = '@_IsUseMinifier';
+        var SITE_URL = '@Ecam.Framework.Helper.SiteUrl';
+    </script>
+    @{
+        if (isLocal == "false")
+        {
+            <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
+            <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,900' rel='stylesheet' type='text/css'>
+            <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+                <script>window.jQuery || document.write('<script src="/js/jquery/jquery-1.11.2.min.js">\x3C/script>')</script>
+                <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+                <script>window.$.validator || document.write('<script src="/js/jquery/jquery.validate.min.js">\x3C/script>')</script>
+                <script src="//ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+                <script>window.$.tmpl || document.write('<script src="/js/jquery/jquery.tmpl.min.js">\x3C/script>')</script>
+        }
+        else
+        {
+            <script src="/js/jquery/jquery-1.11.2.min.js"></script>
+                <script src="/js/jquery/jquery.validate.min.js"></script>
+                <script src="/js/jquery/jquery.tmpl.min.js"></script>
+        }
+    }
+    <script src="/js/plugins/date/date.js"></script>
+    <script src="/js/plugins/sticky-header/jquery.fixedheadertable.js"></script>
+    @{
+        if (isLocal == "false")
+        {
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+                <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+                <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+        }
+        else
+        {
+            <script src="/js/bootstrap/bootstrap.js"></script>
+                <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css" />
+                <link type="text/css" rel="stylesheet" href="/css/bootstrap-theme.min.css" />
+        }
+    }
+    <link type="text/css" rel="stylesheet" href="/css/plugins/font-awesome/font-awesome.min.css" />
+    @Styles.Render("~/bundles/css")
+    @Scripts.Render("~/bundles/flot")
+    @Scripts.Render("~/bundles/plugins")
+    <link href="/js/plugins/bootstrap-switch-master/css/bootstrap3/bootstrap-switch.min.css" rel="stylesheet" />
+    <script src="/js/plugins/bootstrap-switch-master/js/bootstrap-switch.min.js"></script>
+    <script src="/js/plugins/fileinput/fileinput.js?v=1"></script>
+    <script src="/js/require/require-2.1.15.min.js?v=1"></script>
+    <script src="/js/plugins/marquee/jquery.marquee.js"></script>
+    @Html.JavascriptInclueTag("/js/require/config.js")
+    @{
+        if (isLocal == "false")
+        {
+            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBLxSI2OHpn9AlGxpQk7zP9MSi8tWyYMSo&signed_in=true&libraries=geometry,places"></script>
+                @*<script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerwithlabel/src/markerwithlabel.js"></script>
+                    <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js"></script>*@
+                <script src="/js/plugins/map/markerwithlabel.js"></script>
+                <script src="/js/plugins/map/infobox.js"></script>
+        }
+    }
+    <script src="/Scripts/jquery.signalR-2.2.0.min.js"></script>
+    <script src="/signalr/hubs"></script>
+    <script>
+        var _USDCurrencyID= @Convert.ToInt32(Ecam.Views.CurrencyEnum.USD).ToString();
+        var _TODAYDATE = moment().format('MM/DD/YYYY');
+    </script>
+    <script>
+        $(function (){
+            $('.marquee-with-options').marquee({
+                speed: 12000,
+                gap: 50,
+                delayBeforeStart: 0,
+                direction: 'left',
+                duplicated: true,
+                pauseOnHover: true
+            });
+        });
+    </script>
+    <style>
+        .menu-bar {
+            background: #fff;
+            position: relative;
+            z-index: 10000;
+        }
+    </style>
+    <link type='text/css' rel='stylesheet' href='/css/ecam2/site.min.css?v=@_Version' />
+    <link type='text/css' rel='stylesheet' href='/css/ecam2/sky-blue.css?v=@_Version' />
+    <link type='text/css' rel='stylesheet' href='/css/ecam2/site-chages.css?v=@_Version' />
+    <link type='text/css' rel='stylesheet' href='/css/new-theme.css?v=@_Version' />
+    <link type='text/css' rel='stylesheet' href='/css/ecam2/agent-page-gui.css?v=@_Version' />
+    <link href="/js/plugins/bootstrap-tour/css/bootstrap-tour.css?v=@_Version" rel="stylesheet" />
+</head>
+
+<body class="header-fixed sidebar-animation sidebar-fixed ecam2 top-menu-view @(Ecam.Framework.Helper.IsDVL == true ? " is_dvl " : " ")">
+    <div class="header navbar navbar-inverse navbar-fixed-top">
+        <div class="header-content container navbar-collapse">
+            <!-- navbar-header -->
+            <div class="navbar-header company-info dropdown">
+                <a data-toggle="dropdown" href="/" class="navbar-brand">
+                    <span class="name">
+                    </span>
+                    <span class="EA_name hide">
+                        @Ecam.Framework.Helper.ProjectName
+                    </span>
+                </a>
+                <ul class="address-ul dropdown-menu">
+                    <li class="dropdown dropdown-submenu sidebar-content">
+                        <div class="addressDiv text-center bg-white text-black p-10">
+                            <div class="p-t-10">
+                                <div class="img"></div>
+                            </div>
+                            <div class="info">
+                                <div style="font-size:15px;" class="name">
+                                    Leisure Cargo India Pvt Ltd
+                                </div>
+                                <div class="address m-t-10 p-b-10">
+                                </div>
+                                <div class="p-t-10 p-b-10 dropdown-submenu">
+                                    <a class="text-black" href="javascript:;" data-toggle="dropdown">
+                                        <u>Change company</u>
+                                    </a>
+                                    <ul class="dropdown-menu companyList"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <button data-sidebar-type="sm" data-sidebar-action="sidebar-toggle" class="navbar-toggle visible-md visible-lg btn-mobile-view" type="button">
+                    <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+                </button>
+            </div>
+            <!-- end navbar-header -->
+            <div class="navbar-header top-menu no-auth-hide">
+                <ul>
+                    <li class="dropdown profile-menu">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:;">
+                            <div class="clearfix"></div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                        </ul>
+                    </li>
+                </ul>
+            </div> 
+        </div>
+    </div>
+    <div class="page-container container-fluid no-padding">
+        <div class="sidebar-wrapper">
+            <div class="sidebar">
+                <div class="sidebar-content">
+                    <ul class="nav sidebar-menu"> 
+                    </ul> 
+                </div>
+            </div> 
+        </div>
+        <div class="clearfix"></div>
+        <div class="page-content">
+            @RenderBody()
+        </div>
+        <div class="clearfix"></div>
+        <div class="footer">
+            <strong>&copy; @DateTime.Now.Year - @Ecam.Framework.Helper.ProjectName</strong>
+        </div>
+    </div>
+    <script src="/js/plugins/slimscroll/jquery.slimscroll.js?v=@_Version"></script>
+    @RenderSection("scripts", required: false)
+    <script type='text/javascript' src='/js/ecam2/ecam2-app.js?v=@_Version'></script>
+    <script type="text/html" id="error-display-template">
+        <div class="alert alert-danger error-alert" style="width:100%;">
+            <p>
+                {{each(i,err) errors}}
+                <span>${ErrorMessage}</span><br />
+                {{/each}}
+            </p>
+            <button type="button" class="close alert-close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+    </script>
+    <script>
+        $(function(){
+            APP.addResponsiveHandler(function(){
+                changeLayoutLeftTop();
+            });
+        });
+    </script>
+</body>
+</html>

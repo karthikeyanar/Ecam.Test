@@ -1,0 +1,94 @@
+<#@ template hostspecific="true" language="C#" #>
+<#@ include file="EF.Utility.CS.ttinclude" #><#@
+ output extension=".cs" #><#
+
+    var efHost = (EfTextTemplateHost)Host;
+    var code = new CodeGenerationTools(this);
+#>
+using System;
+using System.Collections.Generic;
+using Ecam.Framework;
+
+// namespace <#= code.EscapeNamespace(efHost.Namespace) #>
+namespace Ecam.Models
+{
+    public partial class <#= efHost.EntityType.Name #> : BaseEntity<<#= efHost.EntityType.Name #>>
+    {
+<#
+	// Declare the property names that should not be generated on this Entity, but on the BaseEntity
+	string[] excludeProperties = new string[]{"created_date", "created_by", "last_updated_date", "last_updated_by"};
+	
+    var collectionNavigations = efHost.EntityType.NavigationProperties.Where(
+        np => np.DeclaringType == efHost.EntityType
+            && np.ToEndMember.RelationshipMultiplicity == RelationshipMultiplicity.Many);
+
+    // Add a ctor to initialize any collections
+    if (collectionNavigations.Any())
+    {
+#>
+        public <#= code.Escape(efHost.EntityType) #>()
+        {
+<#
+        foreach (var navProperty in collectionNavigations)
+        {
+#>
+            this.<#= code.Escape(navProperty) #> = new List<<#= code.Escape(navProperty.ToEndMember.GetEntityType()) #>>();
+<#
+        }
+#>
+        }
+
+<#
+    }
+        
+    foreach (var property in efHost.EntityType.Properties)
+    {
+#>
+		<#
+		//Exclude properties that should go in BaseEntity
+		bool excludeProperty = excludeProperties.Contains(code.Escape(property));
+		if(!excludeProperty) {
+		// check if this is a primaryKey
+		if( efHost.EntityType.KeyMembers.Select(m => m.Name).FirstOrDefault() != null) { // if this is a PK
+		if (efHost.EntityType.KeyMembers.Count() == 1) {
+			// If there is only one PK, and this property is the one, then exclude it, as it will be included as id on the base entity
+			if(efHost.EntityType.KeyMembers.Single().Name.Equals(code.Escape(property))){
+				excludeProperty = true;
+			}
+		 } else {
+			// If there are more than one PK and this property is one of the PKs, then we need to find which one of the PK properties maps
+			// to the id property on the BaseEntity, and exclude that one. To do that, we have to establish a pattern. Change the following
+			// code based on the Pattern you choose. Currently, we are using the <TableName>id as the primary key of the DB table. eg: For the Fund table, we declare the PK as FundID
+			if(code.Escape(property).Equals(efHost.EntityType.Name + "id")) {
+				excludeProperty = true;
+			}
+		 } // end else
+		 } // end- if this is a PK
+		}
+		#>
+
+		<#if(!excludeProperty) {#>
+
+        <#= Accessibility.ForProperty(property) #> <#= code.Escape(property.TypeUsage) #> <#= code.Escape(property) #> { get; set; }
+<#
+		} // End If- exclude properties
+    }
+
+    foreach (var navProperty in efHost.EntityType.NavigationProperties.Where(np => np.DeclaringType == efHost.EntityType))
+    {
+        if (navProperty.ToEndMember.RelationshipMultiplicity == RelationshipMultiplicity.Many)
+        {
+#>
+        public virtual ICollection<<#= code.Escape(navProperty.ToEndMember.GetEntityType()) #>> <#= code.Escape(navProperty) #> { get; set; }
+<#
+        }
+        else
+        {
+#>
+        public virtual <#= code.Escape(navProperty.ToEndMember.GetEntityType()) #> <#= code.Escape(navProperty) #> { get; set; }
+<#
+        }
+    }
+#>
+    }
+}

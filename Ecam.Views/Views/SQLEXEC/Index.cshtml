@@ -1,0 +1,149 @@
+﻿@using Ecam.Framework
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SQL</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    @Html.JavascriptInclueTag("~/js/plugins/storage/jquery.storageapi-1.0.js")
+    <style>
+        body, .form-control, .btn, .alert {
+            font-family: 'Open Sans', Arial, sans-serif;
+        }
+
+        body {
+            padding: 10px;
+            font-size: 12px;
+        }
+
+        .alert {
+            margin: 0;
+        }
+    </style>
+    <script>
+        function TableModel() {
+            var self=this;
+            this.columns=ko.observableArray([]);
+            this.rows=ko.observableArray([]);
+            this.error=ko.observable("");
+        }
+    </script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <form action="/api/sqlexport/export" method="post">
+                    <!-- ko if: error()!="" -->
+                    <div class="form-group">
+                        <div class="alert alert-danger" role="alert" data-bind="text:error">
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                    <div class="form-group">
+                        <textarea id="sql" name="sql" class="form-control" rows="5" cols="20"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <button id="submit" class="btn btn-sm btn-primary" data-loading-text="Submit">Submit</button>
+                        <button id="export" type="submit" class="btn btn-sm btn-success" style="margin-left: 20px;">Export</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table id="tbl" class="table table-striped table-bordered  table-hover table-condensed">
+                    <thead>
+                        <tr data-bind="foreach: columns">
+                            <th data-bind="text: $data">
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach: rows">
+                        <tr data-bind="foreach: $data">
+                            <td data-bind="text: $data"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        function getLS(key) {
+            return $.localStorage.get(key);
+        }
+        function getSS(key) {
+            return $.sessionStorage.get(key);
+        }
+        function getAuth() {
+            var key="auth";
+            var isRememberMe=getLS("rememberme");
+            if(isRememberMe==true) {
+                return getLS(key);
+            } else {
+                return getSS(key);
+            }
+        }
+        function addAuthHeader(xhr) {
+            //var authToken=getAuth();
+            //if(authToken!=null) {
+            //    xhr.setRequestHeader("Authorization","Bearer "+authToken.access_token);
+            //}
+        }
+        $.ajaxSetup({
+            beforeSend: function(xhr) {
+                addAuthHeader(xhr);
+            },
+            error: function(jqXHR,exception) {
+                $('#submit').button("reset");
+                $('#export').button("reset");
+            }
+        });
+    </script>
+    <script>
+        $(function() {
+            var tbl=new TableModel();
+            ko.applyBindings(tbl);
+            var $btn=$('#submit');
+            $btn.on('click',function() {
+                var param=new Array();
+                param[param.length]={ "name": "key","value": "@HttpContext.Current.Request["key"]" };
+                param[param.length]={ "name": "sql","value": $("#sql").val() };
+                var url="/api/SQLEXPORT/Report";
+                $btn.button('loading');
+                $.ajax({
+                    "url": url,
+                    "cache": false,
+                    "type": "POST",
+                    "data": param
+                }).done(function(json) {
+                    if(json.rows.length>500) {
+                        alert("Total Rows "+json.rows.length+" Please apply limit")
+                    } else {
+                        $btn.button('reset');
+                        tbl.columns.removeAll();
+                        tbl.rows.removeAll();
+                        $.each(json.columns,function(i,col) {
+                            tbl.columns.push(col);
+                        });
+                        $.each(json.rows,function(i,row) {
+                            tbl.rows.push(row);
+                        });
+                    }
+                    tbl.error(json.error);
+                });
+                return false;
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=11; IE=10; IE=9; IE=8; IE=7; IE=EDGE" />
+    @RenderSection("title",required: false)
+    <title>Login - @Ecam.Framework.Helper.ProjectName</title>
+    @{
+        string _Version = string.Empty;
+        string isLocal = System.Configuration.ConfigurationManager.AppSettings["is_local"];
+        string _IsUseMinifier = System.Configuration.ConfigurationManager.AppSettings["is_use_minifier"];
+        if(isLocal == "false") {
+            _Version = System.Configuration.ConfigurationManager.AppSettings["product_version"];
+        }
+        else {
+            _Version = DateTime.Now.ToString("yyyyMMddhhmmss");
+        }
+    }
+    @{
+        if(isLocal == "false") {
+            <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
+            <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+            <script>window.jQuery||document.write('<script src="/js/jquery/jquery-1.11.2.min.js">\x3C/script>')</script>
+            <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+            <script>window.$.validator||document.write('<script src="/js/jquery/jquery.validate.min.js">\x3C/script>')</script>
+            <script src="//ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+            <script>window.$.tmpl||document.write('<script src="/js/jquery/jquery.tmpl.min.js">\x3C/script>')</script>
+        }
+        else {
+            <script src="/js/jquery/jquery-1.11.2.min.js"></script>
+            <script src="/js/jquery/jquery.validate.min.js"></script>
+            <script src="/js/jquery/jquery.tmpl.min.js"></script>
+        }
+    }
+    <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="/css/bootstrap-theme.min.css" />
+    <link type="text/css" rel="stylesheet" href="/css/plugins/font-awesome/font-awesome.min.css" />
+    <link type="text/css" rel="stylesheet" href="/css/pages/agent-registration.css" />
+    <link type="text/css" rel="stylesheet" href="/css/pages/group-registration.css" />
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
+    <script src="~/js/knockout/knockout-3.1.0.js"></script>
+    <script src="~/js/knockout/knockout.mapping-latest.js"></script>
+    @Styles.Render("~/bundles/css")
+    @Scripts.Render("~/bundles/flot")
+    @Scripts.Render("~/bundles/plugins")
+    <style>
+        .form-group > .col-md-3 > .error {
+            color: red;
+        }
+
+        .form-group > .col-md-3 > .input-icon > .error {
+            color: red;
+        }
+
+        html, body {
+            height: 100%;
+        }
+    </style>
+    @RenderSection("header",required: false)
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,900' rel='stylesheet' type='text/css'>
+    <link type="text/css" rel="stylesheet" href="/css/newsite.css" />
+</head>
+<body class="public-page @(Ecam.Framework.Helper.IsDVL == true ? "is_dvl" : "")">
+    <div class="height-100">
+        <div class="col-md-12 no-padding height-100">
+            <div class="col-md-7 no-padding height-100">
+                <!-- header -->
+                <div class="">
+                    <img class="ecamslogo" align="left" src="/img/ecamslogo.png" height="104" width="272">
+                </div>
+                <!-- end header -->
+            </div>
+            <div class="col-md-5 no-padding height-100">
+                <div class="login-screen">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </div>
+    @RenderSection("scripts",required: false)
+</body>
+</html>

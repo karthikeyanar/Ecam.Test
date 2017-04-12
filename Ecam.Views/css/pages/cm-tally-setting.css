@@ -1,0 +1,27 @@
+﻿.tab-content{
+	display : inline-block;
+	width: 100%;
+}
+.agentLedgerTbl,.rateSheetTbl{
+	width:600px;
+	margin:auto;
+	padding:5px;
+}
+.agentLedgerTbl > tbody > tr > td,.rateSheetTbl > tbody > tr > td {
+	vertical-align: middle;
+	white-space: nowrap;
+}
+input.ledger_name{
+	border:0;
+	border-bottom: 1px solid #ccc;
+	border-radius: 0;
+	background: none;
+    box-shadow: none;
+	width:300px;
+}
+.rateSheetTbl > tbody > tr > td{
+	border-top: none;
+}
+.rateSheetTbl > thead > tr > td{
+	border-bottom: 1px solid #ccc;
+}

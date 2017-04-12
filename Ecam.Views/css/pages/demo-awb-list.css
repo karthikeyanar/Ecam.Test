@@ -1,0 +1,263 @@
+﻿.awb-upload1 .view a{
+	text-decoration: underline;
+}
+.awb-upload1 .inputs table > tbody > tr > td{
+	padding-right:5px;
+	padding-bottom:5px;	
+}
+.m-t-7{
+    margin-top:7px;
+}
+/* cargo uplift */
+
+.font15,.font15 > span{
+    font-size: 15px;
+}
+.font17{
+    font-size: 17px;
+}
+.bold{
+    font-weight : bold;
+}
+ul[class^='flightList_'] li{
+    font-size : 13px;
+    list-style: none;
+    line-height:20px;
+}
+.awb-upload1 .col1{
+    color:#58697B;
+}
+.text-red{
+    color:red;
+}
+.awb-upload1 .col1 p{
+    font-size: 15px;
+    text-align: justify;
+}
+.text-underline{
+    text-decoration: underline;
+}
+
+/* awb-print.css*/
+
+.invoice_bg{	
+    background-image: url("../../img/invoice_bg1.jpg");
+	background-repeat:no-repeat;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	/*line-height:16px;*/
+    line-height:38px;
+	color:#333333;    
+     /*background-position: -102px -2px;*/
+	}
+.invoice_bg_print{
+	background-image:url(../print/images/invoice_bg.jpg);
+	background-repeat:no-repeat;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	line-height:16px;
+	color:#333333;
+	background-position:-32px 0;
+	}
+.left_barcode{
+	width:67px;    
+	margin:402px auto 0 auto;
+	height:50px;
+	}
+.top_barcode{
+	height:50px;
+	}
+h1{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:24px;
+	font-weight:bold;
+	margin:0 0 0 0;
+	}
+h3{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:16px;
+	font-weight:bold;
+	margin:3px 0 0 0;
+	}
+.invoice_num{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:22px;
+	font-weight:bold;
+	}
+.invoice_heading{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	font-weight:bold;
+	}
+.invoice_heading01{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	font-weight:bold;
+	letter-spacing:-.70px;
+	}
+.invoice_heading02{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	font-weight:bold;
+	line-height:14px;
+	}
+.text_small{
+	font-size:12px;
+	/*line-height:22px;*/
+	font-weight:bold;
+	}
+.text_small01{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:11px;
+	font-weight:bold;
+	/*text-align:justify;*/
+	line-height:13px;
+	}
+.text_small02{	
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:11px;
+	font-weight:bold;
+	line-height:14px;
+	letter-spacing:-1px;
+	}
+.text_small03{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:11px;
+	font-weight:bold;
+	/*text-align:justify;*/
+	line-height:9px;
+	}
+.address_holder{
+	width:100%;
+	height:16px;
+	/*overflow:hidden;*/
+	}
+.address_holder1{
+	width:100%;
+	height:14px;
+	/*overflow:hidden;*/
+	}
+.issuing_carrier_holder{
+	width:100%;
+	height:87px;
+	margin:0;
+	overflow:hidden;
+	}
+.airbill_issue_holder{
+	/*width:100%;
+	height:56px;
+	margin:0;
+	overflow:hidden;*/
+	}
+.account_info_holder{
+	width:100%;
+	height:146px;
+	margin:0;
+	overflow:hidden;
+    line-height:14px;
+	}
+.other_charges_holder{
+	width:100%;
+	height:42px;
+	margin:0;
+	overflow:hidden;
+	}
+.shipper_certifi_holder{
+	width:100%;
+	height:75px;
+	margin:0;
+	overflow:hidden;
+	}
+.carrier_holder{
+	width:100%;
+	height:38px;
+	margin:0;
+	overflow:hidden;
+	}
+.awb-top-left{
+	height:25px;
+	margin-top:25px;
+}
+.shipper-td{
+	height:15px;
+}
+.shipper-whole-td{
+	height:125px;
+}
+.shipper-right-side{
+	height:130px;
+}
+.consignee-td{
+	height:130px;
+}
+.consignee-right-side{
+	height:130px;
+}
+.issuing-td{
+	height:98px;
+}
+.invoice_bg .test {
+    line-height: 12px;
+}
+
+.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
+    min-height: 1px;
+    padding-left: 12px;
+    padding-right: 15px;
+    position: relative;
+}
+.text_line_height{	
+	line-height:14px;
+	}
+
+
+/* CSS Document */
+.tc_outer{
+	width:20.5cm;
+	height:30cm;
+	padding-top: 1cm;
+	/*padding-left: 1cm;*/
+    padding-left: 175px;
+	background-color:#FFFFFF;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:9px;
+	color:#000000;
+	text-align:justify;
+	clear:both;
+    margin-top:-320px;
+}
+#tc_wrapper{
+	width:19.8cm;
+	height:29cm;
+}
+h3{
+	font-size:16px;
+	font-weight:bold;
+	color:#000000;
+	margin:10px 0 5px 0;
+	text-align:center;
+}
+h4{
+	font-size:15px;
+	font-weight:bold;
+	color:#000000;
+	margin:2px 0 2px 0;
+	text-align:center;
+}
+.textBold{
+	font-weight:bold;
+	color:#666666;
+}
+.invoice_tc_bg{
+	border:1px solid #333333;
+}
+
+.tc_page_holder{
+	width:19cm;
+	height:29cm;
+	/* height:1600px;
+	overflow:hidden;*/
+}
+.tc_linebreak{
+	border-bottom:1px solid #666666;
+}

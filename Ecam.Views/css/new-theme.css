@@ -1,0 +1,606 @@
+.table.table-gray.table-bordered,
+.table.table-gray.table-bordered > tbody > tr {
+    border: 1px solid #e6e6e6 !important;
+}
+
+.header .navbar-toggle {
+    margin-left: 0px !important;
+}
+
+.page-title {
+    /*text-decoration: underline;*/
+    font-weight: 500;
+    padding-top: 15px !important;
+}
+
+.awb_hand {
+    position: relative;
+    top: -10px;
+}
+
+.inline {
+    display: inline-block;
+    position: absolute;
+    top: -35px;
+    width: 52%;
+    left: 34%;
+}
+
+tr[id^="Edit"] .inline {
+    position: relative;
+    top: 0px;
+}
+
+form#frmAWBLot .form-group {
+    margin-bottom: 10px;
+}
+
+.table-bordered.table-gray.table > thead > tr > th {
+    background: #fff;
+    border-color: #e7e6e6;
+    color: #333;
+    filter: none !important;
+}
+
+.table-gray.table-striped > tbody > tr,
+.table-gray.table-striped > tbody > tr:nth-of-type(2n+1) {
+    background: #fff;
+}
+
+.table-gray.table-hover > tbody > tr:hover {
+    background-color: #f5f5f5;
+}
+
+.page-header {
+    margin-bottom: 0px !important;
+    padding-bottom: 10px;
+}
+
+.p-0 {
+    padding: 0px;
+}
+
+.text-u,
+.text-u:hover {
+    text-decoration: underline;
+}
+
+.input-115 {
+    width: 115px !important;
+}
+
+.input-130 {
+    width: 130px !important;
+}
+
+.input-70 {
+    width: 70px !important;
+}
+
+.input-40 {
+    width: 40px !important;
+}
+
+.tbl-awb-request > tbody > tr > td,
+#awblotTable > thead > tr > th,
+.addition-container table > thead > tr > th {
+    text-align: center;
+}
+
+#awblotCurrentStatus > thead > tr > th {
+    text-align: center;
+}
+
+.ms2side__select select[multiple] {
+    width: 100%;
+}
+
+.ms2side__header input.small.form-control {
+    display: none;
+}
+
+.ms2side__select .ms2side__header {
+    height: 0px !important;
+}
+
+.ms2side__options,
+.ms2side__updown {
+    padding-top: 0px !important;
+}
+
+ul.new-tab-view li,
+#StockContent ul.nav li {
+    list-style: none;
+    float: left;
+    font-size: 14px;
+}
+
+    ul.new-tab-view li a,
+    #StockContent ul.nav li a {
+        color: #333;
+        padding: 0;
+        margin-right: 10px;
+        margin-left: 10px;
+    }
+
+    #StockContent ul.nav li.active a,
+    #StockContent ul.nav li:hover a {
+        text-decoration: underline;
+        background: #f1f3f6;
+        border: 1px solid #f1f3f6;
+    }
+
+    ul.new-tab-view li.active a,
+    ul.new-tab-view li:hover a,
+    ul.new-tab-view li.active a:hover,
+    ul.new-tab-view li.active a:focus {
+        text-decoration: underline;
+        background-color: transparent !important;
+        border: 1px solid transparent;
+        color: #333;
+    }
+
+    ul.new-tab-view li:not(:last-child),
+    #StockContent ul.nav li:not(:last-child) {
+        border-right: 1px solid #999;
+    }
+
+.rm-background {
+    background: transparent;
+    border: none;
+}
+
+
+/*ul.new-tab-view{
+    position: absolute;
+    top:-140px;
+}*/
+
+ul.new-tab-view li a {
+    background: none;
+}
+
+
+/* table scroll */
+
+table.scroll {
+    width: 100%;
+    border-spacing: 0;
+}
+
+    table.scroll th,
+    table.scroll td,
+    table.scroll tr,
+    table.scroll thead,
+    table.scroll tbody {
+        display: block;
+    }
+
+
+        /*table.scroll thead tr {
+    width: 97%;
+    /* minus scroll bar width 
+    width: -webkit-calc(100% - 16px);
+    width:    -moz-calc(100% - 16px);
+    width:         calc(100% - 16px);
+}*/
+
+        table.scroll tr:after,
+        table.scroll th:after {
+            content: ' ';
+            display: block;
+            visibility: hidden;
+            clear: both;
+        }
+
+    table.scroll tbody {
+        max-height: 176px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+        table.scroll tbody td,
+        table.scroll thead th {
+            width: 14%;
+            float: left;
+            border-right: 1px solid #333;
+        }
+
+.scroll thead tr th {
+    height: 30px;
+    line-height: 20px;
+    /*text-align: left;*/
+}
+
+.scroll thead tr {
+    border: 1px solid #bcbcbc !important;
+}
+
+.scroll tbody td:last-child,
+thead th:last-child {
+    border-right: none !important;
+}
+
+table.scroll tbody td {
+    padding: 0px;
+}
+
+
+/*
+.air-sel-cnt > .child-air-sel-cnt > .air-row, .air-sel-cnt > .air-row{
+    width:95px;
+}
+*/
+.well-sm > .air-sel-cnt {
+    float: left;
+}
+
+@media (min-width: 992px) {
+    /* sidebar-user */
+    .sidebar-sm .sidebar .sidebar-user > .info {
+        background-color: #f1f3f6;
+        /*f8f8f8*/
+    }
+}
+
+
+/* new GUI AWB Lot*/
+
+.border-bottom-none {
+    border-bottom: none;
+}
+
+.border-top-none {
+    /*border-top: none;*/
+    border: none;
+}
+
+.tab-content {
+    background: transparent;
+    border: none;
+    padding: 0px;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #dbdbdb;
+}
+
+.is-agent-bdy .footer {
+    background: #fff;
+}
+
+
+/*For stylish cjeckbox */
+
+.material-switch > input[type="checkbox"] {
+    display: none;
+}
+
+.material-switch > label {
+    cursor: pointer;
+    height: 0px;
+    position: relative;
+    width: 40px;
+}
+
+    .material-switch > label::before {
+        background: rgb(84, 115, 137);
+        box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        content: '';
+        height: 13px;
+        margin-top: -6px;
+        position: absolute;
+        opacity: 0.6;
+        transition: all 0.4s ease-in-out;
+        width: 25px;
+    }
+
+    .material-switch > label::after {
+        background: rgb(255, 255, 255);
+        border-radius: 16px;
+        box-shadow: 0px 0px 5px rgba(84, 115, 137, 0.3);
+        content: '';
+        height: 15px;
+        left: -4px;
+        margin-top: -8px;
+        position: absolute;
+        top: 1px;
+        transition: all 0.3s ease-in-out;
+        width: 15px;
+    }
+
+.material-switch > input[type="checkbox"]:checked + label::before {
+    background: inherit;
+    opacity: 0.5;
+}
+
+.material-switch > input[type="checkbox"]:checked + label::after {
+    background: inherit;
+    left: 12px;
+}
+
+.table tbody tr.selected-row,
+.table tbody tr.selected-row:hover td,
+.table tbody tr.selected-row:active td {
+    background-color: #f6f5f5 !important;
+}
+
+#nonProductiveAgent table thead th:last-child {
+    padding-right: 0px;
+}
+
+.table-responsive > table > tbody > tr > td {
+    margin-top: 10px;
+    padding: 7px; /* NEWTHEME */
+}
+
+div.alert-danger {
+    display: inline-block;
+}
+
+    div.alert-danger p {
+        float: left;
+        margin-top: 5px;
+    }
+
+    div.alert-danger .alert-close {
+        float: left;
+    }
+
+.cls-reduce-width {
+    width: 6.1%;
+}
+/* AWBs*/
+.m-l-0 {
+    margin-left: 0px !important;
+}
+
+.awbs .seperator {
+    border-right: 1px solid #428bca;
+    min-height: 420px;
+}
+
+.p-l-0 {
+    padding-left: 0px !important;
+}
+
+table.table-spaceless > tbody > tr > td {
+    padding: 2px 0px;
+    border: none;
+}
+
+.awbs #awbStockTable {
+    width: 400px;
+}
+
+.table.table-gray.table-bordered > tbody > tr > td > .table.table-gray.table-bordered > thead > tr > th {
+    background: #eee;
+}
+
+.tab-content.tab-content-border {
+    border-bottom: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+/* TABLE COLOR FIXED - NEWTHEME */
+.table-bordered.table-gray.table > thead > tr > th, #tbody_groupChildTable > table > thead > tr > th {
+    background-color: #f2f2f2 !important;
+    color: #333 !important;
+}
+
+.table-gray > tbody > tr {
+    background: #fff !important;
+}
+
+    .table-gray > tbody > tr:hover {
+        background: #f5f5f5 !important;
+    }
+/* END TABLE COLOR */
+/* AGENT/ADMIN BACKGROUND - NEWTHEME */
+
+.page-container .page-content,
+.page-container .footer {
+    background: #f1f3f6;
+    color: #000;
+}
+
+.is-agent-bdy .page-container .page-content,
+.is-agent-bdy .page-container .footer {
+    background: #fff;
+    /*f1f3f6 F1F3F6 f3f3f3;*/
+    color: #000;
+}
+
+.is-agent-bdy .page-container .page-content,
+.is-agent-bdy .page-container .footer {
+    margin-top: 0px;
+    padding-top: 10px;
+    background: #fff;
+}
+
+.is-agent-bdy .page-container .menu-bar,
+.is-agent-bdy .page-container .sf-menu > li > a {
+    background: #fff !important;
+}
+
+.page-container .menu-bar, .page-container .sf-menu > li > a {
+    background: #f1f3f6 !important;
+}
+
+.is-agent-bdy .page-title {
+    text-decoration: none !important;
+    margin-left:-15px;
+    padding-top:5px !important;
+    color: #000 !important;
+}
+
+.header {
+    /*background: #f8f8f8;*/
+    background: #f1f3f6;
+    /*F7F9FA*/
+    color: #000;
+}
+
+    .header .navbar-toggle {
+        background-color: #fff;
+        /* f8f8f8 */
+        border-left: 1px solid #ccc;
+    }
+
+        .header .navbar-toggle:hover,
+        .header .navbar-toggle:focus {
+            background-color: #fff;
+            /*f8f8f8*/
+        }
+
+    .header .search-form {
+        background: #fff;
+        border-right: 1px solid #ccc !important;
+        border-left: 1px solid #ccc !important;
+        width: calc(100% - 410px) !important;
+    }
+
+.is-agent-bdy .sidebar {
+    background: #fff !important;
+}
+
+.sidebar {
+    background: #f1f3f6;
+    /*f8f8f8*/
+    color: #ffffff;
+    border-right: solid 1px #dbdbdb;
+}
+
+.is-agent-bdy .sidebar-menu.nav > li > a {
+    background-color: #fff !important;
+}
+
+.sidebar-menu.nav > li > a {
+    border-top: 1px solid #dbdbdb !important;
+    /*background-color: #f8f8f8;*/
+    background-color: #f1f3f6;
+    /* f7f9fa */
+    color: #495c6f;
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.is-agent-bdy .page-container .menu-bar,
+.is-agent-bdy .page-container .sf-menu > li > a {
+    background: #fff !important;
+    /*f1f3f6 F1F3F6 f3f3f3*/
+    color: #000;
+}
+
+.is-agent-bdy .border-white {
+    border: none !important;
+    margin-bottom: 1px;
+    background: #fff !important;
+    padding-bottom: 0px;
+    padding-top: 0px;
+}
+
+.border-white {
+    border: 1px solid #DBDBDB;
+    background: #fff !important;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+.no-scroll {
+    overflow: hidden !important;
+}
+.no-x-scroll {
+    overflow-x: hidden !important;
+}
+.no-y-scroll {
+    overflow-y: hidden !important;
+}
+
+body {
+    background: #f1f3f6;
+}
+/* END AGENT/ADMIN BACKGROUND */
+.total-width{
+	width:200px;
+	height:50px;
+}
+.label-width{
+	width:80px;
+}
+.input-width{
+	width:110px;
+}
+.input-80{
+	width:80px !important;
+}
+.input-110{
+	width:115px !important;
+	padding-right: 5px;
+}
+
+.logo_icon_spn > .logo_icon {
+	height: 25px;
+	padding-right: 5px;
+	padding-top: 2px;
+	vertical-align: top;
+	width: 50px;
+}
+.table-responsive > table#cargoTable > tbody > tr > td {
+    padding: 5px 15px; /* NEWTHEME */
+}
+.table-responsive > table#cargoTable > tbody > tr > td > span.logo_icon_spn{
+    vertical-align: middle !important;
+}
+table#cargoTable .tree-expand.ex-minus,table#cargoTable .tree-expand.ex-plus,
+table#currentStockSummaryTable .tree-expand.ex-minus,table#currentStockSummaryTable .tree-expand.ex-plus,
+table#airlineStockSummaryTable .tree-expand.ex-minus,table#airlineStockSummaryTable .tree-expand.ex-plus{
+    height:25px;
+}
+table#cargoTable .tree-expand,table#currentStockSummaryTable .tree-expand,table#airlineStockSummaryTable .tree-expand{
+    background-image: url("../img/excol-1.png");
+}
+.table > tbody > tr > td {
+    vertical-align: middle;
+}
+.width-230{
+    width:230px !important;
+    padding-bottom:10px !important;
+}
+.width-175{
+    width:175px !important;
+}
+.metro-checkbox > label > span.check{
+    position:relative;
+    left:0px;
+    margin-right: 10px;
+}
+/*.flex-grow{
+    flex-grow:100;
+    flex-shrink: 1;
+    flex-basis: 0%;
+}
+.border-white.header {
+    display:flex;
+    float:left;
+    width:100%;
+    margin: 10px 0;
+    position:relative;
+}*/
+.border-white.header > div:first-child{
+    width: 15%;
+    float: left;
+}
+.border-white.header > div:nth-child(2){
+    width: 84%;
+    float: left;
+    height: 50px;
+}
+.left-menu-view .border-white.header > div:first-child{
+    width: 25% !important;
+}
+.left-menu-view .border-white.header > div:nth-child(2){
+    width: 74% !important;
+}

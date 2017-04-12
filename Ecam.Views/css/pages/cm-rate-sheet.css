@@ -1,0 +1,144 @@
+﻿
+.table.excel-tbl {
+    font-family: "Open Sans",Arial;
+    font-size: 13px;
+    margin: 0 !important;
+}
+
+.excel-tbl > thead > tr > th {
+    white-space: nowrap;
+    background: #F1F1F1;
+}
+
+.excel-tbl > thead > tr > th,
+.excel-tbl > tbody > tr > td {
+    padding: 0 !important;
+}
+
+
+.excel-tbl > thead > tr > th > .col-cnt {
+    padding: 5px;
+}
+
+.excel-tbl > thead > tr > th.dynamic-col > .col-cnt {
+    position: relative;
+}
+
+.excel-tbl > thead > tr > th.dynamic-col > .col-cnt > .col-input {
+    left: 4px;
+    position: absolute;
+    right: 4px;
+    top: 2px;
+}
+
+.excel-tbl > thead > tr > th.dynamic-col > .col-cnt > .col-input > .form-control {
+    border-radius: 0;
+    box-shadow: none;
+    font-size: 12px;
+    height: 24px;
+    line-height: 1.2;
+    margin: 0;
+    padding: 5px;
+    transition: none 0s ease 0s;
+}
+
+/*
+.excel-tbl > tbody > tr:hover {
+	background-color: #f5f5f5 !important;
+}
+*/
+
+.fre-bdy .DTFC_LeftBodyLiner {
+    width: auto !important;
+    overflow: hidden !important;
+}
+
+.excel-tbl > tbody > tr > td > .col-cnt > .form-control {
+    border: 0 none;
+    border-radius: 0;
+    box-shadow: none;
+    height: 24px;
+    line-height: 1.2;
+    font-size: 13px;
+    margin: 0;
+    padding: 5px;
+    transition: none 0s ease 0s;
+    /*background-color: inherit;*/
+}
+
+.excel-tbl > tbody > tr > td.weight-col > .col-cnt > .form-control {
+    text-align: right;
+}
+
+.excel-tbl > tbody > tr > td > .col-cnt > .form-control:focus {
+    border: solid 1px #0503F9;
+    border-radius: 0;
+    outline: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+/*.excel-tbl.dataTable.fixedHeader-floating {
+	top: 76px !important;
+}*/
+
+
+.cm-rate-sheet .popover {
+    max-width: none !important;
+}
+
+.cm-rate-sheet .popover > .popover-content {
+    color: red;
+}
+
+.spn-weight {
+    padding-left: 5px;
+}
+
+.red-col {
+    background-color: red;
+    color: white;
+}
+
+.cm-rate-sheet .popover > .popover-content .rate-value-info {
+    color: #333;
+    font-size: 12px;
+}
+
+.sheet-detail {
+    left: 320px;
+    position: absolute;
+    top: 3px;
+    z-index: 1;
+}
+
+.sheet-detail p span.from-to {
+    /*color:#ccc;*/
+    font-size: 11px;
+}
+
+.hiddenfile {
+    width: 0px;
+    height: 0px;
+    overflow: hidden;
+}
+
+.charge-code {
+    padding: 20px;
+    font-size: 17px;
+}
+
+.sec-table {
+    padding-left: 10px;
+}
+
+.logo_m_icon {
+    display: block;
+    height: 40px;
+    width: 110px;
+}
+
+.logo_m_icon img {
+    height: 100%;
+    width: 100%;
+}

@@ -1,0 +1,30 @@
+﻿.awbs .seperator{
+	border-right:1px solid #428bca;
+	min-height: 420px;
+}
+.ecam2 ul.searchbar{
+	height:30px;
+}
+.ecam2 ul.searchbar > li{
+	float:left;
+	font-size:14px;
+	list-style: none;
+	padding: 0 10px;
+	cursor: pointer;
+}
+.ecam2 ul.searchbar li:not(:last-child){
+	border-right: 1px solid #ddd;
+}
+.p-l-0{
+	padding-left:0px !important;
+}
+.m-l-0{
+	margin-left:0px;
+}
+table.table-spaceless > tbody > tr > td{
+	padding:2px 0px;
+	border:none;
+}
+.awbs #awbStockTable{	
+	width:400px;
+}

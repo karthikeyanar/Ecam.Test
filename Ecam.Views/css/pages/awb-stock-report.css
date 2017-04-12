@@ -1,0 +1,161 @@
+﻿body {
+    overflow: hidden;
+}
+.filter-box {
+    bottom: 50px;
+    overflow: auto;
+    padding-right: 5px;
+    position: fixed;
+    top: 138px;
+    width: 185px;
+    z-index: 0;
+}
+.additional-cnt {
+    position: relative;
+    z-index: 1;
+    background: #fff;
+}
+.form-inline.rep-fil-form .form-group {
+     float:left;
+     margin-right: 15px;
+ }
+.page-header .page-title {
+	margin: 0;
+	font-size: 20px;
+	float:left;
+    font-weight: 400;
+}
+.filter-panel > .panel-heading  {
+    padding: 7px;
+}
+.filter-panel > .panel-heading > .panel-title {
+    font-size: 13px;
+}
+.filter-panel > .panel-body {
+    padding: 7px;
+}
+.filter-panel .radio, .filter-panel .checkbox {
+    margin-bottom: 10px;
+    margin-top: 0;
+}
+.filter-panel .list-group {
+       margin-bottom: 0;
+    margin-top: 0;
+}
+.detail-mode .page-container > .page-content {
+    min-height: 0 !important;
+    padding-bottom: 0;
+}
+.detail-mode .detail-grid-box > .header-tool {
+    height: 7px;
+    background: #ddd;
+    margin-bottom: 15px;
+    position:relative;
+}
+.detail-mode .detail-grid-box > .header-tool > .close-btn {
+    background: #ddd;
+    position: relative;
+    text-align: center;
+    width: 50px;
+    height: 15px;
+    margin: 0 auto;
+    cursor: pointer;
+}
+.detail-mode .detail-grid-box > .header-tool > .close-btn > i {
+    font-size: 16px;
+    left: 20px;
+    position: absolute;
+    top: 0;
+}
+.summary-table-cnt {
+    height: 200px;
+    overflow: auto;  
+    margin-bottom: 10px;
+}
+.detail-grid-box {
+    display: none;
+}
+.detail-mode .detail-grid-box {
+    display: block;
+}
+.detail-mode .detail-grid-box .detail-table-cnt {
+    height: 200px;
+    overflow: auto;
+    padding-right: 5px;
+    margin-bottom: 10px;
+}
+.key-col {
+    width: 30%;
+    overflow: hidden;
+}
+.amount-col {
+	width: 12%;
+    overflow: hidden;
+}
+.shipments-col {
+	width: 9%;
+    overflow: hidden;
+}
+.table > tbody > tr.select-row > td,
+.table > tbody > tr.select-row:hover > td,
+.table > tbody > tr.select-row:focus > td
+{
+    background: green;
+    color: white;
+}
+.airline-col {
+    width: 40%;
+}
+
+.number-col {
+    width: 12%;
+}
+
+.child-row-cnt {
+    padding: 10px 20px !important;
+    background: #fff;
+}
+
+.child-row-cnt > table.table {
+     margin-bottom: 0 !important;
+     width: 70%;
+    }
+.child-row-cnt > table.table > tbody > table.table {
+    margin-bottom: 0 !important;
+    }
+#groupChildTable.table > tbody > tr > td {
+    border-top: 0;
+}
+
+#groupChildTable.table > tbody > tr > td {
+    border-right: solid 1px #ddd;
+}
+
+#groupChildTable.table > tbody > tr > td:last-child {
+    border-right: 0;
+}
+
+#groupChildTable.table > tbody > tr > td.airline-col {
+    padding-left: 25px;
+}
+
+.img-compare {
+    background-image: url("../../img/compare.png");
+    background-repeat: no-repeat;
+    float: left;
+    height: 26px;
+    width: 26px;
+}
+.img-compare.check {
+    background-image: url(../../img/compare-orange.png);
+}
+@media (min-width: 992px) {
+	#groupkeylist.autofix_sb.bottom.fixed {
+		position: fixed;
+		top: 90px;
+		width: 170px;
+	}
+}
+.multiselect-container.dropdown-menu {
+    z-index: 999999999;
+} 

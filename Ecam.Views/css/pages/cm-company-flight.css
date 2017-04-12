@@ -1,0 +1,32 @@
+﻿.acc-dimension .additional-flight-info {
+     padding-bottom: 5px;
+    }
+.additional-flight-info  .input-group-addon {
+ font-size: 13px;
+    padding-bottom: 4px;
+    width: 45px;
+    }
+.select-name{
+     padding: 0px 0px;
+}
+.airport-span{
+    font-size: 11px;
+    color:#d9c9c9;
+}
+.airport-pair-odd{
+    /*background-color:aliceblue;*/
+}
+.airport-pair-even{
+    background-color:aqua;
+}
+#tblSettings > tbody > tr.apply-bg {
+    background: white;
+}
+
+#tblSettings > tbody > tr.apply-bg:nth-child(4n+1) {
+    background: #eee;
+}
+
+#tblSettings > tbody > tr.apply-bg:nth-child(4n+2) {
+    background: #eee;
+}

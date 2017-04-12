@@ -1,0 +1,251 @@
+﻿.is_flight_book .page-container.container,
+.additional-cnt.page-container.container {
+    display: none !important;
+}
+
+.is_flight_book .additional-cnt.page-container.container {
+    display: block !important;
+}
+
+.nav-tabs>li.active {
+    font-weight: 600;
+}
+
+#routeTabs>.nav-tabs>li {
+    position: relative;
+}
+
+#routeTabs>.nav-tabs>li>a {
+    padding-left: 30px;
+    padding-right: 5px;
+}
+
+#routeTabs>.nav-tabs>li.active>a {
+    background: #428bca;
+    color: #fff;
+}
+
+#routeTabs>.nav-tabs {
+    border-bottom: 1px solid #428bca;
+}
+
+.chk-select-route {
+    left: 8px;
+    position: absolute;
+    top: 6px;
+    z-index: 1;
+}
+
+.table-margin-free {
+    margin-bottom: 0px !important;
+}
+
+.ui-autocomplete {
+    max-height: 200px;
+}
+
+.sta-det-tbl>tbody>tr>td {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0 5px 5px 0;
+    white-space: nowrap;
+}
+
+.datepicker table tr td.disabled,
+.datepicker table tr td.disabled:hover {
+    color: #999;
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+.flight-search-box {
+    display: none;
+}
+
+.flight-box-lnk {
+    background: #333 none repeat scroll 0 0;
+    border-radius: 5px 5px 0 0;
+    bottom: 0;
+    color: #fff;
+    padding: 5px 10px;
+    position: fixed;
+    right: 100px;
+    cursor: pointer;
+    z-index: 9999999;
+}
+
+.show-fsbox .flight-search-box {
+    display: block;
+}
+
+.show-fsbox .flight-book-box,
+.show-fsbox .flight-book-lnk {
+    display: none;
+}
+
+.rou-sta-box1 {
+    border: 1px solid #ddd;
+    margin-bottom: 5px;
+    padding: 0;
+}
+
+.rou-sta-row {
+    margin-bottom: 5px;
+    padding: 5px;
+    display: inline-block;
+}
+
+.rou-sta-box1 {
+    background-color: #f5f5f5;
+}
+
+.rou-sta-box1:nth-child(odd) {
+    background-color: #fff;
+}
+
+.rou-sta-box1>.rou-sta-row {
+    border-top: 2px dotted #c6c6c6;
+}
+
+.rou-sta-box1>.rou-sta-row:first-child {
+    border-top: 0;
+}
+
+.rou-sta-row>.sta-det {
+    position: relative;
+}
+
+.fli-col,
+.fli-date-col,
+.fli-station-col,
+.fli-status-col {
+    float: left;
+    position: relative;
+}
+
+.fli-col {
+    margin-right: 10px;
+    width: 85px;
+}
+
+.fli-date-col {
+    margin-right: 10px;
+    width: 130px;
+}
+
+.fli-station-col {
+    margin-right: 10px;
+    width: 210px;
+}
+
+.fli-status-col {
+    width: 160px;
+}
+
+.ecam2 #tblShipmentItemDetails>tbody>tr>td {
+    text-align: right;
+}
+
+.ecam2 #tblShipmentItemDetails {
+    margin-bottom: 5px;
+}
+
+.ecam2 .grwt-info .form-control {
+    width: 73px;
+    padding-right: 5px;
+    font-size: 12px;
+}
+
+.ecam2 .tbl-charge-info>thead>tr>th,
+.ecam2 .tbl-charge-info>tbody>tr>td {
+    white-space: nowrap;
+}
+
+.ecam2 .rou-sta-row {
+    width: 100%;
+}
+
+@media (min-width: 992px) {
+    .fb-content>.fb-col1,
+    .fb-content>.fb-col2,
+    .fb-content>.fb-col3 {
+        float: left;
+        padding: 0 5px;
+    }
+    .fb-content>.fb-col1 {
+        width: 365px;
+        padding-left: 0;
+        padding-right: 0;
+    }
+    .fb-content>.fb-col2 {
+        width: 445px;
+    }
+    .fb-content>.fb-col3 {
+        padding-left: 0;
+        padding-right: 0;
+        width: 370px;
+    }
+    .ecam2 #tblShipmentItemDetails>tbody>tr>td>.form-control {
+        width: 50px;
+        float: right;
+    }
+    .ecam2 .tbl-charge-info>tbody>tr>td>.form-control {
+        width: 60px;
+        float: right;
+        text-align: right;
+    }
+}
+
+
+/* fb space confirm */
+
+.fb-space-confirm .fb-space-confirm-detail {
+    width: 375px;
+    border-right: solid 1px #f5f5f5;
+    float: left;
+    padding-left: 15px;
+}
+
+.fb-space-confirm .fb-content {
+    width: auto;
+    float: left;
+}
+
+.fb-space-confirm .fb-content>.fb-col3 {
+    display: none !important;
+}
+
+.fb-space-confirm #spacePendingTabsList>li>a {
+    padding: 10px;
+}
+
+.space-confirm-lnk {
+    cursor: pointer;
+}
+
+.space-confirm-lnk {
+    cursor: pointer;
+}
+
+.fb-space-confirm .sticky-wrapper.is-sticky {
+    float: left;
+}
+
+.fb-space-confirm .sticky-wrapper .fb-content {
+    position: relative !important;
+}
+
+.fb-space-confirm .sticky-wrapper.is-sticky .fb-content {
+    position: fixed !important;
+    width: auto !important;
+}
+
+.adhoc-tabs.nav-tabs>li.active>a,
+.adhoc-tabs.nav-tabs>li.active>a:focus,
+.adhoc-tabs.nav-tabs>li.active>a:hover {
+    background: #428bca;
+    color: #fff;
+}
+
+
+/* end fb space confirm */

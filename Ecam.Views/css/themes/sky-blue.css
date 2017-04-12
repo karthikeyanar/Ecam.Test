@@ -1,0 +1,111 @@
+/* body */
+body {
+  background: #ffffff;
+}
+body.page-boxed {
+  background: #32353e;
+}
+/* page container */
+.page-container .page-content,
+.page-container .footer {
+  background: #ffffff;
+  color: #333333;
+}
+.page-boxed .page-container.container {
+  border-left: solid 0 #272930;
+  border-right: solid 0 #272930;
+}
+/* header */
+.header {
+  background: #007fff;
+  color: #ffffff;
+}
+.header.navbar-inverse .navbar-brand {
+  color: inherit;
+}
+/* horizontal menu */
+.header.navbar-inverse .navbar-nav > li > a {
+  color: #ffffff;
+}
+.header.navbar-inverse .navbar-nav > .active > a {
+  background: #ffffff;
+  color: #333333;
+}
+.header.navbar-inverse .navbar-nav > .open > a,
+.header.navbar-inverse .navbar-nav > .open > a:hover,
+.header.navbar-inverse .navbar-nav > .open > a:focus,
+.header.navbar-inverse .navbar-nav > li > a:hover,
+.header.navbar-inverse .navbar-nav > li > a:focus {
+  background: #0072e6;
+  color: #ffffff;
+}
+.header .dropdown-menu {
+  box-shadow: none;
+  border-radius: 0;
+  border-width: 2px;
+  border-color: #007fff;
+  border-top: 0;
+}
+.header .dropdown-menu .dropdown-submenu > .dropdown-menu {
+  border: solid 2px #007fff !important;
+}
+/* dropdown-menu */
+.header .dropdown-menu > li > a:hover,
+.header .dropdown-menu > li > a:focus,
+.header .dropdown-menu > .active > a,
+.header .dropdown-menu > .active > a:hover,
+.header .dropdown-menu > .active > a:focus {
+  background: #0072e6;
+  color: #ffffff;
+}
+.header .dropdown-submenu > a:after,
+.header .dropdown-submenu:hover > a:after {
+  border-color: transparent transparent transparent #333;
+}
+.header .dropdown-menu > li > a {
+  padding: 6px 15px;
+}
+.header .navbar-toggle {
+  background-color: #007fff;
+}
+.header .navbar-toggle .icon-bar {
+  background-color: #ffffff;
+}
+.header .navbar-toggle:hover,
+.header .navbar-toggle:focus {
+  background-color: #0072e6;
+}
+.header .navbar-toggle:hover .icon-bar {
+  background-color: #ffffff;
+}
+/* top menu */
+.header .top-menu > ul > li > a {
+  color: inherit;
+}
+.header .top-menu > ul > li > a:hover,
+.header .top-menu > ul > li > a:focus {
+  background: #0072e6;
+  color: #ffffff;
+}
+.header .top-menu > ul > li > a.dropdown-toggle > .badge {
+  background: #004c99;
+  color: #ffffff;
+}
+/* header search form */
+.header .search-form {
+  background: #0066cc;
+  border-color: #0066cc !important;
+}
+.header .search-form .form-control {
+  color: #fff;
+}
+.header .search-form .form-control::-moz-placeholder {
+  color: #B5B5B5;
+  opacity: 1;
+}
+.header .search-form .form-control:-ms-input-placeholder {
+  color: #B5B5B5;
+}
+.header .search-form .form-control::-webkit-input-placeholder {
+  color: #B5B5B5;
+}

@@ -1,0 +1,30 @@
+﻿.surcharge-group-cnt > .panel > .panel-heading > .panel-title {
+    position: relative;
+}
+
+.surcharge-group-cnt > .panel > .panel-heading > .panel-title > a {
+    padding-left: 15px;
+}
+
+.surcharge-group-cnt > .panel > .panel-heading > .panel-title > a:before {
+    background-image: url("../../img/down.png");
+    background-repeat: no-repeat;
+    content: "";
+    float: left;
+    height: 32px;
+    left: -13px;
+    position: absolute;
+    top: -8px;
+    width: 32px;
+}
+.surcharge-group-cnt > .panel > .panel-heading > .panel-title > a.collapsed:before {
+    background-image: url("../../img/right.png");
+    }
+  
+
+.surcharge-group-cnt .well {
+    position: relative;
+    }
+.surcharge-group-cnt .well .table > tbody > tr > td {
+    border: 0;
+    }

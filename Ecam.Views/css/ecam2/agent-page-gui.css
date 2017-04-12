@@ -1,0 +1,54 @@
+.is-agent-bdy {
+	background: #fff;
+}
+.is-agent-bdy .page-container .page-content, .is-agent .page-container .footer {
+	background: #fff;
+	margin-top:5px;
+}
+.is-agent-bdy .header{
+	background: #1F69A8;
+	border-bottom: 1px solid #1F69A8;
+	color: #fff;
+}
+.is-agent-bdy .header .search-form{
+	border: none !important;
+	width: 300px !important;
+	background: transparent;
+}
+.is-agent-bdy .header .search-form > div{
+	background: #fff;
+    border-radius: 10px;
+}
+.is-agent-bdy .sf-menu{
+	margin-top:15px;
+}
+.is-agent-bdy .sf-menu > li:not(:last-child){
+	border-right: 1px solid #1F69A8;
+}
+.is-agent-bdy .sf-menu > li > a{
+	padding: 2px 15px !important;
+	line-height: 10px;
+}
+.is-agent-bdy .normal-view .sf-menu ul{
+	margin-top:-13px;
+}
+.is-agent-bdy .sf-menu > li:first-child > a{
+	padding-left:0px !important;
+}
+.is-agent-bdy .page-header > .page-title, .is-agent-bdy .page-title{
+	text-decoration: underline;
+}
+.is-agent-bdy .input-icon i{
+	color: #1F69A8;
+}
+.is-agent-bdy .navbar .navbar-header .navbar-brand .name{
+	display: inline;
+}
+.is-agent-bdy .header .navbar-toggle{
+	background-color: #1f69a8;
+    border-left: 1px solid #fff;
+	border-right: 1px solid #fff;
+}
+.is-agent-bdy .header .navbar-toggle > span,.is-agent-bdy .header .navbar-toggle:hover > span{
+	background-color:#fff;
+}

@@ -1,0 +1,11 @@
+﻿#tblInvoiceDetail > tbody > tr > td {
+	padding: 8px;
+}
+
+#invoiceTable .child-row-cnt {
+	background: #fff !important;
+}
+#invoiceTable .child-row-cnt > .table {
+	margin:0;
+	padding:0;
+}

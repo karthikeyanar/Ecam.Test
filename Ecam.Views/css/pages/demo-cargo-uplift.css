@@ -1,0 +1,30 @@
+﻿.font15{
+    font-size: 15px;
+}
+.font17{
+    font-size: 17px;
+}
+.bold{
+    font-weight : bold;
+}
+ul[class^='flightList_'] li{
+    font-size : 13px;
+    list-style: none;
+    line-height:20px;
+}
+.cargo-uplift .col1,.cargo-uplift .col2{
+    color:#58697B;
+}
+.text-red{
+    color:red;
+}
+.cargo-uplift .col1 p{
+    font-size: 15px;
+    text-align: justify;
+}
+.cargo-uplift .seperator{
+    border-right: 1px solid #428bca;
+}
+.text-underline{
+    text-decoration: underline;
+}

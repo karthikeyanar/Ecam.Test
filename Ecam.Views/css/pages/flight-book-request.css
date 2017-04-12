@@ -1,0 +1,37 @@
+﻿.is_flight_book .page-container.container,
+.additional-cnt.page-container.container {
+    display: none !important;
+}
+.is_flight_book .additional-cnt.page-container.container {
+    display: block !important;
+}
+.nav-tabs > li.active {
+    font-weight: 600;
+    }
+#routeTabs > .nav-tabs > li {
+    position: relative;
+    }
+#routeTabs > .nav-tabs > li > a {
+    padding-left: 30px;
+    padding-right: 5px;
+    }
+#routeTabs > .nav-tabs > li.active > a {
+  background: #428bca;
+    color: #fff;
+        }
+#routeTabs > .nav-tabs {
+     border-bottom: 1px solid #428bca;
+    }
+.chk-select-route {
+      left: 8px;
+    position: absolute;
+    top: 6px;
+    z-index: 1;
+    }
+
+#routeTabs > .nav-tabs > li.select-route > a {
+    }
+
+.table-margin-free {
+    margin-bottom: 0px !important;    
+} 

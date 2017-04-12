@@ -1,0 +1,45 @@
+﻿.enquiryListTable > tbody > tr{
+    border : 1px solid #1f69a8;
+    border-radius: 10px;
+    display:block;
+    margin: 5px 0;
+}
+.enquiryListTable > tbody > tr > td{
+    border-top : none;
+    /*border-radius: 10px;*/
+}
+.link{
+    cursor:pointer;
+    text-decoration:underline;
+}
+.enquiry .seperator{
+	border-right:1px solid #428bca;
+	min-height: 80px;
+}
+.ecam2 .grwt-info .form-control{
+    font:12px;
+    width:73px;
+}
+.ecam2 .grwt-info label{
+    padding:0 20px;
+}
+.ecam2 .table-primary > tbody > tr > td{
+    border: 1px solid #fff;
+}
+.ecam2 .table-primary > tbody > tr.bg-light {
+    background: #EAEEF7;
+}
+.ecam2 .table-primary > tbody > tr.bg-dark {
+    background: #B1CBE7;
+}
+.enquiry .seperator.height-420{
+    min-height: 420px;
+}
+.sort{
+    padding:2px 10px;
+    margin-top:3px;
+    border-radius: 5px;
+    position: absolute;
+    right:30px;
+    background: #B1CBE7;
+}

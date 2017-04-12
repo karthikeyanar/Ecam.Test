@@ -1,0 +1,11 @@
+﻿#summaryTable > thead> tr> th,#tbody_groupChildTable > table> thead> tr> th{
+    background-color:#F2F2F2;
+}
+
+.tab-content {
+    background: rgb(241,243,246) none repeat scroll 0 0;
+    border-bottom: 0px solid #ddd;
+    border-left: 0px solid #ddd;
+    border-right: 0px solid #ddd;
+    padding: 5px;
+}

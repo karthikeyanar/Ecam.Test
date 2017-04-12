@@ -1,0 +1,69 @@
+﻿.pl-report-cnt .left-col {
+	width: 200px;
+	float: left;
+}
+
+.pl-report-cnt .right-col {
+	width: 875px;
+	float: left;
+	overflow: auto;
+	overflow-y: hidden;
+}
+
+.pl-report-cnt .left-col > .table,
+.pl-report-cnt .right-col > .table {
+	margin-bottom: 5px;
+}
+
+.pl-report-cnt .is-total-row, .pl-report-cnt .PR {
+	font-weight: 600;
+}
+
+.pl-report-cnt .is-total-row.DI {
+	background-color: #dff0d8;
+}
+
+.pl-report-cnt .is-total-row.DE {
+	background-color: #d9edf7;
+}
+
+.pl-report-cnt .is-total-row.II {
+	background-color: #fcf8e3;
+}
+
+.pl-report-cnt .is-total-row.IE {
+	background-color: #f2dede;
+}
+
+.pl-report-cnt .is-sh-row {
+	background-color: #ddd !important;
+}
+
+.pl-report-cnt .PR {
+	background-color: #EBE7FC;
+}
+
+.pl-report-cnt table > tbody > tr.is-row > .is-expand > a {
+	background-image: url("../../img/excol.png");
+	background-repeat: no-repeat;
+	color: #333;
+	height: auto;
+	width: auto;
+	padding-left: 20px;
+}
+
+.pl-report-cnt table > tbody > tr.is-row > .is-expand.ex-minus > a {
+    background-position: 0 -20px;
+}
+
+.pl-report-cnt table > tbody > tr.is-sh-row {
+	display: none;
+}
+
+.pl-report-cnt table > tbody > tr.is-sh-row.show-row {
+	display: table-row;
+}
+
+.pl-report-cnt table > tbody > tr.is-sh-row > td {
+	padding-left: 35px;
+}

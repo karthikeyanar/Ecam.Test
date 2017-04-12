@@ -1,0 +1,180 @@
+﻿#cargoTable > tbody > tr > td.child-row-cnt:hover {
+	background: #fff;
+}
+
+#cargoTable > tbody > tr > td.child-row-cnt .lot-det {
+	font-size: 14px;
+}
+
+.lot-det > td > table > tbody > tr > td {
+	padding: 0 7px;
+	white-space: nowrap;
+	font-size: 13px;
+}
+
+#cargoTable > tbody > tr > td.child-row-cnt .lot-0,
+#cargoTable > tbody > tr > td.child-row-cnt .lot-3 {
+	background-color: #dff0d8;
+}
+
+#cargoTable > tbody > tr > td.child-row-cnt .lot-1,
+#cargoTable > tbody > tr > td.child-row-cnt .lot-4 {
+	background-color: #d9edf7;
+}
+
+#cargoTable > tbody > tr > td.child-row-cnt .lot-2,
+#cargoTable > tbody > tr > td.child-row-cnt .lot-5 {
+	background-color: #f2dede;
+}
+
+.table-cargo-det {
+	border: 1px solid #e0dcdc;
+	font-size: 12px;
+}
+
+.cargo-det-cell {
+	cursor: pointer;
+}
+
+.table-cargo-det > thead > tr {
+	background-color: #fff;
+	color: #333;
+}
+
+.table-cargo-det > tbody > tr {
+	background-color: #f2dede;
+	color: #333;
+}
+
+.table-cargo-det > tbody > tr:nth-child(2n+1) {
+	background-color: #fcf8e3;
+	color: #333;
+}
+
+.table-cargo-det > tbody > tr.edit-row {
+	background-color: #f5f5f5 !important;
+	color: #333;
+}
+
+.table-cargo-det > tbody > tr > td {
+	white-space: nowrap;
+}
+
+.cargo-act-btn {
+	text-decoration: none;
+	font-size: 12px;
+	float: left;
+	padding: 0 8px;
+}
+
+.add-cargo-det:hover, .delete-cargo-det:hover {
+	text-decoration: underline;
+}
+
+.child-row-cnt .loading-cnt, .child-row-cnt .loading-cnt-box {
+	display: none;
+}
+
+.child-row-cnt.loading .loading-cnt {
+	background: #333 none repeat scroll 0 0;
+	bottom: 0;
+	display: block;
+	left: 0;
+	opacity: 0.5;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+
+.child-row-cnt.loading .loading-cnt-box {
+	background: #ffffb8 none repeat scroll 0 0;
+	border: 1px solid #a6a3a3;
+	border-radius: 5px;
+	box-shadow: 0 0 1px 1px #dcc3c3;
+	display: block;
+	font-size: 14px;
+	font-weight: 600;
+	height: 32px;
+	left: 43%;
+	margin: 0 auto;
+	padding-top: 6px;
+	position: absolute;
+	text-align: center;
+	top: 3px;
+	width: 100px;
+	z-index: 1;
+}
+
+.sipt-info, .actmov-info, .followup-info {
+	float: left;
+}
+
+.sipt-info {
+	padding-right: 10px;
+	width: 345px;
+}
+
+.actmov-info {
+	width: 520px;
+}
+
+.followup-info {
+	padding: 0 10px;
+	width: 260px;
+}
+
+.follow-up-det-box {
+	background: #f5f5f5 none repeat scroll 0 0;
+	border: 1px solid #d2cfcf;
+	margin: 0 0 3px;
+	padding: 3px;
+}
+
+.follow-up-det-box > div {
+	border-bottom: 1px solid #d0cece;
+	margin: 3px 0 0;
+	padding-bottom: 5px;
+	padding-left: 10px;
+	padding-right: 15px;
+	position: relative;
+}
+
+.follow-up-det-box > div:last-child {
+	border-bottom: 0;
+}
+
+.follow-up-det-box > div > .follow-up-det-remove {
+	position: absolute;
+	top: 0;
+	right: 5px;
+	cursor: pointer;
+}
+
+.actmov-info > .form-horizontal > .form-group {
+	margin-bottom: 0;
+	}
+
+.actmov-info > .form-horizontal > .form-group {
+	margin-bottom: 0;
+	}
+.actmov-info .car-sta-tbl > tbody > tr > td {
+	font-weight: normal !important;
+    padding: 5px;
+	}
+.actmov-info .car-sta-tbl > tbody > tr > td.lbl {
+	font-weight: 600;
+	text-align:right;
+	white-space: nowrap;
+	}
+.shipment-status-select {    
+    border:1px solid #040d09;
+    border-radius: 10px;    
+    padding: 5px;
+}
+
+.actmov-info-report {
+	width: 350px;
+}
+.cls-background{
+    background-color:#00FFFF !important;
+}

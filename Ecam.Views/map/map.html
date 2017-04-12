@@ -1,0 +1,86 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Simple Polylines</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            height: 500px;
+            width: 620px;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBLxSI2OHpn9AlGxpQk7zP9MSi8tWyYMSo&signed_in=true"></script>
+    <script>
+
+        // This example creates a 2-pixel-wide red polyline showing the path of William
+        // Kingsford Smith's first trans-Pacific flight between Oakland, CA, and
+        // Brisbane, Australia.
+
+        function getGeoLocation(add,callback) {
+            var geocoder=new google.maps.Geocoder();
+            geocoder.geocode({
+                address: add
+            },function(results,status) {
+                console.log('status=',status);
+                console.log('results=',results);
+                if(status==google.maps.GeocoderStatus.OK) {
+                    var myLatlng=results[0].geometry.location;
+                    if(callback)
+                        callback(myLatlng);
+                }
+            });
+        }
+
+        function initMap() {
+            var originAddress="Chek Lap Kok International Airport,Hong Kong,China";
+            var destAddress="Heydar Aliyev Intl Airport,Baku,Azerbaijan";
+
+            var oriLoc={ lat: 0,lng: 0 };
+            var destLoc={ lat: 0,lng: 0 };
+            getGeoLocation(originAddress,function(loc) {
+                oriLoc.lat=loc.lat();
+                oriLoc.lng=loc.lng();
+                getGeoLocation(destAddress,function(loc2) {
+                    destLoc.lat=loc2.lat();
+                    destLoc.lng=loc2.lng();
+
+                    var map=new google.maps.Map(document.getElementById('map'),{
+                        zoom: 4,
+                        center: { lat: destLoc.lat,lng: destLoc.lng },
+                        mapTypeId: google.maps.MapTypeId.TERRAIN
+                    });
+
+                    var flightPlanCoordinates=[];
+                    flightPlanCoordinates.push(oriLoc);
+                    flightPlanCoordinates.push(destLoc);
+
+                    var flightPath=new google.maps.Polyline({
+                        path: flightPlanCoordinates,
+                        geodesic: true,
+                        strokeColor: '#FF0000',
+                        strokeOpacity: 1.0,
+                        strokeWeight: 2
+                    });
+
+                    flightPath.setMap(map);
+
+                });
+            });
+        }
+
+        initMap();
+
+    </script>
+
+</body>
+</html>

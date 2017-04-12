@@ -1,0 +1,89 @@
+
+/*Ailine Select*/
+
+.air-sel-cnt {
+	width: 370px;
+	position: relative;
+}
+
+.air-sel-cnt > .no-airline {
+	font-size: 20px;
+	text-align: center;
+}
+
+.air-sel-cnt > .child-air-sel-cnt > .air-row,
+.air-sel-cnt > .air-row {
+	cursor: pointer;
+	float: left;
+	/*height: auto;*/
+    height: 49px;
+	line-height: 30px;
+	margin: 0 10px 0 0;
+	padding-bottom: 5px;
+	padding-top: 5px;
+	width: 100px;
+}
+
+.air-sel-cnt > .air-arrow {
+	float: left;
+	margin-top: 5px;
+}
+
+.air-sel-cnt > .child-air-sel-cnt > .air-row > .spn-iata-code,
+.air-sel-cnt > .air-row > .spn-iata-code {
+	font-size: 20px;
+}
+
+.air-sel-cnt:after {
+	display: table;
+	content: " ";
+}
+
+.airline-select-logo {
+	width: 90px;
+	max-height: 40px;
+	cursor: pointer;
+}
+
+.air-row.select {
+	/*border: 1px solid #bababa;*/
+	border: 1px solid #605e5e;
+	border-radius: 10px;
+	box-shadow: 0 0 4px -1px #777373;
+	padding: 5px;
+}
+
+.child-air-sel-cnt {
+	position: absolute;
+	left: 0;
+	top: 52px;
+	/*width: 370px;*/
+	right: 0;
+	z-index: 1000;
+	background-color: #FFF;
+	overflow-x: hidden;
+	background-clip: padding-box;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+	border-radius: 4px;
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.176);
+	max-height: 300px;
+}
+
+.child-air-sel-cnt.close-box {
+	visibility: hidden;
+}
+
+.air-arrow-image {
+	cursor: pointer;
+	float: left;
+}
+
+.air-sel-cnt > .child-air-sel-cnt {
+	padding: 10px;
+}
+
+.air-sel-cnt > .child-air-sel-cnt > .air-row {
+	border: 1px solid #c1bdbd;
+	border-radius: 5px;
+	margin: 5px;
+}

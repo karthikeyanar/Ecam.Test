@@ -1,0 +1,44 @@
+﻿@{ Layout = null; }
+<div class="edit-cnt p-10">
+    <div class="row">
+        <div class="col-md-12">
+            <form id="frmCompanyType" method="post" class="form-horizontal form-validate" role="form" data-bind="submit: save,formValidate:{}">
+                <div class="form-group">
+                    <label class="col-md-4 control-label">
+                        Company Name
+                    </label>
+                    <div class="col-md-7">
+                        <input type="text" class="form-control input-sm" name="company_name" data-bind="value:company_name,hasFocus: is_focus" placeholder="Company Name" data-rule-required="true" data-msg-required="Required" data-placement="bottom" />
+                    </div>
+                </div> 
+                <div class="form-group">
+                    <label class="col-md-4 control-label">
+                        Symbol
+                    </label>
+                    <div class="col-md-7">
+                        <input type="text" class="form-control input-sm" name="symbol" data-bind="value:symbol" placeholder="Symbol" data-rule-required="true" data-msg-required="Required" data-placement="bottom" />
+                    </div>
+                </div> 
+                <!-- ko if: errors() -->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.Partial("_ErrorDisplay")
+                    </div>
+                </div>
+                <!-- /ko -->
+                <div class="form-group">
+                    <div class="col-md-offset-4 col-md-8">
+                        <input type="hidden" name="id" data-bind="value:id" />
+                        <!-- ko if: is_edit_mode()==false -->
+                        <button type="submit" id="save" class="btn btn-sm btn-success" data-loading-text="Add">Add</button>
+                        <!-- /ko -->
+                        <!-- ko if: is_edit_mode()==true -->
+                        <button type="submit" id="save" class="btn btn-sm btn-primary" data-loading-text="Save">Save</button>
+                        <!-- /ko -->
+                        <button type="button" class="btn btn-sm btn-danger m-l-15" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

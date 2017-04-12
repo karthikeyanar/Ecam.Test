@@ -1,0 +1,91 @@
+﻿@{ Layout = null; }
+<div class="edit-cnt p-10">
+    <div class="row">
+        <div class="col-md-12">
+            <form id="frmExpertsType" method="post" class="form-horizontal form-validate" role="form" data-bind="submit: save,formValidate:{}">
+                <div class="form-group">
+                    <label class="col-md-4 control-label">
+                        Experts Name
+                    </label>
+                    <div class="col-md-8">
+                        <input type="hidden" name="experts_id" data-bind="value:experts_id" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">
+                        Company Name
+                    </label>
+                    <div class="col-md-8">
+                        <input type="hidden" name="company_id" data-bind="value:company_id" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">
+                        Date
+                    </label>
+                    <div class="col-md-3">
+                        <div class="input-icon">
+                            <i class="fa fa-calendar"></i>
+                            <input type="text" class="form-control input-sm" name="record_date" data-provide="datepicker" data-date-format="dd/M/yyyy" data-date-autoclose="true" data-bind="value:formatDate(record_date())" placeholder="Date" data-rule-required="true" data-msg-required="Required" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">
+                        Recommend Type
+                    </label>
+                    <div class="col-md-5">
+                        <select name="recommend_type" data-bind="value:recommend_type" class="form-control input-sm input-150">
+                            <option value="@Ecam.Contracts.Enums.RecommendType.Buy">Buy</option>
+                            <option value="@Ecam.Contracts.Enums.RecommendType.Sell">Sell</option>
+                            <option value="@Ecam.Contracts.Enums.RecommendType.Hold">Hold</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">
+                        Stop Loss
+                    </label>
+                    <div class="col-md-3">
+                            <input type="text" class="form-control input-sm" name="stop_loss" data-bind="value:stop_loss" placeholder="Stop Loss" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">
+                        Target
+                    </label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control input-sm" name="target" data-bind="value:target" placeholder="Target" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">
+                        URL
+                    </label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control input-sm" name="url" data-bind="value:url" placeholder="URL" />
+                    </div>
+                </div>
+                <!-- ko if: errors() -->
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.Partial("_ErrorDisplay")
+                    </div>
+                </div>
+                <!-- /ko -->
+                <div class="form-group">
+                    <div class="col-md-offset-4 col-md-8">
+                        <input type="hidden" name="id" data-bind="value:id" />
+                        <!-- ko if: is_edit_mode()==false -->
+                        <button type="submit" id="save" class="btn btn-sm btn-success" data-loading-text="Add">Add</button>
+                        <!-- /ko -->
+                        <!-- ko if: is_edit_mode()==true -->
+                        <button type="submit" id="save" class="btn btn-sm btn-primary" data-loading-text="Save">Save</button>
+                        <!-- /ko -->
+                        <button type="button" class="btn btn-sm btn-danger m-l-15" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

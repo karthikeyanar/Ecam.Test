@@ -1,0 +1,34 @@
+﻿.ecam2 ul.searchbar{
+	height:30px;
+}
+.ecam2 ul.searchbar > li{
+	float:left;
+	font-size:14px;
+	list-style: none;
+	padding: 0 10px;
+	cursor: pointer;
+}
+.ecam2 ul.searchbar li:not(:last-child){
+	border-right: 1px solid #ddd;
+}
+.ecam2 ul.searchbar li:first-child{
+	border-right: 0px;
+}
+.p-l-0{
+	padding-left:0px;
+}
+.m-l-0{
+	margin-left:0px;
+}
+.searchText{
+	width:100px;
+	border: 0px;
+	border-bottom: 1px solid #999;
+}
+table .table-spaceless > tbody > tr > td{
+	padding:2px 0px;
+	border:none;
+}
+#invoiceTable thead th {
+	vertical-align: middle;
+}

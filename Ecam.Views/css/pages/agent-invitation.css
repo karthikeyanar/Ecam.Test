@@ -1,0 +1,17 @@
+﻿.contact-box {
+    padding: 20px;
+    border: solid 1px #BCBCBC;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    position: relative;
+}
+.remove-contact {
+     color: #333;
+    font-size: 25px;
+    position: absolute;
+    right: 10px;
+    top: 0;
+}
+.remove-contact > a {
+    color: #333;
+}

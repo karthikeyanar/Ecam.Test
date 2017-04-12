@@ -1,0 +1,86 @@
+﻿.tar-rep-month-col {
+    width: 1px;
+    white-space:nowrap;
+}
+
+.tar-rep-col {
+    width: 70px;
+}
+
+.tonnage-col {
+    background: #CDDDAC !important;
+    border-color: #9BBB59 !important;
+    color: #000;
+}
+
+th.tonnage-col,
+.table-striped > tbody > tr:nth-child(2n+1) > td.tonnage-col {
+    background: #F5F8EE !important;
+    border-color: #9BBB59 !important;
+    color: #000;
+}
+
+.revenue-col {
+    background: #A5D5E2 !important;
+    border-color: #98a4a9 !important;
+    color: #000;
+}
+
+th.revenue-col,
+.table-striped > tbody > tr:nth-child(2n+1) > td.revenue-col {
+    background: #EDF6F9 !important;
+    border-color: #98a4a9 !important;
+    color: #000;
+}
+
+.cost-col {
+    background: #CDDDAC !important;
+    border-color: #9BBB59 !important;
+    color: #000;
+}
+
+th.cost-col,
+.table-striped > tbody > tr:nth-child(2n+1) > td.cost-col {
+    background: #F5F8EE !important;
+    border-color: #9BBB59 !important;
+    color: #000;
+}
+
+.red-col {
+    color: red !important;
+}
+
+.green-col {
+    color: green !important;
+}
+
+.float-container {
+    box-sizing: border-box;
+    width: 100%;
+    height: 250px;
+    padding: 10px;
+    margin: 10px auto 10px auto;
+    border: 1px solid #ddd;
+    background: #fff;
+    background: linear-gradient(#f6f6f6 0, #fff 50px);
+    background: -o-linear-gradient(#f6f6f6 0, #fff 50px);
+    background: -ms-linear-gradient(#f6f6f6 0, #fff 50px);
+    background: -moz-linear-gradient(#f6f6f6 0, #fff 50px);
+    background: -webkit-linear-gradient(#f6f6f6 0, #fff 50px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    -o-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    -ms-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    -webkit-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.float-placeholder {
+    width: 100%;
+    height: 100%;
+    font-size: 14px;
+    line-height: 1.2em;
+}
+
+.float-container .legendLabel {
+    padding-left: 5px;
+}

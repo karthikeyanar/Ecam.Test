@@ -1,0 +1,153 @@
+﻿@{ Layout = null; }<!-- ko if: grid() -->
+<div class="page-header">
+    <div class="row">
+        <div class="col-md-12">
+            <form id="frmMarketSearch" class="form-inline form-validate" role="form" onsubmit="return false">
+                <div class="form-group" style="margin-right:30px;float:left;">
+                    <h1 class="page-title">Market</h1>
+                </div>
+                <div class="pull-left m-l-15 m-r-15 m-t-10">
+                    <button id="reportrange" type="button" class="btn btn-sm btn-default">
+                        <i class="fa fa-calendar cursor-pointer m-r-10"></i><span class="m-r-10">
+                        </span><b class="caret"></b>
+                    </button>
+                    <input type="hidden" name="start_date" data-bind="value:start_date" />
+                    <input type="hidden" name="end_date" data-bind="value:end_date" />
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <input type="hidden" name="symbols" />
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <input type="hidden" name="categories" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div><div class="clearfix" style="height:5px">&nbsp;</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="row m-t-5 m-b-5">
+            <div class="col-md-12">
+                <div class="pull-left m-r-15" data-bind="visible:grid().total_pages()>1">
+                    <span class="pull-left p-t-5 p-r-10">Rows</span>
+                    <select id="rows" name="rows" data-bind="options:grid().row_sizes,value:grid().rows_per_page,valueAllowUnset:{}" class="pull-left form-control input-sm input-60"></select>
+                </div>
+                @*<div class="pull-left">
+                        <button id="add" class="btn btn-sm btn-success" data-bind="click: grid().add">Add</button>
+                    </div>*@
+                <div class="pull-right" data-bind="visible:grid().total_pages()>1">
+                    <ul class="no-margin" data-bind="bsPagination: {'total_rows': grid().total_rows(),'page_index': grid().page_index(),'rows_per_page': grid().rows_per_page(),'onPageClick': grid().onPageClick,'onRender':grid().onRenderPagination}"></ul>
+                </div>
+            </div>
+        </div>
+        <table id="marketTable" class="table table-striped table-bordered table-hover table-condensed table-gray" sortname="trade_date" sortorder="desc" data-bind="sortingTable: { 'onSorting': grid().changeSortOrder }">
+            <thead>
+                <tr>
+                    <th sortname="company_name">
+                        Company
+                    </th>
+                    <th sortname="symbol">
+                        Symbol
+                    </th>
+                    <th sortname="trade_type">
+                        Type
+                    </th>
+                    <th sortname="trade_date">
+                        Date
+                    </th>
+                    <th sortname="open_price" class="text-right text-nowrap">
+                        Open
+                    </th>
+                    <th sortname="high_price" class="text-right text-nowrap">
+                        High
+                    </th>
+                    <th sortname="low_price" class="text-right text-nowrap">
+                        Low
+                    </th>
+                    <th sortname="close_price" class="text-right text-nowrap">
+                        Close
+                    </th>
+                    <th sortname="prev_percentage" class="text-right text-nowrap">
+                        Prev
+                    </th>
+                    <th sortname="day_5_percentage" class="text-right text-nowrap">
+                        5 Days
+                    </th>
+                    <th sortname="months_1_percentage" class="text-right text-nowrap">
+                        1 Months
+                    </th>
+                    <th sortname="months_3_percentage" class="text-right text-nowrap">
+                        3 Months
+                    </th>
+                    <th sortname="week_52_percentage" class="text-right text-nowrap">
+                        Week 52
+                    </th>
+                    <th style="width: 50px">
+                    </th>
+                    <th style="width: 50px">
+                    </th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach: grid().rows">
+                <tr>
+                    <td class="cursor-pointer" data-bind="text:company_name,click:edit"></td>
+                    <td class="cursor-pointer" data-bind="text:symbol,click:edit"></td>
+                    <td class="cursor-pointer" data-bind="text:trade_type,click:edit"></td>
+                    <td class="cursor-pointer" data-bind="text:formatDate(trade_date()),click:edit"></td>
+                    <td class="cursor-pointer text-right" data-bind="text:formatNumber(open_price()),click:edit"></td>
+                    <td class="cursor-pointer text-right" data-bind="text:formatNumber(high_price()),click:edit"></td>
+                    <td class="cursor-pointer text-right" data-bind="text:formatNumber(low_price()),click:edit"></td>
+                    <td class="cursor-pointer text-right" data-bind="text:formatNumber(close_price()),click:edit"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right">
+                        <span data-bind="text:formatPercentage(prev_percentage()),click:edit"></span><br />
+                        <span data-bind="text:formatNumber(prev_price()),click:edit"></span>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right">
+                        <span data-bind="text:formatPercentage(day_5_percentage()),click:edit"></span><br />
+                        <span data-bind="text:formatNumber(day_5_high()),click:edit"></span>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right">
+                        <span data-bind="text:formatPercentage(months_1_percentage()),click:edit"></span><br />
+                        <span data-bind="text:formatNumber(months_1_high()),click:edit"></span>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right">
+                        <span data-bind="text:formatPercentage(months_3_percentage()),click:edit"></span><br />
+                        <span data-bind="text:formatNumber(months_3_high()),click:edit"></span>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right">
+                        <span data-bind="text:formatPercentage(week_52_percentage()),click:edit"></span><br />
+                        <span data-bind="text:formatNumber(week_52_high()),click:edit"></span>
+                    </td>
+                    <td style="text-align:center;">
+                        <a data-bind="attr:{'href': 'https://www.google.com/finance?q=NSE:'+symbol()}" target="_blank">G</a>
+                    </td>
+                    <td class="text-center">
+                        <a href="javascript:;" class="cursor-pointer fg-black" data-bind="jConfirm: {'ok': deleteMarket}" data-placement="top"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="row">
+            <div class="col-md-4">
+                <span data-bind="text:grid().paging_status" class="pull-left m-t-5"></span>
+            </div>
+            <div class="col-md-8" data-bind="visible:grid().total_pages()>1">
+                <div class="pull-right">
+                    <ul class="no-margin" data-bind="bsPagination: {'total_rows': grid().total_rows(),'page_index': grid().page_index(),'rows_per_page': grid().rows_per_page(),'onPageClick': grid().onPageClick,'onRender':grid().onRenderPagination}"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-container">
+</div>
+<!-- /ko -->
+<script type="text/html" id="modal-template">
+    <div id="modal-${name}" class="modal {{if is_modal_full==true}}container{{/if}} {{if position=='top'}}modal-top{{/if}}" data-width="800" tabindex="-1" data-focus-on="input:first" style="display: none;">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">${title}</h4>
+        </div>
+        <div class="modal-body"></div>
+    </div>
+</script>

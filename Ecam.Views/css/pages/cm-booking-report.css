@@ -1,0 +1,7 @@
+﻿#reportTable .ic-show {
+	display: none;
+}
+
+.mode-ic #reportTable .ic-show {
+	display: table-cell;
+}

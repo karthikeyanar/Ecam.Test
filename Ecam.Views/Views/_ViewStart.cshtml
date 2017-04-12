@@ -1,0 +1,12 @@
+﻿@{
+    string layoutPath = "~/Views/Shared/_Layout.cshtml";
+    string templateName = string.Empty;
+    //string templateName = Ecam.Framework.DataTypeHelper.ConvertString(System.Configuration.ConfigurationManager.AppSettings["TemplateName"]);
+    //if(string.IsNullOrEmpty(templateName) == true) {
+    //    templateName = string.Empty;
+    //}
+    if(string.IsNullOrEmpty(templateName) == false) {
+        layoutPath = string.Format("~/Views/Templates/{0}/Shared/_Layout.cshtml",templateName);
+    }
+    Layout = layoutPath;
+}

@@ -1,0 +1,325 @@
+body, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6, .close {
+	font-family: "Lato","Open Sans", "Arial", "sans-serif" !important;
+}
+.header {
+	background: none repeat scroll 0 0 #1f69a8;
+	color: #fff;
+}
+
+.header .navbar-brand {
+	font-size: 22px;
+	line-height: 18px;
+	font-weight: 400;
+}
+
+.page-container {
+	height: calc(100% - 40px);
+}
+
+.btn {
+	font-family: "Open Sans", "Arial", "sans-serif" !important;
+}
+/*.page-container > div.page-content{
+    height: 100%;
+    white-space: nowrap;
+    text-align: center;
+}
+.page-container > div.page-content:before{
+    content: "";
+    display: inline-block;
+    vertical-align: middle;
+    width: 0;
+    margin-right: -.25em;
+    height: 100%;
+}
+.page-container > div.page-content > div{
+    display: inline-block;
+    vertical-align: middle;
+    white-space: normal;
+}*/
+.aa_header {
+	background: #1F69A8 none repeat scroll 0 0;
+	color: #fff;
+	font-weight: 400;
+}
+
+.ca_header {
+	background: #1F69A8 none repeat scroll 0 0;
+	color: #fff;
+	font-weight: 400;
+}
+
+.aa_header .top-menu > ul > li > a:hover, .aa_header .top-menu > ul > li > a:focus {
+	background-color: #47A447;
+}
+
+.v-wrap {
+	height: 100%;
+	white-space: nowrap;
+	text-align: center;
+}
+
+.v-wrap:before {
+	content: "";
+	display: inline-block;
+	vertical-align: middle;
+	width: 0;
+	margin-right: -.25em;
+	height: 100%;
+}
+
+.v-box {
+	display: inline-block;
+	vertical-align: middle;
+	white-space: normal;
+}
+
+.page-container.col-md-12 {
+	height: calc(100% - 40px);
+}
+
+.menu-bar .navbar .navbar-brand {
+	display: none;
+	background: transparent;
+	color: #000;
+	font-size: 19px;
+	height: 0;
+	padding: 8px 15px;
+	font-weight: 500;
+}
+
+.nav .open > a, .nav .open > a:hover, .nav .open > a:focus, .nav li > a:hover, .nav li > a:focus {
+	background: #fff;
+}
+
+.menu-bar .navbar {
+	background: #fff;
+}
+
+.menu-bar .navbar .navbar-nav > li > a {
+	color: #000;
+	padding: 8px 12px;
+	font-size: 14px;
+}
+
+.menu-bar .navbar .navbar-nav > li:not(:last-child) > a {
+	border-right: 1px solid #ccc;
+}
+
+.nav .open > a, .nav .open > a:hover, .nav .open > a:focus, .nav li > a:hover, .nav li > a:focus {
+	background: #fff;
+}
+
+.menu-bar .navbar .navbar-nav > li.active > a, .menu-bar .navbar .navbar-nav > li > a:hover, .menu-bar .navbar .navbar-nav > li > a:focus, .menu-bar .navbar .navbar-nav > li > a:active, .nav .open > a:hover, .nav .open > a:focus, .nav .open > a:active {
+	background: none;
+	color: #0079c2 /*0079c2*/;
+	font-weight: 400;
+}
+
+.menu-bar .navbar .navbar-nav > li > a span.caret {
+	visibility: hidden;
+}
+
+.menu-bar .navbar .navbar-nav > li:hover > a span.caret, .menu-bar .navbar .navbar-nav > li:focus > a span.caret, .menu-bar .navbar .navbar-nav > li:active > a span.caret, .menu-bar .navbar .navbar-nav > li.active > a span.caret {
+	visibility: visible;
+}
+
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+	font-weight: 400;
+	color: #0079c2;
+	background-color: #fff;
+}
+
+.table > tbody > tr.select-row > td, #groupChildTable:first-child > tbody > tr.select-row > td {
+	background-color: #62b8ec /*f2dede*/ !important;
+	color: #fff !important;
+}
+
+.table.table-gray.table-bordered {
+	border: 1px solid #428bca;
+}
+
+.table-bordered.table-gray.table > thead > tr > th {
+	background: #428bca;
+	border-color: #5697d0;
+	color: #fff;
+	filter: none !important;
+}
+
+.table-gray > tbody > tr:nth-child(odd) > td {
+	background: #d2deef;
+}
+/*.table-gray > tbody > tr:not([style="display:none"]):nth-of-type(even) td,*/
+.table-gray > tbody > tr:nth-child(even) > td, table#agentReportTable > tbody > tr:nth-child(even) > td.pin-col {
+	background: #eaeff7;
+}
+
+.table-gray > tbody > tr > td:not(last-child), .table-gray > thead > tr > th:not(last-child), .table.table-gray.table-bordered {
+	border: none;
+}
+
+#groupChildTable:first-child > tbody > tr > td, #groupChildTable > tbody > tr > td > #groupChildTable > tbody > tr > td > a > span {
+	color: #333 !important;
+}
+
+#groupChildTable:first-child > tbody > tr:hover > td, #groupChildTable > tbody > tr > td > #groupChildTable > tbody > tr:hover > td > a > span {
+	color: #fff !important;
+}
+
+.table-gray > tbody > tr:hover > td.child-row-cnt:hover {
+	background: #eaeff7 !important;
+	color: #333 !important;
+}
+
+.table-gray > tbody > tr:hover > td, table#agentReportTable > tbody > tr:hover > td.pin-col {
+	background: #62b8ec;
+	color: #fff !important;
+}
+
+.table-gray > tbody > tr:hover > td > a > span, .table-gray > tbody > tr:hover > td > a > i, .table-gray > tbody > tr:hover > td > div > a > i, .table > tbody > tr.select-row > td > a > span, .table-gray > tbody > tr:hover > td > div > a.fg-black {
+	color: #fff !important;
+}
+
+.table-gray > tbody > tr:hover > td > a.tree-expand, tr > td > a.tree-expand, .table-gray > tbody > tr:hover > td.is-total-row a span, .pl-report-cnt .is-total-row, div.pl-report-cnt > div > table > tbody > tr > td.is-total-row {
+	color: #333 !important;
+}
+
+#targetTable > tbody > tr > td > input.no-b, #plvalueTable > tbody > tr > td > input.no-b, #plvalueTable > tbody > tr > td > table > tbody > tr > td > input.no-b {
+	border: 1px solid #ccc !important;
+	background: #fff;
+}
+
+#plvalueTable > tbody > tr > td > table > tbody > tr > td > button {
+	margin-left: 10px;
+}
+
+.highLight {
+	background-color: #208ed3 !important;
+}
+
+.child-row-cnt > .table > tbody > tr:hover > td {
+	color: #333;
+}
+
+div.pl-report-cnt > div.right-col {
+	width: calc(100% - 200px);
+}
+
+.gray-b {
+	background: transparent;
+	border: 1px solid #ccc;
+}
+
+.text-primary {
+	color: #337ab7;
+}
+
+a.text-primary:hover {
+	color: #3071a9;
+}
+
+.text-success {
+	color: #3c763d;
+}
+
+a.text-success:hover {
+	color: #449d44;
+}
+
+.text-info {
+	color: #31708f;
+}
+
+a.text-info:hover {
+	color: #31b0d5;
+}
+
+.text-warning {
+	color: #8a6d3b;
+}
+
+a.text-warning:hover {
+	color: #ec971f;
+}
+
+.text-danger {
+	color: #a94442;
+}
+
+a.text-danger:hover {
+	color: #c9302c;
+}
+
+/* Login Screen */
+
+/*.header-screen{
+	background:#b0d0ff;	
+}*/
+.header-screen,.login-screen,.height-100{
+	height:100%;
+}
+.login_logo{
+	position: absolute;
+    right: 0;
+    /*top: 50%;*/
+	top:70%;
+    transform: translate(0%, -50%);
+}
+.public-page .login-content{
+	/*left:10px;*/
+	right:35%;
+	/*bottom:50px;*/
+	margin:0px;
+	width: 310px;	
+}
+form#frmSignIn .form-group input{
+	border:none;
+	box-shadow: none;
+	border-bottom:1px solid #999;
+}
+.btn-login,.btn-login:hover {
+    background-image: linear-gradient(to bottom, #398AFF 0px, #398AFF 100%);
+    background-repeat: repeat-x;
+    border-color: #398AFF;
+	color:#fff;
+	font-size:20px;
+	width:99%;
+	padding: 3px 0 !important;
+}
+.uppercase{
+	text-transform : uppercase;
+}
+#lnkForgotPassword{
+	cursor:pointer;
+	color:#333;
+}
+.m-r-30{
+	margin-right:30px !important;
+}
+.fa-question{
+	bottom: 7px;
+    color: #afafaf;
+    cursor: pointer;
+    font-size: 15px;
+    position: absolute;
+    right: 5px;
+}
+.forgotpassword-content,.forgotuname-content{
+	top:50%;
+	position:absolute;
+	transform: translate(0%, -50%);
+}
+/* NEWTHEME */
+body{
+	background: #ebebeb url("/img/login-bg.png") no-repeat fixed left center;
+    height: 100%;
+    width: 100%;
+	background-size: cover;
+}
+.ecamslogo{
+	position: absolute;
+	left: 30%;
+	top:20%;
+}
+/* NEWTHEME */

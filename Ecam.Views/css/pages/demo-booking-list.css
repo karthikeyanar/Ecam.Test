@@ -1,0 +1,7 @@
+﻿.booking-list .searchBox h3{
+	font-size: 15px;
+	margin:5px 0px;
+}
+.booking-list .searchBox,.booking-list .searchBox h3{
+	color:#888;
+}

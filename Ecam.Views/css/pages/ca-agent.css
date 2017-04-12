@@ -1,0 +1,77 @@
+﻿.highLight {
+    background-color:#208ED3;
+    color:#fff;
+}
+.panel-heading.no-bg,.panel-body{
+    background:none;
+    border:none !important;
+}
+a,a:hover{
+    color:#333;
+}
+.checkbox{
+    margin-top: 0;
+    vertical-align: middle;
+}
+.width-60{
+    width:60px !important;
+    display:inline-block;
+}
+.m-t-7 {
+    margin-top:7px;
+}
+.m-t-17 {
+    margin-top:17px;
+}
+.glyphicon-ok{
+    color:green;
+}
+.gray{
+    color:#a0a0a0;
+}
+.font-18{
+    font-size:18px;
+}
+.font-20{
+    font-size:20px;
+    font-weight: normal;
+}
+.font-25{
+    font-size:25px;
+    font-weight: normal;
+}
+.font-30{
+    font-weight: normal;
+    font-size:30px;
+}
+.font-40{
+    font-weight: normal;
+    font-size:40px;
+}
+.m-b-30{
+    margin-bottom:30px;
+}
+.m-t-20{
+    margin-top:20px;
+}
+.panel-border{
+    border: 1px solid #ccc;
+    padding-left: 5px;
+}
+.width-45{
+    width:45%;
+}
+.centerImg{
+    text-align:center;
+    cursor:pointer;
+}
+.vat{
+    vertical-align: top;
+}
+.p-15{
+    padding-top:0px !important;
+}
+.agentsList{
+    height:430px;
+    overflow-y:scroll;
+}

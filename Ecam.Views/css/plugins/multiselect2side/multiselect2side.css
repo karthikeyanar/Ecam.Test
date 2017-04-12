@@ -1,0 +1,37 @@
+.ms2side__updown,
+.ms2side__options,
+.ms2side__select {
+    float: left;
+}
+.ms2side__options, .ms2side__updown {
+    margin: 0 10px;
+}
+.ms2side__select {
+       width: 44%;
+}
+.ms2side__select .ms2side__header {
+    height: 50px;
+    position: relative;
+}
+.ms2side__header > .header-label {
+    position: absolute;
+    bottom: 0;
+    font-weight: bold;
+}
+.ms2side__options > .btn,
+.ms2side__updown > .btn {
+    display: block;
+    width: 40px;
+    margin: 5px 0;
+    font-size: 18px;
+}
+.ms2side__updown > .btn  {
+    width: 70px;
+    font-size: 13px;
+}
+.ms2side__select select[multiple] {
+    height: 200px;  padding: 5px;
+}
+.ms2side__options, .ms2side__updown {
+    padding-top: 50px;
+}

@@ -1,0 +1,16 @@
+﻿.awb-no-list {
+    margin: 0;
+    padding: 0;
+}
+.awb-no-list > li {
+    float: left;
+    margin: 10px 32px;
+    padding: 0;
+    width: 80px;
+    white-space: nowrap;
+}
+.tab-filters {
+    position: absolute;
+    right: 15px;
+    top: 5px;
+}

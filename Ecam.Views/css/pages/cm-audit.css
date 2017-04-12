@@ -1,0 +1,161 @@
+﻿.flight-book-cnt {
+}
+
+    .flight-book-cnt .form-horizontal > .form-group > .control-label {
+        padding: 0;
+        margin: 3px 0;
+    }
+
+    .flight-book-cnt .form-horizontal > .form-group > div > .form-control-static {
+        padding: 0;
+        margin: 3px 0;
+    }
+
+.divider {
+    border-right: 1px solid #ccc;
+}
+
+.box {
+    border: 1px solid #ccc;
+}
+
+.active .text-muted {
+    color: #fff;
+}
+
+.fre-charge-bdy > .table {
+    margin-bottom: 0px;
+}
+
+    .fre-charge-bdy > .table > tbody > tr > td,
+    .acc-charge-bdy > .table > tbody > tr > td {
+        border-top: 0 none;
+        padding: 5px;
+        vertical-align: middle;
+    }
+
+        .fre-charge-bdy > .table > tbody > tr > td .form-control,
+        .acc-charge-bdy > .table > tbody > tr > td .form-control {
+            font-size: 13px;
+            height: 25px;
+            line-height: 1.5;
+            padding: 6px;
+        }
+
+#pdfRenderer {
+    padding-top: 10px;
+}
+
+#BGFlightBook {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1;
+}
+
+    #BGFlightBook .step {
+        position: absolute;
+        /*border: 1px solid #333;*/
+    }
+
+        #BGFlightBook .step .step-content {
+            display: none;
+        }
+
+        #BGFlightBook .step.step-awb-no {
+            height: 50px;
+            right: 90px;
+            top: 70px;
+            width: 200px;
+        }
+
+        #BGFlightBook .step.step-shipper-info {
+            height: 50px;
+            left: 10px;
+            top: 40px;
+            width: 200px;
+        }
+
+        #BGFlightBook .step.step-consignee-info {
+            height: 50px;
+            left: 10px;
+            top: 150px;
+            width: 200px;
+        }
+
+        #BGFlightBook .step.step-agent-name {
+            height: 50px;
+            left: 10px;
+            top: 320px;
+            width: 200px;
+        }
+
+        #BGFlightBook .step.step-origin {
+            height: 50px;
+            left: 10px;
+            top: 400px;
+            width: 200px;
+        }
+
+        #BGFlightBook .step.step-dest {
+            height: 50px;
+            left: 10px;
+            top: 450px;
+            width: 200px;
+        }
+
+        #BGFlightBook .step.step-route {
+            height: 50px;
+            left: 10px;
+            top: 380px;
+            width: 200px;
+        }
+
+        #BGFlightBook .step.step-handling-info {
+            height: 50px;
+            left: 10px;
+            top: 550px;
+            width: 200px;
+        }
+
+        #BGFlightBook .step.step-weight {
+            height: 50px;
+            left: 10px;
+            top: 600px;
+            width: 200px;
+        }
+
+        #BGFlightBook .step.step-shippment-info {
+            height: 50px;
+            right: 90px;
+            top: 600px;
+            width: 200px;
+        }
+
+        #BGFlightBook .step.step-charges {
+            height: 50px;
+            left: 10px;
+            top: 550px;
+            width: 200px;
+        }
+
+#viewDiscrepancy table > tbody > tr > td,
+#viewDiscrepancy table > thead > tr > th {
+    padding: 3px;
+} 
+#viewDiscrepancy.no-discrepancy {
+    padding: 20px;
+}
+#viewDiscrepancy .img-exclude-point {
+    cursor: pointer;
+}
+
+.redDiscrepancy, .redDiscrepancy:hover{ 
+    background-color:red !important;    
+}
+
+.redDiscrepancy span{
+    color:white;
+}
