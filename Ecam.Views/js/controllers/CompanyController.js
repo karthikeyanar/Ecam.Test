@@ -146,13 +146,13 @@ define("CompanyController", ["knockout", "komapping", "../models/GridModel", "..
                     "data": arr
                 }).done(function (json) {
                     m.total_rows(json.total);
-                    m.rows.removeAll();
-                    $.each(json.rows, function (i, row) {
-                        var rm = new CompanyModel();
-                        self.assignEditEvents(rm, m)
-                        komapping.fromJS(row, {}, rm);
-                        m.rows.push(rm);
-                    });
+                    m.rows(json.rows);
+                    //$.each(json.rows, function (i, row) {
+                    //    var rm = new CompanyModel();
+                    //    self.assignEditEvents(rm, m)
+                    //    komapping.fromJS(row, {}, rm);
+                    //    m.rows.push(rm);
+                    //});
                     if (m.refreshCallBack == null) {
                         m.refreshCallBack = function (m) {
                             self.loadCompanyGrid(m, $target);

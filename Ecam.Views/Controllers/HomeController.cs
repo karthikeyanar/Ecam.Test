@@ -35,9 +35,6 @@ namespace Ecam.Views.Controllers
 
         public ActionResult SQLChecking()
         {
-            using (EcamContext context = new EcamContext())
-            {
-            }
             return View();
         }
 

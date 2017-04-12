@@ -224,11 +224,9 @@ namespace Ecam.Framework.Repository
             orderBy = string.Format("order by {0} {1}", paging.SortName, paging.SortOrder);
 
             selectFields = "ct.*" +
-                           ",(((ifnull(ct.close_price, 0) - ifnull(ct.prev_price, 0)) / ifnull(ct.prev_price, 0)) * 100) as prev_percentage" +
-                           ",(((ifnull(ct.close_price, 0) - ifnull(ct.week_52_high, 0)) / ifnull(ct.week_52_high, 0)) * 100) as week_52_percentage" +
-                           ",(((ifnull(ct.close_price, 0) - ifnull(ct.months_3_high, 0)) / ifnull(ct.months_3_high, 0)) * 100) as months_3_percentage" +
-                           ",(((ifnull(ct.close_price, 0) - ifnull(ct.months_1_high, 0)) / ifnull(ct.months_1_high, 0)) * 100) as months_1_percentage" +
-                           ",(((ifnull(ct.close_price, 0) - ifnull(ct.day_5_high, 0)) / ifnull(ct.day_5_high, 0)) * 100) as day_5_percentage" +
+                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.prev_price, 0)) / ifnull(ct.prev_price, 0)) * 100) as prev_percentage" +
+                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.week_52_high, 0)) / ifnull(ct.week_52_high, 0)) * 100) as week_52_percentage" +
+                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.week_52_low, 0)) / ifnull(ct.week_52_low, 0)) * 100) as week_52_low_percentage" +
                            ",ct.company_id as id"
                            ;
 

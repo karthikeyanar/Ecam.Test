@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecam.Contracts", "Ecam.Cont
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecam.Framework", "Ecam.Framework\Ecam.Framework.csproj", "{21F3E8AC-D30D-4D01-89CF-35663DB5C177}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecam.AlertEmail", "Ecam.AlertEmail\Ecam.AlertEmail.csproj", "{77C314BA-2C0F-43EF-BDC3-B1DE28CB2637}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DownloadHTMLContent", "DownloadHTMLContent\DownloadHTMLContent.csproj", "{B0F3CE79-77C4-4ED5-AC05-6A2C75714F51}"
 EndProject
 Global
@@ -55,12 +53,6 @@ Global
 		{21F3E8AC-D30D-4D01-89CF-35663DB5C177}.Release|Any CPU.Build.0 = Release|Any CPU
 		{21F3E8AC-D30D-4D01-89CF-35663DB5C177}.Release|x86.ActiveCfg = Release|Any CPU
 		{21F3E8AC-D30D-4D01-89CF-35663DB5C177}.Release|x86.Build.0 = Release|Any CPU
-		{77C314BA-2C0F-43EF-BDC3-B1DE28CB2637}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{77C314BA-2C0F-43EF-BDC3-B1DE28CB2637}.Debug|x86.ActiveCfg = Debug|x86
-		{77C314BA-2C0F-43EF-BDC3-B1DE28CB2637}.Debug|x86.Build.0 = Debug|x86
-		{77C314BA-2C0F-43EF-BDC3-B1DE28CB2637}.Release|Any CPU.ActiveCfg = Release|x86
-		{77C314BA-2C0F-43EF-BDC3-B1DE28CB2637}.Release|x86.ActiveCfg = Release|x86
-		{77C314BA-2C0F-43EF-BDC3-B1DE28CB2637}.Release|x86.Build.0 = Release|x86
 		{B0F3CE79-77C4-4ED5-AC05-6A2C75714F51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B0F3CE79-77C4-4ED5-AC05-6A2C75714F51}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0F3CE79-77C4-4ED5-AC05-6A2C75714F51}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -72,5 +64,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.Common.6.0.1304.0\lib\NET45;packages\EnterpriseLibrary.Validation.6.0.1304.0\lib\NET45
 	EndGlobalSection
 EndGlobal

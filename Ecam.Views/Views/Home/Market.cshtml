@@ -64,24 +64,21 @@
                     <th sortname="low_price" class="text-right text-nowrap">
                         Low
                     </th>
+                    <th sortname="ltp_price" class="text-right text-nowrap">
+                        LTP
+                    </th>
                     <th sortname="close_price" class="text-right text-nowrap">
                         Close
                     </th>
-                    <th sortname="prev_percentage" class="text-right text-nowrap">
+                    <th sortname="prev_price" class="text-right text-nowrap">
                         Prev
                     </th>
-                    <th sortname="day_5_percentage" class="text-right text-nowrap">
-                        5 Days
+                    <th sortname="prev_percentage" class="text-right text-nowrap">
+                        Prev %
                     </th>
-                    <th sortname="months_1_percentage" class="text-right text-nowrap">
-                        1 Months
-                    </th>
-                    <th sortname="months_3_percentage" class="text-right text-nowrap">
-                        3 Months
-                    </th>
-                    <th sortname="week_52_percentage" class="text-right text-nowrap">
-                        Week 52
-                    </th>
+                    <th sortname="week_52_low" class="text-right text-nowrap">Week 52 Low</th>
+                    <th sortname="week_52_high" class="text-right text-nowrap">Week 52 High</th>
+                    <th sortname="week_52_percentage" class="text-right text-nowrap">Week 52 %</th>
                     <th style="width: 50px">
                     </th>
                     <th style="width: 50px">
@@ -93,31 +90,17 @@
                     <td class="cursor-pointer" data-bind="text:company_name,click:edit"></td>
                     <td class="cursor-pointer" data-bind="text:symbol,click:edit"></td>
                     <td class="cursor-pointer" data-bind="text:trade_type,click:edit"></td>
-                    <td class="cursor-pointer" data-bind="text:formatDate(trade_date()),click:edit"></td>
-                    <td class="cursor-pointer text-right" data-bind="text:formatNumber(open_price()),click:edit"></td>
-                    <td class="cursor-pointer text-right" data-bind="text:formatNumber(high_price()),click:edit"></td>
-                    <td class="cursor-pointer text-right" data-bind="text:formatNumber(low_price()),click:edit"></td>
-                    <td class="cursor-pointer text-right" data-bind="text:formatNumber(close_price()),click:edit"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right">
-                        <span data-bind="text:formatPercentage(prev_percentage()),click:edit"></span><br />
-                        <span data-bind="text:formatNumber(prev_price()),click:edit"></span>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right">
-                        <span data-bind="text:formatPercentage(day_5_percentage()),click:edit"></span><br />
-                        <span data-bind="text:formatNumber(day_5_high()),click:edit"></span>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right">
-                        <span data-bind="text:formatPercentage(months_1_percentage()),click:edit"></span><br />
-                        <span data-bind="text:formatNumber(months_1_high()),click:edit"></span>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right">
-                        <span data-bind="text:formatPercentage(months_3_percentage()),click:edit"></span><br />
-                        <span data-bind="text:formatNumber(months_3_high()),click:edit"></span>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right">
-                        <span data-bind="text:formatPercentage(week_52_percentage()),click:edit"></span><br />
-                        <span data-bind="text:formatNumber(week_52_high()),click:edit"></span>
-                    </td>
+                    <td class="cursor-pointer" data-bind="text:formatDate(trade_date),click:edit"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(open_price),click:edit"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(high_price),click:edit"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(low_price),click:edit"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(ltp_price),click:edit"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(close_price),click:edit"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(prev_price),click:edit"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatPercentage(prev_percentage),click:edit"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(week_52_low),click:edit"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(week_52_high),click:edit"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatPercentage(week_52_percentage),click:edit"></td>
                     <td style="text-align:center;">
                         <a data-bind="attr:{'href': 'https://www.google.com/finance?q=NSE:'+symbol()}" target="_blank">G</a>
                     </td>

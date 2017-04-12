@@ -175,13 +175,13 @@ define("MarketController", ["knockout", "komapping", "../models/GridModel", "../
                     "data": arr
                 }).done(function (json) {
                     m.total_rows(json.total);
-                    m.rows.removeAll();
-                    $.each(json.rows, function (i, row) {
-                        var rm = new MarketModel();
-                        self.assignEditEvents(rm, m)
-                        komapping.fromJS(row, {}, rm);
-                        m.rows.push(rm);
-                    });
+                    m.rows(json.rows); //.removeAll();
+                    //$.each(json.rows, function (i, row) {
+                    //    var rm = new MarketModel();
+                    //    self.assignEditEvents(rm, m)
+                    //    komapping.fromJS(row, {}, rm);
+                    //    m.rows.push(rm);
+                    //});
                     if (m.refreshCallBack == null) {
                         m.refreshCallBack = function (m) {
                             self.loadMarketGrid(m, $target);

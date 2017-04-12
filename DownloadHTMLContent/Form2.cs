@@ -8,7 +8,6 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -16,9 +15,9 @@ using System.Windows.Forms;
 
 namespace DownloadHTMLContent
 {
-    public partial class Form1 : Form
+    public partial class Form2 : Form
     {
-        public Form1()
+        public Form2()
         {
             InitializeComponent();
         }
@@ -30,8 +29,7 @@ namespace DownloadHTMLContent
         //private int _YearIndex = -1;
         //private int _MonthIndex = 0;
         //private bool _IsYearWise = false;
-
-        private void Form1_Load(object sender, EventArgs e)
+        private void Form2_Load(object sender, EventArgs e)
         {
             //string IsYearWise = System.Configuration.ConfigurationManager.AppSettings["IsYearWise"];
             //if (IsYearWise == "true")
@@ -56,29 +54,8 @@ namespace DownloadHTMLContent
             //}
             //else
             //{
-            //}
             DownloadHTMLCompanies();
-        }
-
-        private void Update52WeekPrice()
-        {
-            //string dirPath = System.Configuration.ConfigurationManager.AppSettings["DownloadHTMLPath"];
-            //string fileName = dirPath + "\\" + "google.finance.html";
-            //string html = System.IO.File.ReadAllText(fileName);
-            TradeHelper.UpdateCompanyPrice(_lastCompany.symbol);
-            lblCompany.Text = _lastCompany.company_name;
-            lblSymbol.Text = _lastCompany.symbol;
-            lblStartDate.Text = "";
-            lblEndDate.Text = "";
-            lblTotalRecords.Text = "";
-            lblCompanyStatus.Text = "";
-            lblError.Text = "Update google finance values symbol=" + _lastCompany.symbol;
-            Application.DoEvents();
-            WebClient webClient = new WebClient();
-            string url = string.Format("https://www.google.com/finance?q=NSE:{0}", _lastCompany.symbol.Replace("&", "%26"));
-            string html = webClient.DownloadString(url);
-            TradeHelper.GoogleFinance52WeekImport(_lastCompany.symbol, html);
-            Helper.Log(lblError.Text, "GOOGLEFINANCE");
+            //}
         }
 
         //private void ProcessHTMLFiles()
@@ -178,7 +155,6 @@ namespace DownloadHTMLContent
                         else
                         {
                             TradeHelper.NSEIndiaImport(html);
-                            Update52WeekPrice();
                             DownloadHTMLCompanies();
                         }
                     }
@@ -356,7 +332,6 @@ namespace DownloadHTMLContent
                 //if (_IsYearWise == false)
                 //{
                 TradeHelper.NSEIndiaImport(html);
-                Update52WeekPrice();
                 //}
             }
             //

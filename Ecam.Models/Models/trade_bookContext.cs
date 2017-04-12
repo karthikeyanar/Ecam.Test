@@ -22,7 +22,6 @@ namespace Ecam.Models{
             modelBuilder.Configurations.Add(new tra_marketMap());
 			modelBuilder.Configurations.Add(new aspnetuserrolesMap());
              
-
         }
     }
 }

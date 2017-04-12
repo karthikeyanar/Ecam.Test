@@ -19,17 +19,12 @@ namespace Ecam.Contracts
         public Nullable<decimal> low_price { get; set; }
         public Nullable<decimal> close_price { get; set; }
         public Nullable<decimal> prev_price { get; set; }
-        public Nullable<decimal> week_52_high { get; set; }
-        public Nullable<decimal> months_3_high { get; set; }
-        public Nullable<decimal> months_1_high { get; set; }
-        public Nullable<decimal> day_5_high { get; set; }
+        public Nullable<int> ltp_price { get; set; }
 
         public string company_name { get; set; }
         public Nullable<decimal> prev_percentage { get; set; }
         public Nullable<decimal> week_52_percentage { get; set; }
-        public Nullable<decimal> months_3_percentage { get; set; }
-        public Nullable<decimal> months_1_percentage { get; set; }
-        public Nullable<decimal> day_5_percentage { get; set; }
+        public Nullable<decimal> week_52_low_percentage { get; set; }
     }
 
     public class TRA_MARKET_SEARCH : TRA_MARKET
