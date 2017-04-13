@@ -331,18 +331,22 @@ namespace DownloadHTMLContent
             if (html.Contains("Make sure the web address") == true)
             {
                 isIgnore = true;
+                Helper.Log(_lastCompany.symbol, "DOWNLOAD_ERROR");
             }
             if (html.Contains("Service Unavailable") == true)
             {
                 isIgnore = true;
+                Helper.Log(_lastCompany.symbol, "DOWNLOAD_ERROR");
             }
             if (html.Contains("What you can try") == true)
             {
                 isIgnore = true;
+                Helper.Log(_lastCompany.symbol, "DOWNLOAD_ERROR");
             }
             if (html.Contains("No Records") == true)
             {
                 isIgnore = true;
+                Helper.Log(_lastCompany.symbol, "DOWNLOAD_ERROR");
             }
             if (isIgnore == false)
             {

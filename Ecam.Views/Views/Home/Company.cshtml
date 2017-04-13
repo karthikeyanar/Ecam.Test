@@ -76,24 +76,24 @@
             </thead>
             <tbody data-bind="foreach: grid().rows">
                 <tr>
-                    <td style="vertical-align:top;" class="cursor-pointer" data-bind="text:company_name,click:edit"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer" data-bind="text:symbol,click:edit"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer" data-bind="text:category_name,click:edit"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(open_price),click:edit"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(high_price),click:edit"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(low_price),click:edit"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(ltp_price),click:edit"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(close_price),click:edit"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(prev_price),click:edit"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatPercentage(prev_percentage),click:edit"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(week_52_low),click:edit"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(week_52_high),click:edit"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatPercentage(week_52_percentage),click:edit"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer" data-bind="text:company_name"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer" data-bind="text:symbol"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer" data-bind="text:category_name"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(open_price)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(high_price)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(low_price)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(ltp_price)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(close_price)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(prev_price)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatPercentage(prev_percentage)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(week_52_low)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(week_52_high)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatPercentage(week_52_percentage)"></td>
                     <td style="text-align:center;">
-                        <a data-bind="attr:{'href': 'https://www.google.com/finance?q=NSE:'+symbol()}" target="_blank">G</a>
+                        <a data-bind="attr:{'href': 'https://www.google.com/finance?q=NSE:'+symbol}" target="_blank">G</a>
                     </td>
                     <td style="vertical-align:top;" class="text-center">
-                        <a href="javascript:;" class="cursor-pointer fg-black" data-bind="jConfirm: {'ok': deleteCompany}" data-placement="top"><i class="fa fa-times"></i></a>
+                        <a href="javascript:;" class="cursor-pointer fg-black" data-placement="top"><i class="fa fa-times"></i></a>
                     </td>
                 </tr>
             </tbody>

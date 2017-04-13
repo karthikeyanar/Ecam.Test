@@ -160,10 +160,12 @@ namespace Ecam.Models
                     }
                 }
             }
-            if (high > 0 || low > 0)
+
+            string sql = string.Format(" update tra_company set week_52_low={0},week_52_high={1} where symbol='{2}'", low, high, symbol);
+            MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+            if(high<=0 || low <= 0)
             {
-                string sql = string.Format(" update tra_company set week_52_low={0},week_52_high={1} where symbol='{2}'", low, high, symbol);
-                MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+                Helper.Log("Not update google finace value symbol=" + symbol, "NOT_UPDATE_GOOGLEFINANCE");
             }
         }
 
