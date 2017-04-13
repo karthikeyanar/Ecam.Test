@@ -52,6 +52,27 @@ namespace Ecam.Views.Controllers
         }
 
 
+        [HttpPost]
+        [ActionName("UpdateBookMark")]
+        public IHttpActionResult UpdateBookMark()
+        {
+            string symbol = HttpContext.Current.Request["symbol"];
+            string is_book_mark = HttpContext.Current.Request["is_book_mark"];
+            using(EcamContext context = new EcamContext())
+            {
+                tra_company company = (from q in context.tra_company
+                                       where q.symbol == symbol
+                                       select q).FirstOrDefault();
+                if(company != null)
+                {
+                    company.is_book_mark = (is_book_mark == "true");
+                    context.Entry(company).State = System.Data.Entity.EntityState.Modified;
+                    context.SaveChanges();
+                }
+            }
+            return Ok();
+        }
+
         [HttpGet]
         [ActionName("SelectCategories")]
         public List<Select2List> GetSelectCategories([FromUri] string term, [FromUri] int pageSize = 50)

@@ -142,7 +142,6 @@ namespace Ecam.Framework.Repository
             return rows;
         }
 
-
         public PaginatedListResult<TRA_COMPANY> Get(TRA_COMPANY_SEARCH criteria, Paging paging)
         {
             StringBuilder where = new StringBuilder();
@@ -201,6 +200,11 @@ namespace Ecam.Framework.Repository
                 {
                     where.AppendFormat(" and ct.symbol in({0})", Helper.ConvertStringSQLFormat(categorySymbols));
                 }
+            }
+
+            if (criteria.is_book_mark.HasValue)
+            {
+                where.AppendFormat(" and ifnull(ct.is_book_mark,0)={0}", ((criteria.is_book_mark ?? false) == true ? "1" : "0"));
             }
 
             selectFields = "count(*) as cnt";

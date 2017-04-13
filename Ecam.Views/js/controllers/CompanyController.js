@@ -138,6 +138,10 @@ define("CompanyController", ["knockout", "komapping", "../models/GridModel", "..
                 arr[arr.length] = { "name": "pageSize", "value": m.rows_per_page() };
                 arr[arr.length] = { "name": "sortName", "value": m.sort_name() };
                 arr[arr.length] = { "name": "sortOrder", "value": m.sort_order() };
+                var isbookmark = $("#frmCompanySearch #is_book_mark")[0].checked;
+                if (isbookmark == true) {
+                    arr[arr.length] = { "name": "is_book_mark", "value": isbookmark };
+                }
                 var url = apiUrl("/Company/List");
                 $.ajax({
                     "url": url,
@@ -250,6 +254,34 @@ define("CompanyController", ["knockout", "komapping", "../models/GridModel", "..
                     self.applyPlugins();
                     var $target = $(".page-content");
                     self.loadCompanyGrid(self.grid(), $target);
+
+                    $("body").on("click", "#frmCompanySearch #is_book_mark", function (event) {
+                        self.loadCompanyGrid(self.grid(), $target);
+                    });
+
+                    $("body").on("click", ".is-book-mark", function (event) {
+                        var $this = $(this);
+                        var $i = $("i", $this);
+                        var dataFor = ko.dataFor(this);
+                        var url = apiUrl('/Company/UpdateBookMark');
+                        var arr = [];
+                        var isBookMark = $i.hasClass('fa-bookmark');
+                        arr.push({ "name": "symbol", "value": dataFor.symbol });
+                        arr.push({ "name": "is_book_mark", "value": !isBookMark });
+                        $i.removeClass('fa-bookmark').removeClass('fa-bookmark-o').removeClass('fg-primary');
+                        if (isBookMark == true) {
+                            $i.addClass('fa-bookmark-o');
+                        } else {
+                            $i.addClass('fa-bookmark fg-primary');
+                        }
+                        $.ajax({
+                            "url": url,
+                            "cache": false,
+                            "type": "POST",
+                            "data": arr
+                        }).done(function (json) {
+                        });
+                    });
                 });
                 unblockUI();
             }
