@@ -76,6 +76,7 @@ namespace DownloadHTMLContent
             Application.DoEvents();
             WebClient webClient = new WebClient();
             string url = string.Format("https://www.google.com/finance?q=NSE:{0}", _lastCompany.symbol.Replace("&", "%26"));
+            //string url = "https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/GetQuote.jsp?symbol=JSWSTEEL";
             string html = webClient.DownloadString(url);
             TradeHelper.GoogleFinance52WeekImport(_lastCompany.symbol, html);
             Helper.Log(lblError.Text, "GOOGLEFINANCE");
