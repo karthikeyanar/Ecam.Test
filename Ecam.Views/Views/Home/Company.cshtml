@@ -13,11 +13,20 @@
                     <input type="hidden" name="categories" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
+                    <input type="text" name="from_price" class="form-control input-sm" placeholder="From Price" style="width:100px" />
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <input type="text" name="to_price" class="form-control input-sm" placeholder="To Price" style="width:100px" />
+                </div>
+                <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" id="is_book_mark"  /> Show Book Mark
                         </label>
                     </div>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                   <button type="button" id="btn" class="btn btn-success btn-sm" data-bind="click:refresh">Refresh</button>
                 </div>
             </form>
         </div>

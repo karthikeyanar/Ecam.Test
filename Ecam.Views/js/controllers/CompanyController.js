@@ -168,13 +168,18 @@ define("CompanyController", ["knockout", "komapping", "../models/GridModel", "..
             }
 
 
+            this.refresh = function () {
+                var $target = $(".page-content");
+                self.loadCompanyGrid(self.grid(), $target);
+            }
+
             this.applyPlugins = function () {
                 var $frmCompanySearch = $("#frmCompanySearch");
                 var $symbols = $(":input[name='symbols']", $frmCompanySearch);
                 var $categories = $(":input[name='categories']", $frmCompanySearch);
                 select2Setup($symbols[0], {
                     multiple: true
-                    , width: 400
+                    , width: 300
                    , url: apiUrl("/Company/Select")
                    , placeholder: "Select Company"
                    , resultsCallBack: function (data, page) {
@@ -198,7 +203,7 @@ define("CompanyController", ["knockout", "komapping", "../models/GridModel", "..
 
                 select2Setup($categories[0], {
                     multiple: true
-                   , width: 400
+                   , width: 300
                    , url: apiUrl("/Company/SelectCategories")
                    , placeholder: "Select Categories"
                    , resultsCallBack: function (data, page) {
@@ -242,6 +247,7 @@ define("CompanyController", ["knockout", "komapping", "../models/GridModel", "..
                 self.grid(new GridModel())
                 self.grid().sort_name("week_52_percentage");
                 self.grid().sort_order("desc");
+                self.grid().rows_per_page(200);
                 var $target = $(".page-content");
                 if (callback)
                     callback();

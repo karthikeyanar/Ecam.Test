@@ -207,6 +207,16 @@ namespace Ecam.Framework.Repository
                 where.AppendFormat(" and ifnull(ct.is_book_mark,0)={0}", ((criteria.is_book_mark ?? false) == true ? "1" : "0"));
             }
 
+            if (criteria.from_price.HasValue)
+            {
+                where.AppendFormat(" and ifnull(ct.close_price,0)>={0}", criteria.from_price);
+            }
+
+            if (criteria.to_price.HasValue)
+            {
+                where.AppendFormat(" and ifnull(ct.close_price,0)<={0}", criteria.to_price);
+            }
+
             selectFields = "count(*) as cnt";
 
             sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, "", "");

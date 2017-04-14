@@ -34,6 +34,8 @@ namespace Ecam.Contracts
     {
         public string symbols { get; set; }
         public string categories { get; set; }
+        public decimal? from_price { get; set; }
+        public decimal? to_price { get; set; }
     }
 }
 
