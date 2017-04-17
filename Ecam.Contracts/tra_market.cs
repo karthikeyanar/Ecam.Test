@@ -22,6 +22,8 @@ namespace Ecam.Contracts
         public Nullable<int> ltp_price { get; set; }
 
         public string company_name { get; set; }
+        public Nullable<decimal> week_52_low { get; set; }
+        public Nullable<decimal> week_52_high { get; set; }
         public Nullable<decimal> prev_percentage { get; set; }
         public Nullable<decimal> week_52_percentage { get; set; }
         public Nullable<decimal> week_52_low_percentage { get; set; }

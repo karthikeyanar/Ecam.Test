@@ -91,6 +91,8 @@ namespace Ecam.Framework.Repository
 
             selectFields = "ct.*" +
                            ",c.company_name as company_name" +
+                           ",c.week_52_low" +
+                           ",c.week_52_high" +
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.prev_price, 0)) / ifnull(ct.prev_price, 0)) * 100) as prev_percentage" +
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(c.week_52_high, 0)) / ifnull(c.week_52_high, 0)) * 100) as week_52_percentage" +
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(c.week_52_low, 0)) / ifnull(c.week_52_low, 0)) * 100) as week_52_low_percentage" +
