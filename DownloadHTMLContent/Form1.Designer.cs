@@ -37,6 +37,7 @@
             this.lblCompany = new System.Windows.Forms.Label();
             this.lblCompanyStatus = new System.Windows.Forms.Label();
             this.lblTotalRecords = new System.Windows.Forms.Label();
+            this.webBrowser2 = new System.Windows.Forms.WebBrowser();
             this.SuspendLayout();
             // 
             // webBrowser1
@@ -47,7 +48,7 @@
             this.webBrowser1.Location = new System.Drawing.Point(12, 140);
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
-            this.webBrowser1.Size = new System.Drawing.Size(1338, 589);
+            this.webBrowser1.Size = new System.Drawing.Size(636, 589);
             this.webBrowser1.TabIndex = 0;
             this.webBrowser1.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser1_DocumentCompleted);
             // 
@@ -130,11 +131,24 @@
             this.lblTotalRecords.TabIndex = 9;
             this.lblTotalRecords.Text = "label1";
             // 
+            // webBrowser2
+            // 
+            this.webBrowser2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.webBrowser2.Location = new System.Drawing.Point(654, 140);
+            this.webBrowser2.MinimumSize = new System.Drawing.Size(20, 20);
+            this.webBrowser2.Name = "webBrowser2";
+            this.webBrowser2.Size = new System.Drawing.Size(696, 589);
+            this.webBrowser2.TabIndex = 10;
+            this.webBrowser2.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser2_DocumentCompleted);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1362, 741);
+            this.Controls.Add(this.webBrowser2);
             this.Controls.Add(this.lblTotalRecords);
             this.Controls.Add(this.lblCompanyStatus);
             this.Controls.Add(this.lblCompany);
@@ -163,6 +177,7 @@
         private System.Windows.Forms.Label lblCompany;
         private System.Windows.Forms.Label lblCompanyStatus;
         private System.Windows.Forms.Label lblTotalRecords;
+        private System.Windows.Forms.WebBrowser webBrowser2;
     }
 }
 

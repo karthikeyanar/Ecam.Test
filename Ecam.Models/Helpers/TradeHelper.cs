@@ -163,9 +163,105 @@ namespace Ecam.Models
 
             string sql = string.Format(" update tra_company set week_52_low={0},week_52_high={1} where symbol='{2}'", low, high, symbol);
             MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-            if(high<=0 || low <= 0)
+            if (high <= 0 || low <= 0)
             {
                 Helper.Log("Not update google finace value symbol=" + symbol, "NOT_UPDATE_GOOGLEFINANCE");
+            }
+        }
+
+
+        public static void NSEIndia52WeekImport(string html)
+        {
+            decimal low = 0;
+            decimal high = 0;
+            string symbol = "";
+            string series = "";
+            string sql = "";
+            html = html.Replace("\n", "").Replace("\r", "").Replace("\r\n", "");
+            //int startIndex = html.IndexOf("<table class=\"snap-data\">");
+            //int endIndex = html.IndexOf("</table>");
+            //int length = endIndex - startIndex + 8;
+            //string tblHTML = html.Substring(startIndex, length);
+            //tblHTML = tblHTML.Replace(" ", "");
+            Regex regex = new Regex(
+    @"\""high52\""\:\""(?<v>.*)\""\,\""purpose",
+    RegexOptions.IgnoreCase
+    | RegexOptions.Multiline
+    | RegexOptions.IgnorePatternWhitespace
+    | RegexOptions.Compiled
+    );
+            MatchCollection collections = regex.Matches(html);
+            foreach (Match col in collections)
+            {
+                if (col.Groups.Count > 0)
+                {
+                    high = DataTypeHelper.ToDecimal(col.Groups["v"].Value);
+                }
+            }
+
+            regex = new Regex(
+     @"\""low52\""\:\""(?<v>.*)\""\,\""securityVar",
+     RegexOptions.IgnoreCase
+     | RegexOptions.Multiline
+     | RegexOptions.IgnorePatternWhitespace
+     | RegexOptions.Compiled
+     );
+            collections = regex.Matches(html);
+            foreach (Match col in collections)
+            {
+                if (col.Groups.Count > 0)
+                {
+                    low = DataTypeHelper.ToDecimal(col.Groups["v"].Value);
+                }
+            }
+
+            regex = new Regex(
+    @"\""symbol\""\:\""(?<v>.*)\""\,\""varMargin",
+    RegexOptions.IgnoreCase
+    | RegexOptions.Multiline
+    | RegexOptions.IgnorePatternWhitespace
+    | RegexOptions.Compiled
+    );
+            collections = regex.Matches(html);
+            foreach (Match col in collections)
+            {
+                if (col.Groups.Count > 0)
+                {
+                    symbol = col.Groups["v"].Value;
+                }
+            }
+
+            regex = new Regex(
+    @"\""series\""\:\""(?<v>.*)\""\,\""isinCode",
+    RegexOptions.IgnoreCase
+    | RegexOptions.Multiline
+    | RegexOptions.IgnorePatternWhitespace
+    | RegexOptions.Compiled
+    );
+
+            collections = regex.Matches(html);
+            foreach (Match col in collections)
+            {
+                if (col.Groups.Count > 0)
+                {
+                    series = col.Groups["v"].Value;
+                }
+            }
+
+            if (string.IsNullOrEmpty(symbol) == false
+                && string.IsNullOrEmpty(series) == false)
+            {
+                if (series != "EQ")
+                {
+                    Helper.Log("Not EQ Series symbol=" + symbol, "NOT_EQ_SERIES_NSEINDIA_Week_52");
+                    high = 0;low = 0;
+                }
+                sql = string.Format(" update tra_company set week_52_low={0},week_52_high={1} where symbol='{2}'", low, high, symbol);
+                MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+                if (high <= 0 || low <= 0)
+                {
+                    Helper.Log("Not update nse india symbol=" + symbol, "NOT_Update_Week_52_SERIES_NSEINDIA_Week_52");
+                }
             }
         }
 

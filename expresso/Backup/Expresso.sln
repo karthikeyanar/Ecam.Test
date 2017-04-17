@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 7.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Expresso", "Expresso.csproj", "{C90F3902-A0FF-4534-9240-B99CC8A08505}"
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		ConfigName.0 = Debug
+		ConfigName.1 = Release
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{C90F3902-A0FF-4534-9240-B99CC8A08505}.Debug.ActiveCfg = Debug|.NET
+		{C90F3902-A0FF-4534-9240-B99CC8A08505}.Debug.Build.0 = Debug|.NET
+		{C90F3902-A0FF-4534-9240-B99CC8A08505}.Release.ActiveCfg = Release|.NET
+		{C90F3902-A0FF-4534-9240-B99CC8A08505}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
