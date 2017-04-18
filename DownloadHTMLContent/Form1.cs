@@ -48,7 +48,7 @@ namespace DownloadHTMLContent
                     query = (from q in query where symbols.Contains(q.symbol) == true select q);
                 }
                 _companies = (from q in query
-                              select q).Take(2).ToList();
+                              select q).ToList();
             }
             //if (_IsYearWise)
             //{

@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecam.Contracts", "Ecam.Cont
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ecam.Framework", "Ecam.Framework\Ecam.Framework.csproj", "{21F3E8AC-D30D-4D01-89CF-35663DB5C177}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DownloadHTMLContent", "DownloadHTMLContent\DownloadHTMLContent.csproj", "{B0F3CE79-77C4-4ED5-AC05-6A2C75714F51}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,14 +51,6 @@ Global
 		{21F3E8AC-D30D-4D01-89CF-35663DB5C177}.Release|Any CPU.Build.0 = Release|Any CPU
 		{21F3E8AC-D30D-4D01-89CF-35663DB5C177}.Release|x86.ActiveCfg = Release|Any CPU
 		{21F3E8AC-D30D-4D01-89CF-35663DB5C177}.Release|x86.Build.0 = Release|Any CPU
-		{B0F3CE79-77C4-4ED5-AC05-6A2C75714F51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B0F3CE79-77C4-4ED5-AC05-6A2C75714F51}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B0F3CE79-77C4-4ED5-AC05-6A2C75714F51}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{B0F3CE79-77C4-4ED5-AC05-6A2C75714F51}.Debug|x86.Build.0 = Debug|Any CPU
-		{B0F3CE79-77C4-4ED5-AC05-6A2C75714F51}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B0F3CE79-77C4-4ED5-AC05-6A2C75714F51}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B0F3CE79-77C4-4ED5-AC05-6A2C75714F51}.Release|x86.ActiveCfg = Release|Any CPU
-		{B0F3CE79-77C4-4ED5-AC05-6A2C75714F51}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
