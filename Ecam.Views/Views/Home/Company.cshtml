@@ -21,12 +21,12 @@
                 <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" id="is_book_mark"  /> Show Book Mark
+                            <input type="checkbox" id="is_book_mark" /> Show Book Mark
                         </label>
                     </div>
                 </div>
                 <div class="form-group m-r-10 m-t-10">
-                   <button type="button" id="btn" class="btn btn-success btn-sm" data-bind="click:refresh">Refresh</button>
+                    <button type="button" id="btn" class="btn btn-success btn-sm" data-bind="click:refresh">Refresh</button>
                 </div>
             </form>
         </div>
@@ -115,8 +115,13 @@
                     <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatPercentage(week_52_low_percentage)"></td>
                     <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(week_52_high)"></td>
                     <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatPercentage(week_52_percentage)"></td>
-                    <td style="text-align:center;">
-                        <a data-bind="attr:{'href': 'https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/GetQuote.jsp?symbol='+symbol}" target="_blank">NSE</a>
+                    <td style="text-align:center;white-space:nowrap;width:90px;">
+                        <div class="pull-left m-l-15">
+                            <a data-bind="attr:{'href': 'https://www.google.co.in/search?q=NSE:'+symbol}" target="_blank">G</a>
+                        </div>
+                        <div class="pull-left m-l-15">
+                            <a data-bind="attr:{'href': 'https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/GetQuote.jsp?symbol='+symbol}" target="_blank">NSE</a>
+                        </div><div class="clearfix"></div>
                     </td>
                     <td style="vertical-align:top;" class="text-center">
                         <a href="javascript:;" class="cursor-pointer fg-black" data-placement="top"><i class="fa fa-times"></i></a>
