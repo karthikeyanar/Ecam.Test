@@ -48,6 +48,7 @@ namespace DownloadHTMLContent
                     query = (from q in query where symbols.Contains(q.symbol) == true select q);
                 }
                 _companies = (from q in query
+                              orderby q.company_name ascending
                               select q).ToList();
             }
             //if (_IsYearWise)
@@ -65,7 +66,7 @@ namespace DownloadHTMLContent
             //string dirPath = System.Configuration.ConfigurationManager.AppSettings["DownloadHTMLPath"];
             //string fileName = dirPath + "\\" + "google.finance.html";
             //string html = System.IO.File.ReadAllText(fileName);
-            TradeHelper.UpdateCompanyPrice(_lastCompany.symbol);
+            //TradeHelper.UpdateCompanyPrice(_lastCompany.symbol);
             lblCompany.Text = _lastCompany.company_name;
             lblSymbol.Text = _lastCompany.symbol;
             lblStartDate.Text = "";
@@ -98,6 +99,11 @@ namespace DownloadHTMLContent
                 if (html.Contains("What you can try") == true)
                 {
                     Helper.Log(fullFileName, "Whatyoucantry");
+                    System.IO.File.Delete(fullFileName);
+                }
+                if (html.Contains("The proxy server did not") == true)
+                {
+                    Helper.Log(fullFileName, "Theproxyserverdidnot");
                     System.IO.File.Delete(fullFileName);
                 }
             }
@@ -201,7 +207,13 @@ namespace DownloadHTMLContent
                                 Helper.Log(fullFileName, "Whatyoucantry");
                                 System.IO.File.Delete(fullFileName);
                             }
+                            if (html.Contains("The proxy server did not") == true)
+                            {
+                                Helper.Log(fullFileName, "Theproxyserverdidnot");
+                                System.IO.File.Delete(fullFileName);
+                            }
                         }
+                        /*
                         if (System.IO.File.Exists(fullFileName) == false)
                         {
                             lblCompany.Text = _lastCompany.company_name;
@@ -216,7 +228,7 @@ namespace DownloadHTMLContent
                             lblStartDate.Text = startDate.ToString("dd/MMM/yyyy");
                             lblEndDate.Text = endDate.ToString("dd/MMM/yyyy");
                             //_lastURL = url;
-                            //Helper.Log(url, "NAVIGATE");
+                            Helper.Log(url, "NAVIGATE");
                             webBrowser1.ScriptErrorsSuppressed = true;
                             webBrowser1.Navigate(url);
                         }
@@ -225,6 +237,8 @@ namespace DownloadHTMLContent
                             TradeHelper.NSEIndiaImport(html);
                             Update52WeekPrice();
                         }
+                        */
+                        Update52WeekPrice();
                     }
                 }
                 else
@@ -392,6 +406,11 @@ namespace DownloadHTMLContent
                 isIgnore = true;
                 Helper.Log(_lastCompany.symbol, "DOWNLOAD_ERROR");
             }
+            if (html.Contains("The proxy server did not") == true)
+            {
+                isIgnore = true;
+                Helper.Log(_lastCompany.symbol, "DOWNLOAD_ERROR");
+            }
             if (isIgnore == false)
             {
                 string fullFileName = dirPath + "\\" + _lastCompany.symbol + ".html";
@@ -447,6 +466,11 @@ namespace DownloadHTMLContent
                 Helper.Log(_lastCompany.symbol, "DOWNLOAD_ERROR");
             }
             if (html.Contains("No Records") == true)
+            {
+                isIgnore = true;
+                Helper.Log(_lastCompany.symbol, "DOWNLOAD_ERROR");
+            }
+            if (html.Contains("The proxy server did not") == true)
             {
                 isIgnore = true;
                 Helper.Log(_lastCompany.symbol, "DOWNLOAD_ERROR");

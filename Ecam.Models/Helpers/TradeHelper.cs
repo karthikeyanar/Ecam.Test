@@ -172,96 +172,256 @@ namespace Ecam.Models
 
         public static void NSEIndia52WeekImport(string html)
         {
-            decimal low = 0;
-            decimal high = 0;
+            decimal week_52_low = 0;
+            decimal week_52_high = 0;
+            string low = "";
+            string high = "";
+            string close = "";
+            string open = "";
+            string lastTrade = "";
+            string prev = "";
             string symbol = "";
             string series = "";
             string sql = "";
-            html = html.Replace("\n", "").Replace("\r", "").Replace("\r\n", "");
-            //int startIndex = html.IndexOf("<table class=\"snap-data\">");
-            //int endIndex = html.IndexOf("</table>");
-            //int length = endIndex - startIndex + 8;
-            //string tblHTML = html.Substring(startIndex, length);
-            //tblHTML = tblHTML.Replace(" ", "");
-            Regex regex = new Regex(
-    @"\""high52\""\:\""(?<v>.*)\""\,\""purpose",
-    RegexOptions.IgnoreCase
-    | RegexOptions.Multiline
-    | RegexOptions.IgnorePatternWhitespace
-    | RegexOptions.Compiled
-    );
-            MatchCollection collections = regex.Matches(html);
-            foreach (Match col in collections)
+            string lastUpdateTime = "";
+            List<TempClass> tempList = new List<TempClass>();
+            html = html.Replace("\n", "").Replace("\r", "").Replace("\r\n", "").Replace("DIV", "div");
+            if (html.Contains("futLink") == true)
             {
-                if (col.Groups.Count > 0)
+                int startIndex = html.IndexOf("{\"futLink\"");
+                int endIndex = html.IndexOf("],\"optLink\"");
+                int length = endIndex - startIndex + 8;
+                html = html.Substring(startIndex, length);
+                //int startIndex = html.IndexOf("<table class=\"snap-data\">");
+                //int endIndex = html.IndexOf("</table>");
+                //int length = endIndex - startIndex + 8;
+                //string tblHTML = html.Substring(startIndex, length);
+                //tblHTML = tblHTML.Replace(" ", "");
+                Regex regex = new Regex(
+        @"\""high52\""\:\""(?<v>.*)\""\,\""purpose",
+        RegexOptions.IgnoreCase
+        | RegexOptions.Multiline
+        | RegexOptions.IgnorePatternWhitespace
+        | RegexOptions.Compiled
+        );
+                MatchCollection collections = regex.Matches(html);
+                foreach (Match col in collections)
                 {
-                    high = DataTypeHelper.ToDecimal(col.Groups["v"].Value);
+                    if (col.Groups.Count > 0)
+                    {
+                        week_52_high = DataTypeHelper.ToDecimal(col.Groups["v"].Value);
+                    }
                 }
-            }
 
-            regex = new Regex(
-     @"\""low52\""\:\""(?<v>.*)\""\,\""securityVar",
+                regex = new Regex(
+         @"\""low52\""\:\""(?<v>.*)\""\,\""securityVar",
+         RegexOptions.IgnoreCase
+         | RegexOptions.Multiline
+         | RegexOptions.IgnorePatternWhitespace
+         | RegexOptions.Compiled
+         );
+                collections = regex.Matches(html);
+                foreach (Match col in collections)
+                {
+                    if (col.Groups.Count > 0)
+                    {
+                        week_52_low = DataTypeHelper.ToDecimal(col.Groups["v"].Value);
+                    }
+                }
+
+                regex = new Regex(
+        @"\""symbol\""\:\""(?<v>.*)\""\,\""varMargin",
+        RegexOptions.IgnoreCase
+        | RegexOptions.Multiline
+        | RegexOptions.IgnorePatternWhitespace
+        | RegexOptions.Compiled
+        );
+                collections = regex.Matches(html);
+                foreach (Match col in collections)
+                {
+                    if (col.Groups.Count > 0)
+                    {
+                        symbol = col.Groups["v"].Value;
+                    }
+                }
+
+                regex = new Regex(
+        @"\""series\""\:\""(?<v>.*)\""\,\""isinCode",
+        RegexOptions.IgnoreCase
+        | RegexOptions.Multiline
+        | RegexOptions.IgnorePatternWhitespace
+        | RegexOptions.Compiled
+        );
+
+                collections = regex.Matches(html);
+                foreach (Match col in collections)
+                {
+                    if (col.Groups.Count > 0)
+                    {
+                        series = col.Groups["v"].Value;
+                    }
+                }
+
+                regex = new Regex(
+       @"\""lastUpdateTime\""\:\""(?<v>.*)\""\,\""tradedDate",
+       RegexOptions.IgnoreCase
+       | RegexOptions.Multiline
+       | RegexOptions.IgnorePatternWhitespace
+       | RegexOptions.Compiled
+       );
+
+                collections = regex.Matches(html);
+                foreach (Match col in collections)
+                {
+                    if (col.Groups.Count > 0)
+                    {
+                        lastUpdateTime = col.Groups["v"].Value;
+                    }
+                }
+
+                regex = new Regex(
+     @"\""dayLow\""\:\""(?<v>.*)\""\,\""deliveryToTradedQuantity",
      RegexOptions.IgnoreCase
      | RegexOptions.Multiline
      | RegexOptions.IgnorePatternWhitespace
      | RegexOptions.Compiled
      );
-            collections = regex.Matches(html);
-            foreach (Match col in collections)
-            {
-                if (col.Groups.Count > 0)
-                {
-                    low = DataTypeHelper.ToDecimal(col.Groups["v"].Value);
-                }
-            }
 
-            regex = new Regex(
-    @"\""symbol\""\:\""(?<v>.*)\""\,\""varMargin",
-    RegexOptions.IgnoreCase
-    | RegexOptions.Multiline
-    | RegexOptions.IgnorePatternWhitespace
-    | RegexOptions.Compiled
-    );
-            collections = regex.Matches(html);
-            foreach (Match col in collections)
-            {
-                if (col.Groups.Count > 0)
+                collections = regex.Matches(html);
+                foreach (Match col in collections)
                 {
-                    symbol = col.Groups["v"].Value;
+                    if (col.Groups.Count > 0)
+                    {
+                        low = col.Groups["v"].Value;
+                    }
                 }
-            }
 
-            regex = new Regex(
-    @"\""series\""\:\""(?<v>.*)\""\,\""isinCode",
+                regex = new Regex(
+    @"\""dayHigh\""\:\""(?<v>.*)\""\,\""exDate",
     RegexOptions.IgnoreCase
     | RegexOptions.Multiline
     | RegexOptions.IgnorePatternWhitespace
     | RegexOptions.Compiled
     );
 
-            collections = regex.Matches(html);
-            foreach (Match col in collections)
-            {
-                if (col.Groups.Count > 0)
+                collections = regex.Matches(html);
+                foreach (Match col in collections)
                 {
-                    series = col.Groups["v"].Value;
+                    if (col.Groups.Count > 0)
+                    {
+                        high = col.Groups["v"].Value;
+                    }
+                }
+
+                regex = new Regex(
+    @"\""closePrice\""\:\""(?<v>.*)\""\,\""isExDateFlag",
+    RegexOptions.IgnoreCase
+    | RegexOptions.Multiline
+    | RegexOptions.IgnorePatternWhitespace
+    | RegexOptions.Compiled
+    );
+
+                collections = regex.Matches(html);
+                foreach (Match col in collections)
+                {
+                    if (col.Groups.Count > 0)
+                    {
+                        close = col.Groups["v"].Value;
+                    }
+                }
+
+                regex = new Regex(
+    @"\""open\""\:\""(?<v>.*)\""\,\""low52",
+    RegexOptions.IgnoreCase
+    | RegexOptions.Multiline
+    | RegexOptions.IgnorePatternWhitespace
+    | RegexOptions.Compiled
+    );
+
+                collections = regex.Matches(html);
+                foreach (Match col in collections)
+                {
+                    if (col.Groups.Count > 0)
+                    {
+                        open = col.Groups["v"].Value;
+                    }
+                }
+
+                regex = new Regex(
+    @"\""lastPrice\""\:\""(?<v>.*)\""\,\""pChange",
+    RegexOptions.IgnoreCase
+    | RegexOptions.Multiline
+    | RegexOptions.IgnorePatternWhitespace
+    | RegexOptions.Compiled
+    );
+
+                collections = regex.Matches(html);
+                foreach (Match col in collections)
+                {
+                    if (col.Groups.Count > 0)
+                    {
+                        lastTrade = col.Groups["v"].Value;
+                    }
+                }
+
+                regex = new Regex(
+    @"\""previousClose\""\:\""(?<v>.*)\""\,\""symbol",
+    RegexOptions.IgnoreCase
+    | RegexOptions.Multiline
+    | RegexOptions.IgnorePatternWhitespace
+    | RegexOptions.Compiled
+    );
+
+                collections = regex.Matches(html);
+                foreach (Match col in collections)
+                {
+                    if (col.Groups.Count > 0)
+                    {
+                        prev = col.Groups["v"].Value;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(symbol) == false
+                    && string.IsNullOrEmpty(series) == false)
+                {
+                    if (series != "EQ")
+                    {
+                        Helper.Log("Not EQ Series symbol=" + symbol, "NOT_EQ_SERIES_NSEINDIA_Week_52");
+                        week_52_low = 0; week_52_high = 0;
+                    }
+                    DateTime dt = DataTypeHelper.ToDateTime(lastUpdateTime);
+                    tempList.Add(new TempClass
+                    {
+                        symbol = symbol,
+                        trade_type = "NSE",
+                        trade_date = dt,
+                        close_price = DataTypeHelper.ToDecimal(close),
+                        high_price = DataTypeHelper.ToDecimal(high),
+                        low_price = DataTypeHelper.ToDecimal(low),
+                        open_price = DataTypeHelper.ToDecimal(open),
+                        ltp_price = DataTypeHelper.ToDecimal(lastTrade),
+                        prev_price = DataTypeHelper.ToDecimal(prev),
+                    });
+                    int rowIndex = 0;
+                    foreach (var row in tempList)
+                    {
+                        rowIndex += 1;
+                        //Console.WriteLine(" Rows " + rowIndex + " Of " + tempList.Count());
+                        //lblTotalRecords.Text = " Import Price Rows " + rowIndex + " Of " + tempList.Count();
+                        ImportPrice(row);
+                    }
+                    TradeHelper.UpdateCompanyPrice(symbol);
+                    sql = string.Format(" update tra_company set week_52_low={0},week_52_high={1} where symbol='{2}'", week_52_low, week_52_high, symbol);
+                    MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+                    if (week_52_high <= 0 || week_52_low <= 0)
+                    {
+                        Helper.Log("Not update nse india symbol=" + symbol, "NOT_Update_Week_52_SERIES_NSEINDIA_Week_52");
+                    }
                 }
             }
-
-            if (string.IsNullOrEmpty(symbol) == false
-                && string.IsNullOrEmpty(series) == false)
+            else
             {
-                if (series != "EQ")
-                {
-                    Helper.Log("Not EQ Series symbol=" + symbol, "NOT_EQ_SERIES_NSEINDIA_Week_52");
-                    high = 0;low = 0;
-                }
-                sql = string.Format(" update tra_company set week_52_low={0},week_52_high={1} where symbol='{2}'", low, high, symbol);
-                MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-                if (high <= 0 || low <= 0)
-                {
-                    Helper.Log("Not update nse india symbol=" + symbol, "NOT_Update_Week_52_SERIES_NSEINDIA_Week_52");
-                }
+                Helper.Log("NO CONTENT in futLink","futLink");
             }
         }
 
