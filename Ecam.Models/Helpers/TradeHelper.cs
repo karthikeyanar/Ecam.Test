@@ -242,6 +242,7 @@ namespace Ecam.Models
                     if (col.Groups.Count > 0)
                     {
                         symbol = col.Groups["v"].Value;
+                        symbol = symbol.Replace("&amp;", "&");
                     }
                 }
 
