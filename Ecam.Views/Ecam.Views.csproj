@@ -550,6 +550,7 @@
     <Content Include="js\bootstrap\bootstrap.js" />
     <Content Include="js\bootstrap\bootstrap.min.js" />
     <Content Include="js\bootstrap\npm.js" />
+    <Content Include="js\controllers\CompanyController - Copy.js" />
     <Content Include="js\controllers\MarketController.js" />
     <Content Include="js\controllers\CompanyController.js" />
     <Content Include="js\controllers\BlankController.js" />
@@ -1178,6 +1179,7 @@
     <Content Include="Views\Home\AddCompany.cshtml" />
     <Content Include="Views\Home\Market.cshtml" />
     <Content Include="Views\Home\AddMarket.cshtml" />
+    <Content Include="Views\Home\Company - Copy.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

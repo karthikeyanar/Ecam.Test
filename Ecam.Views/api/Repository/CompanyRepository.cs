@@ -258,9 +258,13 @@ namespace Ecam.Framework.Repository
             }
             foreach (var row in rows)
             {
-                row.category_name = (from q in companyCategories
+                row.category_list = (from q in companyCategories
                                      where q.symbol == row.symbol
-                                     select q.category_name).FirstOrDefault();
+                                     select q.category_name).ToList();
+                if (row.category_list.Count > 0)
+                {
+                    row.category_name = row.category_list[0];
+                }
             }
             return new PaginatedListResult<TRA_COMPANY> { total = paging.Total, rows = rows };
         }

@@ -26,13 +26,11 @@ define(["knockout", "komapping", "helper"], function (ko, komapping, helper) {
 
         this.onEdit = null;
         this.edit = function () {
-            return;
             if (self.onEdit)
                 self.onEdit();
         }
         this.onAdd = null;
         this.add = function () {
-            return;
             if (self.onAdd)
                 self.onAdd();
         }

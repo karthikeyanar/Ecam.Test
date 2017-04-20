@@ -28,6 +28,8 @@ namespace Ecam.Contracts
         public Nullable<decimal> week_52_low_percentage { get; set; }
 
         public string category_name { get; set; }
+
+        public List<string> category_list { get; set; }
     }
 
     public class TRA_COMPANY_SEARCH : TRA_COMPANY
