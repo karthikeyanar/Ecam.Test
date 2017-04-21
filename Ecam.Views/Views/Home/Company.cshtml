@@ -93,25 +93,25 @@
                         </a>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:company_name"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer" data-bind="text:symbol"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer" data-bind="text:category_name"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(open_price)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(high_price)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(low_price)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(ltp_price)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(close_price)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(prev_price)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatPercentage(prev_percentage)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(week_52_low)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatPercentage(week_52_low_percentage)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatNumber(week_52_high)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer text-right" data-bind="text:formatPercentage(week_52_percentage)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:symbol"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:category_name"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(open_price)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(high_price)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(low_price)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(ltp_price)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(close_price)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(prev_price)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatPercentage(prev_percentage)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(week_52_low)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatPercentage(week_52_low_percentage)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(week_52_high)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatPercentage(week_52_percentage)"></td>
                     <td style="text-align:center;white-space:nowrap;width:90px;">
                         <div class="pull-left m-l-15">
-                            <a data-bind="attr:{'href': 'https://www.google.co.in/search?q=NSE:'+symbol}" target="_blank">G</a>
+                            <a data-bind="attr:{'href': 'https://www.google.co.in/search?q=NSE:'+symbol.replace('&','%26')}" target="_blank">G</a>
                         </div>
                         <div class="pull-left m-l-15">
-                            <a data-bind="attr:{'href': 'https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/GetQuote.jsp?symbol='+symbol}" target="_blank">NSE</a>
+                            <a data-bind="attr:{'href': 'https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/GetQuote.jsp?symbol='+symbol.replace('&','%26')}" target="_blank">NSE</a>
                         </div><div class="clearfix"></div>
                     </td>
                     <td style="vertical-align:top;" class="text-center">
