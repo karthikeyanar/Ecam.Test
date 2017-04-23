@@ -48,7 +48,6 @@ namespace DownloadHTMLContent
                     query = (from q in query where symbols.Contains(q.symbol) == true select q);
                 }
                 _companies = (from q in query
-                              where (q.open_price ?? 0) <= 0
                               orderby q.company_name ascending
                               select q).ToList();
             }
