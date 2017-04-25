@@ -191,7 +191,9 @@ namespace Ecam.Models
                 int startIndex = html.IndexOf("{\"futLink\"");
                 int endIndex = html.IndexOf("],\"optLink\"");
                 int length = endIndex - startIndex + 8;
+
                 html = html.Substring(startIndex, length);
+
                 //int startIndex = html.IndexOf("<table class=\"snap-data\">");
                 //int endIndex = html.IndexOf("</table>");
                 //int length = endIndex - startIndex + 8;
@@ -422,7 +424,7 @@ namespace Ecam.Models
             }
             else
             {
-                Helper.Log("NO CONTENT in futLink","futLink");
+                Helper.Log("NO CONTENT in futLink", "futLink");
             }
         }
 

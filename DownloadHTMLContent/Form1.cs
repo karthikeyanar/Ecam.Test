@@ -119,7 +119,16 @@ namespace DownloadHTMLContent
             }
             else
             {
-                TradeHelper.NSEIndia52WeekImport(html);
+                try
+                {
+                    TradeHelper.NSEIndia52WeekImport(html);
+                }
+                catch (Exception ex)
+                {
+                    System.IO.File.Delete(fullFileName);
+                    Helper.Log(ex.Message, "ImportProblemException");
+                    Helper.Log(_lastCompany.symbol, "ImportProblem");
+                }
                 DownloadHTMLCompanies();
             }
             //Application.DoEvents();
@@ -487,7 +496,16 @@ namespace DownloadHTMLContent
                 //Helper.Log("New Symbol=" + _lastCompany.symbol + ",fullFileName=" + fullFileName, "NEWCOMPANY");
                 //if (_IsYearWise == false)
                 //{
-                TradeHelper.NSEIndia52WeekImport(html);
+                try
+                {
+                    TradeHelper.NSEIndia52WeekImport(html);
+                }
+                catch (Exception ex)
+                {
+                    System.IO.File.Delete(fullFileName);
+                    Helper.Log(ex.Message, "ImportProblemException");
+                    Helper.Log(_lastCompany.symbol, "ImportProblem");
+                }
                 //}
             }
             //
