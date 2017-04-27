@@ -227,6 +227,29 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             $("body").on("change", "#Company #rows", function (event) {
                 self.loadGrid();
             });
+            $("body").on("click", ".is-book-mark", function (event) {
+                var $this = $(this);
+                var $i = $("i", $this);
+                var dataFor = ko.dataFor(this);
+                var url = apiUrl('/Company/UpdateBookMark');
+                var arr = [];
+                var isBookMark = $i.hasClass('fa-bookmark');
+                arr.push({ "name": "symbol", "value": dataFor.symbol });
+                arr.push({ "name": "is_book_mark", "value": !isBookMark });
+                $i.removeClass('fa-bookmark').removeClass('fa-bookmark-o').removeClass('fg-primary');
+                if (isBookMark == true) {
+                    $i.addClass('fa-bookmark-o');
+                } else {
+                    $i.addClass('fa-bookmark fg-primary');
+                }
+                $.ajax({
+                    "url": url,
+                    "cache": false,
+                    "type": "POST",
+                    "data": arr
+                }).done(function (json) {
+                });
+            });
         }
 
         this.offElements = function () {
@@ -235,6 +258,7 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             $("body").off("click", "#Company .btn-edit");
             $("body").off("click", "#Company .btn-delete");
             $("body").off("change", "#Company #rows");
+            $("body").off("click", ".is-book-mark");
         }
 
         this.unInit = function () {
