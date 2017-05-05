@@ -533,10 +533,6 @@ namespace Ecam.Models
                     )
                 {
                     DateTime dt = DataTypeHelper.ToDateTime(date);
-                    if (dt.Year < 2016)
-                    {
-                        continue;
-                    }
                     tempList.Add(new TempClass
                     {
                         symbol = symbol,
@@ -559,7 +555,7 @@ namespace Ecam.Models
             foreach (var row in tempList)
             {
                 rowIndex += 1;
-                Console.WriteLine(" Rows " + rowIndex + " Of " + tempList.Count());
+                //Console.WriteLine(" Rows " + rowIndex + " Of " + tempList.Count());
                 //lblTotalRecords.Text = " Import Price Rows " + rowIndex + " Of " + tempList.Count();
                 ImportPrice(row);
             }

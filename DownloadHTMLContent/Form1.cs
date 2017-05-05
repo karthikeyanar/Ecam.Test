@@ -26,10 +26,11 @@ namespace DownloadHTMLContent
         private List<tra_company> _companies;
         private tra_company _lastCompany = null;
         private int _index = -1;
-        //private List<int> _Years = new List<int> { 2017, 2016 };
-        //private int _YearIndex = -1;
-        //private int _MonthIndex = 0;
-        //private bool _IsYearWise = false;
+        private List<int> _Years = new List<int> { 2017 };
+        private int _YearIndex = -1;
+        private int _MonthIndex = 0;
+        private bool _IsYearWise = false;
+        private bool _IsDateDownload = false;
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -38,6 +39,11 @@ namespace DownloadHTMLContent
             //{
             //    _IsYearWise = true;
             //}
+            string isDateDownload = System.Configuration.ConfigurationManager.AppSettings["IsDateDownload"];
+            if (isDateDownload == "true")
+            {
+                _IsDateDownload = true;
+            }
             using (EcamContext context = new EcamContext())
             {
                 string symbolsAppSetting = System.Configuration.ConfigurationManager.AppSettings["symbols"];
@@ -57,87 +63,91 @@ namespace DownloadHTMLContent
             //}
             //else
             //{
+                DownloadHTMLCompanies();
             //}
-            DownloadHTMLCompanies();
+           
         }
 
         private void Update52WeekPrice()
         {
-            //string dirPath = System.Configuration.ConfigurationManager.AppSettings["DownloadHTMLPath"];
-            //string fileName = dirPath + "\\" + "google.finance.html";
-            //string html = System.IO.File.ReadAllText(fileName);
-            //TradeHelper.UpdateCompanyPrice(_lastCompany.symbol);
-            lblCompany.Text = _lastCompany.company_name;
-            lblSymbol.Text = _lastCompany.symbol;
-            lblStartDate.Text = "";
-            lblEndDate.Text = "";
-            lblTotalRecords.Text = "";
-            lblCompanyStatus.Text = "";
-            lblError.Text = "Update nse india symbol=" + _lastCompany.symbol;
-
-            string dirPath = System.Configuration.ConfigurationManager.AppSettings["Download_NSEINDIA_HTML_Path"];
-            if (System.IO.Directory.Exists(dirPath) == false)
+            if (_IsDateDownload == false)
             {
-                System.IO.Directory.CreateDirectory(dirPath);
-            }
-            string fullFileName = dirPath + "\\" + _lastCompany.symbol + ".html";
-            string html = string.Empty;
-            //Helper.Log(fullFileName);
-            if (System.IO.File.Exists(fullFileName) == true)
-            {
-                html = System.IO.File.ReadAllText(fullFileName);
-                if (html.Contains("Make sure the web address") == true)
-                {
-                    Helper.Log(fullFileName, "MakeSure");
-                    System.IO.File.Delete(fullFileName);
-                }
-                if (html.Contains("Service Unavailable") == true)
-                {
-                    Helper.Log(fullFileName, "ServiceUnavailable");
-                    System.IO.File.Delete(fullFileName);
-                }
-                if (html.Contains("What you can try") == true)
-                {
-                    Helper.Log(fullFileName, "Whatyoucantry");
-                    System.IO.File.Delete(fullFileName);
-                }
-                if (html.Contains("The proxy server did not") == true)
-                {
-                    Helper.Log(fullFileName, "Theproxyserverdidnot");
-                    System.IO.File.Delete(fullFileName);
-                }
-            }
-            if (System.IO.File.Exists(fullFileName) == false)
-            {
+                //string dirPath = System.Configuration.ConfigurationManager.AppSettings["DownloadHTMLPath"];
+                //string fileName = dirPath + "\\" + "google.finance.html";
+                //string html = System.IO.File.ReadAllText(fileName);
+                //TradeHelper.UpdateCompanyPrice(_lastCompany.symbol);
                 lblCompany.Text = _lastCompany.company_name;
                 lblSymbol.Text = _lastCompany.symbol;
-                string url = string.Format("https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/GetQuote.jsp?symbol={0}"
-                                                                                                  , _lastCompany.symbol.Replace("&", "%26")
-                                                                                                  );
-                webBrowser2.ScriptErrorsSuppressed = true;
-                webBrowser2.Navigate(url);
-            }
-            else
-            {
-                try
+                lblStartDate.Text = "";
+                lblEndDate.Text = "";
+                lblTotalRecords.Text = "";
+                lblCompanyStatus.Text = "";
+                lblError.Text = "Update nse india symbol=" + _lastCompany.symbol;
+
+                string dirPath = System.Configuration.ConfigurationManager.AppSettings["Download_NSEINDIA_HTML_Path"];
+                if (System.IO.Directory.Exists(dirPath) == false)
                 {
-                    TradeHelper.NSEIndia52WeekImport(html);
+                    System.IO.Directory.CreateDirectory(dirPath);
                 }
-                catch (Exception ex)
+                string fullFileName = dirPath + "\\" + _lastCompany.symbol + ".html";
+                string html = string.Empty;
+                //Helper.Log(fullFileName);
+                if (System.IO.File.Exists(fullFileName) == true)
                 {
-                    System.IO.File.Delete(fullFileName);
-                    Helper.Log(ex.Message, "ImportProblemException");
-                    Helper.Log(_lastCompany.symbol, "ImportProblem");
+                    html = System.IO.File.ReadAllText(fullFileName);
+                    if (html.Contains("Make sure the web address") == true)
+                    {
+                        Helper.Log(fullFileName, "MakeSure");
+                        System.IO.File.Delete(fullFileName);
+                    }
+                    if (html.Contains("Service Unavailable") == true)
+                    {
+                        Helper.Log(fullFileName, "ServiceUnavailable");
+                        System.IO.File.Delete(fullFileName);
+                    }
+                    if (html.Contains("What you can try") == true)
+                    {
+                        Helper.Log(fullFileName, "Whatyoucantry");
+                        System.IO.File.Delete(fullFileName);
+                    }
+                    if (html.Contains("The proxy server did not") == true)
+                    {
+                        Helper.Log(fullFileName, "Theproxyserverdidnot");
+                        System.IO.File.Delete(fullFileName);
+                    }
                 }
-                DownloadHTMLCompanies();
+                if (System.IO.File.Exists(fullFileName) == false)
+                {
+                    lblCompany.Text = _lastCompany.company_name;
+                    lblSymbol.Text = _lastCompany.symbol;
+                    string url = string.Format("https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/GetQuote.jsp?symbol={0}"
+                                                                                                      , _lastCompany.symbol.Replace("&", "%26")
+                                                                                                      );
+                    webBrowser2.ScriptErrorsSuppressed = true;
+                    webBrowser2.Navigate(url);
+                }
+                else
+                {
+                    try
+                    {
+                        TradeHelper.NSEIndia52WeekImport(html);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.IO.File.Delete(fullFileName);
+                        Helper.Log(ex.Message, "ImportProblemException");
+                        Helper.Log(_lastCompany.symbol, "ImportProblem");
+                    }
+                    DownloadHTMLCompanies();
+                }
+                //Application.DoEvents();
+                //WebClient webClient = new WebClient();
+                //string url = string.Format("https://www.google.com/finance?q=NSE:{0}", _lastCompany.symbol.Replace("&", "%26"));
+                ////string url = "https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/GetQuote.jsp?symbol=JSWSTEEL";
+                //string html = webClient.DownloadString(url);
+                //TradeHelper.NSEIndia52WeekImport(html);
+                //Helper.Log(lblError.Text, "GOOGLEFINANCE");
             }
-            //Application.DoEvents();
-            //WebClient webClient = new WebClient();
-            //string url = string.Format("https://www.google.com/finance?q=NSE:{0}", _lastCompany.symbol.Replace("&", "%26"));
-            ////string url = "https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/GetQuote.jsp?symbol=JSWSTEEL";
-            //string html = webClient.DownloadString(url);
-            //TradeHelper.NSEIndia52WeekImport(html);
-            //Helper.Log(lblError.Text, "GOOGLEFINANCE");
         }
 
         //private void ProcessHTMLFiles()
@@ -186,6 +196,7 @@ namespace DownloadHTMLContent
                     var company = _companies[_index];
                     _lastCompany = company;
 
+                    lblCompany.Text = _lastCompany.company_name;
                     lblCompanyStatus.Text = "Companies " + _index + " Of " + _companies.Count();
                     if (_lastCompany != null)
                     {
@@ -222,7 +233,7 @@ namespace DownloadHTMLContent
                                 System.IO.File.Delete(fullFileName);
                             }
                         }
-                        /*
+                         
                         if (System.IO.File.Exists(fullFileName) == false)
                         {
                             lblCompany.Text = _lastCompany.company_name;
@@ -237,16 +248,15 @@ namespace DownloadHTMLContent
                             lblStartDate.Text = startDate.ToString("dd/MMM/yyyy");
                             lblEndDate.Text = endDate.ToString("dd/MMM/yyyy");
                             //_lastURL = url;
-                            Helper.Log(url, "NAVIGATE");
+                            //Helper.Log(url, "NAVIGATE");
                             webBrowser1.ScriptErrorsSuppressed = true;
                             webBrowser1.Navigate(url);
                         }
                         else
                         {
                             TradeHelper.NSEIndiaImport(html);
-                            Update52WeekPrice();
+                            DownloadHTMLCompanies();
                         }
-                        */
                         Update52WeekPrice();
                     }
                 }
@@ -378,7 +388,6 @@ namespace DownloadHTMLContent
         //        {
         //            DownloadHTMLCompanies_MonthWise();
         //        }
-
         //    }
         //}
 
@@ -435,6 +444,7 @@ namespace DownloadHTMLContent
                 TradeHelper.NSEIndiaImport(html);
                 //}
             }
+            DownloadHTMLCompanies();
             //
             //if (_IsYearWise)
             //{
@@ -442,7 +452,7 @@ namespace DownloadHTMLContent
             //}
             //else
             //{
-            Update52WeekPrice();
+            //Update52WeekPrice();
             //}
         }
 
