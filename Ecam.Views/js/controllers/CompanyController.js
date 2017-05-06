@@ -54,6 +54,26 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             });
         }
 
+        this.exportGrid = function () {
+            var $Company = $("#Company");
+            var arr = $("#frmCompanySearch").serializeArray();
+            arr.push({ "name": "PageSize", "value": 0 });
+            arr.push({ "name": "PageIndex", "value": 0 });
+            arr.push({ "name": "SortName", "value": $(":input[name='sort_name']", $Company).val() });
+            arr.push({ "name": "SortOrder", "value": $(":input[name='sort_order']", $Company).val() });
+            var isbookmark = $("#frmCompanySearch #is_book_mark")[0].checked;
+            if (isbookmark == true) {
+                arr[arr.length] = { "name": "is_book_mark", "value": isbookmark };
+            }
+            arr[arr.length] = { "name": "is_export_excel", "value": true };
+            var url = apiUrl("/Company/Export?t=1");
+            $.each(arr, function (i, p) {
+                url += "&" + p.name + "=" + p.value;
+            });
+            var width = 300; var height = 200; var left = (screen.availWidth / 2) - (width / 2); var top = (screen.availHeight / 2) - (height / 2); var features = "width=" + width + ",height=" + height + ",left=" + left + ",top=" + top + ",location=no,menubar=no,toobar=no,scrollbars=yes,resizable=yes,status=yes";
+            window.open(url, "downloadexcelfile", features);
+        }
+
         this.applyPlugins = function () {
             var $frmCompanySearch = $("#frmCompanySearch");
             var $symbols = $(":input[name='symbols']", $frmCompanySearch);
@@ -202,6 +222,9 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             $("body").on("click", "#Company .btn-add", function (event) {
                 self.openItem(null)
             });
+            $("body").on("click", "#Company .btn-export", function (event) {
+                self.exportGrid()
+            });
             $("body").on("click", "#Company .btn-edit", function (event) {
                 self.openItem(ko.dataFor(this));
             });
@@ -259,6 +282,7 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             $("body").off("click", "#Company .btn-delete");
             $("body").off("change", "#Company #rows");
             $("body").off("click", ".is-book-mark");
+            $("body").off("click", "#Company .btn-export");
         }
 
         this.unInit = function () {

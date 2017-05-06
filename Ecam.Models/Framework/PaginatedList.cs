@@ -41,7 +41,7 @@ namespace Ecam.Models {
 	public class PaginatedListResult<T> {
 		public int total;
 		public IEnumerable<T> rows;
-	}
+    }
 
 	public class Paging {
 

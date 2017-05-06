@@ -1,6 +1,7 @@
 ﻿
 using Ecam.Contracts;
 using Ecam.Framework;
+using Ecam.Framework.ExcelHelper;
 using Ecam.Framework.Repository;
 using Ecam.Models;
 using System;
@@ -42,6 +43,28 @@ namespace Ecam.Views.Controllers
         public PaginatedListResult<TRA_COMPANY> List([FromUri] TRA_COMPANY_SEARCH criteria, [FromUri] Paging paging)
         {
             return _CompanyRepository.Get(criteria, paging);
+        }
+
+        [HttpGet]
+        [ActionName("Export")]
+        public IHttpActionResult Export([FromUri] TRA_COMPANY_SEARCH criteria, [FromUri] Paging paging)
+        {
+            PaginatedListResult<TRA_COMPANY> obj = _CompanyRepository.Get(criteria, paging);
+            List<TRA_COMPANY> rows = obj.rows.ToList();
+            List<Ecam.Framework.CSVColumn> columnFormats = new List<Ecam.Framework.CSVColumn>();
+            columnFormats.Add(new CSVColumn { DisplayName = "Mark", PropertyName = "is_book_mark" });
+            columnFormats.Add(new CSVColumn { DisplayName = "Company", PropertyName = "company_name" });
+            columnFormats.Add(new CSVColumn { DisplayName = "Symbol", PropertyName = "symbol" });
+            columnFormats.Add(new CSVColumn { DisplayName = "Category", PropertyName = "category_name" });
+            columnFormats.Add(new CSVColumn { DisplayName = "LTP", PropertyName = "ltp_price", IsNumber = true });
+            columnFormats.Add(new CSVColumn { DisplayName = "Change %", PropertyName = "prev_percentage", IsPercentage = true });
+            columnFormats.Add(new CSVColumn { DisplayName = "Last 5 Days %", PropertyName = "last_5_day_percentage", IsPercentage = true });
+            columnFormats.Add(new CSVColumn { DisplayName = "Last 1 Month %", PropertyName = "last_1_month_percentage", IsPercentage = true });
+            columnFormats.Add(new CSVColumn { DisplayName = "Last 2 Month %", PropertyName = "last_2_month_percentage", IsPercentage = true });
+            columnFormats.Add(new CSVColumn { DisplayName = "Last 3 Month %", PropertyName = "last_3_month_percentage", IsPercentage = true });
+            columnFormats.Add(new CSVColumn { DisplayName = "Week 52 Low %", PropertyName = "week_52_low_percentage", IsPercentage = true });
+            columnFormats.Add(new CSVColumn { DisplayName = "Week 52 High %", PropertyName = "week_52_percentage", IsPercentage = true });
+            return new ExportToCSV<List<TRA_COMPANY>>(string.Format("{0}", DateTime.Now.ToString("dd_MMM_yyyy")), columnFormats, rows);
         }
 
         [HttpGet]

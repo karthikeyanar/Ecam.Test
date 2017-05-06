@@ -261,6 +261,8 @@ namespace Ecam.Framework.Repository
                           ") as tbl {0} {1} {2}", groupByName, orderBy, pageLimit);
 
             List<TRA_COMPANY> rows = new List<TRA_COMPANY>();
+            SLExcelData excelData = null;
+
             List<tra_company_category> companyCategories;
             using (EcamContext context = new EcamContext())
             {
