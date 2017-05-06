@@ -290,6 +290,11 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
                         self.loadGrid();
                     }
                 });
+                $tbl.floatThead({
+                    scrollContainer: function ($t) {
+                        return $t.closest('.summary-table-cnt');
+                    }
+                });
             });
         }
     }

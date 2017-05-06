@@ -39,95 +39,12 @@
                 </div>
             </div>
         </div>
-        <table id="CompanyTable" class="table table-striped table-bordered table-hover table-condensed table-gray">
-            <thead>
-                <tr>
-                    <th style="width: 50px" sortname="is_book_mark">
-                        Mark
-                    </th>
-                    <th sortname="company_name">
-                        Company
-                    </th>
-                    <th sortname="symbol">
-                        Symbol
-                    </th>
-                    <th>
-                        Category
-                    </th>
-                    <th sortname="open_price" class="text-right text-nowrap">
-                        Open
-                    </th>
-                    <th sortname="high_price" class="text-right text-nowrap">
-                        High
-                    </th>
-                    <th sortname="low_price" class="text-right text-nowrap">
-                        Low
-                    </th>
-                    <th sortname="ltp_price" class="text-right text-nowrap">
-                        LTP
-                    </th>
-                    <th sortname="close_price" class="text-right text-nowrap">
-                        Close
-                    </th>
-                    <th sortname="prev_price" class="text-right text-nowrap">
-                        Prev
-                    </th>
-                    <th sortname="prev_percentage" class="text-right text-nowrap">
-                        Prev %
-                    </th>
-                    <th sortname="week_52_low" class="text-right text-nowrap">Week 52 Low</th>
-                    <th sortname="week_52_low_percentage" class="text-right text-nowrap">Week 52 Low %</th>
-                    <th sortname="week_52_high" class="text-right text-nowrap">Week 52 High</th>
-                    <th sortname="week_52_percentage" class="text-right text-nowrap">Week 52 %</th>
-                    <th style="width: 50px">
-                    </th>
-                    <th style="width: 50px">
-                    </th>
-                </tr>
-            </thead>
-            <tbody data-bind="foreach:rows">
-                <tr>
-                    <td style="text-align:center;">
-                        <a href="javascript:;" class="is-book-mark">
-                            <i data-bind="css:{'fa-bookmark fg-primary': cBool(is_book_mark)==true,'fa-bookmark-o': cBool(is_book_mark)==false}" class="fa fa-bookmark"></i>
-                        </a>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:company_name"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:symbol"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:category_name"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(open_price)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(high_price)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(low_price)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(ltp_price)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(close_price)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(prev_price)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatPercentage(prev_percentage)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(week_52_low)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatPercentage(week_52_low_percentage)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(week_52_high)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatPercentage(week_52_percentage)"></td>
-                    <td style="text-align:center;white-space:nowrap;width:120px;">
-                        <div class="pull-left m-l-15">
-                            <a data-bind="attr:{'href': 'https://www.google.co.in/search?q=NSE:'+symbol.replace('&','%26')}" target="_blank">G</a>
-                        </div>
-                        <div class="pull-left m-l-15">
-                            <a data-bind="attr:{'href': 'https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/GetQuote.jsp?symbol='+symbol.replace('&','%26')}" target="_blank">NSE</a>
-                        </div>
-                        <div class="pull-left m-l-15">
-                            <a data-bind="attr:{'href': 'http://economictimes.indiatimes.com/markets/technical-charts?symbol='+symbol.replace('&','%26')+'EQ&exchange=NSE&entity=company'}" target="_blank">ET</a>
-                        </div><div class="clearfix"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="text-center">
-                        <a href="javascript:;" class="cursor-pointer fg-black btn-delete" data-placement="top"><i class="fa fa-times"></i></a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
         <div class="row">
             <div class="col-md-6">
                 <div class="pull-left m-r-15">
                     <span class="pull-left p-t-5 p-r-10">Rows</span>
                     <select id="rows" name="rows" class="pull-left form-control input-sm input-60">
+                        <option value="10">10</option>
                         <option value="50">50</option>
                         <option value="200" selected>200</option>
                         <option value="500">500</option>
@@ -146,6 +63,119 @@
             <input type="hidden" name="sort_name" value="week_52_low_percentage" />
             <input type="hidden" name="sort_order" value="desc" />
         </div>
+        <table id="CompanyTable" class="table table-striped table-bordered table-hover table-condensed table-gray">
+            <thead>
+                <tr>
+                    <th style="width: 50px" sortname="is_book_mark">
+                        Mark
+                    </th>
+                    <th sortname="company_name">
+                        Company
+                    </th>
+                    <th sortname="symbol">
+                        Symbol
+                    </th>
+                    <th>
+                        Category
+                    </th>
+                    @*<th sortname="open_price" class="text-right text-nowrap">
+                        Open
+                    </th>
+                    <th sortname="high_price" class="text-right text-nowrap">
+                        High
+                    </th>
+                    <th sortname="low_price" class="text-right text-nowrap">
+                        Low
+                    </th>*@
+                    <th sortname="ltp_price" class="text-right text-nowrap">
+                        LTP
+                    </th>
+                    @*<th sortname="close_price" class="text-right text-nowrap">
+                        Close
+                    </th>*@
+                    @*<th sortname="prev_price" class="text-right text-nowrap">
+                        Change
+                    </th>*@
+                    <th sortname="prev_percentage" class="text-right text-nowrap">
+                        Change %
+                    </th>
+                    <th sortname="last_5_day_percentage" class="text-right text-nowrap">Last 5 Days %</th>
+                    <th sortname="last_1_month_percentage" class="text-right text-nowrap">Last 1 Month %</th>
+                    <th sortname="last_2_month_percentage" class="text-right text-nowrap">Last 2 Month %</th>
+                    <th sortname="last_3_month_percentage" class="text-right text-nowrap">Last 3 Month %</th>
+                    @*<th sortname="week_52_low" class="text-right text-nowrap">Week 52 Low</th>*@
+                    <th sortname="week_52_low_percentage" class="text-right text-nowrap">Week 52 Low %</th>
+                    @*<th sortname="week_52_high" class="text-right text-nowrap">Week 52 High</th>*@
+                    <th sortname="week_52_percentage" class="text-right text-nowrap">Week 52 %</th>
+                    <th style="width: 50px">
+                    </th>
+                    <th style="width: 50px">
+                    </th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach:rows">
+                <tr>
+                    <td style="text-align:center;">
+                        <a href="javascript:;" class="is-book-mark">
+                            <i data-bind="css:{'fa-bookmark fg-primary': cBool(is_book_mark)==true,'fa-bookmark-o': cBool(is_book_mark)==false}" class="fa fa-bookmark"></i>
+                        </a>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:company_name"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:symbol"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:category_name"></td>
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(open_price)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(high_price)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(low_price)"></td>*@
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(ltp_price)"></td>
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(close_price)"></td>*@
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(prev_price)"></td>*@
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(prev_percentage)"></div>
+                        <div class="font-11" data-bind="text:formatNumber(prev_price)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(last_5_day_percentage)"></div>
+                        <div class="font-11" data-bind="text:formatNumber(last_5_day_price)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(last_1_month_percentage)"></div>
+                        <div class="font-11" data-bind="text:formatNumber(last_1_month_price)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(last_2_month_percentage)"></div>
+                        <div class="font-11" data-bind="text:formatNumber(last_2_month_price)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(last_3_month_percentage)"></div>
+                        <div class="font-11" data-bind="text:formatNumber(last_3_month_price)"></div>
+                    </td>
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(week_52_low)"></td>*@
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(week_52_low_percentage)"></div>
+                        <div class="font-11" data-bind="text:formatNumber(week_52_low)"></div>
+                    </td>
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(week_52_high)"></td>*@
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(week_52_percentage)"></div>
+                        <div class="font-11" data-bind="text:formatNumber(week_52_high)"></div>
+                    </td>
+                    <td style="text-align:center;white-space:nowrap;width:120px;">
+                        <div class="pull-left m-l-15">
+                            <a data-bind="attr:{'href': 'https://www.google.co.in/search?q=NSE:'+symbol.replace('&','%26')}" target="_blank">G</a>
+                        </div>
+                        <div class="pull-left m-l-15">
+                            <a data-bind="attr:{'href': 'https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/GetQuote.jsp?symbol='+symbol.replace('&','%26')}" target="_blank">NSE</a>
+                        </div>
+                        <div class="pull-left m-l-15">
+                            <a data-bind="attr:{'href': 'http://economictimes.indiatimes.com/markets/technical-charts?symbol='+symbol.replace('&','%26')+'EQ&exchange=NSE&entity=company'}" target="_blank">ET</a>
+                        </div><div class="clearfix"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="text-center">
+                        <a href="javascript:;" class="cursor-pointer fg-black btn-delete" data-placement="top"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 <div class="modal-container">

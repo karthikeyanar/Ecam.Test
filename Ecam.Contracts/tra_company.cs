@@ -27,8 +27,15 @@ namespace Ecam.Contracts
         public Nullable<decimal> week_52_percentage { get; set; }
         public Nullable<decimal> week_52_low_percentage { get; set; }
 
+        public Nullable<decimal> last_5_day_price { get; set; }
+        public Nullable<decimal> last_5_day_percentage { get; set; }
+        public Nullable<decimal> last_1_month_price { get; set; }
+        public Nullable<decimal> last_1_month_percentage { get; set; }
+        public Nullable<decimal> last_2_month_price { get; set; }
+        public Nullable<decimal> last_2_month_percentage { get; set; }
+        public Nullable<decimal> last_3_month_price { get; set; }
+        public Nullable<decimal> last_3_month_percentage { get; set; }
         public string category_name { get; set; }
-
         public List<string> category_list { get; set; }
     }
 
