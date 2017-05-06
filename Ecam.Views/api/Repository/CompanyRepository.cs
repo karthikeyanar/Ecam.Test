@@ -239,6 +239,7 @@ namespace Ecam.Framework.Repository
 
             selectFields = "ct.*" + Environment.NewLine +
                            ",(select m.ltp_price from tra_market m where m.trade_date <= DATE_ADD(curdate(), INTERVAL -5 DAY) and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_5_day_price" + Environment.NewLine +
+                           ",(select m.ltp_price from tra_market m where m.trade_date <= DATE_ADD(curdate(), INTERVAL -10 DAY) and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_10_day_price" + Environment.NewLine +
                            ",(select m.ltp_price from tra_market m where m.trade_date <= DATE_ADD(curdate(), INTERVAL -1 MONTH) and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_1_month_price" + Environment.NewLine +
                            ",(select m.ltp_price from tra_market m where m.trade_date <= DATE_ADD(curdate(), INTERVAL -2 MONTH) and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_2_month_price" + Environment.NewLine +
                            ",(select m.ltp_price from tra_market m where m.trade_date <= DATE_ADD(curdate(), INTERVAL -3 MONTH) and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_3_month_price" + Environment.NewLine +
@@ -252,6 +253,7 @@ namespace Ecam.Framework.Repository
 
             sql = string.Format("select " +
                           "(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_5_day_price, 0)) / ifnull(tbl.last_5_day_price, 0)) * 100) as last_5_day_percentage" + Environment.NewLine +
+                          ",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_5_day_price, 0)) / ifnull(tbl.last_10_day_price, 0)) * 100) as last_10_day_percentage" + Environment.NewLine +
                           ",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_1_month_price, 0)) / ifnull(tbl.last_1_month_price, 0)) * 100) as last_1_month_percentage" + Environment.NewLine +
                           ",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_2_month_price, 0)) / ifnull(tbl.last_2_month_price, 0)) * 100) as last_2_month_percentage" + Environment.NewLine +
                           ",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_3_month_price, 0)) / ifnull(tbl.last_3_month_price, 0)) * 100) as last_3_month_percentage" + Environment.NewLine +
@@ -261,7 +263,6 @@ namespace Ecam.Framework.Repository
                           ") as tbl {0} {1} {2}", groupByName, orderBy, pageLimit);
 
             List<TRA_COMPANY> rows = new List<TRA_COMPANY>();
-            SLExcelData excelData = null;
 
             List<tra_company_category> companyCategories;
             using (EcamContext context = new EcamContext())

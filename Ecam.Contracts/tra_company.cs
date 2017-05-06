@@ -18,6 +18,7 @@ namespace Ecam.Contracts
         public Nullable<decimal> ltp_price { get; set; }
         public Nullable<decimal> prev_percentage { get; set; }
         public Nullable<decimal> last_5_day_percentage { get; set; }
+        public Nullable<decimal> last_10_day_percentage { get; set; }
         public Nullable<decimal> last_1_month_percentage { get; set; }
         public Nullable<decimal> last_2_month_percentage { get; set; }
         public Nullable<decimal> last_3_month_percentage { get; set; }
@@ -36,6 +37,7 @@ namespace Ecam.Contracts
       
         public Nullable<decimal> week_52_low { get; set; }
         public Nullable<decimal> last_5_day_price { get; set; }
+        public Nullable<decimal> last_10_day_price { get; set; }
         public Nullable<decimal> last_1_month_price { get; set; }
         public Nullable<decimal> last_2_month_price { get; set; }
         public Nullable<decimal> last_3_month_price { get; set; }

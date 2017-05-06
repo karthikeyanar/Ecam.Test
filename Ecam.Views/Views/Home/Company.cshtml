@@ -103,6 +103,7 @@
                         Change %
                     </th>
                     <th sortname="last_5_day_percentage" class="text-right text-nowrap">Last 5 Days %</th>
+                    <th sortname="last_10_day_percentage" class="text-right text-nowrap">Last 10 Days %</th>
                     <th sortname="last_1_month_percentage" class="text-right text-nowrap">Last 1 Month %</th>
                     <th sortname="last_2_month_percentage" class="text-right text-nowrap">Last 2 Month %</th>
                     <th sortname="last_3_month_percentage" class="text-right text-nowrap">Last 3 Month %</th>
@@ -139,6 +140,10 @@
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(last_5_day_percentage)"></div>
                         <div class="font-11" data-bind="text:formatNumber(last_5_day_price)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(last_10_day_percentage)"></div>
+                        <div class="font-11" data-bind="text:formatNumber(last_10_day_price)"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(last_1_month_percentage)"></div>

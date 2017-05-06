@@ -59,6 +59,7 @@ namespace Ecam.Views.Controllers
             columnFormats.Add(new CSVColumn { DisplayName = "LTP", PropertyName = "ltp_price", IsNumber = true });
             columnFormats.Add(new CSVColumn { DisplayName = "Change %", PropertyName = "prev_percentage", IsPercentage = true });
             columnFormats.Add(new CSVColumn { DisplayName = "Last 5 Days %", PropertyName = "last_5_day_percentage", IsPercentage = true });
+            columnFormats.Add(new CSVColumn { DisplayName = "Last 10 Days %", PropertyName = "last_10_day_percentage", IsPercentage = true });
             columnFormats.Add(new CSVColumn { DisplayName = "Last 1 Month %", PropertyName = "last_1_month_percentage", IsPercentage = true });
             columnFormats.Add(new CSVColumn { DisplayName = "Last 2 Month %", PropertyName = "last_2_month_percentage", IsPercentage = true });
             columnFormats.Add(new CSVColumn { DisplayName = "Last 3 Month %", PropertyName = "last_3_month_percentage", IsPercentage = true });
