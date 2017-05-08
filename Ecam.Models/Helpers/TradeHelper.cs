@@ -682,7 +682,7 @@ namespace Ecam.Models
             {
                 var row = (from q in context.tra_market
                            where q.symbol == import.symbol
-                           && q.trade_date == import.trade_date
+                           && q.trade_date == import.trade_date.Date
                            && q.trade_type == import.trade_type
                            select q).FirstOrDefault();
                 bool isNew = false;
@@ -693,7 +693,7 @@ namespace Ecam.Models
                 }
                 row.symbol = import.symbol;
                 row.trade_type = import.trade_type;
-                row.trade_date = import.trade_date;
+                row.trade_date = import.trade_date.Date;
                 row.open_price = import.open_price;
                 row.high_price = import.high_price;
                 row.low_price = import.low_price;

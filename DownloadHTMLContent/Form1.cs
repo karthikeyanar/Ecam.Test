@@ -65,14 +65,14 @@ namespace DownloadHTMLContent
             //{
             DownloadHTMLCompanies();
             //}
-            //foreach(var company in _companies)
+            //foreach (var company in _companies)
             //{
             //    TradeHelper.CalculateMovingAVG(company.symbol);
             //}
             //MessageBox.Show("Completed");
         }
 
-     
+
 
         private void Update52WeekPrice()
         {
@@ -202,67 +202,73 @@ namespace DownloadHTMLContent
                     var company = _companies[_index];
                     _lastCompany = company;
 
-                    lblCompany.Text = _lastCompany.company_name;
-                    lblCompanyStatus.Text = "Companies " + _index + " Of " + _companies.Count();
-                    if (_lastCompany != null)
+                    if (_IsDateDownload == true)
                     {
+                        lblCompany.Text = _lastCompany.company_name;
+                        lblCompanyStatus.Text = "Companies " + _index + " Of " + _companies.Count();
+                        if (_lastCompany != null)
+                        {
 
-                        string dirPath = System.Configuration.ConfigurationManager.AppSettings["DownloadHTMLPath"];
-                        if (System.IO.Directory.Exists(dirPath) == false)
-                        {
-                            System.IO.Directory.CreateDirectory(dirPath);
-                        }
-                        string fullFileName = dirPath + "\\" + _lastCompany.symbol + ".html";
-                        string html = string.Empty;
-                        //Helper.Log(fullFileName);
-                        if (System.IO.File.Exists(fullFileName) == true)
-                        {
-                            html = System.IO.File.ReadAllText(fullFileName);
-                            if (html.Contains("Make sure the web address") == true)
+                            string dirPath = System.Configuration.ConfigurationManager.AppSettings["DownloadHTMLPath"];
+                            if (System.IO.Directory.Exists(dirPath) == false)
                             {
-                                Helper.Log(fullFileName, "MakeSure");
-                                System.IO.File.Delete(fullFileName);
+                                System.IO.Directory.CreateDirectory(dirPath);
                             }
-                            if (html.Contains("Service Unavailable") == true)
+                            string fullFileName = dirPath + "\\" + _lastCompany.symbol + ".html";
+                            string html = string.Empty;
+                            //Helper.Log(fullFileName);
+                            if (System.IO.File.Exists(fullFileName) == true)
                             {
-                                Helper.Log(fullFileName, "ServiceUnavailable");
-                                System.IO.File.Delete(fullFileName);
+                                html = System.IO.File.ReadAllText(fullFileName);
+                                if (html.Contains("Make sure the web address") == true)
+                                {
+                                    Helper.Log(fullFileName, "MakeSure");
+                                    System.IO.File.Delete(fullFileName);
+                                }
+                                if (html.Contains("Service Unavailable") == true)
+                                {
+                                    Helper.Log(fullFileName, "ServiceUnavailable");
+                                    System.IO.File.Delete(fullFileName);
+                                }
+                                if (html.Contains("What you can try") == true)
+                                {
+                                    Helper.Log(fullFileName, "Whatyoucantry");
+                                    System.IO.File.Delete(fullFileName);
+                                }
+                                if (html.Contains("The proxy server did not") == true)
+                                {
+                                    Helper.Log(fullFileName, "Theproxyserverdidnot");
+                                    System.IO.File.Delete(fullFileName);
+                                }
                             }
-                            if (html.Contains("What you can try") == true)
-                            {
-                                Helper.Log(fullFileName, "Whatyoucantry");
-                                System.IO.File.Delete(fullFileName);
-                            }
-                            if (html.Contains("The proxy server did not") == true)
-                            {
-                                Helper.Log(fullFileName, "Theproxyserverdidnot");
-                                System.IO.File.Delete(fullFileName);
-                            }
-                        }
 
-                        if (System.IO.File.Exists(fullFileName) == false)
-                        {
-                            lblCompany.Text = _lastCompany.company_name;
-                            lblSymbol.Text = _lastCompany.symbol;
-                            DateTime startDate = DateTime.Now.Date.AddDays(-DataTypeHelper.ToInt32(System.Configuration.ConfigurationManager.AppSettings["no_of_days"].ToString()));
-                            DateTime endDate = DateTime.Now.Date;
-                            string url = string.Format("https://nseindia.com/products/dynaContent/common/productsSymbolMapping.jsp?symbol={0}&segmentLink=3&symbolCount=2&series=EQ&dateRange=+&fromDate={1}&toDate={2}&dataType=PRICEVOLUME"
-                                                                                                              , _lastCompany.symbol.Replace("&", "%26")
-                                                                                                              , startDate.ToString("dd-MM-yyyy")
-                                                                                                              , endDate.ToString("dd-MM-yyyy")
-                                                                                                              );
-                            lblStartDate.Text = startDate.ToString("dd/MMM/yyyy");
-                            lblEndDate.Text = endDate.ToString("dd/MMM/yyyy");
-                            //_lastURL = url;
-                            //Helper.Log(url, "NAVIGATE");
-                            webBrowser1.ScriptErrorsSuppressed = true;
-                            webBrowser1.Navigate(url);
+                            if (System.IO.File.Exists(fullFileName) == false)
+                            {
+                                lblCompany.Text = _lastCompany.company_name;
+                                lblSymbol.Text = _lastCompany.symbol;
+                                DateTime startDate = DateTime.Now.Date.AddDays(-DataTypeHelper.ToInt32(System.Configuration.ConfigurationManager.AppSettings["no_of_days"].ToString()));
+                                DateTime endDate = DateTime.Now.Date;
+                                string url = string.Format("https://nseindia.com/products/dynaContent/common/productsSymbolMapping.jsp?symbol={0}&segmentLink=3&symbolCount=2&series=EQ&dateRange=+&fromDate={1}&toDate={2}&dataType=PRICEVOLUME"
+                                                                                                                  , _lastCompany.symbol.Replace("&", "%26")
+                                                                                                                  , startDate.ToString("dd-MM-yyyy")
+                                                                                                                  , endDate.ToString("dd-MM-yyyy")
+                                                                                                                  );
+                                lblStartDate.Text = startDate.ToString("dd/MMM/yyyy");
+                                lblEndDate.Text = endDate.ToString("dd/MMM/yyyy");
+                                //_lastURL = url;
+                                //Helper.Log(url, "NAVIGATE");
+                                webBrowser1.ScriptErrorsSuppressed = true;
+                                webBrowser1.Navigate(url);
+                            }
+                            else
+                            {
+                                TradeHelper.NSEIndiaImport(html);
+                                DownloadHTMLCompanies();
+                            }
                         }
-                        else
-                        {
-                            TradeHelper.NSEIndiaImport(html);
-                            DownloadHTMLCompanies();
-                        }
+                    }
+                    else
+                    {
                         Update52WeekPrice();
                     }
                 }
