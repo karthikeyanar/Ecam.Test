@@ -51,6 +51,13 @@ namespace Ecam.Contracts
         public Nullable<decimal> day_20_total { get; set; }
         public Nullable<decimal> day_25_total { get; set; }
         public Nullable<decimal> day_30_total { get; set; }
+        public Nullable<bool> is_nifty_50 { get; set; }
+        public Nullable<bool> is_nifty_100 { get; set; }
+        public Nullable<bool> is_nifty_200 { get; set; }
+        public Nullable<decimal> last_2_month_price { get; set; }
+        public Nullable<decimal> last_2_month_percentage { get; set; }
+        public Nullable<decimal> last_3_month_price { get; set; }
+        public Nullable<decimal> last_3_month_percentage { get; set; }
 
         public List<string> category_list { get; set; }
     }

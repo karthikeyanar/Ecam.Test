@@ -217,6 +217,19 @@ namespace Ecam.Framework.Repository
                 where.AppendFormat(" and ifnull(ct.close_price,0)<={0}", criteria.to_price);
             }
 
+            if (criteria.is_nifty_50.HasValue)
+            {
+                where.AppendFormat(" and ifnull(ct.is_nifty_50,0)={0}", ((criteria.is_nifty_50 ?? false) == true ? "1" : "0"));
+            }
+            if (criteria.is_nifty_100.HasValue)
+            {
+                where.AppendFormat(" and ifnull(ct.is_nifty_100,0)={0}", ((criteria.is_nifty_100 ?? false) == true ? "1" : "0"));
+            }
+            if (criteria.is_nifty_200.HasValue)
+            {
+                where.AppendFormat(" and ifnull(ct.is_nifty_200,0)={0}", ((criteria.is_nifty_200 ?? false) == true ? "1" : "0"));
+            }
+
             selectFields = "count(*) as cnt";
 
             sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, "", "");
@@ -243,9 +256,9 @@ namespace Ecam.Framework.Repository
                            //",(select m.ltp_price from tra_market m where m.trade_date <= DATE_ADD(curdate(), INTERVAL -15 DAY) and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_15_day_price" + Environment.NewLine +
                            //",(select m.ltp_price from tra_market m where m.trade_date <= DATE_ADD(curdate(), INTERVAL -20 DAY) and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_20_day_price" + Environment.NewLine +
                            //",(select m.ltp_price from tra_market m where m.trade_date <= DATE_ADD(curdate(), INTERVAL -1 MONTH) and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_1_month_price" + Environment.NewLine +
-                           //",(select m.ltp_price from tra_market m where m.trade_date <= DATE_ADD(curdate(), INTERVAL -2 MONTH) and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_2_month_price" + Environment.NewLine +
-                           //",(select m.ltp_price from tra_market m where m.trade_date <= DATE_ADD(curdate(), INTERVAL -3 MONTH) and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_3_month_price" + Environment.NewLine +
-                           
+                           ",(select m.ltp_price from tra_market m where m.trade_date <= DATE_ADD(curdate(), INTERVAL -2 MONTH) and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_2_month_price" + Environment.NewLine +
+                           ",(select m.ltp_price from tra_market m where m.trade_date <= DATE_ADD(curdate(), INTERVAL -3 MONTH) and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_3_month_price" + Environment.NewLine +
+
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.prev_price, 0)) / ifnull(ct.prev_price, 0)) * 100) as prev_percentage" + Environment.NewLine +
 
                            ",(((ifnull(ct.day_5, 0) - ifnull(ct.day_10, 0)) / ifnull(ct.day_10, 0)) * 100) as day_5_percentage" + Environment.NewLine +
@@ -283,11 +296,10 @@ namespace Ecam.Framework.Repository
                           //",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_1_month_price, 0)) / ifnull(tbl.last_1_month_price, 0)) * 100) as last_1_month_percentage" + Environment.NewLine +
                           //",(((ifnull(tbl.last_1_month_price, 0) - ifnull(tbl.last_2_month_price, 0)) / ifnull(tbl.last_2_month_price, 0)) * 100) as last_1_month_change" + Environment.NewLine +
 
-                          //",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_2_month_price, 0)) / ifnull(tbl.last_2_month_price, 0)) * 100) as last_2_month_percentage" + Environment.NewLine +
-                          //",(((ifnull(tbl.last_2_month_price, 0) - ifnull(tbl.last_3_month_price, 0)) / ifnull(tbl.last_3_month_price, 0)) * 100) as last_2_month_change" + Environment.NewLine +
-
-                          //",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_3_month_price, 0)) / ifnull(tbl.last_3_month_price, 0)) * 100) as last_3_month_percentage" + Environment.NewLine +
                           "tbl.*" + Environment.NewLine +
+                          ",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_2_month_price, 0)) / ifnull(tbl.last_2_month_price, 0)) * 100) as last_2_month_percentage" + Environment.NewLine +
+                          //",(((ifnull(tbl.last_2_month_price, 0) - ifnull(tbl.last_3_month_price, 0)) / ifnull(tbl.last_3_month_price, 0)) * 100) as last_2_month_change" + Environment.NewLine +
+                          ",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_3_month_price, 0)) / ifnull(tbl.last_3_month_price, 0)) * 100) as last_3_month_percentage" + Environment.NewLine +
                           " from(" + Environment.NewLine +
                           sql + Environment.NewLine +
                           ") as tbl {0} {1} {2}", groupByName, orderBy, pageLimit);

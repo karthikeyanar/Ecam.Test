@@ -22,6 +22,18 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             if (isbookmark == true) {
                 arr[arr.length] = { "name": "is_book_mark", "value": isbookmark };
             }
+            var isNifty50 = $("#frmCompanySearch #is_nifty_50")[0].checked;
+            if (isNifty50 == true) {
+                arr[arr.length] = { "name": "is_nifty_50", "value": isNifty50 };
+            }
+            var isNifty100 = $("#frmCompanySearch #is_nifty_100")[0].checked;
+            if (isNifty100 == true) {
+                arr[arr.length] = { "name": "is_nifty_100", "value": isNifty100 };
+            }
+            var isNifty200 = $("#frmCompanySearch #is_nifty_200")[0].checked;
+            if (isNifty200 == true) {
+                arr[arr.length] = { "name": "is_nifty_200", "value": isNifty200 };
+            }
             var url = apiUrl("/Company/List");
             $.ajax({
                 "url": url,
@@ -219,6 +231,15 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             $("body").on("click", "#frmCompanySearch #is_book_mark", function (event) {
                 self.loadGrid();
             });
+            $("body").on("click", "#frmCompanySearch #is_nifty_50", function (event) {
+                self.loadGrid();
+            });
+            $("body").on("click", "#frmCompanySearch #is_nifty_100", function (event) {
+                self.loadGrid();
+            });
+            $("body").on("click", "#frmCompanySearch #is_nifty_200", function (event) {
+                self.loadGrid();
+            });
             $("body").on("click", "#Company .btn-add", function (event) {
                 self.openItem(null)
             });
@@ -277,6 +298,9 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
 
         this.offElements = function () {
             $("body").off("click", "#frmCompanySearch #is_book_mark");
+            $("body").off("click", "#frmCompanySearch #is_nifty_50");
+            $("body").off("click", "#frmCompanySearch #is_nifty_100");
+            $("body").off("click", "#frmCompanySearch #is_nifty_200");
             $("body").off("click", "#Company .btn-add");
             $("body").off("click", "#Company .btn-edit");
             $("body").off("click", "#Company .btn-delete");

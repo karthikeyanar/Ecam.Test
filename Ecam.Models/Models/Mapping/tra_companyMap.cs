@@ -90,6 +90,9 @@ namespace Ecam.Models
             this.Property(t => t.day_30).HasColumnName("day_30");
             this.Property(t => t.day_35).HasColumnName("day_35");
             this.Property(t => t.day_60).HasColumnName("day_60");
+            this.Property(t => t.is_nifty_50).HasColumnName("is_nifty_50");
+            this.Property(t => t.is_nifty_100).HasColumnName("is_nifty_100");
+            this.Property(t => t.is_nifty_200).HasColumnName("is_nifty_200");
             Ignore(t => t.created_date);
             Ignore(t => t.created_by);
             Ignore(t => t.last_updated_date);
@@ -97,3 +100,4 @@ namespace Ecam.Models
         }
     }
 }
+

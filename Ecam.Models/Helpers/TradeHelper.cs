@@ -680,6 +680,7 @@ namespace Ecam.Models
         {
             using (EcamContext context = new EcamContext())
             {
+                import.symbol = import.symbol.Replace("&amp;", "&");
                 var row = (from q in context.tra_market
                            where q.symbol == import.symbol
                            && q.trade_date == import.trade_date.Date
