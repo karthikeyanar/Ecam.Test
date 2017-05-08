@@ -610,7 +610,70 @@ namespace Ecam.Models
                     //Console.WriteLine("CalculatedPrice Update Company=" + company.company_name);
                 }
             }
+            CalculateMovingAVG(symbol);
             #endregion
+        }
+
+        public static void CalculateMovingAVG(string symbol)
+        {
+            using (EcamContext context = new EcamContext())
+            {
+                tra_company company = (from q in context.tra_company
+                                       where q.symbol == symbol
+                                       select q).FirstOrDefault();
+                if (company != null)
+                {
+                    DateTime startDate = DateTime.Now.AddDays(-90);
+                    DateTime endDate = DateTime.Now.Date;
+                    List<tra_market> markets = (from q in context.tra_market
+                                                where q.trade_date >= startDate
+                                                && q.trade_date <= endDate
+                                                && q.symbol == symbol
+                                                orderby q.trade_date descending
+                                                select q).ToList();
+
+
+                    company.day_5 = CalculateAVG((company.ltp_price ?? 0), markets, 5);
+                    company.day_10 = CalculateAVG((company.ltp_price ?? 0), markets, 10);
+                    company.day_15 = CalculateAVG((company.ltp_price ?? 0), markets, 15);
+                    company.day_20 = CalculateAVG((company.ltp_price ?? 0), markets, 20);
+                    company.day_25 = CalculateAVG((company.ltp_price ?? 0), markets, 25);
+                    company.day_30 = CalculateAVG((company.ltp_price ?? 0), markets, 30);
+                    company.day_35 = CalculateAVG((company.ltp_price ?? 0), markets, 35);
+                    company.day_60 = CalculateAVG((company.ltp_price ?? 0), markets, 60);
+                    context.Entry(company).State = System.Data.Entity.EntityState.Modified;
+                    context.SaveChanges();
+                }
+            }
+        }
+
+        private static decimal CalculateAVG(decimal currentPrice, List<tra_market> markets, int dayCount)
+        {
+            int i = 0;
+            //decimal total = 0;
+            List<tra_market> temp = new List<tra_market>();
+            foreach (var market in markets)
+            {
+                if (dayCount > i)
+                {
+              //      total += (market.close_price ?? 0);
+                    temp.Add(market);
+                    i += 1;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            //decimal avg = DataTypeHelper.SafeDivision(total, dayCount);
+            decimal value = 0;
+            if (temp.Count > 0)
+            {
+                value = (from q in temp
+                         orderby q.trade_date ascending
+                         select (q.ltp_price ?? 0)).FirstOrDefault();
+            }
+            return value; // DataTypeHelper.SafeDivision((currentPrice - avg), avg) * 100;
         }
 
         private static void ImportPrice(TempClass import)

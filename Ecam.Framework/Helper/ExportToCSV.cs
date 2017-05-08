@@ -305,9 +305,14 @@ namespace Ecam.Framework {
                 foreach(PropertyInfo pi in props) {
                     if(pi.CanRead && pi.PropertyType.Name != "List`1"
                          && pi.PropertyType.FullName.Contains("Pepper.") == false) {
-                        if(CSVHelper.IsIgNoreColumn(pi.Name,columnFormats) == false) {
-                            displayName = CSVHelper.GetDisplayName(pi.Name,columnFormats);
-                            sb.Append("\"").Append(displayName).Append("\"").Append(",");
+                        int cnt = (from q in columnFormats where q.PropertyName == pi.Name select q).Count();
+                        if (cnt > 0)
+                        {
+                            if (CSVHelper.IsIgNoreColumn(pi.Name, columnFormats) == false)
+                            {
+                                displayName = CSVHelper.GetDisplayName(pi.Name, columnFormats);
+                                sb.Append("\"").Append(displayName).Append("\"").Append(",");
+                            }
                         }
                     }
                 }
@@ -317,47 +322,65 @@ namespace Ecam.Framework {
                 foreach(var item in list) {
                     //this acts as datacolumn
                     foreach(PropertyInfo pi in props) {
-                        if(pi.CanRead && pi.PropertyType.Name != "List`1"
-                        && pi.PropertyType.FullName.Contains("Pepper.") == false) {
-                            if(CSVHelper.IsIgNoreColumn(pi.Name,columnFormats) == false) {
-                                //this is the row+col intersection (the value)
-                                var value = item.GetType()
-                                            .GetProperty(pi.Name)
-                                            .GetValue(item,null);
-                                string whatToWrite = Convert.ToString(value);
-                                if(CSVHelper.IsNoFormatColumn(pi.Name,columnFormats) == false) {
-                                    string propertyType = item.GetType().GetProperty(pi.Name).PropertyType.FullName;
-                                    if(propertyType.Contains("System.Boolean")) {
-                                        bool b = false;
-                                        bool.TryParse(whatToWrite,out b);
-                                        whatToWrite = (b == true ? "Yes" : "No");
-                                    }
-                                    if(propertyType.Contains("System.DateTime")) {
-                                        DateTime d;
-                                        DateTime.TryParse(whatToWrite,out d);
-                                        if(d.Year > 1900)
-                                            whatToWrite = d.ToString("MM/dd/yyyy");
-                                        else
-                                            whatToWrite = string.Empty;
-                                    }
-                                    if(propertyType.Contains("System.Decimal")) {
-                                        decimal v;
-                                        decimal.TryParse(whatToWrite,out v);
-                                        if(v == 0) {
-                                            whatToWrite = string.Empty;
-                                        } else {
-                                            int precision = CSVHelper.GetPrecision(pi.Name,columnFormats);
-                                            if(CSVHelper.IsNumberColumn(pi.Name,columnFormats)) {
-                                                whatToWrite = FormatHelper.NumberFormat(v,precision);
-                                            } else if(CSVHelper.IsPercentageColumn(pi.Name,columnFormats)) {
-                                                whatToWrite = FormatHelper.PercentageFormat(v);
-                                            } else {
-                                                whatToWrite = FormatHelper.CurrencyFormat(v,precision);
+                        if (pi.CanRead && pi.PropertyType.Name != "List`1"
+                        && pi.PropertyType.FullName.Contains("Pepper.") == false)
+                        {
+                            int cnt = (from q in columnFormats where q.PropertyName == pi.Name select q).Count();
+                            if (cnt > 0)
+                            {
+                                if (CSVHelper.IsIgNoreColumn(pi.Name, columnFormats) == false)
+                                {
+                                    //this is the row+col intersection (the value)
+                                    var value = item.GetType()
+                                                .GetProperty(pi.Name)
+                                                .GetValue(item, null);
+                                    string whatToWrite = Convert.ToString(value);
+                                    if (CSVHelper.IsNoFormatColumn(pi.Name, columnFormats) == false)
+                                    {
+                                        string propertyType = item.GetType().GetProperty(pi.Name).PropertyType.FullName;
+                                        if (propertyType.Contains("System.Boolean"))
+                                        {
+                                            bool b = false;
+                                            bool.TryParse(whatToWrite, out b);
+                                            whatToWrite = (b == true ? "Yes" : "No");
+                                        }
+                                        if (propertyType.Contains("System.DateTime"))
+                                        {
+                                            DateTime d;
+                                            DateTime.TryParse(whatToWrite, out d);
+                                            if (d.Year > 1900)
+                                                whatToWrite = d.ToString("MM/dd/yyyy");
+                                            else
+                                                whatToWrite = string.Empty;
+                                        }
+                                        if (propertyType.Contains("System.Decimal"))
+                                        {
+                                            decimal v;
+                                            decimal.TryParse(whatToWrite, out v);
+                                            if (v == 0)
+                                            {
+                                                whatToWrite = string.Empty;
+                                            }
+                                            else
+                                            {
+                                                int precision = CSVHelper.GetPrecision(pi.Name, columnFormats);
+                                                if (CSVHelper.IsNumberColumn(pi.Name, columnFormats))
+                                                {
+                                                    whatToWrite = FormatHelper.NumberFormat(v, precision);
+                                                }
+                                                else if (CSVHelper.IsPercentageColumn(pi.Name, columnFormats))
+                                                {
+                                                    whatToWrite = FormatHelper.PercentageFormat(v);
+                                                }
+                                                else
+                                                {
+                                                    whatToWrite = FormatHelper.CurrencyFormat(v, precision);
+                                                }
                                             }
                                         }
                                     }
+                                    sb.Append("\"").Append(ReplaceCSVFormat(whatToWrite)).Append("\"").Append(CSVDelimeter);
                                 }
-                                sb.Append("\"").Append(ReplaceCSVFormat(whatToWrite)).Append("\"").Append(CSVDelimeter);
                             }
                         }
                     }

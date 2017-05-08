@@ -63,10 +63,16 @@ namespace DownloadHTMLContent
             //}
             //else
             //{
-                DownloadHTMLCompanies();
+            DownloadHTMLCompanies();
             //}
-           
+            //foreach(var company in _companies)
+            //{
+            //    TradeHelper.CalculateMovingAVG(company.symbol);
+            //}
+            //MessageBox.Show("Completed");
         }
+
+     
 
         private void Update52WeekPrice()
         {
@@ -233,7 +239,7 @@ namespace DownloadHTMLContent
                                 System.IO.File.Delete(fullFileName);
                             }
                         }
-                         
+
                         if (System.IO.File.Exists(fullFileName) == false)
                         {
                             lblCompany.Text = _lastCompany.company_name;
