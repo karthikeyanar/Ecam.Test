@@ -123,19 +123,19 @@
                     <th sortname="prev_percentage" class="text-right text-nowrap">
                         Change %
                     </th>
-                    <th sortname="day_5_percentage" class="text-right text-nowrap">5 Days %</th>
-                    <th sortname="day_10_percentage" class="text-right text-nowrap">10 Days %</th>
-                    <th sortname="day_15_percentage" class="text-right text-nowrap">15 Days %</th>
-                    <th sortname="day_20_percentage" class="text-right text-nowrap">20 Days %</th>
-                    <th sortname="day_25_percentage" class="text-right text-nowrap">25 Days %</th>
-                    <th sortname="day_30_percentage" class="text-right text-nowrap">30 Days %</th>
-                    <th sortname="day_35" class="text-right text-nowrap">35 Days</th>
-                    <th sortname="last_2_month_percentage" class="text-right text-nowrap">2 Month %</th>
-                    <th sortname="last_3_month_percentage" class="text-right text-nowrap">3 Month %</th>
-                    <th sortname="week_52_low" class="text-right text-nowrap">Week 52 Low</th>
-                    <th sortname="week_52_low_percentage" class="text-right text-nowrap">Week 52 Low %</th>
-                    <th sortname="week_52_high" class="text-right text-nowrap">Week 52 High</th>
-                    <th sortname="week_52_percentage" class="text-right text-nowrap">Week 52 %</th>
+                    <th sortname="day_5_percentage" class="text-right text-nowrap">5D</th>
+                    <th sortname="day_10_percentage" class="text-right text-nowrap">10D</th>
+                    <th sortname="day_15_percentage" class="text-right text-nowrap">15D</th>
+                    <th sortname="day_20_percentage" class="text-right text-nowrap">20D</th>
+                    <th sortname="day_25_percentage" class="text-right text-nowrap">25D</th>
+                    <th sortname="day_30_percentage" class="text-right text-nowrap">30D</th>
+                    <th sortname="day_35_percentage" class="text-right text-nowrap">35D</th>
+                    <th sortname="last_2_month_percentage" class="text-right text-nowrap">2M</th>
+                    <th sortname="last_3_month_percentage" class="text-right text-nowrap">3M</th>
+                    <th sortname="week_52_low" class="text-right text-nowrap">W52Low</th>
+                    <th sortname="week_52_low_percentage" class="text-right text-nowrap">W52L%</th>
+                    <th sortname="week_52_high" class="text-right text-nowrap">W52High</th>
+                    <th sortname="week_52_percentage" class="text-right text-nowrap">W52H%</th>
                     <th style="width: 50px">
                     </th>
                     <th style="width: 50px">
@@ -193,7 +193,8 @@
                         <div class="font-11" data-bind="text:formatPercentage(day_30_total)"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(day_35)"></div>
+                        <div data-bind="text:formatPercentage(day_35_percentage)"></div>
+                        <div class="font-11" data-bind="text:formatNumber(day_35)"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(last_2_month_percentage)"></div>

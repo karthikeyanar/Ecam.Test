@@ -297,6 +297,7 @@ namespace Ecam.Framework.Repository
                           //",(((ifnull(tbl.last_1_month_price, 0) - ifnull(tbl.last_2_month_price, 0)) / ifnull(tbl.last_2_month_price, 0)) * 100) as last_1_month_change" + Environment.NewLine +
 
                           "tbl.*" + Environment.NewLine +
+                          ",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.day_35, 0)) / ifnull(tbl.day_35, 0)) * 100) as day_35_percentage" + Environment.NewLine +
                           ",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_2_month_price, 0)) / ifnull(tbl.last_2_month_price, 0)) * 100) as last_2_month_percentage" + Environment.NewLine +
                           //",(((ifnull(tbl.last_2_month_price, 0) - ifnull(tbl.last_3_month_price, 0)) / ifnull(tbl.last_3_month_price, 0)) * 100) as last_2_month_change" + Environment.NewLine +
                           ",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_3_month_price, 0)) / ifnull(tbl.last_3_month_price, 0)) * 100) as last_3_month_percentage" + Environment.NewLine +

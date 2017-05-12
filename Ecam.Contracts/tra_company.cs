@@ -30,6 +30,7 @@ namespace Ecam.Contracts
         public Nullable<decimal> day_30 { get; set; }
         public Nullable<decimal> day_30_percentage { get; set; }
         public Nullable<decimal> day_35 { get; set; }
+        public Nullable<decimal> day_35_percentage { get; set; }
         public Nullable<decimal> day_60 { get; set; }
 
         public Nullable<decimal> week_52_low { get; set; }
