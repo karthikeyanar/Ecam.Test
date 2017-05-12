@@ -623,7 +623,7 @@ namespace Ecam.Models
                                        select q).FirstOrDefault();
                 if (company != null)
                 {
-                    DateTime startDate = DateTime.Now.AddDays(-90);
+                    DateTime startDate = DateTime.Now.AddDays(-120);
                     DateTime endDate = DateTime.Now.Date;
                     List<tra_market> markets = (from q in context.tra_market
                                                 where q.trade_date >= startDate
@@ -633,21 +633,32 @@ namespace Ecam.Models
                                                 select q).ToList();
 
 
-                    company.day_5 = CalculateAVG((company.ltp_price ?? 0), markets, 5);
-                    company.day_10 = CalculateAVG((company.ltp_price ?? 0), markets, 10);
-                    company.day_15 = CalculateAVG((company.ltp_price ?? 0), markets, 15);
-                    company.day_20 = CalculateAVG((company.ltp_price ?? 0), markets, 20);
-                    company.day_25 = CalculateAVG((company.ltp_price ?? 0), markets, 25);
-                    company.day_30 = CalculateAVG((company.ltp_price ?? 0), markets, 30);
-                    company.day_35 = CalculateAVG((company.ltp_price ?? 0), markets, 35);
-                    company.day_60 = CalculateAVG((company.ltp_price ?? 0), markets, 60);
+                    company.day_5 = CalculateAVG(markets, 5);
+                    company.day_10 = CalculateAVG(markets, 10);
+                    company.day_15 = CalculateAVG(markets, 15);
+                    company.day_20 = CalculateAVG(markets, 20);
+                    company.day_25 = CalculateAVG(markets, 25);
+                    company.day_30 = CalculateAVG(markets, 30);
+                    company.day_35 = CalculateAVG(markets, 35);
+                    company.day_40 = CalculateAVG(markets, 40);
+                    company.day_45 = CalculateAVG(markets, 45);
+                    company.day_50 = CalculateAVG(markets, 50);
+                    company.day_55 = CalculateAVG(markets, 55);
+                    company.day_60 = CalculateAVG(markets, 60);
+                    company.day_65 = CalculateAVG(markets, 65);
+                    company.day_70 = CalculateAVG(markets, 70);
+                    company.day_75 = CalculateAVG(markets, 75);
+                    company.day_80 = CalculateAVG(markets, 80);
+                    company.day_85 = CalculateAVG(markets, 85);
+                    company.day_90 = CalculateAVG(markets, 90);
+
                     context.Entry(company).State = System.Data.Entity.EntityState.Modified;
                     context.SaveChanges();
                 }
             }
         }
 
-        private static decimal CalculateAVG(decimal currentPrice, List<tra_market> markets, int dayCount)
+        private static decimal CalculateAVG(List<tra_market> markets, int dayCount)
         {
             int i = 0;
             //decimal total = 0;
@@ -713,6 +724,7 @@ namespace Ecam.Models
                 //lblError.Text = "ImportPrice Price Index symbol=" + row.symbol + ",Date=" + row.trade_date;
                 //Console.WriteLine("ImportPrice Price Index symbol=" + row.symbol + ",Date=" + row.trade_date);
             }
+            CalculateMovingAVG(import.symbol);
         }
 
         //private static void CalculatedPrice(TempClass import)

@@ -251,30 +251,18 @@ namespace Ecam.Framework.Repository
             orderBy = string.Format("order by {0} {1}", paging.SortName, paging.SortOrder);
 
             selectFields = "ct.*" + Environment.NewLine +
-                           //",(select m.ltp_price from tra_market m where m.trade_date <= DATE_ADD(curdate(), INTERVAL -5 DAY) and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_5_day_price" + Environment.NewLine +
-                           //",(select m.ltp_price from tra_market m where m.trade_date <= DATE_ADD(curdate(), INTERVAL -10 DAY) and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_10_day_price" + Environment.NewLine +
-                           //",(select m.ltp_price from tra_market m where m.trade_date <= DATE_ADD(curdate(), INTERVAL -15 DAY) and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_15_day_price" + Environment.NewLine +
-                           //",(select m.ltp_price from tra_market m where m.trade_date <= DATE_ADD(curdate(), INTERVAL -20 DAY) and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_20_day_price" + Environment.NewLine +
-                           //",(select m.ltp_price from tra_market m where m.trade_date <= DATE_ADD(curdate(), INTERVAL -1 MONTH) and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_1_month_price" + Environment.NewLine +
-                           ",(select m.ltp_price from tra_market m where m.trade_date <= DATE_ADD(curdate(), INTERVAL -2 MONTH) and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_2_month_price" + Environment.NewLine +
-                           ",(select m.ltp_price from tra_market m where m.trade_date <= DATE_ADD(curdate(), INTERVAL -3 MONTH) and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_3_month_price" + Environment.NewLine +
 
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.prev_price, 0)) / ifnull(ct.prev_price, 0)) * 100) as prev_percentage" + Environment.NewLine +
 
-                           ",(((ifnull(ct.day_5, 0) - ifnull(ct.day_10, 0)) / ifnull(ct.day_10, 0)) * 100) as day_5_percentage" + Environment.NewLine +
-                           ",(((ifnull(ct.day_10, 0) - ifnull(ct.day_15, 0)) / ifnull(ct.day_15, 0)) * 100) as day_10_percentage" + Environment.NewLine +
-                           ",(((ifnull(ct.day_15, 0) - ifnull(ct.day_20, 0)) / ifnull(ct.day_20, 0)) * 100) as day_15_percentage" + Environment.NewLine +
-                           ",(((ifnull(ct.day_20, 0) - ifnull(ct.day_25, 0)) / ifnull(ct.day_25, 0)) * 100) as day_20_percentage" + Environment.NewLine +
-                           ",(((ifnull(ct.day_25, 0) - ifnull(ct.day_30, 0)) / ifnull(ct.day_30, 0)) * 100) as day_25_percentage" + Environment.NewLine +
-                           ",(((ifnull(ct.day_30, 0) - ifnull(ct.day_35, 0)) / ifnull(ct.day_35, 0)) * 100) as day_30_percentage" + Environment.NewLine +
+                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_5, 0)) / ifnull(ct.day_5, 0)) * 100) as day_5_percentage" + Environment.NewLine +
+                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_10, 0)) / ifnull(ct.day_10, 0)) * 100) as day_10_percentage" + Environment.NewLine +
+                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_15, 0)) / ifnull(ct.day_15, 0)) * 100) as day_15_percentage" + Environment.NewLine +
+                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_20, 0)) / ifnull(ct.day_20, 0)) * 100) as day_20_percentage" + Environment.NewLine +
+                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_25, 0)) / ifnull(ct.day_25, 0)) * 100) as day_25_percentage" + Environment.NewLine +
 
-
-                           ",(((ifnull(ct.day_5, 0) - ifnull(ct.day_35, 0)) / ifnull(ct.day_35, 0)) * 100) as day_5_total" + Environment.NewLine +
-                           ",(((ifnull(ct.day_10, 0) - ifnull(ct.day_35, 0)) / ifnull(ct.day_35, 0)) * 100) as day_10_total" + Environment.NewLine +
-                           ",(((ifnull(ct.day_15, 0) - ifnull(ct.day_35, 0)) / ifnull(ct.day_35, 0)) * 100) as day_15_total" + Environment.NewLine +
-                           ",(((ifnull(ct.day_20, 0) - ifnull(ct.day_35, 0)) / ifnull(ct.day_35, 0)) * 100) as day_20_total" + Environment.NewLine +
-                           ",(((ifnull(ct.day_25, 0) - ifnull(ct.day_35, 0)) / ifnull(ct.day_35, 0)) * 100) as day_25_total" + Environment.NewLine +
-                           ",(((ifnull(ct.day_30, 0) - ifnull(ct.day_35, 0)) / ifnull(ct.day_35, 0)) * 100) as day_30_total" + Environment.NewLine +
+                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_30, 0)) / ifnull(ct.day_30, 0)) * 100) as day_30_percentage" + Environment.NewLine +
+                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_60, 0)) / ifnull(ct.day_60, 0)) * 100) as day_60_percentage" + Environment.NewLine +
+                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_90, 0)) / ifnull(ct.day_90, 0)) * 100) as day_90_percentage" + Environment.NewLine +
 
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.week_52_high, 0)) / ifnull(ct.week_52_high, 0)) * 100) as week_52_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.week_52_low, 0)) / ifnull(ct.week_52_low, 0)) * 100) as week_52_low_percentage" + Environment.NewLine +
@@ -297,10 +285,10 @@ namespace Ecam.Framework.Repository
                           //",(((ifnull(tbl.last_1_month_price, 0) - ifnull(tbl.last_2_month_price, 0)) / ifnull(tbl.last_2_month_price, 0)) * 100) as last_1_month_change" + Environment.NewLine +
 
                           "tbl.*" + Environment.NewLine +
-                          ",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.day_35, 0)) / ifnull(tbl.day_35, 0)) * 100) as day_35_percentage" + Environment.NewLine +
-                          ",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_2_month_price, 0)) / ifnull(tbl.last_2_month_price, 0)) * 100) as last_2_month_percentage" + Environment.NewLine +
+                          //",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.day_35, 0)) / ifnull(tbl.day_35, 0)) * 100) as day_35_percentage" + Environment.NewLine +
+                          //",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_2_month_price, 0)) / ifnull(tbl.last_2_month_price, 0)) * 100) as last_2_month_percentage" + Environment.NewLine +
                           //",(((ifnull(tbl.last_2_month_price, 0) - ifnull(tbl.last_3_month_price, 0)) / ifnull(tbl.last_3_month_price, 0)) * 100) as last_2_month_change" + Environment.NewLine +
-                          ",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_3_month_price, 0)) / ifnull(tbl.last_3_month_price, 0)) * 100) as last_3_month_percentage" + Environment.NewLine +
+                          //",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_3_month_price, 0)) / ifnull(tbl.last_3_month_price, 0)) * 100) as last_3_month_percentage" + Environment.NewLine +
                           " from(" + Environment.NewLine +
                           sql + Environment.NewLine +
                           ") as tbl {0} {1} {2}", groupByName, orderBy, pageLimit);

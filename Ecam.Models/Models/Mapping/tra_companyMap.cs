@@ -89,7 +89,20 @@ namespace Ecam.Models
             this.Property(t => t.day_25).HasColumnName("day_25");
             this.Property(t => t.day_30).HasColumnName("day_30");
             this.Property(t => t.day_35).HasColumnName("day_35");
+
+            this.Property(t => t.day_40).HasColumnName("day_40");
+            this.Property(t => t.day_45).HasColumnName("day_45");
+            this.Property(t => t.day_50).HasColumnName("day_50");
+            this.Property(t => t.day_55).HasColumnName("day_55");
             this.Property(t => t.day_60).HasColumnName("day_60");
+            this.Property(t => t.day_65).HasColumnName("day_65");
+            this.Property(t => t.day_70).HasColumnName("day_70");
+            this.Property(t => t.day_75).HasColumnName("day_75");
+            this.Property(t => t.day_80).HasColumnName("day_80");
+            this.Property(t => t.day_85).HasColumnName("day_85");
+            this.Property(t => t.day_90).HasColumnName("day_90");
+
+
             this.Property(t => t.is_nifty_50).HasColumnName("is_nifty_50");
             this.Property(t => t.is_nifty_100).HasColumnName("is_nifty_100");
             this.Property(t => t.is_nifty_200).HasColumnName("is_nifty_200");
