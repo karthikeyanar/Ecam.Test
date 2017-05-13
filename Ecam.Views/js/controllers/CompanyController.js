@@ -34,6 +34,22 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             if (isNifty200 == true) {
                 arr[arr.length] = { "name": "is_nifty_200", "value": isNifty200 };
             }
+            var is_all_time_low = $("#frmCompanySearch #is_all_time_low")[0].checked;
+            if (is_all_time_low == true) {
+                arr[arr.length] = { "name": "is_all_time_low", "value": is_all_time_low };
+            }
+            var is_all_time_high = $("#frmCompanySearch #is_all_time_high")[0].checked;
+            if (is_all_time_high == true) {
+                arr[arr.length] = { "name": "is_all_time_high", "value": is_all_time_high };
+            }
+            var is_all_time_low_15_days = $("#frmCompanySearch #is_all_time_low_15_days")[0].checked;
+            if (is_all_time_low_15_days == true) {
+                arr[arr.length] = { "name": "is_all_time_low_15_days", "value": is_all_time_low_15_days };
+            }
+            var is_all_time_high_15_days = $("#frmCompanySearch #is_all_time_high_15_days")[0].checked;
+            if (is_all_time_high_15_days == true) {
+                arr[arr.length] = { "name": "is_all_time_high_15_days", "value": is_all_time_high_15_days };
+            }
             var url = apiUrl("/Company/List");
             $.ajax({
                 "url": url,
@@ -240,6 +256,18 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             $("body").on("click", "#frmCompanySearch #is_nifty_200", function (event) {
                 self.loadGrid();
             });
+            $("body").on("click", "#frmCompanySearch #is_all_time_low", function (event) {
+                self.loadGrid();
+            });
+            $("body").on("click", "#frmCompanySearch #is_all_time_high", function (event) {
+                self.loadGrid();
+            });
+            $("body").on("click", "#frmCompanySearch #is_all_time_low_15_days", function (event) {
+                self.loadGrid();
+            });
+            $("body").on("click", "#frmCompanySearch #is_all_time_high_15_days", function (event) {
+                self.loadGrid();
+            });
             $("body").on("click", "#Company .btn-add", function (event) {
                 self.openItem(null)
             });
@@ -301,6 +329,10 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             $("body").off("click", "#frmCompanySearch #is_nifty_50");
             $("body").off("click", "#frmCompanySearch #is_nifty_100");
             $("body").off("click", "#frmCompanySearch #is_nifty_200");
+            $("body").off("click", "#frmCompanySearch #is_all_time_low");
+            $("body").off("click", "#frmCompanySearch #is_all_time_high");
+            $("body").off("click", "#frmCompanySearch #is_all_time_low_15_days");
+            $("body").off("click", "#frmCompanySearch #is_all_time_high_15_days");
             $("body").off("click", "#Company .btn-add");
             $("body").off("click", "#Company .btn-edit");
             $("body").off("click", "#Company .btn-delete");

@@ -67,8 +67,12 @@ namespace Ecam.Contracts
 
         public Nullable<decimal> week_52_low_percentage { get; set; }
         public Nullable<decimal> week_52_percentage { get; set; }
-
         public List<string> category_list { get; set; }
+        public Nullable<bool> is_all_time_high { get; set; }
+        public Nullable<bool> is_all_time_low { get; set; }
+
+        public Nullable<bool> is_all_time_high_15_days { get; set; }
+        public Nullable<bool> is_all_time_low_15_days { get; set; }
     }
 
     public class TRA_COMPANY_SEARCH : TRA_COMPANY

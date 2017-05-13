@@ -230,6 +230,64 @@ namespace Ecam.Framework.Repository
                 where.AppendFormat(" and ifnull(ct.is_nifty_200,0)={0}", ((criteria.is_nifty_200 ?? false) == true ? "1" : "0"));
             }
 
+            if (criteria.is_all_time_low.HasValue)
+            {
+                if (criteria.is_all_time_low == true)
+                {
+                    where.Append(" and ("+
+                            " ifnull(ct.day_30,0)>ifnull(ct.day_25,0)" +
+                            " and ifnull(ct.day_25,0)>ifnull(ct.day_20,0)" +
+                            " and ifnull(ct.day_20,0)>ifnull(ct.day_15,0)" +
+                            " and ifnull(ct.day_15,0)>ifnull(ct.day_10,0)" +
+                            " and ifnull(ct.day_10,0)>ifnull(ct.day_5,0)" +
+                            " and ifnull(ct.day_5,0)>ifnull(ct.ltp_price,0)" +
+                            ")" +
+                            "");
+                }
+            }
+
+            if (criteria.is_all_time_high.HasValue)
+            {
+                if (criteria.is_all_time_high == true)
+                {
+                    where.Append(" and (" +
+                            " ifnull(ct.day_30,0)<ifnull(ct.day_25,0)" +
+                            " and ifnull(ct.day_25,0)<ifnull(ct.day_20,0)" +
+                            " and ifnull(ct.day_20,0)<ifnull(ct.day_15,0)" +
+                            " and ifnull(ct.day_15,0)<ifnull(ct.day_10,0)" +
+                            " and ifnull(ct.day_10,0)<ifnull(ct.day_5,0)" +
+                            " and ifnull(ct.day_5,0)<ifnull(ct.ltp_price,0)" +
+                            ")" +
+                            "");
+                }
+            }
+
+            if (criteria.is_all_time_low_15_days.HasValue)
+            {
+                if (criteria.is_all_time_low_15_days == true)
+                {
+                    where.Append(" and (" +
+                            " ifnull(ct.day_15,0)>ifnull(ct.day_10,0)" +
+                            " and ifnull(ct.day_10,0)>ifnull(ct.day_5,0)" +
+                            " and ifnull(ct.day_5,0)>ifnull(ct.ltp_price,0)" +
+                            ")" +
+                            "");
+                }
+            }
+
+            if (criteria.is_all_time_high_15_days.HasValue)
+            {
+                if (criteria.is_all_time_high_15_days == true)
+                {
+                    where.Append(" and (" +
+                            " ifnull(ct.day_15,0)<ifnull(ct.day_10,0)" +
+                            " and ifnull(ct.day_10,0)<ifnull(ct.day_5,0)" +
+                            " and ifnull(ct.day_5,0)<ifnull(ct.ltp_price,0)" +
+                            ")" +
+                            "");
+                }
+            }
+
             selectFields = "count(*) as cnt";
 
             sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, "", "");
