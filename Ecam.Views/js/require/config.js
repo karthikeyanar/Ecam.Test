@@ -212,6 +212,20 @@ $(function () {
             unload: function () { }
         });
 
+        createFinchRoute("/category", {
+            setup: function (url) {
+                handleBlockUI();
+            },
+            load: function () {
+                require(['CategoryController'], function (ViewModel) {
+                    document.title = "Category - Ecams";
+                    var m = new ViewModel();
+                    app.viewModel(m);
+                });
+            },
+            unload: function () { }
+        });
+
         createFinchRoute("/market", {
             setup: function (url) {
                 handleBlockUI();

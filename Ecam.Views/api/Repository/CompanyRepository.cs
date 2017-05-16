@@ -234,7 +234,7 @@ namespace Ecam.Framework.Repository
             {
                 if (criteria.is_all_time_low == true)
                 {
-                    where.Append(" and ("+
+                    where.Append(" and (" +
                             " ifnull(ct.day_30,0)>ifnull(ct.day_25,0)" +
                             " and ifnull(ct.day_25,0)>ifnull(ct.day_20,0)" +
                             " and ifnull(ct.day_20,0)>ifnull(ct.day_15,0)" +
@@ -367,10 +367,16 @@ namespace Ecam.Framework.Repository
                 row.category_list = (from q in companyCategories
                                      where q.symbol == row.symbol
                                      select q.category_name).ToList();
-                if (row.category_list.Count > 0)
+                string categoryName = "";
+                foreach (var cat in row.category_list)
                 {
-                    row.category_name = row.category_list[0];
+                    categoryName += cat + ",";
                 }
+                if (string.IsNullOrEmpty(categoryName) == false)
+                {
+                    categoryName = categoryName.Substring(0, categoryName.Length - 1);
+                }
+                row.category_name = categoryName;
             }
             return new PaginatedListResult<TRA_COMPANY> { total = paging.Total, rows = rows };
         }

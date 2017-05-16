@@ -172,16 +172,9 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
                 row = {
                     'company_name': ''
                     , 'symbol': ''
-                    , 'open_price': ''
-                    , 'high_price': ''
-                    , 'low_price': ''
-                    , 'ltp_price': ''
-                    , 'close_price': ''
-                    , 'prev_price': ''
-                    , 'week_52_low': ''
-                    , 'week_52_high': ''
-                    , 'is_book_mark': 'false'
+                    , 'category_name': ''
                     , 'id': 0
+                    , 'category_list': []
                 };
             }
             ko.applyBindings(row, $modal[0]);

@@ -118,6 +118,16 @@ namespace Ecam.Views.Controllers
             {
                 return BadRequest(ModelState);
             }
+            string companyName = contract.company_name;
+            string symbol = contract.symbol;
+            string categoryName = contract.category_name;
+            if ((contract.id ?? 0) > 0)
+            {
+                contract = _CompanyRepository.Get(new TRA_COMPANY_SEARCH { id = contract.id }, new Paging { }).rows.FirstOrDefault();
+                contract.company_name = companyName;
+                contract.symbol = symbol;
+                contract.category_name = categoryName;
+            }
             var saveContract = Repository.Save(contract);
             if (saveContract.Errors == null)
             {

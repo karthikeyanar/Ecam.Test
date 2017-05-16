@@ -38,6 +38,11 @@ namespace Ecam.Views.Controllers
             return View();
         }
 
+        public ActionResult Category()
+        {
+            return View();
+        }
+
         public ActionResult Company()
         {
             return View();
