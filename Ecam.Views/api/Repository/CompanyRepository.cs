@@ -180,9 +180,47 @@ namespace Ecam.Framework.Repository
                 using (EcamContext context = new EcamContext())
                 {
                     List<string> categoryList = Helper.ConvertStringList(criteria.categories);
-                    List<string> categorySymbolList = (from q in context.tra_company_category
-                                                       where categoryList.Contains(q.category_name) == true
-                                                       select q.symbol).Distinct().ToList();
+                    var isAllCategory = false;
+                    if (categoryList.Count > 1)
+                    {
+                        isAllCategory = true;
+                    }
+                    List<tra_company_category> categories = null;
+                    List<string> categorySymbolList = null;
+                    categories = (from q in context.tra_company_category
+                                  where categoryList.Contains(q.category_name) == true
+                                  select q).ToList();
+                    if (isAllCategory == true)
+                    {
+                        categorySymbolList = new List<string>();
+                        foreach (var row in categories)
+                        {
+                            var tempList = (from q in categories where q.symbol == row.symbol select q).ToList();
+                            int selCnt = 0;
+                            foreach (var tempRow in tempList)
+                            {
+                                foreach (string str in categoryList)
+                                {
+                                    if (string.IsNullOrEmpty(str) == false)
+                                    {
+                                        if (tempRow.category_name == str)
+                                        {
+                                            selCnt += 1;
+                                        }
+                                    }
+                                }
+                            }
+                            if (selCnt == categoryList.Count)
+                            {
+                                categorySymbolList.Add(row.symbol);
+                            }
+                        }
+                        categorySymbolList = categorySymbolList.Distinct().ToList();
+                    }
+                    else
+                    {
+                        categorySymbolList = (from q in categories select q.symbol).Distinct().ToList();
+                    }
                     if (categorySymbolList.Count > 0)
                     {
                         categorySymbols = "";
