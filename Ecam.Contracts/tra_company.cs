@@ -67,6 +67,7 @@ namespace Ecam.Contracts
 
         public Nullable<decimal> week_52_low_percentage { get; set; }
         public Nullable<decimal> week_52_percentage { get; set; }
+        public Nullable<decimal> week_52_positive_percentage { get; set; }
         public List<string> category_list { get; set; }
         public Nullable<bool> is_all_time_high { get; set; }
         public Nullable<bool> is_all_time_low { get; set; }

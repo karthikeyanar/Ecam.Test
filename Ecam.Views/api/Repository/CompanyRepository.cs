@@ -323,6 +323,7 @@ namespace Ecam.Framework.Repository
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_90, 0)) / ifnull(ct.day_90, 0)) * 100) as day_90_percentage" + Environment.NewLine +
 
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.week_52_high, 0)) / ifnull(ct.week_52_high, 0)) * 100) as week_52_percentage" + Environment.NewLine +
+                           ",(((ifnull(ct.week_52_high, 0) - ifnull(ct.ltp_price, 0)) / ifnull(ct.ltp_price, 0)) * 100) as week_52_positive_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.week_52_low, 0)) / ifnull(ct.week_52_low, 0)) * 100) as week_52_low_percentage" + Environment.NewLine +
                            ",ct.company_id as id" + Environment.NewLine +
                            "";
