@@ -26,17 +26,17 @@ namespace Ecam.Models {
             this.Property(t => t.low_price)
                 .HasPrecision(13,4);
 
+            this.Property(t => t.ltp_price)
+                .HasPrecision(13,4);
+
             this.Property(t => t.close_price)
                 .HasPrecision(13,4);
 
             this.Property(t => t.prev_price)
                 .HasPrecision(13,4);
 
-            this.Property(t => t.ltp_price)
-              .HasPrecision(13, 4);
-
             // Table & Column Mappings
-            this.ToTable("tra_market");
+			this.ToTable("tra_market");
             this.Property(t => t.id).HasColumnName("market_id");
             this.Property(t => t.symbol).HasColumnName("symbol");
             this.Property(t => t.trade_date).HasColumnName("trade_date");
@@ -44,9 +44,9 @@ namespace Ecam.Models {
             this.Property(t => t.open_price).HasColumnName("open_price");
             this.Property(t => t.high_price).HasColumnName("high_price");
             this.Property(t => t.low_price).HasColumnName("low_price");
+            this.Property(t => t.ltp_price).HasColumnName("ltp_price");
             this.Property(t => t.close_price).HasColumnName("close_price");
             this.Property(t => t.prev_price).HasColumnName("prev_price");
-            this.Property(t => t.ltp_price).HasColumnName("ltp_price");
 			       Ignore(t=>t.created_date);
 						       Ignore(t=>t.created_by);
 						       Ignore(t=>t.last_updated_date);
