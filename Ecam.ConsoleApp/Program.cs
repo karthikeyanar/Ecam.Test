@@ -9,70 +9,115 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 
-namespace Ecam.ConsoleApp {
-    class Program {
+namespace Ecam.ConsoleApp
+{
+    class Program
+    {
 
-        static void Main(string[] args) {
-            using(EcamContext context = new EcamContext())
-            {
-                var companies = (from q in context.tra_company
-                                 select q).ToList();
-            }
+        static void Main(string[] args)
+        {
+            ParseMainHTML();
             Console.ReadLine();
         }
- 
-		//private static void DownloadAirlineLogo() {
-		//	using(EcamContext context = new EcamContext()) {
-		//		string siteViewsPath = ConfigurationManager.AppSettings["site_views_path"];
-		//		string ecamUrl = ConfigurationManager.AppSettings["ecam_url"];
-		//		string logoPath = Path.Combine(siteViewsPath,"files\\airline_logo");
 
-		//		Common.Log("SiteViewsPath=" + siteViewsPath);
-		//		Common.Log("logoPath=" + logoPath);
-		//		List<ec_airline> airlines = (from q in context.ec_airline
-		//									 select q).ToList();
-		//		Common.Log("airlines=" + airlines.Count());
-		//		string fileName = string.Empty;
-		//		WebClient webClient = new WebClient();
-		//		foreach(var airline in airlines) {
-		//			string airlineFileName = string.Format("{0}.png",airline.airline_code);
-		//			fileName = string.Format("{0}/files/airline_logo/{1}",ecamUrl,airlineFileName);
-		//			string destFileName = Path.Combine(logoPath,airlineFileName);
-		//			if(File.Exists(destFileName) == false) {
-		//				try {
-		//					webClient.DownloadFile(fileName,destFileName);
-		//					Console.WriteLine("Airline Download=" + airline.airline_code);
-		//				} catch { }
-		//			} else {
-		//				Console.WriteLine("Aleready Exist=" + airline.airline_code);
-		//			}
+        private static void ParseMainHTML()
+        {
+            string fileName = "C:\\Users\\kart\\Desktop\\MF\\1.html";
+            string content = System.IO.File.ReadAllText(fileName);
+            string startWord = "<table width=\"100%\" class=\"tblporhd\">";
+            string endWord = "<table width=\"100%\" class=\"tblporhd MT25\">";
+            int startIndex = content.IndexOf(startWord);
+            int endIndex = content.IndexOf(endWord);
+            int length = endIndex - startIndex + endWord.Length;
+            string parseContent = content.Substring(startIndex, length);
+            endWord = "</table>";
+            startIndex = parseContent.IndexOf(startWord);
+            endIndex = parseContent.IndexOf(endWord);
+            length = endIndex - startIndex + endWord.Length;
+            parseContent = parseContent.Substring(startIndex, length);
+            Regex regex = new Regex(
+     @"<tr>(.*?)</tr>",
+     RegexOptions.IgnoreCase
+     | RegexOptions.Multiline
+     | RegexOptions.IgnorePatternWhitespace
+     | RegexOptions.Compiled
+     );
 
-		//			airlineFileName = string.Format("{0}_icon.png",airline.airline_code);
-		//			fileName = string.Format("{0}/files/airline_logo/{1}",ecamUrl,airlineFileName);
-		//			destFileName = Path.Combine(logoPath,airlineFileName);
-		//			if(File.Exists(destFileName) == false) {
-		//				try {
-		//					webClient.DownloadFile(fileName,destFileName);
-		//					Console.WriteLine("Airline Download=" + airline.airline_code);
-		//				} catch { }
-		//			} else {
-		//				Console.WriteLine("Aleready Exist=" + airline.airline_code);
-		//			}
+            MatchCollection trCollections = regex.Matches(parseContent);
+            int i = 0;
+            foreach (Match trMatch in trCollections)
+            {
+                i += 1;
+                string tr = trMatch.Value;
+                string tagName = "td";
+                if (i == 1)
+                {
+                    tagName = "th";
+                }
+                regex = new Regex(
+                            @"<" + tagName + "[^>]*>(.+?)</" + tagName + ">",
+                            RegexOptions.IgnoreCase
+                            | RegexOptions.Multiline
+                            | RegexOptions.IgnorePatternWhitespace
+                            | RegexOptions.Compiled
+                            );
+                MatchCollection rowMatches = regex.Matches(tr);
+                string equity = "";
+                string sector = "";
+                string qty = "";
+                string totalValue = "";
+                string percentage = "";
+                
+                int colIndex = -1;
+                foreach (Match colMatch in rowMatches)
+                {
+                    colIndex += 1;
+                    if (i > 1)
+                    {
+                        string value = string.Empty;
+                        if (colMatch.Groups.Count >= 2)
+                        {
+                            value = colMatch.Groups[1].Value;
+                        }
+                        if (string.IsNullOrEmpty(value) == false)
+                        {
+                            value = value.Trim();
+                        }
+                        switch (colIndex)
+                        {
+                            case 0: equity = value; break;
+                            case 1: sector = value; break;
+                            case 2: qty = value; break;
+                            case 3: totalValue = value; break;
+                            case 4: percentage = value; break;
+                        }
+                    }
+                } 
+                if (string.IsNullOrEmpty(equity) == false)
+                {
+                    string symbol = GetSymbol(equity);
+                }
+            }
+        }
 
-		//			airlineFileName = string.Format("{0}_medium.png",airline.airline_code);
-		//			fileName = string.Format("{0}/files/airline_logo/{1}",ecamUrl,airlineFileName);
-		//			destFileName = Path.Combine(logoPath,airlineFileName);
-		//			if(File.Exists(destFileName) == false) {
-		//				try {
-		//					webClient.DownloadFile(fileName,destFileName);
-		//					Console.WriteLine("Airline Download=" + airline.airline_code);
-		//				} catch { }
-		//			} else {
-		//				Console.WriteLine("Aleready Exist=" + airline.airline_code);
-		//			}
-		//		}
-		//	}
-		//}
+        private static string GetSymbol(string equity)
+        {
+            string symbol = "";
+            Regex regex = new Regex(
+    @"href=[""|'](.*?)[""|']",
+    RegexOptions.IgnoreCase
+    | RegexOptions.Multiline
+    | RegexOptions.IgnorePatternWhitespace
+    | RegexOptions.Compiled
+    );
+            MatchCollection collections = regex.Matches(equity);
+            if (collections.Count > 0)
+            {
+                string href = collections[0].Groups[1].Value;
+            }
+            return symbol;
+        }
     }
 }
