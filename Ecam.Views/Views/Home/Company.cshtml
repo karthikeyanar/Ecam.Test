@@ -12,6 +12,9 @@
                 <input type="hidden" name="categories" />
             </div>
             <div class="form-group m-r-10 m-t-10">
+                <input type="hidden" name="mf_ids" />
+            </div>
+            <div class="form-group m-r-10 m-t-10">
                 <input type="text" name="from_price" class="form-control input-sm" placeholder="From Price" style="width:100px" />
             </div>
             <div class="form-group m-r-10 m-t-10">
@@ -44,6 +47,13 @@
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" id="is_nifty_200" /> Nifty 200
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="is_mf" /> MF Stock
                         </label>
                     </div>
                 </div>
@@ -135,6 +145,12 @@
                     </th>
                     <th>
                         Category
+                    </th> 
+                    <th sortname="mf_cnt_2" class="text-right text-nowrap">
+                        MFCNT
+                    </th>
+                    <th sortname="mf_qty_2" class="text-right text-nowrap">
+                        MFQTY
                     </th>
                     <th sortname="ltp_price" class="text-right text-nowrap">
                         LTP
@@ -170,6 +186,12 @@
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:company_name"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:symbol"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:category_name"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(mf_cnt_2)"></div>
+                    </td> 
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(mf_qty_2)"></div>
+                    </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(ltp_price)"></div>
                     </td>

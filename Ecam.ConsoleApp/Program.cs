@@ -21,7 +21,7 @@ namespace Ecam.ConsoleApp
             if (string.IsNullOrEmpty(linkFileName) == false)
             {
                 string content = System.IO.File.ReadAllText(linkFileName);
-                string[] arr = content.Split(("\r\n").ToCharArray(),StringSplitOptions.RemoveEmptyEntries);
+                string[] arr = content.Split(("\r\n").ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                 foreach (string url in arr)
                 {
                     if (string.IsNullOrEmpty(url) == false)
@@ -29,6 +29,22 @@ namespace Ecam.ConsoleApp
                         ParseMainHTML(url);
                     }
                 }
+            }
+            using (EcamContext context = new EcamContext())
+            {
+                var companies = (from q in context.tra_company select q).ToList();
+                var funds = (from q in context.tra_mutual_fund_pf select q).ToList();
+                foreach(var company in companies)
+                {
+                    company.mf_cnt = (from q in funds
+                                      where q.symbol == company.symbol
+                                      select q.fund_id).Count();
+                    company.mf_qty = (from q in funds
+                                      where q.symbol == company.symbol
+                                      select q.quantity).Sum();
+                    context.Entry(company).State = System.Data.Entity.EntityState.Modified;
+                }
+                context.SaveChanges();
             }
             Console.WriteLine("Completed");
             Console.ReadLine();

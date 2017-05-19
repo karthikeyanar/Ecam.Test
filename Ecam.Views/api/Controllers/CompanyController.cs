@@ -108,6 +108,13 @@ namespace Ecam.Views.Controllers
             return _CompanyRepository.GetCategories(term, pageSize);
         }
 
+        [HttpGet]
+        [ActionName("SelectMFS")]
+        public List<Select2List> GetSelectMFS([FromUri] string term, [FromUri] int pageSize = 50)
+        {
+            return _CompanyRepository.GetMFFunds(term, pageSize);
+        }
+
         public override IHttpActionResult Post(TRA_COMPANY contract)
         {
             if (contract == null)

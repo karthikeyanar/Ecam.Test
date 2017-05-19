@@ -50,6 +50,10 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             if (is_all_time_high_15_days == true) {
                 arr[arr.length] = { "name": "is_all_time_high_15_days", "value": is_all_time_high_15_days };
             }
+            var is_mf = $("#frmCompanySearch #is_mf")[0].checked;
+            if (is_mf == true) {
+                arr[arr.length] = { "name": "is_mf", "value": is_mf };
+            }
             var url = apiUrl("/Company/List");
             $.ajax({
                 "url": url,
@@ -106,6 +110,7 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             var $frmCompanySearch = $("#frmCompanySearch");
             var $symbols = $(":input[name='symbols']", $frmCompanySearch);
             var $categories = $(":input[name='categories']", $frmCompanySearch);
+            var $mf_ids = $(":input[name='mf_ids']", $frmCompanySearch);
             select2Setup($symbols[0], {
                 multiple: true
                 , width: 300
@@ -135,6 +140,29 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
                , width: 300
                , url: apiUrl("/Company/SelectCategories")
                , placeholder: "Select Categories"
+               , resultsCallBack: function (data, page) {
+                   var s2data = [];
+                   $.each(data, function (i, d) {
+                       s2data.push({ "id": d.id, "text": d.label, "source": d });
+                   });
+                   return { results: s2data };
+               }
+               , onParam: function (term, page) {
+                   return {
+                       term: term
+                   };
+               }
+               , onChange: function (e, ui) {
+                   var $target = $(".page-content");
+                   self.loadGrid();
+               }
+            });
+
+            select2Setup($mf_ids[0], {
+                multiple: true
+               , width: 300
+               , url: apiUrl("/Company/SelectMFS")
+               , placeholder: "Select MFS"
                , resultsCallBack: function (data, page) {
                    var s2data = [];
                    $.each(data, function (i, d) {
@@ -261,6 +289,9 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             $("body").on("click", "#frmCompanySearch #is_all_time_high_15_days", function (event) {
                 self.loadGrid();
             });
+            $("body").on("click", "#frmCompanySearch #is_mf", function (event) {
+                self.loadGrid();
+            });
             $("body").on("click", "#Company .btn-add", function (event) {
                 self.openItem(null)
             });
@@ -326,6 +357,7 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             $("body").off("click", "#frmCompanySearch #is_all_time_high");
             $("body").off("click", "#frmCompanySearch #is_all_time_low_15_days");
             $("body").off("click", "#frmCompanySearch #is_all_time_high_15_days");
+            $("body").off("click", "#frmCompanySearch #is_mf");
             $("body").off("click", "#Company .btn-add");
             $("body").off("click", "#Company .btn-edit");
             $("body").off("click", "#Company .btn-delete");

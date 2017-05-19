@@ -16,6 +16,7 @@ namespace Ecam.Framework.Repository
         PaginatedListResult<TRA_COMPANY> Get(TRA_COMPANY_SEARCH criteria, Paging paging);
         List<Select2List> GetCompanys(string name, int pageSize = 50, string categories = "");
         List<Select2List> GetCategories(string name, int pageSize = 50);
+        List<Select2List> GetMFFunds(string name, int pageSize = 50);
     }
 
     public class CompanyRepository : ICompanyRepository
@@ -58,6 +59,55 @@ namespace Ecam.Framework.Repository
             selectFields = "comp.category_name as id" +
                            ",comp.category_name as label" +
                            ",comp.category_name as value";
+
+            sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, orderBy, pageLimit);
+
+            List<Select2List> rows = new List<Select2List>();
+            using (EcamContext context = new EcamContext())
+            {
+                rows = context.Database.SqlQuery<Select2List>(sql).ToList();
+            }
+            return rows;
+        }
+
+        public List<Select2List> GetMFFunds(string name, int pageSize = 50)
+        {
+            StringBuilder where = new StringBuilder();
+            string selectFields = "";
+            string pageLimit = "";
+            string orderBy = "";
+            string groupByName = string.Empty;
+            string joinTables = string.Empty;
+            string sqlFormat = "select {0} from tra_mutual_fund comp {1} where {2} {3} {4} {5}";
+            string sql = string.Empty;
+            string role = Authentication.CurrentRole;
+
+            where.AppendFormat(" comp.mutual_fund_id > 0");
+
+            if (string.IsNullOrEmpty(name) == false)
+            {
+                where.AppendFormat(" and comp.fund_name like '{0}%'", name);
+            }
+
+            Paging paging = new Paging { PageIndex = 1, PageSize = pageSize };
+
+            if (string.IsNullOrEmpty(paging.SortOrder))
+            {
+                paging.SortOrder = "asc";
+            }
+
+            if (paging.PageSize > 0)
+            {
+                int from = (paging.PageIndex > 1) ? ((paging.PageIndex - 1) * paging.PageSize) : 0;
+                int to = paging.PageSize;
+                pageLimit = string.Format("limit {0},{1}", from, to);
+            }
+
+            orderBy = string.Format("order by {0} {1}", paging.SortName, paging.SortOrder);
+
+            selectFields = "comp.mutual_fund_id as id" +
+                           ",comp.fund_name as label" +
+                           ",comp.fund_name as value";
 
             sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, orderBy, pageLimit);
 
@@ -181,10 +231,10 @@ namespace Ecam.Framework.Repository
                 {
                     List<string> categoryList = Helper.ConvertStringList(criteria.categories);
                     var isAllCategory = false;
-                    if (categoryList.Count > 1)
-                    {
-                        isAllCategory = true;
-                    }
+                    //if (categoryList.Count > 1)
+                    //{
+                    //    isAllCategory = true;
+                    //}
                     List<tra_company_category> categories = null;
                     List<string> categorySymbolList = null;
                     categories = (from q in context.tra_company_category
@@ -237,6 +287,33 @@ namespace Ecam.Framework.Repository
                 if (string.IsNullOrEmpty(categorySymbols) == false)
                 {
                     where.AppendFormat(" and ct.symbol in({0})", Helper.ConvertStringSQLFormat(categorySymbols));
+                }
+            }
+
+            if (string.IsNullOrEmpty(criteria.mf_ids) == false)
+            {
+                string symbols = "";
+                using (EcamContext context = new EcamContext())
+                {
+                    List<int> ids = Helper.ConvertIntIds(criteria.mf_ids);
+                    if (ids.Count > 0)
+                    {
+                        var list = (from q in context.tra_mutual_fund_pf
+                                    where ids.Contains(q.fund_id) == true
+                                    select q.symbol).ToList();
+                        foreach (var str in list)
+                        {
+                            symbols += str + ",";
+                        }
+                        if (string.IsNullOrEmpty(symbols) == false)
+                        {
+                            symbols = symbols.Substring(0, symbols.Length - 1);
+                        }
+                    }
+                }
+                if (string.IsNullOrEmpty(symbols) == false)
+                {
+                    where.AppendFormat(" and ct.symbol in({0})", Helper.ConvertStringSQLFormat(symbols));
                 }
             }
 
@@ -326,6 +403,14 @@ namespace Ecam.Framework.Repository
                 }
             }
 
+            if (criteria.is_mf.HasValue)
+            {
+                if (criteria.is_mf == true)
+                {
+                    where.Append(" and ifnull(ct.mf_cnt,0)>0");
+                }
+            }
+
             selectFields = "count(*) as cnt";
 
             sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, "", "");
@@ -346,9 +431,21 @@ namespace Ecam.Framework.Repository
 
             orderBy = string.Format("order by {0} {1}", paging.SortName, paging.SortOrder);
 
-            selectFields = "ct.*" + Environment.NewLine +
+            selectFields = "ct.*" + Environment.NewLine + "";
 
-                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.prev_price, 0)) / ifnull(ct.prev_price, 0)) * 100) as prev_percentage" + Environment.NewLine +
+            if (string.IsNullOrEmpty(criteria.mf_ids) == false)
+            {
+                selectFields += ",(select count(mpf.fund_id) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol and mpf.fund_id in(" + criteria.mf_ids + ")) as mf_cnt_2" +
+                    ",(select sum(ifnull(mpf.quantity, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol and mpf.fund_id in(" + criteria.mf_ids + ")) as mf_qty_2" +
+                    "";
+            }
+            else
+            {
+                selectFields += ",(select count(mpf.fund_id) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_cnt_2" +
+                   ",(select sum(ifnull(mpf.quantity, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_qty_2" +
+                   "";
+            }
+            selectFields += ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.prev_price, 0)) / ifnull(ct.prev_price, 0)) * 100) as prev_percentage" + Environment.NewLine +
 
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_5, 0)) / ifnull(ct.day_5, 0)) * 100) as day_5_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_10, 0)) / ifnull(ct.day_10, 0)) * 100) as day_10_percentage" + Environment.NewLine +
@@ -366,32 +463,31 @@ namespace Ecam.Framework.Repository
                            ",ct.company_id as id" + Environment.NewLine +
                            "";
 
-            sql = string.Format(sqlFormat, selectFields, joinTables, where, "", "", "");
-
+            sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, orderBy, pageLimit);
+            /*
             sql = string.Format("select " +
-                          //"(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_5_day_price, 0)) / ifnull(tbl.last_5_day_price, 0)) * 100) as last_5_day_percentage" + Environment.NewLine +
-                          //",(((ifnull(tbl.last_5_day_price, 0) - ifnull(tbl.last_10_day_price, 0)) / ifnull(tbl.last_10_day_price, 0)) * 100) as last_5_day_change" + Environment.NewLine +
+            //"(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_5_day_price, 0)) / ifnull(tbl.last_5_day_price, 0)) * 100) as last_5_day_percentage" + Environment.NewLine +
+            //",(((ifnull(tbl.last_5_day_price, 0) - ifnull(tbl.last_10_day_price, 0)) / ifnull(tbl.last_10_day_price, 0)) * 100) as last_5_day_change" + Environment.NewLine +
 
-                          //",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_10_day_price, 0)) / ifnull(tbl.last_10_day_price, 0)) * 100) as last_10_day_percentage" + Environment.NewLine +
-                          //",(((ifnull(tbl.last_10_day_price, 0) - ifnull(tbl.last_15_day_price, 0)) / ifnull(tbl.last_15_day_price, 0)) * 100) as last_10_day_change" + Environment.NewLine +
+            //",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_10_day_price, 0)) / ifnull(tbl.last_10_day_price, 0)) * 100) as last_10_day_percentage" + Environment.NewLine +
+            //",(((ifnull(tbl.last_10_day_price, 0) - ifnull(tbl.last_15_day_price, 0)) / ifnull(tbl.last_15_day_price, 0)) * 100) as last_10_day_change" + Environment.NewLine +
 
-                          //",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_15_day_price, 0)) / ifnull(tbl.last_15_day_price, 0)) * 100) as last_15_day_percentage" + Environment.NewLine +
-                          //",(((ifnull(tbl.last_15_day_price, 0) - ifnull(tbl.last_1_month_price, 0)) / ifnull(tbl.last_1_month_price, 0)) * 100) as last_15_day_change" + Environment.NewLine +
+            //",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_15_day_price, 0)) / ifnull(tbl.last_15_day_price, 0)) * 100) as last_15_day_percentage" + Environment.NewLine +
+            //",(((ifnull(tbl.last_15_day_price, 0) - ifnull(tbl.last_1_month_price, 0)) / ifnull(tbl.last_1_month_price, 0)) * 100) as last_15_day_change" + Environment.NewLine +
 
-                          //",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_1_month_price, 0)) / ifnull(tbl.last_1_month_price, 0)) * 100) as last_1_month_percentage" + Environment.NewLine +
-                          //",(((ifnull(tbl.last_1_month_price, 0) - ifnull(tbl.last_2_month_price, 0)) / ifnull(tbl.last_2_month_price, 0)) * 100) as last_1_month_change" + Environment.NewLine +
+            //",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_1_month_price, 0)) / ifnull(tbl.last_1_month_price, 0)) * 100) as last_1_month_percentage" + Environment.NewLine +
+            //",(((ifnull(tbl.last_1_month_price, 0) - ifnull(tbl.last_2_month_price, 0)) / ifnull(tbl.last_2_month_price, 0)) * 100) as last_1_month_change" + Environment.NewLine +
 
-                          "tbl.*" + Environment.NewLine +
-                          //",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.day_35, 0)) / ifnull(tbl.day_35, 0)) * 100) as day_35_percentage" + Environment.NewLine +
-                          //",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_2_month_price, 0)) / ifnull(tbl.last_2_month_price, 0)) * 100) as last_2_month_percentage" + Environment.NewLine +
-                          //",(((ifnull(tbl.last_2_month_price, 0) - ifnull(tbl.last_3_month_price, 0)) / ifnull(tbl.last_3_month_price, 0)) * 100) as last_2_month_change" + Environment.NewLine +
-                          //",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_3_month_price, 0)) / ifnull(tbl.last_3_month_price, 0)) * 100) as last_3_month_percentage" + Environment.NewLine +
-                          " from(" + Environment.NewLine +
-                          sql + Environment.NewLine +
-                          ") as tbl {0} {1} {2}", groupByName, orderBy, pageLimit);
-
+            "tbl.*" + Environment.NewLine +
+            //",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.day_35, 0)) / ifnull(tbl.day_35, 0)) * 100) as day_35_percentage" + Environment.NewLine +
+            //",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_2_month_price, 0)) / ifnull(tbl.last_2_month_price, 0)) * 100) as last_2_month_percentage" + Environment.NewLine +
+            //",(((ifnull(tbl.last_2_month_price, 0) - ifnull(tbl.last_3_month_price, 0)) / ifnull(tbl.last_3_month_price, 0)) * 100) as last_2_month_change" + Environment.NewLine +
+            //",(((ifnull(tbl.ltp_price, 0) - ifnull(tbl.last_3_month_price, 0)) / ifnull(tbl.last_3_month_price, 0)) * 100) as last_3_month_percentage" + Environment.NewLine +
+            " from(" + Environment.NewLine +
+            sql + Environment.NewLine +
+            ") as tbl {0} {1} {2}", groupByName, orderBy, pageLimit);
+            */
             List<TRA_COMPANY> rows = new List<TRA_COMPANY>();
-
             List<tra_company_category> companyCategories;
             using (EcamContext context = new EcamContext())
             {

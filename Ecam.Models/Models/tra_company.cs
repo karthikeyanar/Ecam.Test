@@ -37,5 +37,7 @@ namespace Ecam.Models
         public Nullable<decimal> day_80 { get; set; }
         public Nullable<decimal> day_85 { get; set; }
         public Nullable<decimal> day_90 { get; set; }
+        public Nullable<int> mf_cnt { get; set; }
+        public Nullable<decimal> mf_qty { get; set; }
     }
 }
