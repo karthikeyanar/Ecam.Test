@@ -54,11 +54,23 @@ namespace Ecam.ConsoleApp
         {
             //string fileName = "C:\\Users\\kart\\Desktop\\MF\\1.html";
             //string content = System.IO.File.ReadAllText(fileName);
+            string MF_HTML_PATH = System.Configuration.ConfigurationManager.AppSettings["MF_HTML_PATH"];
+            string fundCode = url.Replace("http://www.moneycontrol.com/india/mutualfunds/mfinfo/portfolio_holdings/", "");
+            string fileName = MF_HTML_PATH + "\\" + fundCode + ".html";
             string content = "";
-            WebClient client = new WebClient();
-            content = client.DownloadString(url);
+            if (File.Exists(fileName) == true)
+            {
+                content = System.IO.File.ReadAllText(fileName);
+            }
+            else
+            {
+                WebClient client = new WebClient();
+                content = client.DownloadString(url);
+                System.IO.File.WriteAllText(fileName, content);
+            }
             if (string.IsNullOrEmpty(content) == false)
             {
+                Console.WriteLine("ParseMainHTML url=" + url);
                 string startWord = "<table width=\"100%\" class=\"tblporhd\">";
                 string endWord = "<table width=\"100%\" class=\"tblporhd MT25\">";
                 int startIndex = content.IndexOf(startWord);
@@ -102,14 +114,14 @@ namespace Ecam.ConsoleApp
                                 context.tra_mutual_fund.Add(fund);
                                 context.SaveChanges();
                             }
-                            var rows = (from q in context.tra_mutual_fund_pf
-                                        where q.fund_id == fund.id
-                                        select q).ToList();
-                            foreach (var row in rows)
-                            {
-                                context.tra_mutual_fund_pf.Remove(row);
-                            }
-                            context.SaveChanges();
+                            //var rows = (from q in context.tra_mutual_fund_pf
+                            //            where q.fund_id == fund.id
+                            //            select q).ToList();
+                            //foreach (var row in rows)
+                            //{
+                            //    context.tra_mutual_fund_pf.Remove(row);
+                            //}
+                            //context.SaveChanges();
                         }
                     }
                     regex = new Regex(
@@ -171,9 +183,48 @@ namespace Ecam.ConsoleApp
                             }
                         }
                         string symbol = "";
+                        string symbolName = "";
                         if (string.IsNullOrEmpty(equity) == false)
                         {
-                            symbol = GetSymbol(equity);
+                            regex = new Regex(
+                                    @"<[^>].+?>",
+                                    RegexOptions.IgnoreCase
+                                    | RegexOptions.Multiline
+                                    | RegexOptions.IgnorePatternWhitespace
+                                    | RegexOptions.Compiled
+                                    );
+                            symbolName = regex.Replace(equity, "").Trim();
+                            if (string.IsNullOrEmpty(symbolName) == false)
+                            {
+                                using (EcamContext context = new EcamContext())
+                                {
+                                    tra_mutual_fund_pf temp = (from q in context.tra_mutual_fund_pf
+                                                               where q.stock_name == symbolName
+                                                               select q).FirstOrDefault();
+                                    if (temp != null)
+                                    {
+                                        symbol = temp.symbol;
+                                    }
+                                    if (string.IsNullOrEmpty(symbol) == false)
+                                    {
+                                        tra_company company = (from q in context.tra_company
+                                                               where q.symbol == symbol
+                                                               select q).FirstOrDefault();
+                                        if (company == null)
+                                        {
+                                            symbol = string.Empty;
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Symbol already get symbol=" + symbol);
+                                        }
+                                    }
+                                }
+                            }
+                            if (string.IsNullOrEmpty(symbol) == true)
+                            {
+                                symbol = GetSymbol(equity, symbolName);
+                            }
                         }
                         if (string.IsNullOrEmpty(symbol) == false
                             && fund != null)
@@ -200,6 +251,7 @@ namespace Ecam.ConsoleApp
                                     pf.quantity = DataTypeHelper.ToDecimal(qty);
                                     pf.stock_value = DataTypeHelper.ToDecimal(totalValue);
                                     pf.stock_percentage = DataTypeHelper.ToDecimal(percentage);
+                                    pf.stock_name = symbolName;
                                     if (isNew == true)
                                     {
                                         context.tra_mutual_fund_pf.Add(pf);
@@ -212,7 +264,7 @@ namespace Ecam.ConsoleApp
                                 }
                                 else
                                 {
-                                    Helper.Log("equity=" + equity + ",symbol=" + symbol, "Fund Does Not Exist");
+                                    Helper.Log("equity=" + equity + ",symbol=" + symbol, "FundDoesNotExist");
                                 }
                             }
                         }
@@ -221,7 +273,7 @@ namespace Ecam.ConsoleApp
             }
         }
 
-        private static string GetSymbol(string equity)
+        private static string GetSymbol(string equity, string symbolName)
         {
             string symbol = "";
             try
@@ -236,20 +288,31 @@ namespace Ecam.ConsoleApp
                 MatchCollection collections = regex.Matches(equity);
                 if (collections.Count > 0)
                 {
-                    string href = "http://www.moneycontrol.com/" + collections[0].Groups[1].Value;
-                    WebClient client = new WebClient();
                     string content = string.Empty;
+                    string HTML_PATH = System.Configuration.ConfigurationManager.AppSettings["HTML_PATH"];
+                    string fileName = HTML_PATH + "\\" + symbolName + ".html";
+                    if (File.Exists(fileName) == true)
+                    {
+                        content = System.IO.File.ReadAllText(fileName);
+                        Console.WriteLine("Process File Text=" + symbolName);
+                    }
+                    else
+                    {
+                        string href = "http://www.moneycontrol.com/" + collections[0].Groups[1].Value;
+                        WebClient client = new WebClient();
+                        content = client.DownloadString(href);
+                        System.IO.File.WriteAllText(fileName, content);
+                        Console.WriteLine("Download equity=" + href);
+                    }
                     //string fileName = "C:\\Users\\kart\\Desktop\\MF\\relianceindustries_RI.html";
-                    content = client.DownloadString(href);
-                    Console.WriteLine("Download equity=" + href);
                     //content = System.IO.File.ReadAllText(fileName);
                     regex = new Regex(
-        @"NSE:(?<symbol>\s*\w*)",
-        RegexOptions.IgnoreCase
-        | RegexOptions.Multiline
-        | RegexOptions.IgnorePatternWhitespace
-        | RegexOptions.Compiled
-        );
+@"NSE:(?<symbol>\s*\w*&*\w*)",
+RegexOptions.IgnoreCase
+| RegexOptions.Multiline
+| RegexOptions.IgnorePatternWhitespace
+| RegexOptions.Compiled
+);
                     collections = regex.Matches(content);
                     if (collections.Count > 0)
                     {
