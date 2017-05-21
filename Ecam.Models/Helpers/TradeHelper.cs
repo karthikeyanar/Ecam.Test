@@ -169,7 +169,6 @@ namespace Ecam.Models
             }
         }
 
-
         public static void NSEIndia52WeekImport(string html)
         {
             decimal week_52_low = 0;
@@ -428,6 +427,228 @@ namespace Ecam.Models
             }
         }
 
+        public static void GoogleIndiaImport(string html, string symbol)
+        {
+            //try
+            //{
+            html = ReplaceTagAttributes(html, "table");
+            html = ReplaceTagAttributes(html, "tbody");
+            html = ReplaceTagAttributes(html, "tr");
+            html = ReplaceTagAttributes(html, "td");
+            html = ReplaceTagAttributes(html, "th");
+            html = ReplaceTagAttributes(html, "img");
+            html = ReplaceTagAttributes(html, "div");
+            html = ReplaceAttributes(html, "style", "");
+            html = ReplaceAttributes(html, "class", "");
+            html = ReplaceAttributes(html, "nowrap", "");
+            html = ReplaceAttributes(html, "title", "");
+            html = html.Replace("<TH nowrap=\"\">", "<th>");
+            html = html.Replace("<TD class=\"normalText\" nowrap=\"\">", "<td>");
+            html = html.Replace("<TD class=\"date\" nowrap=\"\">", "<td>");
+            html = html.Replace("<TD class=\"number\" nowrap=\"\">", "<td>");
+            html = html.Replace("\n", "").Replace("\r", "").Replace("\r\n", "").Replace("TABLE", "table").Replace("TR", "tr").Replace("TD", "td").Replace("TH", "th").Replace("TBODY", "tbody");
+            int startIndex = html.IndexOf("<tbody>");
+            int endIndex = html.IndexOf("</tbody>");
+            int length = endIndex - startIndex + 8;
+            string tblHTML = html;//.Substring(startIndex, length);
+            tblHTML = tblHTML.Replace(" ", "");
+            List<TempClass> tempList = new List<TempClass>();
+            tblHTML = tblHTML.Replace("<tr>", "||");
+            tblHTML = tblHTML.Replace("<td>", "~");
+            tblHTML = tblHTML.Replace("<table>", "");
+            tblHTML = tblHTML.Replace("</table>", "");
+            string date = "";
+            //string prev = "";
+            string open = "";
+            string high = "";
+            string low = "";
+            string lastTrade = "";
+            string close = "";
+            string tradeType = "NSE";
+            string[] rows = tblHTML.Split(("||").ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            foreach (string row in rows)
+            {
+
+                string[] cells = row.Split(("~").ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                int index = 0;
+                for (index = 0; index < cells.Length; index++)
+                {
+                    string value = cells[index].Trim();
+                    switch (index)
+                    {
+                        case 0: date = value; break;
+                        case 1: open = value; break;
+                        case 2: high = value; break;
+                        case 3: low = value; break;
+                        case 4: close = value; break;
+                    }
+                }
+                lastTrade = close;
+                if (string.IsNullOrEmpty(date) == false
+                  && string.IsNullOrEmpty(symbol) == false
+                  )
+                {
+                    DateTime dt = DataTypeHelper.ToDateTime(date);
+                    if (dt.Year > 1900)
+                    {
+                        tempList.Add(new TempClass
+                        {
+                            symbol = symbol,
+                            trade_type = tradeType,
+                            trade_date = dt,
+                            close_price = DataTypeHelper.ToDecimal(close),
+                            high_price = DataTypeHelper.ToDecimal(high),
+                            low_price = DataTypeHelper.ToDecimal(low),
+                            open_price = DataTypeHelper.ToDecimal(open),
+                            ltp_price = DataTypeHelper.ToDecimal(lastTrade),
+                            //prev_price = DataTypeHelper.ToDecimal(prev),
+                        });
+                    }
+                }
+            }
+            int rowIndex = 0;
+            foreach (var temprow in tempList)
+            {
+                rowIndex += 1;
+                ImportPrice(temprow);
+                Console.WriteLine("Symbol=" + symbol + ",Date=" + temprow.trade_date.ToString("dd/MM/yyyy") + " Completed");
+            }
+            using (EcamContext context = new EcamContext())
+            {
+                tra_company company = (from q in context.tra_company
+                                       where q.symbol == symbol
+                                       select q).FirstOrDefault();
+                if (company != null)
+                {
+                    DateTime startDate = DateTime.Now.AddDays(-120);
+                    DateTime endDate = DateTime.Now.Date;
+                    List<tra_market> markets = (from q in context.tra_market
+                                                where q.trade_date >= startDate
+                                                && q.trade_date <= endDate
+                                                && q.symbol == symbol
+                                                orderby q.trade_date descending
+                                                select q).ToList();
+                     
+                    foreach(var market in markets)
+                    {
+                        tra_market prevRow = (from q in markets
+                                       where q.trade_date < market.trade_date
+                                       && q.symbol == market.symbol
+                                       orderby q.trade_date descending
+                                       select q).FirstOrDefault();
+                        if (prevRow != null)
+                        {
+                            market.prev_price = prevRow.close_price;
+                            context.Entry(market).State = System.Data.Entity.EntityState.Modified;
+                            context.SaveChanges();
+                            Console.WriteLine("Symbol=" + symbol + ",Date=" + market.trade_date.ToString("dd/MM/yyyy") + " Update prev date=" + prevRow.trade_date.ToString("dd/MMM/yyyy") + ",preprice=" + prevRow.close_price + " completed");
+                        }
+                    }
+                }
+            }
+            /*
+            Regex regex = new Regex(
+        @"<tr>(.*?)<tr>",
+        RegexOptions.IgnoreCase
+        | RegexOptions.Multiline
+        | RegexOptions.IgnorePatternWhitespace
+        | RegexOptions.Compiled
+        );
+
+            MatchCollection trCollections = regex.Matches(tblHTML);
+            int i = 0;
+            foreach (Match trMatch in trCollections)
+            {
+                i += 1;
+                string tr = trMatch.Value;
+                string tagName = "td";
+
+                regex = new Regex(
+                            @"<" + tagName + ">(.+?)</" + tagName + ">",
+                            RegexOptions.IgnoreCase
+                            | RegexOptions.Multiline
+                            | RegexOptions.IgnorePatternWhitespace
+                            | RegexOptions.Compiled
+                            );
+                MatchCollection rowMatches = regex.Matches(tr);
+                string date = "";
+                string series = "";
+                string prev = "";
+                string open = "";
+                string high = "";
+                string low = "";
+                string lastTrade = "";
+                string close = "";
+                string tradeType = "NSE";
+                int colIndex = -1;
+                foreach (Match colMatch in rowMatches)
+                {
+                    colIndex += 1;
+
+                    string value = string.Empty;
+                    if (colMatch.Groups.Count >= 2)
+                    {
+                        value = colMatch.Groups[1].Value;
+                    }
+                    if (string.IsNullOrEmpty(value) == false)
+                    {
+                        value = value.Trim();
+                    }
+                    switch (colIndex)
+                    {
+                        case 0: symbol = value; break;
+                        case 1: series = value; break;
+                        case 2: date = value; break;
+                        case 3: prev = value; break;
+                        case 4: open = value; break;
+                        case 5: high = value; break;
+                        case 6: low = value; break;
+                        case 7: lastTrade = value; break;
+                        case 8: close = value; break;
+                    }
+
+                }
+                if (string.IsNullOrEmpty(series) == false)
+                {
+                    if (series != "EQ")
+                    {
+                        Helper.Log("NOTSERIES Symbol =" + symbol, "NOTSERIES");
+                    }
+                }
+                if (string.IsNullOrEmpty(date) == false
+                    && string.IsNullOrEmpty(symbol) == false
+                    && series == "EQ"
+                    )
+                {
+                    DateTime dt = DataTypeHelper.ToDateTime(date);
+                    tempList.Add(new TempClass
+                    {
+                        symbol = symbol,
+                        trade_type = tradeType,
+                        trade_date = dt,
+                        close_price = DataTypeHelper.ToDecimal(close),
+                        high_price = DataTypeHelper.ToDecimal(high),
+                        low_price = DataTypeHelper.ToDecimal(low),
+                        open_price = DataTypeHelper.ToDecimal(open),
+                        ltp_price = DataTypeHelper.ToDecimal(lastTrade),
+                        prev_price = DataTypeHelper.ToDecimal(prev),
+                    });
+                }
+            }
+            
+            if (tempList.Count() <= 0)
+            {
+                Helper.Log("NSEIndiaImport Temp List No Records Found " + Environment.NewLine + html, "ERROR");
+            }
+            int rowIndex = 0;
+            foreach (var row in tempList)
+            {
+                rowIndex += 1;
+                ImportPrice(row);
+            } 
+            */
+        }
+
         public static void NSEIndiaImport(string html)
         {
             //try
@@ -667,7 +888,7 @@ namespace Ecam.Models
             {
                 if (dayCount > i)
                 {
-              //      total += (market.close_price ?? 0);
+                    //      total += (market.close_price ?? 0);
                     temp.Add(market);
                     i += 1;
                 }

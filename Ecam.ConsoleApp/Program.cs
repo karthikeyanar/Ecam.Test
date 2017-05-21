@@ -17,6 +17,73 @@ namespace Ecam.ConsoleApp
     {
         static void Main(string[] args)
         {
+            GoogleData();
+            Console.WriteLine("Completed");
+            Console.ReadLine();
+        }
+
+        private static void GoogleData()
+        {
+            List<tra_company> companies;
+            using (EcamContext context = new EcamContext())
+            {
+                companies = (from q in context.tra_company select q).ToList();
+            }
+            string url = string.Empty;
+            string html = string.Empty;
+            string GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
+            WebClient client = new WebClient();
+            foreach (var company in companies)
+            {
+                url = string.Format("https://www.google.com/finance/historical?q=NSE:{0}"
+                                                                    , company.symbol.Replace("&", "%26")
+                                                                    );
+                string fileName = GOOGLE_DATA + "\\" + company.symbol + ".html";
+                if (File.Exists(fileName) == false)
+                {
+                    html = client.DownloadString(url);
+                    File.WriteAllText(fileName, html);
+                    Console.WriteLine("Download google data symbol=" + company.symbol);
+                }
+                else
+                {
+                    html = File.ReadAllText(fileName);
+                }
+                if (string.IsNullOrEmpty(html) == false)
+                {
+                    string startWord = "<table class=\"gf-table historical_price\">";
+                    string endWord = "google.finance.gce";
+                    int startIndex = html.IndexOf(startWord);
+                    int endIndex = html.IndexOf(endWord);
+                    int length = endIndex - startIndex + endWord.Length;
+                    if (startIndex > 0 && endIndex > 0)
+                    {
+                        html = html.Substring(startIndex, length);
+                    }
+                    else
+                    {
+                        Helper.Log("ErrorOnGoogleData symbol=" + company.symbol, "ErrorOnGoogleData");
+                    }
+                    startWord = "<table class=\"gf-table historical_price\">";
+                    endWord = "</table>";
+                    startIndex = html.IndexOf(startWord);
+                    endIndex = html.IndexOf(endWord);
+                    length = endIndex - startIndex + endWord.Length;
+                    if (startIndex >= 0 && endIndex > 0)
+                    {
+                        string parseContent = html.Substring(startIndex, length);
+                        TradeHelper.GoogleIndiaImport(parseContent, company.symbol);
+                    }
+                    else
+                    {
+                        Helper.Log("ErrorOnGoogleData symbol=" + company.symbol, "ErrorOnGoogleData");
+                    }
+                }
+            }
+        }
+
+        private static void MutualFunds()
+        {
             string linkFileName = System.Configuration.ConfigurationManager.AppSettings["LINK_FILE_NAME"];
             if (string.IsNullOrEmpty(linkFileName) == false)
             {
@@ -34,7 +101,7 @@ namespace Ecam.ConsoleApp
             {
                 var companies = (from q in context.tra_company select q).ToList();
                 var funds = (from q in context.tra_mutual_fund_pf select q).ToList();
-                foreach(var company in companies)
+                foreach (var company in companies)
                 {
                     company.mf_cnt = (from q in funds
                                       where q.symbol == company.symbol
@@ -46,8 +113,6 @@ namespace Ecam.ConsoleApp
                 }
                 context.SaveChanges();
             }
-            Console.WriteLine("Completed");
-            Console.ReadLine();
         }
 
         private static void ParseMainHTML(string url)

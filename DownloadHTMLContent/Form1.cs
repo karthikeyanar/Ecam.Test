@@ -201,81 +201,107 @@ namespace DownloadHTMLContent
                 {
                     var company = _companies[_index];
                     _lastCompany = company;
-
-                    if (_IsDateDownload == true)
-                    {
-                        lblCompany.Text = _lastCompany.company_name;
-                        lblCompanyStatus.Text = "Companies " + _index + " Of " + _companies.Count();
-                        if (_lastCompany != null)
-                        {
-
-                            string dirPath = System.Configuration.ConfigurationManager.AppSettings["DownloadHTMLPath"];
-                            if (System.IO.Directory.Exists(dirPath) == false)
-                            {
-                                System.IO.Directory.CreateDirectory(dirPath);
-                            }
-                            string fullFileName = dirPath + "\\" + _lastCompany.symbol + ".html";
-                            string html = string.Empty;
-                            //Helper.Log(fullFileName);
-                            if (System.IO.File.Exists(fullFileName) == true)
-                            {
-                                html = System.IO.File.ReadAllText(fullFileName);
-                                if (html.Contains("Make sure the web address") == true)
-                                {
-                                    Helper.Log(fullFileName, "MakeSure");
-                                    System.IO.File.Delete(fullFileName);
-                                }
-                                if (html.Contains("Service Unavailable") == true)
-                                {
-                                    Helper.Log(fullFileName, "ServiceUnavailable");
-                                    System.IO.File.Delete(fullFileName);
-                                }
-                                if (html.Contains("What you can try") == true)
-                                {
-                                    Helper.Log(fullFileName, "Whatyoucantry");
-                                    System.IO.File.Delete(fullFileName);
-                                }
-                                if (html.Contains("The proxy server did not") == true)
-                                {
-                                    Helper.Log(fullFileName, "Theproxyserverdidnot");
-                                    System.IO.File.Delete(fullFileName);
-                                }
-                            }
-
-                            if (System.IO.File.Exists(fullFileName) == false)
-                            {
-                                lblCompany.Text = _lastCompany.company_name;
-                                lblSymbol.Text = _lastCompany.symbol;
-                                DateTime startDate = DateTime.Now.Date.AddDays(-DataTypeHelper.ToInt32(System.Configuration.ConfigurationManager.AppSettings["no_of_days"].ToString()));
-                                DateTime endDate = DateTime.Now.Date;
-                                string url = string.Format("https://nseindia.com/products/dynaContent/common/productsSymbolMapping.jsp?symbol={0}&segmentLink=3&symbolCount=2&series=EQ&dateRange=+&fromDate={1}&toDate={2}&dataType=PRICEVOLUME"
-                                                                                                                  , _lastCompany.symbol.Replace("&", "%26")
-                                                                                                                  , startDate.ToString("dd-MM-yyyy")
-                                                                                                                  , endDate.ToString("dd-MM-yyyy")
-                                                                                                                  );
-                                lblStartDate.Text = startDate.ToString("dd/MMM/yyyy");
-                                lblEndDate.Text = endDate.ToString("dd/MMM/yyyy");
-                                //_lastURL = url;
-                                //Helper.Log(url, "NAVIGATE");
-                                webBrowser1.ScriptErrorsSuppressed = true;
-                                webBrowser1.Navigate(url);
-                            }
-                            else
-                            {
-                                TradeHelper.NSEIndiaImport(html);
-                                DownloadHTMLCompanies();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Update52WeekPrice();
-                    }
+                    DownloadLastCompany();
                 }
                 else
                 {
                     MessageBox.Show("Completed");
                 }
+            }
+        }
+
+        private void DownloadLastCompany(int symbolCount = 2)
+        {
+            if (_IsDateDownload == true)
+            {
+                lblCompany.Text = _lastCompany.company_name;
+                lblCompanyStatus.Text = "Companies " + _index + " Of " + _companies.Count();
+                if (_lastCompany != null)
+                {
+
+                    string dirPath = System.Configuration.ConfigurationManager.AppSettings["DownloadHTMLPath"];
+                    if (System.IO.Directory.Exists(dirPath) == false)
+                    {
+                        System.IO.Directory.CreateDirectory(dirPath);
+                    }
+                    string fullFileName = dirPath + "\\" + _lastCompany.symbol + ".html";
+                    string html = string.Empty;
+                    //Helper.Log(fullFileName);
+                    if (System.IO.File.Exists(fullFileName) == true)
+                    {
+                        html = System.IO.File.ReadAllText(fullFileName);
+                        if (html.Contains("Make sure the web address") == true)
+                        {
+                            Helper.Log(fullFileName, "MakeSure");
+                            System.IO.File.Delete(fullFileName);
+                        }
+                        if (html.Contains("Service Unavailable") == true)
+                        {
+                            Helper.Log(fullFileName, "ServiceUnavailable");
+                            System.IO.File.Delete(fullFileName);
+                        }
+                        if (html.Contains("What you can try") == true)
+                        {
+                            Helper.Log(fullFileName, "Whatyoucantry");
+                            System.IO.File.Delete(fullFileName);
+                        }
+                        if (html.Contains("The proxy server did not") == true)
+                        {
+                            Helper.Log(fullFileName, "Theproxyserverdidnot");
+                            System.IO.File.Delete(fullFileName);
+                        }
+                    }
+
+                    if (System.IO.File.Exists(fullFileName) == false)
+                    {
+                        lblCompany.Text = _lastCompany.company_name;
+                        lblSymbol.Text = _lastCompany.symbol;
+                        string startDate = System.Configuration.ConfigurationManager.AppSettings["start_date"].ToString(); //DateTime.Now.Date.AddDays(-DataTypeHelper.ToInt32(System.Configuration.ConfigurationManager.AppSettings["no_of_days"].ToString()));
+                        string endDate = System.Configuration.ConfigurationManager.AppSettings["end_date"].ToString(); //DateTime.Now.Date;
+                        string url = string.Format("https://nseindia.com/products/dynaContent/common/productsSymbolMapping.jsp?symbol={0}&segmentLink=3&symbolCount=" + symbolCount + "&series=EQ&dateRange=+&fromDate={1}&toDate={2}&dataType=PRICEVOLUME"
+                                                                                                          , _lastCompany.symbol.Replace("&", "%26")
+                                                                                                          , startDate
+                                                                                                          , endDate
+                                                                                                          );
+                        //string url = string.Format("https://in.finance.yahoo.com/quote/{0}.NS/history?p={0}.NS"
+                        //                                                                                  , _lastCompany.symbol.Replace("&", "%26")
+                        //                                                                                  );
+                        lblStartDate.Text = startDate; //startDate.ToString("dd/MMM/yyyy");
+                        lblEndDate.Text = endDate; // endDate.ToString("dd/MMM/yyyy");
+                                                   //_lastURL = url;
+                                                   //Helper.Log(url, "NAVIGATE");
+                        webBrowser1.ScriptErrorsSuppressed = true;
+                        webBrowser1.Navigate(url);
+                    }
+                    else
+                    {
+                        TradeHelper.NSEIndiaImport(html);
+                        DownloadHTMLCompanies();
+                    }
+                }
+            }
+            else
+            {
+                Update52WeekPrice();
+            }
+        }
+
+        private void DownloadSymbolCount()
+        {
+            if (_IsDateDownload == true)
+            {
+                if (_lastCompany != null)
+                {
+                    string url = string.Format("https://nseindia.com/marketinfo/sym_map/symbolCount.jsp?symbol={0}"
+                                                                                                         , _lastCompany.symbol.Replace("&", "%26")
+                                                                                                         );
+                    //webBrowser3.ScriptErrorsSuppressed = true;
+                    //webBrowser3.Navigate(url);
+                }
+            }
+            else
+            {
+                DownloadLastCompany();
             }
         }
 
@@ -540,5 +566,52 @@ namespace DownloadHTMLContent
             DownloadHTMLCompanies();
             //}
         }
+
+        //private void webBrowser3_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
+        //{
+        //    string html = webBrowser3.DocumentText;
+        //    bool isIgnore = false;
+        //    if (html.Contains("Make sure the web address") == true)
+        //    {
+        //        isIgnore = true;
+        //        Helper.Log(_lastCompany.symbol, "DOWNLOAD_ERROR");
+        //    }
+        //    if (html.Contains("Service Unavailable") == true)
+        //    {
+        //        isIgnore = true;
+        //        Helper.Log(_lastCompany.symbol, "DOWNLOAD_ERROR");
+        //    }
+        //    if (html.Contains("What you can try") == true)
+        //    {
+        //        isIgnore = true;
+        //        Helper.Log(_lastCompany.symbol, "DOWNLOAD_ERROR");
+        //    }
+        //    if (html.Contains("No Records") == true)
+        //    {
+        //        isIgnore = true;
+        //        Helper.Log(_lastCompany.symbol, "DOWNLOAD_ERROR");
+        //    }
+        //    if (html.Contains("The proxy server did not") == true)
+        //    {
+        //        isIgnore = true;
+        //        Helper.Log(_lastCompany.symbol, "DOWNLOAD_ERROR");
+        //    }
+        //    int symbolCount = 0;
+        //    if (isIgnore == false)
+        //    {
+        //        webBrowser3.Stop();
+        //        string startWord = "<BODY>";
+        //        string endWord = "</BODY>";
+        //        int startIndex = html.IndexOf(startWord);
+        //        int endIndex = html.IndexOf(endWord);
+        //        int length = endIndex - startIndex + endWord.Length;
+        //        if (startIndex > 0 && endIndex > 0)
+        //        {
+        //            string parseContent = html.Substring(startIndex, length);
+        //            symbolCount = DataTypeHelper.ToInt32(parseContent.Replace(startWord,"").Replace(endWord,"").Trim());
+        //        }
+        //    }
+        //    DownloadLastCompany(symbolCount);
+        //}
     }
 }
