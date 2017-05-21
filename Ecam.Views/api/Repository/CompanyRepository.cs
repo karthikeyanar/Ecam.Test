@@ -300,7 +300,7 @@ namespace Ecam.Framework.Repository
                     {
                         var list = (from q in context.tra_mutual_fund_pf
                                     where ids.Contains(q.fund_id) == true
-                                    select q.symbol).ToList();
+                                    select q.symbol).Distinct().ToList();
                         foreach (var str in list)
                         {
                             symbols += str + ",";
@@ -314,6 +314,10 @@ namespace Ecam.Framework.Repository
                 if (string.IsNullOrEmpty(symbols) == false)
                 {
                     where.AppendFormat(" and ct.symbol in({0})", Helper.ConvertStringSQLFormat(symbols));
+                }
+                else
+                {
+                    where.Append(" and ct.symbol='-1'");
                 }
             }
 
@@ -436,13 +440,13 @@ namespace Ecam.Framework.Repository
             if (string.IsNullOrEmpty(criteria.mf_ids) == false)
             {
                 selectFields += ",(select count(mpf.fund_id) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol and mpf.fund_id in(" + criteria.mf_ids + ")) as mf_cnt_2" +
-                    ",(select sum(ifnull(mpf.quantity, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol and mpf.fund_id in(" + criteria.mf_ids + ")) as mf_qty_2" +
+                    ",(select sum(ifnull(mpf.stock_value, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol and mpf.fund_id in(" + criteria.mf_ids + ")) as mf_qty_2" +
                     "";
             }
             else
             {
                 selectFields += ",(select count(mpf.fund_id) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_cnt_2" +
-                   ",(select sum(ifnull(mpf.quantity, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_qty_2" +
+                   ",(select sum(ifnull(mpf.stock_value, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_qty_2" +
                    "";
             }
             selectFields += ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.prev_price, 0)) / ifnull(ct.prev_price, 0)) * 100) as prev_percentage" + Environment.NewLine +

@@ -17,7 +17,7 @@ namespace Ecam.ConsoleApp
     {
         static void Main(string[] args)
         {
-            GoogleData();
+            MutualFunds();
             Console.WriteLine("Completed");
             Console.ReadLine();
         }
@@ -179,14 +179,14 @@ namespace Ecam.ConsoleApp
                                 context.tra_mutual_fund.Add(fund);
                                 context.SaveChanges();
                             }
-                            //var rows = (from q in context.tra_mutual_fund_pf
-                            //            where q.fund_id == fund.id
-                            //            select q).ToList();
-                            //foreach (var row in rows)
-                            //{
-                            //    context.tra_mutual_fund_pf.Remove(row);
-                            //}
-                            //context.SaveChanges();
+                            var rows = (from q in context.tra_mutual_fund_pf
+                                        where q.fund_id == fund.id
+                                        select q).ToList();
+                            foreach (var row in rows)
+                            {
+                                context.tra_mutual_fund_pf.Remove(row);
+                            }
+                            context.SaveChanges();
                         }
                     }
                     regex = new Regex(
@@ -204,10 +204,7 @@ namespace Ecam.ConsoleApp
                         i += 1;
                         string tr = trMatch.Value;
                         string tagName = "td";
-                        if (i == 1)
-                        {
-                            tagName = "th";
-                        }
+
                         regex = new Regex(
                                     @"<" + tagName + "[^>]*>(.+?)</" + tagName + ">",
                                     RegexOptions.IgnoreCase
@@ -226,26 +223,25 @@ namespace Ecam.ConsoleApp
                         foreach (Match colMatch in rowMatches)
                         {
                             colIndex += 1;
-                            if (i > 1)
+
+                            string value = string.Empty;
+                            if (colMatch.Groups.Count >= 2)
                             {
-                                string value = string.Empty;
-                                if (colMatch.Groups.Count >= 2)
-                                {
-                                    value = colMatch.Groups[1].Value;
-                                }
-                                if (string.IsNullOrEmpty(value) == false)
-                                {
-                                    value = value.Trim();
-                                }
-                                switch (colIndex)
-                                {
-                                    case 0: equity = value; break;
-                                    case 1: sector = value; break;
-                                    case 2: qty = value; break;
-                                    case 3: totalValue = value; break;
-                                    case 4: percentage = value; break;
-                                }
+                                value = colMatch.Groups[1].Value;
                             }
+                            if (string.IsNullOrEmpty(value) == false)
+                            {
+                                value = value.Trim();
+                            }
+                            switch (colIndex)
+                            {
+                                case 0: equity = value; break;
+                                case 1: sector = value; break;
+                                case 2: qty = value; break;
+                                case 3: totalValue = value; break;
+                                case 4: percentage = value; break;
+                            }
+
                         }
                         string symbol = "";
                         string symbolName = "";
