@@ -101,6 +101,18 @@ namespace Ecam.Models
             this.Property(t => t.mf_qty)
     .HasPrecision(13, 4);
 
+            this.Property(t => t.day_1)
+.HasPrecision(13, 4);
+
+            this.Property(t => t.day_2)
+.HasPrecision(13, 4);
+
+            this.Property(t => t.day_3)
+.HasPrecision(13, 4);
+
+            this.Property(t => t.day_4)
+.HasPrecision(13, 4);
+
             // Table & Column Mappings
             this.ToTable("tra_company");
             this.Property(t => t.id).HasColumnName("company_id");
@@ -138,6 +150,11 @@ namespace Ecam.Models
             this.Property(t => t.day_90).HasColumnName("day_90");
             this.Property(t => t.mf_cnt).HasColumnName("mf_cnt");
             this.Property(t => t.mf_qty).HasColumnName("mf_qty");
+
+            this.Property(t => t.day_1).HasColumnName("day_1");
+            this.Property(t => t.day_2).HasColumnName("day_2");
+            this.Property(t => t.day_3).HasColumnName("day_3");
+            this.Property(t => t.day_4).HasColumnName("day_4");
             Ignore(t => t.created_date);
             Ignore(t => t.created_by);
             Ignore(t => t.last_updated_date);

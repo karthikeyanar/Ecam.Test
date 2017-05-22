@@ -848,11 +848,15 @@ namespace Ecam.Models
                     DateTime endDate = DateTime.Now.Date;
                     List<tra_market> markets = (from q in context.tra_market
                                                 where q.trade_date >= startDate
-                                                && q.trade_date <= endDate
+                                                && q.trade_date < endDate
                                                 && q.symbol == symbol
                                                 orderby q.trade_date descending
                                                 select q).ToList();
 
+                    company.day_1 = CalculateAVG(markets, 1);
+                    company.day_2 = CalculateAVG(markets, 2);
+                    company.day_3 = CalculateAVG(markets, 3);
+                    company.day_4 = CalculateAVG(markets, 4);
 
                     company.day_5 = CalculateAVG(markets, 5);
                     company.day_10 = CalculateAVG(markets, 10);
@@ -901,9 +905,10 @@ namespace Ecam.Models
             decimal value = 0;
             if (temp.Count > 0)
             {
-                value = (from q in temp
-                         orderby q.trade_date ascending
-                         select (q.ltp_price ?? 0)).FirstOrDefault();
+                var tempRow = (from q in temp
+                               orderby q.trade_date ascending
+                               select q).FirstOrDefault();
+                value = (tempRow.ltp_price ?? 0);
             }
             return value; // DataTypeHelper.SafeDivision((currentPrice - avg), avg) * 100;
         }

@@ -45,9 +45,17 @@ namespace Ecam.Contracts
         public Nullable<decimal> day_90 { get; set; }
         public Nullable<int> mf_cnt { get; set; }
         public Nullable<decimal> mf_qty { get; set; }
+        public Nullable<decimal> day_1 { get; set; }
+        public Nullable<decimal> day_2 { get; set; }
+        public Nullable<decimal> day_3 { get; set; }
+        public Nullable<decimal> day_4 { get; set; }
 
         public string category_name { get; set; }
         public Nullable<decimal> prev_percentage { get; set; }
+        public Nullable<decimal> day_1_percentage { get; set; }
+        public Nullable<decimal> day_2_percentage { get; set; }
+        public Nullable<decimal> day_3_percentage { get; set; }
+        public Nullable<decimal> day_4_percentage { get; set; }
         public Nullable<decimal> day_5_percentage { get; set; }
         public Nullable<decimal> day_10_percentage { get; set; }
         public Nullable<decimal> day_15_percentage { get; set; }
@@ -88,6 +96,10 @@ namespace Ecam.Contracts
         public decimal? to_price { get; set; }
         public string mf_ids { get; set; }
         public Nullable<bool> is_mf { get; set; }
+        public Nullable<bool> is_all_time_high_5_days { get; set; }
+        public Nullable<bool> is_all_time_low_5_days { get; set; }
+        public Nullable<bool> is_all_time_high_2_days { get; set; }
+        public Nullable<bool> is_all_time_low_2_days { get; set; }
     }
 }
 

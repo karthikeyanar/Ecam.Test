@@ -63,28 +63,56 @@
                 <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" id="is_all_time_low" /> All Time Low Last Month
+                            <input type="checkbox" id="is_all_time_low" />Low Last Month
                         </label>
                     </div>
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" id="is_all_time_high" /> All Time High Last Month
+                            <input type="checkbox" id="is_all_time_high" />High Last Month
                         </label>
                     </div>
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" id="is_all_time_low_15_days" /> All Time Low 15 Days
+                            <input type="checkbox" id="is_all_time_low_15_days" /> Low 15 Days
                         </label>
                     </div>
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" id="is_all_time_high_15_days" /> All Time High 15 Days
+                            <input type="checkbox" id="is_all_time_high_15_days" /> High 15 Days
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="is_all_time_low_5_days" /> Low 5 Days
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="is_all_time_high_5_days" /> High 5 Days
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="is_all_time_low_2_days" /> Low 2 Days
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="is_all_time_high_2_days" /> High 2 Days
                         </label>
                     </div>
                 </div>
@@ -158,11 +186,15 @@
                     <th sortname="prev_percentage" class="text-right text-nowrap">
                         Change %
                     </th>
+                    <th sortname="day_1_percentage" class="text-right text-nowrap">1D</th>
+                    <th sortname="day_2_percentage" class="text-right text-nowrap">2D</th>
+                    <th sortname="day_3_percentage" class="text-right text-nowrap">3D</th>
+                    <th sortname="day_4_percentage" class="text-right text-nowrap">4D</th>
                     <th sortname="day_5_percentage" class="text-right text-nowrap">5D</th>
-                    <th sortname="day_10_percentage" class="text-right text-nowrap">10D</th>
+                    @*<th sortname="day_10_percentage" class="text-right text-nowrap">10D</th>
                     <th sortname="day_15_percentage" class="text-right text-nowrap">15D</th>
                     <th sortname="day_20_percentage" class="text-right text-nowrap">20D</th>
-                    <th sortname="day_25_percentage" class="text-right text-nowrap">25D</th>
+                    <th sortname="day_25_percentage" class="text-right text-nowrap">25D</th>*@
                     <th sortname="day_30_percentage" class="text-right text-nowrap">30D</th>
                     <th sortname="day_60_percentage" class="text-right text-nowrap">60D</th>
                     <th sortname="day_90_percentage" class="text-right text-nowrap">90D</th>
@@ -201,11 +233,31 @@
                         <div class="font-11" data-bind="text:formatPercentage(((ltp_price - day_5)/day_5)*100)"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(day_1_percentage)"></div>
+                        <div class="font-11" data-bind="text:formatNumber(day_1)"></div>
+                        <div class="font-11" data-bind="text:formatPercentage(((day_1 - day_2)/day_2)*100)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(day_2_percentage)"></div>
+                        <div class="font-11" data-bind="text:formatNumber(day_2)"></div>
+                        <div class="font-11" data-bind="text:formatPercentage(((day_2 - day_3)/day_3)*100)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(day_3_percentage)"></div>
+                        <div class="font-11" data-bind="text:formatNumber(day_3)"></div>
+                        <div class="font-11" data-bind="text:formatPercentage(((day_3 - day_4)/day_5)*100)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(day_4_percentage)"></div>
+                        <div class="font-11" data-bind="text:formatNumber(day_4)"></div>
+                        <div class="font-11" data-bind="text:formatPercentage(((day_4 - day_5)/day_5)*100)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(day_5_percentage)"></div>
                         <div class="font-11" data-bind="text:formatNumber(day_5)"></div>
                         <div class="font-11" data-bind="text:formatPercentage(((day_5 - day_10)/day_10)*100)"></div>
                     </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(day_10_percentage)"></div>
                         <div class="font-11" data-bind="text:formatNumber(day_10)"></div>
                         <div class="font-11" data-bind="text:formatPercentage(((day_10 - day_15)/day_15)*100)"></div>
@@ -224,7 +276,7 @@
                         <div data-bind="text:formatPercentage(day_25_percentage)"></div>
                         <div class="font-11" data-bind="text:formatNumber(day_25)"></div>
                         <div class="font-11" data-bind="text:formatPercentage(((day_25 - day_30)/day_30)*100)"></div>
-                    </td>
+                    </td>*@
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(day_30_percentage)"></div>
                         <div class="font-11" data-bind="text:formatNumber(day_30)"></div>

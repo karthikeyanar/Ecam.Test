@@ -340,10 +340,12 @@ namespace Ecam.Framework.Repository
             {
                 where.AppendFormat(" and ifnull(ct.is_nifty_50,0)={0}", ((criteria.is_nifty_50 ?? false) == true ? "1" : "0"));
             }
+
             if (criteria.is_nifty_100.HasValue)
             {
                 where.AppendFormat(" and ifnull(ct.is_nifty_100,0)={0}", ((criteria.is_nifty_100 ?? false) == true ? "1" : "0"));
             }
+
             if (criteria.is_nifty_200.HasValue)
             {
                 where.AppendFormat(" and ifnull(ct.is_nifty_200,0)={0}", ((criteria.is_nifty_200 ?? false) == true ? "1" : "0"));
@@ -359,7 +361,7 @@ namespace Ecam.Framework.Repository
                             " and ifnull(ct.day_20,0)>ifnull(ct.day_15,0)" +
                             " and ifnull(ct.day_15,0)>ifnull(ct.day_10,0)" +
                             " and ifnull(ct.day_10,0)>ifnull(ct.day_5,0)" +
-                            " and ifnull(ct.day_5,0)>ifnull(ct.ltp_price,0)" +
+                            " and ifnull(ct.day_5,0)>=ifnull(ct.ltp_price,0)" +
                             ")" +
                             "");
                 }
@@ -375,7 +377,7 @@ namespace Ecam.Framework.Repository
                             " and ifnull(ct.day_20,0)<ifnull(ct.day_15,0)" +
                             " and ifnull(ct.day_15,0)<ifnull(ct.day_10,0)" +
                             " and ifnull(ct.day_10,0)<ifnull(ct.day_5,0)" +
-                            " and ifnull(ct.day_5,0)<ifnull(ct.ltp_price,0)" +
+                            " and ifnull(ct.day_5,0)<=ifnull(ct.ltp_price,0)" +
                             ")" +
                             "");
                 }
@@ -388,7 +390,7 @@ namespace Ecam.Framework.Repository
                     where.Append(" and (" +
                             " ifnull(ct.day_15,0)>ifnull(ct.day_10,0)" +
                             " and ifnull(ct.day_10,0)>ifnull(ct.day_5,0)" +
-                            " and ifnull(ct.day_5,0)>ifnull(ct.ltp_price,0)" +
+                            " and ifnull(ct.day_5,0)>=ifnull(ct.ltp_price,0)" +
                             ")" +
                             "");
                 }
@@ -401,7 +403,63 @@ namespace Ecam.Framework.Repository
                     where.Append(" and (" +
                             " ifnull(ct.day_15,0)<ifnull(ct.day_10,0)" +
                             " and ifnull(ct.day_10,0)<ifnull(ct.day_5,0)" +
-                            " and ifnull(ct.day_5,0)<ifnull(ct.ltp_price,0)" +
+                            " and ifnull(ct.day_5,0)<=ifnull(ct.ltp_price,0)" +
+                            ")" +
+                            "");
+                }
+            }
+
+            if (criteria.is_all_time_low_5_days.HasValue)
+            {
+                if (criteria.is_all_time_low_5_days == true)
+                {
+                    where.Append(" and (" +
+                            " ifnull(ct.day_4,0)>ifnull(ct.day_3,0)" +
+                            " and ifnull(ct.day_3,0)>ifnull(ct.day_2,0)" +
+                            " and ifnull(ct.day_2,0)>ifnull(ct.day_1,0)" +
+                            " and ifnull(ct.day_1,0)>=ifnull(ct.ltp_price,0)" +
+                            ")" +
+                            "");
+                }
+            }
+
+            if (criteria.is_all_time_high_5_days.HasValue)
+            {
+                if (criteria.is_all_time_high_5_days == true)
+                {
+                    where.Append(" and (" +
+                            " ifnull(ct.day_4,0)<ifnull(ct.day_3,0)" +
+                            " and ifnull(ct.day_3,0)<ifnull(ct.day_2,0)" +
+                            " and ifnull(ct.day_2,0)<ifnull(ct.day_1,0)" +
+                            " and ifnull(ct.day_1,0)<=ifnull(ct.ltp_price,0)" +
+                            ")" +
+                            "");
+                }
+            }
+
+            if (criteria.is_all_time_low_2_days.HasValue)
+            {
+                if (criteria.is_all_time_low_2_days == true)
+                {
+                    where.Append(" and (" +
+                            " ifnull(ct.day_2,0)>ifnull(ct.day_1,0)" +
+                            " and ifnull(ct.day_1,0)>=ifnull(ct.ltp_price,0)" +
+                            " and ifnull(ct.day_4,0)<ifnull(ct.day_3,0)" +
+                            " and ifnull(ct.day_3,0)<ifnull(ct.day_2,0)" +
+                            ")" +
+                            "");
+                }
+            }
+
+            if (criteria.is_all_time_high_2_days.HasValue)
+            {
+                if (criteria.is_all_time_high_2_days == true)
+                {
+                    where.Append(" and (" +
+                            " ifnull(ct.day_2,0)<ifnull(ct.day_1,0)" +
+                            " and ifnull(ct.day_1,0)<=ifnull(ct.ltp_price,0)" +
+                            " and ifnull(ct.day_4,0)>ifnull(ct.day_3,0)" +
+                            " and ifnull(ct.day_3,0)>ifnull(ct.day_2,0)" +
                             ")" +
                             "");
                 }
@@ -439,18 +497,22 @@ namespace Ecam.Framework.Repository
 
             if (string.IsNullOrEmpty(criteria.mf_ids) == false)
             {
-                selectFields += ",(select count(mpf.fund_id) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol and mpf.fund_id in(" + criteria.mf_ids + ")) as mf_cnt_2" +
-                    ",(select sum(ifnull(mpf.stock_value, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol and mpf.fund_id in(" + criteria.mf_ids + ")) as mf_qty_2" +
+                selectFields += ",(select count(mpf.fund_id) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol and mpf.fund_id in(" + criteria.mf_ids + ")) as mf_cnt_2" + Environment.NewLine +
+                    ",(select sum(ifnull(mpf.stock_value, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol and mpf.fund_id in(" + criteria.mf_ids + ")) as mf_qty_2" + Environment.NewLine +
                     "";
             }
             else
             {
-                selectFields += ",(select count(mpf.fund_id) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_cnt_2" +
-                   ",(select sum(ifnull(mpf.stock_value, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_qty_2" +
+                selectFields += ",(select count(mpf.fund_id) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_cnt_2" + Environment.NewLine +
+                   ",(select sum(ifnull(mpf.stock_value, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_qty_2" + Environment.NewLine +
                    "";
             }
             selectFields += ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.prev_price, 0)) / ifnull(ct.prev_price, 0)) * 100) as prev_percentage" + Environment.NewLine +
 
+                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_1, 0)) / ifnull(ct.day_1, 0)) * 100) as day_1_percentage" + Environment.NewLine +
+                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_2, 0)) / ifnull(ct.day_2, 0)) * 100) as day_2_percentage" + Environment.NewLine +
+                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_3, 0)) / ifnull(ct.day_3, 0)) * 100) as day_3_percentage" + Environment.NewLine +
+                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_4, 0)) / ifnull(ct.day_4, 0)) * 100) as day_4_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_5, 0)) / ifnull(ct.day_5, 0)) * 100) as day_5_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_10, 0)) / ifnull(ct.day_10, 0)) * 100) as day_10_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_15, 0)) / ifnull(ct.day_15, 0)) * 100) as day_15_percentage" + Environment.NewLine +
@@ -491,6 +553,8 @@ namespace Ecam.Framework.Repository
             sql + Environment.NewLine +
             ") as tbl {0} {1} {2}", groupByName, orderBy, pageLimit);
             */
+
+            Helper.Log(sql);
             List<TRA_COMPANY> rows = new List<TRA_COMPANY>();
             List<tra_company_category> companyCategories;
             using (EcamContext context = new EcamContext())

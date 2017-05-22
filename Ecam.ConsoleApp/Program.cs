@@ -17,7 +17,15 @@ namespace Ecam.ConsoleApp
     {
         static void Main(string[] args)
         {
-            MutualFunds();
+            List<tra_company> companies;
+            using (EcamContext context = new EcamContext())
+            {
+                companies = (from q in context.tra_company orderby q.symbol ascending select q).ToList();
+            }
+            foreach(var company in companies)
+            {
+                TradeHelper.CalculateMovingAVG(company.symbol);
+            }
             Console.WriteLine("Completed");
             Console.ReadLine();
         }
@@ -27,7 +35,7 @@ namespace Ecam.ConsoleApp
             List<tra_company> companies;
             using (EcamContext context = new EcamContext())
             {
-                companies = (from q in context.tra_company select q).ToList();
+                companies = (from q in context.tra_company orderby q.symbol ascending select q).ToList();
             }
             string url = string.Empty;
             string html = string.Empty;
