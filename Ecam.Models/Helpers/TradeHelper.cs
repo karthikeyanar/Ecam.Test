@@ -915,7 +915,7 @@ namespace Ecam.Models
             return value; // DataTypeHelper.SafeDivision((currentPrice - avg), avg) * 100;
         }
 
-        private static void ImportPrice(TempClass import)
+        public static void ImportPrice(TempClass import)
         {
             using (EcamContext context = new EcamContext())
             {
@@ -942,14 +942,17 @@ namespace Ecam.Models
                 row.ltp_price = import.ltp_price;
                 row.prev_price = import.prev_price;
 
-                tra_market market = (from q in context.tra_market
-                                     where q.symbol == import.symbol
-                                     && q.trade_date < row.trade_date
-                                     orderby q.trade_date descending
-                                     select q).FirstOrDefault();
-                if (market != null)
+                if ((row.prev_price ?? 0) <= 0)
                 {
-                    row.prev_price = market.ltp_price;
+                    tra_market market = (from q in context.tra_market
+                                         where q.symbol == import.symbol
+                                         && q.trade_date < row.trade_date
+                                         orderby q.trade_date descending
+                                         select q).FirstOrDefault();
+                    if (market != null)
+                    {
+                        row.prev_price = market.ltp_price;
+                    }
                 }
 
                 if (isNew == true)
