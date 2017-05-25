@@ -126,7 +126,7 @@ namespace DownloadHTMLContent
                 {
                     lblCompany.Text = _lastCompany.company_name;
                     lblSymbol.Text = _lastCompany.symbol;
-                    string url = string.Format("https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/GetQuote.jsp?symbol={0}"
+                    string url = string.Format("https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/GetQuote.jsp?symbol={0}&illiquid=0&smeFlag=0&itpFlag=0"
                                                                                                       , _lastCompany.symbol.Replace("&", "%26")
                                                                                                       );
                     webBrowser2.ScriptErrorsSuppressed = true;

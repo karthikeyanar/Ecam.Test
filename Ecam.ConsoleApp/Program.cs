@@ -15,16 +15,22 @@ namespace Ecam.ConsoleApp
 {
     class Program
     {
+        private static string IS_DOWNLOAD_HISTORY = "";
         static void Main(string[] args)
         {
+            IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
             List<tra_company> companies;
             using (EcamContext context = new EcamContext())
             {
                 companies = (from q in context.tra_company orderby q.symbol ascending select q).ToList();
             }
-            foreach(var company in companies)
+            if (IS_DOWNLOAD_HISTORY == "true")
             {
-                TradeHelper.CalculateMovingAVG(company.symbol);
+                GoogleHistoryData();
+            }
+            else
+            {
+                GoogleData();
             }
             Console.WriteLine("Completed");
             Console.ReadLine();
@@ -43,10 +49,221 @@ namespace Ecam.ConsoleApp
             WebClient client = new WebClient();
             foreach (var company in companies)
             {
-                url = string.Format("https://www.google.com/finance/historical?q=NSE:{0}"
+                url = string.Format("https://www.google.com/finance?q=NSE:{0}"
                                                                     , company.symbol.Replace("&", "%26")
                                                                     );
                 string fileName = GOOGLE_DATA + "\\" + company.symbol + ".html";
+                if (File.Exists(fileName) == false)
+                {
+                    html = client.DownloadString(url);
+                    File.WriteAllText(fileName, html);
+                    Console.WriteLine("Download google data symbol=" + company.symbol);
+                }
+                else
+                {
+                    html = File.ReadAllText(fileName);
+                }
+                if (string.IsNullOrEmpty(html) == false)
+                {
+                    try
+                    {
+                        string startWord = "<div id=market-data-div class=\"id-market-data-div nwp g-floatfix\">";
+                        string endWord = "<div id=\"sharebox-data\"";
+                        int startIndex = html.IndexOf(startWord);
+                        int endIndex = html.IndexOf(endWord);
+                        int length = endIndex - startIndex + endWord.Length;
+                        if (startIndex > 0 && endIndex > 0)
+                        {
+                            html = html.Substring(startIndex, length);
+                        }
+                        else
+                        {
+                            Helper.Log("ErrorOnGoogleData symbol=" + company.symbol, "ErrorOnGoogleData");
+                        }
+                        html = html.Replace("\n", "").Replace("\r", "").Replace("\r\n", "");
+
+                        Regex regex = new Regex(
+                            @"<span\s*class=\""pr\""(.*?)>(.*?)</span>",
+                            RegexOptions.IgnoreCase
+                            | RegexOptions.Multiline
+                            | RegexOptions.IgnorePatternWhitespace
+                            | RegexOptions.Compiled
+                            );
+                        MatchCollection collections = regex.Matches(html);
+
+                        decimal currentPrice = 0;
+                        decimal change = 0;
+                        decimal prevPrice = 0;
+                        DateTime tradeDate = DateTime.MinValue;
+                        decimal openPrice = 0;
+                        decimal lowPrice = 0;
+                        decimal highPrice = 0;
+                        decimal week52Low = 0;
+                        decimal week52High = 0;
+                        if (collections.Count > 0)
+                        {
+                            currentPrice = DataTypeHelper.ToDecimal(RemoveHTMLTag(collections[0].Groups[2].Value));
+                        }
+                        regex = new Regex(
+        @"<span\s*class=\""ch\s+bld\""(.*?)>(.*?)</span>",
+        RegexOptions.IgnoreCase
+        | RegexOptions.Multiline
+        | RegexOptions.IgnorePatternWhitespace
+        | RegexOptions.Compiled
+        );
+
+                        collections = regex.Matches(html);
+                        if (collections.Count > 0)
+                        {
+                            change = DataTypeHelper.ToDecimal(RemoveHTMLTag(collections[0].Groups[2].Value));
+                        }
+                        prevPrice = currentPrice - change;
+
+                        regex = new Regex(
+        @"<span\s*class=nwp(.*?)>(.*?)</span>",
+        RegexOptions.IgnoreCase
+        | RegexOptions.Multiline
+        | RegexOptions.IgnorePatternWhitespace
+        | RegexOptions.Compiled
+        );
+                        collections = regex.Matches(html);
+                        if (collections.Count > 0)
+                        {
+                            try
+                            {
+                                string dt = RemoveHTMLTag(collections[0].Groups[2].Value).Replace("- Close", "").Trim();
+                                string[] arr = dt.Split((" ").ToCharArray());
+                                string month = arr[0];
+                                string date = arr[1];
+                                tradeDate = DataTypeHelper.ToDateTime(date + "/" + month + "/" + DateTime.Now.Year);
+                            }
+                            catch (Exception ex)
+                            {
+                                Helper.Log("Symbol=" + company.symbol + ",Google date parse=" + ex.Message, "GoogleDateParse");
+                            }
+                        }
+
+                        regex = new Regex(
+       @"<table(.*?)>(.*?)</table>",
+       RegexOptions.IgnoreCase
+       | RegexOptions.Multiline
+       | RegexOptions.IgnorePatternWhitespace
+       | RegexOptions.Compiled
+       );
+                        collections = regex.Matches(html);
+                        if (collections.Count > 0)
+                        {
+                            string tableContent = collections[0].Groups[2].Value;
+
+                            regex = new Regex(
+        @"<tr(.*?)>(.*?)</tr>",
+        RegexOptions.IgnoreCase
+        | RegexOptions.Multiline
+        | RegexOptions.IgnorePatternWhitespace
+        | RegexOptions.Compiled
+        );
+                            MatchCollection trCollections = regex.Matches(tableContent);
+                            foreach (Match trMatch in trCollections)
+                            {
+                                string tr = trMatch.Value;
+                                regex = new Regex(
+       @"<td(.*?)>(.*?)</td>",
+       RegexOptions.IgnoreCase
+       | RegexOptions.Multiline
+       | RegexOptions.IgnorePatternWhitespace
+       | RegexOptions.Compiled
+       );
+                                MatchCollection tdCollections = regex.Matches(tr);
+
+                                if (tdCollections.Count > 0)
+                                {
+                                    string firstCell = RemoveHTMLTag(tdCollections[0].Groups[2].Value).Trim();
+                                    string secondCell = RemoveHTMLTag(tdCollections[1].Groups[2].Value).Trim();
+                                    string[] arr;
+                                    switch (firstCell)
+                                    {
+                                        case "Range":
+                                            arr = secondCell.Split(("-").ToCharArray());
+                                            lowPrice = DataTypeHelper.ToDecimal(arr[0].Trim());
+                                            highPrice = DataTypeHelper.ToDecimal(arr[1].Trim());
+                                            break;
+                                        case "52 week":
+                                            arr = secondCell.Split(("-").ToCharArray());
+                                            week52Low = DataTypeHelper.ToDecimal(arr[0].Trim());
+                                            week52High = DataTypeHelper.ToDecimal(arr[1].Trim());
+                                            break;
+                                        case "Open":
+                                            openPrice = DataTypeHelper.ToDecimal(secondCell);
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                        if (currentPrice > 0 && tradeDate.Year > 1900)
+                        {
+                            TradeHelper.ImportPrice(new TempClass
+                            {
+                                symbol = company.symbol,
+                                high_price = highPrice,
+                                low_price = lowPrice,
+                                ltp_price = currentPrice,
+                                close_price = currentPrice,
+                                open_price = openPrice,
+                                prev_price = prevPrice,
+                                trade_date = tradeDate,
+                                trade_type = "NSE"
+                            });
+                            string sql = string.Format(" update tra_company set week_52_low={0},week_52_high={1} where symbol='{2}'", week52Low, week52High, company.symbol);
+                            MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+                            if (week52High <= 0 || week52Low <= 0)
+                            {
+                                Helper.Log("GoogleException symbol 1=" + company.symbol, "GoogleException");
+                            }
+                            Console.WriteLine("Completed symbol=" + company.symbol);
+                        }
+                        else
+                        {
+                            Helper.Log("GoogleException symbol 2=" + company.symbol, "GoogleException");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        string s = ex.Message;
+                        Helper.Log("GoogleException symbol 3=" + company.symbol, "GoogleException");
+                    }
+                }
+            }
+        }
+
+        private static string RemoveHTMLTag(string html)
+        {
+            Regex regex = new Regex(
+@"<[^>]*>",
+RegexOptions.IgnoreCase
+| RegexOptions.Multiline
+| RegexOptions.IgnorePatternWhitespace
+| RegexOptions.Compiled
+);
+            return regex.Replace(html, "");
+        }
+
+        private static void GoogleHistoryData()
+        {
+            List<tra_company> companies;
+            using (EcamContext context = new EcamContext())
+            {
+                companies = (from q in context.tra_company orderby q.symbol ascending select q).ToList();
+            }
+            string url = string.Empty;
+            string html = string.Empty;
+            string GOOGLE_HISTORY_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_HISTORY_DATA"];
+            WebClient client = new WebClient();
+            foreach (var company in companies)
+            {
+                url = string.Format("https://www.google.com/finance/historical?q=NSE:{0}&num=10"
+                                                                    , company.symbol.Replace("&", "%26")
+                                                                    );
+                string fileName = GOOGLE_HISTORY_DATA + "\\" + company.symbol + ".html";
                 if (File.Exists(fileName) == false)
                 {
                     html = client.DownloadString(url);
