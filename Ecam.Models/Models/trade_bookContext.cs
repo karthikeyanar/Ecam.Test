@@ -3,7 +3,7 @@ using System.Data.Entity.Infrastructure;
 namespace Ecam.Models{
 	public partial class EcamContext : DbContext {
 		static EcamContext() {
-            //Database.SetInitializer<trade_bookContext>(null);
+            //Database.SetInitializer<ecamtest_backupContext>(null);
 			Database.SetInitializer<EcamContext>(null);
         }
 		public EcamContext(): base("Name=EcamContext") {

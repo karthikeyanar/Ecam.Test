@@ -86,6 +86,11 @@ namespace Ecam.Contracts
         public Nullable<bool> is_all_time_low_15_days { get; set; }
         public Nullable<int> mf_cnt_2 { get; set; }
         public Nullable<decimal> mf_qty_2 { get; set; }
+
+        public Nullable<decimal> diff { get; set; }
+        public Nullable<decimal> profit_percentage { get; set; }
+        public Nullable<decimal> high_percentage { get; set; }
+        public Nullable<decimal> low_percentage { get; set; }
     }
 
     public class TRA_COMPANY_SEARCH : TRA_COMPANY
@@ -100,6 +105,9 @@ namespace Ecam.Contracts
         public Nullable<bool> is_all_time_low_5_days { get; set; }
         public Nullable<bool> is_all_time_high_2_days { get; set; }
         public Nullable<bool> is_all_time_low_2_days { get; set; }
+
+        public Nullable<bool> is_sell_to_buy { get; set; }
+        public Nullable<bool> is_buy_to_sell { get; set; }
     }
 }
 

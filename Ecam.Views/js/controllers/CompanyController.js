@@ -68,6 +68,14 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             if (is_all_time_high_2_days == true) {
                 arr[arr.length] = { "name": "is_all_time_high_2_days", "value": is_all_time_high_2_days };
             }
+            var is_sell_to_buy = $("#frmCompanySearch #is_sell_to_buy")[0].checked;
+            if (is_sell_to_buy == true) {
+                arr[arr.length] = { "name": "is_sell_to_buy", "value": is_sell_to_buy };
+            }
+            var is_buy_to_sell = $("#frmCompanySearch #is_buy_to_sell")[0].checked;
+            if (is_buy_to_sell == true) {
+                arr[arr.length] = { "name": "is_buy_to_sell", "value": is_buy_to_sell };
+            }
 
             var is_mf = $("#frmCompanySearch #is_mf")[0].checked;
             if (is_mf == true) {
@@ -320,6 +328,12 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             $("body").on("click", "#frmCompanySearch #is_all_time_high_2_days", function (event) {
                 self.loadGrid();
             });
+            $("body").on("click", "#frmCompanySearch #is_sell_to_buy", function (event) {
+                self.loadGrid();
+            });
+            $("body").on("click", "#frmCompanySearch #is_buy_to_sell", function (event) {
+                self.loadGrid();
+            });
             $("body").on("click", "#frmCompanySearch #is_mf", function (event) {
                 self.loadGrid();
             });
@@ -392,6 +406,8 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             $("body").off("click", "#frmCompanySearch #is_all_time_high_5_days");
             $("body").off("click", "#frmCompanySearch #is_all_time_low_2_days");
             $("body").off("click", "#frmCompanySearch #is_all_time_high_2_days");
+            $("body").off("click", "#frmCompanySearch #is_sell_to_buy");
+            $("body").off("click", "#frmCompanySearch #is_buy_to_sell");
             $("body").off("click", "#frmCompanySearch #is_mf");
             $("body").off("click", "#Company .btn-add");
             $("body").off("click", "#Company .btn-edit");
