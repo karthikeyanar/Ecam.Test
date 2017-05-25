@@ -249,12 +249,17 @@
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(diff)"></div>
+                        <div data-bind="text:'O:'+formatNumber(open_price)"></div>
+                        <div data-bind="text:'L:'+formatNumber(low_price)+',H:'+formatNumber(high_price)"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(high_percentage)"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(low_percentage)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(ltp_price)"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(prev_percentage)"></div>
@@ -335,12 +340,7 @@
                         <div class="pull-left m-l-15">
                             <a data-bind="attr:{'href': 'https://www.google.co.in/search?q=NSE:'+symbol.replace('&','%26')}" target="_blank">G</a>
                         </div>
-                        <div class="pull-left m-l-15">
-                            <a data-bind="attr:{'href': 'https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/GetQuote.jsp?symbol='+symbol.replace('&','%26')}" target="_blank">NSE</a>
-                        </div>
-                        <div class="pull-left m-l-15">
-                            <a data-bind="attr:{'href': 'http://economictimes.indiatimes.com/markets/technical-charts?symbol='+symbol.replace('&','%26')+'EQ&exchange=NSE&entity=company'}" target="_blank">ET</a>
-                        </div><div class="clearfix"></div>
+                        <div class="clearfix"></div>
                     </td>
                     <td style="vertical-align:top;" class="text-center">
                         <a href="javascript:;" class="cursor-pointer fg-black btn-delete" data-placement="top"><i class="fa fa-times"></i></a>

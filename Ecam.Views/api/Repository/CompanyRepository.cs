@@ -444,8 +444,6 @@ namespace Ecam.Framework.Repository
                     where.Append(" and (" +
                             " ifnull(ct.day_2,0)>ifnull(ct.day_1,0)" +
                             " and ifnull(ct.day_1,0)>=ifnull(ct.ltp_price,0)" +
-                            " and ifnull(ct.day_4,0)<ifnull(ct.day_3,0)" +
-                            " and ifnull(ct.day_3,0)<ifnull(ct.day_2,0)" +
                             ")" +
                             "");
                 }
@@ -458,8 +456,6 @@ namespace Ecam.Framework.Repository
                     where.Append(" and (" +
                             " ifnull(ct.day_2,0)<ifnull(ct.day_1,0)" +
                             " and ifnull(ct.day_1,0)<=ifnull(ct.ltp_price,0)" +
-                            " and ifnull(ct.day_4,0)>ifnull(ct.day_3,0)" +
-                            " and ifnull(ct.day_3,0)>ifnull(ct.day_2,0)" +
                             ")" +
                             "");
                 }
