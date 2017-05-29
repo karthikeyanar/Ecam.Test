@@ -10,20 +10,23 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Ecam.ConsoleApp
 {
     class Program
     {
-        private static string IS_DOWNLOAD_HISTORY = "";
+        public static string IS_DOWNLOAD_HISTORY = "";
+        public static string GOOGLE_DATA = "";
         static void Main(string[] args)
         {
             IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
-            List<tra_company> companies;
-            using (EcamContext context = new EcamContext())
-            {
-                companies = (from q in context.tra_company orderby q.symbol ascending select q).ToList();
-            }
+            GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
+            //List<tra_company> companies;
+            //using (EcamContext context = new EcamContext())
+            //{
+            //    companies = (from q in context.tra_company orderby q.symbol ascending select q).ToList();
+            //}
             if (IS_DOWNLOAD_HISTORY == "true")
             {
                 GoogleHistoryData();
@@ -36,6 +39,9 @@ namespace Ecam.ConsoleApp
             Console.ReadLine();
         }
 
+
+        private static int _INDEX = -1;
+        private static string[] _COMPANIES;
         private static void GoogleData()
         {
             List<tra_company> companies;
@@ -61,210 +67,49 @@ namespace Ecam.ConsoleApp
                              orderby q.symbol ascending
                              select q).ToList();
             }
-            string url = string.Empty;
-            string html = string.Empty;
-            string GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
-            WebClient client = new WebClient();
-            foreach (var company in companies)
+            _COMPANIES = (from q in companies select q.symbol).ToArray();
+            _INDEX = -1;
+            GoogleDownloadStart();
+            //foreach (var company in companies)
+            //{
+            //    Thread thread = new Thread(() => GoogleDataDownload(company.symbol));
+            //    thread.Start();
+            //}
+        }
+
+        private static void GoogleDownloadStart()
+        {
+            int totalCount = _COMPANIES.Length;
+            int queueCount = 64;
+            // One event is used for each Fibonacci object
+            ManualResetEvent[] doneEvents = new ManualResetEvent[queueCount];
+            GoogleDownloadData[] downArray = new GoogleDownloadData[queueCount];
+            //Random r = new Random();
+            // Configure and launch threads using ThreadPool:
+            Console.WriteLine("launching {0} tasks...", totalCount);
+            for (int i = 0; i < queueCount; i++)
             {
-                url = string.Format("https://www.google.com/finance?q=NSE:{0}"
-                                                                    , company.symbol.Replace("&", "%26")
-                                                                    );
-                string fileName = GOOGLE_DATA + "\\" + company.symbol + ".html";
-                if (File.Exists(fileName) == false)
+                _INDEX += 1;
+                string symbol = "";
+                if (_INDEX < _COMPANIES.Length)
                 {
-                    html = client.DownloadString(url);
-                    File.WriteAllText(fileName, html);
-                    Console.WriteLine("Download google data symbol=" + company.symbol);
+                    symbol = _COMPANIES[_INDEX];
                 }
-                else
-                {
-                    html = File.ReadAllText(fileName);
-                }
-                if (string.IsNullOrEmpty(html) == false)
-                {
-                    try
-                    {
-                        string startWord = "<div id=market-data-div class=\"id-market-data-div nwp g-floatfix\">";
-                        string endWord = "<div id=\"sharebox-data\"";
-                        int startIndex = html.IndexOf(startWord);
-                        int endIndex = html.IndexOf(endWord);
-                        int length = endIndex - startIndex + endWord.Length;
-                        if (startIndex > 0 && endIndex > 0)
-                        {
-                            html = html.Substring(startIndex, length);
-                        }
-                        else
-                        {
-                            Helper.Log("ErrorOnGoogleData symbol=" + company.symbol, "ErrorOnGoogleData");
-                        }
-                        html = html.Replace("\n", "").Replace("\r", "").Replace("\r\n", "");
-
-                        Regex regex = new Regex(
-                            @"<span\s*class=\""pr\""(.*?)>(.*?)</span>",
-                            RegexOptions.IgnoreCase
-                            | RegexOptions.Multiline
-                            | RegexOptions.IgnorePatternWhitespace
-                            | RegexOptions.Compiled
-                            );
-                        MatchCollection collections = regex.Matches(html);
-
-                        decimal currentPrice = 0;
-                        decimal change = 0;
-                        decimal prevPrice = 0;
-                        DateTime tradeDate = DateTime.MinValue;
-                        decimal openPrice = 0;
-                        decimal lowPrice = 0;
-                        decimal highPrice = 0;
-                        decimal week52Low = 0;
-                        decimal week52High = 0;
-                        if (collections.Count > 0)
-                        {
-                            currentPrice = DataTypeHelper.ToDecimal(RemoveHTMLTag(collections[0].Groups[2].Value));
-                        }
-                        regex = new Regex(
-        @"<span\s*class=\""ch\s+bld\""(.*?)>(.*?)</span>",
-        RegexOptions.IgnoreCase
-        | RegexOptions.Multiline
-        | RegexOptions.IgnorePatternWhitespace
-        | RegexOptions.Compiled
-        );
-
-                        collections = regex.Matches(html);
-                        if (collections.Count > 0)
-                        {
-                            change = DataTypeHelper.ToDecimal(RemoveHTMLTag(collections[0].Groups[2].Value));
-                        }
-                        prevPrice = currentPrice - change;
-
-                        regex = new Regex(
-        @"<span\s*class=nwp(.*?)>(.*?)</span>",
-        RegexOptions.IgnoreCase
-        | RegexOptions.Multiline
-        | RegexOptions.IgnorePatternWhitespace
-        | RegexOptions.Compiled
-        );
-                        collections = regex.Matches(html);
-                        if (collections.Count > 0)
-                        {
-                            try
-                            {
-                                string dt = RemoveHTMLTag(collections[0].Groups[2].Value).Replace("- Close", "").Trim();
-                                if (dt.Contains("Real-time") == false)
-                                {
-                                    string[] arr = dt.Split((" ").ToCharArray());
-                                    string month = arr[0];
-                                    string date = arr[1];
-                                    tradeDate = DataTypeHelper.ToDateTime(date + "/" + month + "/" + DateTime.Now.Year);
-                                }
-                                else
-                                {
-                                    tradeDate = DateTime.Now.Date;
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Helper.Log("Symbol=" + company.symbol + ",Google date parse=" + ex.Message, "GoogleDateParse");
-                            }
-                        }
-
-                        regex = new Regex(
-       @"<table(.*?)>(.*?)</table>",
-       RegexOptions.IgnoreCase
-       | RegexOptions.Multiline
-       | RegexOptions.IgnorePatternWhitespace
-       | RegexOptions.Compiled
-       );
-                        collections = regex.Matches(html);
-                        if (collections.Count > 0)
-                        {
-                            string tableContent = collections[0].Groups[2].Value;
-
-                            regex = new Regex(
-        @"<tr(.*?)>(.*?)</tr>",
-        RegexOptions.IgnoreCase
-        | RegexOptions.Multiline
-        | RegexOptions.IgnorePatternWhitespace
-        | RegexOptions.Compiled
-        );
-                            MatchCollection trCollections = regex.Matches(tableContent);
-                            foreach (Match trMatch in trCollections)
-                            {
-                                string tr = trMatch.Value;
-                                regex = new Regex(
-       @"<td(.*?)>(.*?)</td>",
-       RegexOptions.IgnoreCase
-       | RegexOptions.Multiline
-       | RegexOptions.IgnorePatternWhitespace
-       | RegexOptions.Compiled
-       );
-                                MatchCollection tdCollections = regex.Matches(tr);
-
-                                if (tdCollections.Count > 0)
-                                {
-                                    string firstCell = RemoveHTMLTag(tdCollections[0].Groups[2].Value).Trim();
-                                    string secondCell = RemoveHTMLTag(tdCollections[1].Groups[2].Value).Trim();
-                                    string[] arr;
-                                    switch (firstCell)
-                                    {
-                                        case "Range":
-                                            arr = secondCell.Split(("-").ToCharArray());
-                                            lowPrice = DataTypeHelper.ToDecimal(arr[0].Trim());
-                                            highPrice = DataTypeHelper.ToDecimal(arr[1].Trim());
-                                            break;
-                                        case "52 week":
-                                            arr = secondCell.Split(("-").ToCharArray());
-                                            week52Low = DataTypeHelper.ToDecimal(arr[0].Trim());
-                                            week52High = DataTypeHelper.ToDecimal(arr[1].Trim());
-                                            break;
-                                        case "Open":
-                                            openPrice = DataTypeHelper.ToDecimal(secondCell);
-                                            break;
-                                    }
-                                }
-                            }
-                        }
-                        if (currentPrice > 0 && tradeDate.Year > 1900)
-                        {
-                            TradeHelper.ImportPrice(new TempClass
-                            {
-                                symbol = company.symbol,
-                                high_price = highPrice,
-                                low_price = lowPrice,
-                                ltp_price = currentPrice,
-                                close_price = currentPrice,
-                                open_price = openPrice,
-                                prev_price = prevPrice,
-                                trade_date = tradeDate,
-                                trade_type = "NSE"
-                            });
-                            string sql = string.Format(" update tra_company set week_52_low={0},week_52_high={1} where symbol='{2}'", week52Low, week52High, company.symbol);
-                            MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-                            if (week52High <= 0 || week52Low <= 0)
-                            {
-                                Helper.Log("GoogleException symbol 1=" + company.symbol, "GoogleException");
-                            }
-                            Console.WriteLine("Completed symbol=" + company.symbol);
-                            if (File.Exists(fileName) == true)
-                            {
-                                File.Delete(fileName);
-                            }
-                        }
-                        else
-                        {
-                            Helper.Log("GoogleException symbol 2=" + company.symbol, "GoogleException");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        string s = ex.Message;
-                        Helper.Log("GoogleException symbol 3=" + company.symbol, "GoogleException");
-                    }
-                }
+                doneEvents[i] = new ManualResetEvent(false);
+                GoogleDownloadData f = new GoogleDownloadData(symbol, doneEvents[i]);
+                downArray[i] = f;
+                ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback, i);
+            }
+            // Wait for all threads in pool to calculation...
+            WaitHandle.WaitAll(doneEvents);
+            if (_INDEX < _COMPANIES.Length)
+            {
+                Console.WriteLine("All calculations are complete.");
+                GoogleDownloadStart();
             }
         }
 
-        private static string RemoveHTMLTag(string html)
+        public static string RemoveHTMLTag(string html)
         {
             Regex regex = new Regex(
 @"<[^>]*>",
@@ -647,5 +492,242 @@ RegexOptions.IgnoreCase
             }
             return symbol;
         }
+    }
+
+    public class GoogleDownloadData
+    {
+        public GoogleDownloadData(string symbol, ManualResetEvent doneEvent)
+        {
+            _Symbol = symbol;
+            _doneEvent = doneEvent;
+        }
+
+        // Wrapper method for use with thread pool.
+        public void ThreadPoolCallback(Object threadContext)
+        {
+            int threadIndex = (int)threadContext;
+            Console.WriteLine("thread {0} started...", threadIndex);
+            GoogleDataDownload(_Symbol);
+            Console.WriteLine("thread {0} result calculated...", threadIndex);
+            _doneEvent.Set();
+        }
+
+        private static void GoogleDataDownload(string symbol)
+        {
+            if (string.IsNullOrEmpty(symbol) == true) { return; }
+            Random rnd = new Random();
+            string url = string.Empty;
+            string html = string.Empty;
+            WebClient client = new WebClient();
+            url = string.Format("https://www.google.com/finance?q=NSE:{0}"
+                                                                   , symbol.Replace("&", "%26")
+                                                                   );
+            string fileName = Program.GOOGLE_DATA + "\\" + symbol + ".html";
+            if (File.Exists(fileName) == false)
+            {
+                try
+                {
+                    html = client.DownloadString(url);
+                    //File.WriteAllText(fileName, html);
+                    Console.WriteLine("Download google data symbol=" + symbol);
+                }
+                catch
+                {
+                    Helper.Log("DownloadErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData_" + rnd.Next(1000, 10000));
+                }
+            }
+            //else
+            //{
+            //    //html = File.ReadAllText(fileName);
+            //}
+            if (string.IsNullOrEmpty(html) == false)
+            {
+                try
+                {
+                    string startWord = "<div id=market-data-div class=\"id-market-data-div nwp g-floatfix\">";
+                    string endWord = "<div id=\"sharebox-data\"";
+                    int startIndex = html.IndexOf(startWord);
+                    int endIndex = html.IndexOf(endWord);
+                    int length = endIndex - startIndex + endWord.Length;
+                    if (startIndex > 0 && endIndex > 0)
+                    {
+                        html = html.Substring(startIndex, length);
+                    }
+                    else
+                    {
+                        Helper.Log("ErrorOnGoogleData symbol=" + symbol, "DownloadErrorOnGoogleData_" + rnd.Next(1000, 10000));
+                    }
+                    html = html.Replace("\n", "").Replace("\r", "").Replace("\r\n", "");
+
+                    Regex regex = new Regex(
+                        @"<span\s*class=\""pr\""(.*?)>(.*?)</span>",
+                        RegexOptions.IgnoreCase
+                        | RegexOptions.Multiline
+                        | RegexOptions.IgnorePatternWhitespace
+                        | RegexOptions.Compiled
+                        );
+                    MatchCollection collections = regex.Matches(html);
+
+                    decimal currentPrice = 0;
+                    decimal change = 0;
+                    decimal prevPrice = 0;
+                    DateTime tradeDate = DateTime.MinValue;
+                    decimal openPrice = 0;
+                    decimal lowPrice = 0;
+                    decimal highPrice = 0;
+                    decimal week52Low = 0;
+                    decimal week52High = 0;
+                    if (collections.Count > 0)
+                    {
+                        currentPrice = DataTypeHelper.ToDecimal(Program.RemoveHTMLTag(collections[0].Groups[2].Value));
+                    }
+                    regex = new Regex(
+    @"<span\s*class=\""ch\s+bld\""(.*?)>(.*?)</span>",
+    RegexOptions.IgnoreCase
+    | RegexOptions.Multiline
+    | RegexOptions.IgnorePatternWhitespace
+    | RegexOptions.Compiled
+    );
+
+                    collections = regex.Matches(html);
+                    if (collections.Count > 0)
+                    {
+                        change = DataTypeHelper.ToDecimal(Program.RemoveHTMLTag(collections[0].Groups[2].Value));
+                    }
+                    prevPrice = currentPrice - change;
+
+                    regex = new Regex(
+    @"<span\s*class=nwp(.*?)>(.*?)</span>",
+    RegexOptions.IgnoreCase
+    | RegexOptions.Multiline
+    | RegexOptions.IgnorePatternWhitespace
+    | RegexOptions.Compiled
+    );
+                    collections = regex.Matches(html);
+                    if (collections.Count > 0)
+                    {
+                        try
+                        {
+                            string dt = Program.RemoveHTMLTag(collections[0].Groups[2].Value).Replace("- Close", "").Trim();
+                            if (dt.Contains("Real-time") == false)
+                            {
+                                string[] arr = dt.Split((" ").ToCharArray());
+                                string month = arr[0];
+                                string date = arr[1];
+                                tradeDate = DataTypeHelper.ToDateTime(date + "/" + month + "/" + DateTime.Now.Year);
+                            }
+                            else
+                            {
+                                tradeDate = DateTime.Now.Date;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Helper.Log("Symbol=" + symbol + ",Google date parse=" + ex.Message, "GoogleDateParse_" + rnd.Next(1000, 10000));
+                        }
+                    }
+
+                    regex = new Regex(
+   @"<table(.*?)>(.*?)</table>",
+   RegexOptions.IgnoreCase
+   | RegexOptions.Multiline
+   | RegexOptions.IgnorePatternWhitespace
+   | RegexOptions.Compiled
+   );
+                    collections = regex.Matches(html);
+                    if (collections.Count > 0)
+                    {
+                        string tableContent = collections[0].Groups[2].Value;
+
+                        regex = new Regex(
+    @"<tr(.*?)>(.*?)</tr>",
+    RegexOptions.IgnoreCase
+    | RegexOptions.Multiline
+    | RegexOptions.IgnorePatternWhitespace
+    | RegexOptions.Compiled
+    );
+                        MatchCollection trCollections = regex.Matches(tableContent);
+                        foreach (Match trMatch in trCollections)
+                        {
+                            string tr = trMatch.Value;
+                            regex = new Regex(
+   @"<td(.*?)>(.*?)</td>",
+   RegexOptions.IgnoreCase
+   | RegexOptions.Multiline
+   | RegexOptions.IgnorePatternWhitespace
+   | RegexOptions.Compiled
+   );
+                            MatchCollection tdCollections = regex.Matches(tr);
+
+                            if (tdCollections.Count > 0)
+                            {
+                                string firstCell = Program.RemoveHTMLTag(tdCollections[0].Groups[2].Value).Trim();
+                                string secondCell = Program.RemoveHTMLTag(tdCollections[1].Groups[2].Value).Trim();
+                                string[] arr;
+                                switch (firstCell)
+                                {
+                                    case "Range":
+                                        arr = secondCell.Split(("-").ToCharArray());
+                                        lowPrice = DataTypeHelper.ToDecimal(arr[0].Trim());
+                                        highPrice = DataTypeHelper.ToDecimal(arr[1].Trim());
+                                        break;
+                                    case "52 week":
+                                        arr = secondCell.Split(("-").ToCharArray());
+                                        week52Low = DataTypeHelper.ToDecimal(arr[0].Trim());
+                                        week52High = DataTypeHelper.ToDecimal(arr[1].Trim());
+                                        break;
+                                    case "Open":
+                                        openPrice = DataTypeHelper.ToDecimal(secondCell);
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                    if (currentPrice > 0 && tradeDate.Year > 1900)
+                    {
+                        TradeHelper.ImportPrice(new TempClass
+                        {
+                            symbol = symbol,
+                            high_price = highPrice,
+                            low_price = lowPrice,
+                            ltp_price = currentPrice,
+                            close_price = currentPrice,
+                            open_price = openPrice,
+                            prev_price = prevPrice,
+                            trade_date = tradeDate,
+                            trade_type = "NSE"
+                        });
+                        string sql = string.Format(" update tra_company set week_52_low={0},week_52_high={1} where symbol='{2}'", week52Low, week52High, symbol);
+                        MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+                        if (week52High <= 0 || week52Low <= 0)
+                        {
+                            Helper.Log("GoogleException symbol 1=" + symbol, "GoogleException_" + rnd.Next(1000, 10000));
+                        }
+                        Console.WriteLine("Completed symbol=" + symbol);
+                        //if (File.Exists(fileName) == true)
+                        //{
+                        //    File.Delete(fileName);
+                        //}
+                    }
+                    else
+                    {
+                        Helper.Log("GoogleException symbol 2=" + symbol, "GoogleException_" + rnd.Next(1000, 10000));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    string s = ex.Message;
+                    Helper.Log("GoogleException symbol 3=" + symbol, "GoogleException_" + rnd.Next(1000, 10000));
+                }
+            }
+        }
+
+
+
+        public string SYMBOL { get { return _Symbol; } }
+        private string _Symbol;
+
+
+        private ManualResetEvent _doneEvent;
     }
 }

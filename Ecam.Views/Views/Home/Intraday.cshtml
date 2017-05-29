@@ -25,7 +25,7 @@
                 <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" id="is_book_mark" checked /> Show Book Mark
+                            <input type="checkbox" id="is_book_mark" /> Show Book Mark
                         </label>
                     </div>
                 </div>
@@ -50,7 +50,7 @@
                         </label>
                     </div>
                 </div>
-                <div class="form-group m-r-10 m-t-10 hide">
+                <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" id="is_mf" /> MF Stock
@@ -60,56 +60,56 @@
             </div>
             <div class="clearfix"></div>
             <div class="m-l-15">
-                <div class="form-group m-r-10 m-t-10 hide">
+                <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" id="is_all_time_low" />Low Last Month
                         </label>
                     </div>
                 </div>
-                <div class="form-group m-r-10 m-t-10 hide">
+                <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" id="is_all_time_high" />High Last Month
                         </label>
                     </div>
                 </div>
-                <div class="form-group m-r-10 m-t-10 hide">
+                <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" id="is_all_time_low_15_days" /> Low 15 Days
                         </label>
                     </div>
                 </div>
-                <div class="form-group m-r-10 m-t-10 hide">
+                <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" id="is_all_time_high_15_days" /> High 15 Days
                         </label>
                     </div>
                 </div>
-                <div class="form-group m-r-10 m-t-10 hide">
+                <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" id="is_all_time_low_5_days" /> Low 5 Days
                         </label>
                     </div>
                 </div>
-                <div class="form-group m-r-10 m-t-10 hide">
+                <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" id="is_all_time_high_5_days" /> High 5 Days
                         </label>
                     </div>
                 </div>
-                <div class="form-group m-r-10 m-t-10 hide">
+                <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" id="is_all_time_low_2_days" /> Low 2 Days
                         </label>
                     </div>
                 </div>
-                <div class="form-group m-r-10 m-t-10 hide">
+                <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" id="is_all_time_high_2_days" /> High 2 Days
@@ -294,8 +294,11 @@
                         <div data-bind="text:formatNumber(stb_stop_loss_profit(),4)"></div>
                     </td>
                     <td style="text-align:center;white-space:nowrap;width:120px;">
+                        <div class="pull-left">
+                            <a data-bind="attr:{'href': 'https://www.google.com/search?q=NSE:'+symbol().replace('&','%26')}" target="_blank">G</a>
+                        </div>
                         <div class="pull-left m-l-15">
-                            <a data-bind="attr:{'href': 'https://www.google.com/finance?q=NSE:'+symbol().replace('&','%26')}" target="_blank">G</a>
+                            <a data-bind="attr:{'href': 'https://www.google.com/finance?q=NSE:'+symbol().replace('&','%26')}" target="_blank">GF</a>
                         </div>
                         <div class="clearfix"></div>
                     </td>
