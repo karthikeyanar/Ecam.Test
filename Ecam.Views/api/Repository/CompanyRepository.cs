@@ -539,12 +539,12 @@ namespace Ecam.Framework.Repository
 
             if ((criteria.is_sell_to_buy ?? false) == true)
             {
-                where.AppendFormat(" and ifnull(diff,0)<=0");
+                where.AppendFormat(" and ifnull(open_price,0)>=ifnull(high_price,0) and ifnull(open_price,0)>=ifnull(low_price,0)");
             }
 
             if ((criteria.is_buy_to_sell ?? false) == true)
             {
-                where.AppendFormat(" and ifnull(diff,0)>=0");
+                where.AppendFormat(" and ifnull(open_price,0)<=ifnull(high_price,0) and ifnull(open_price,0)<=ifnull(low_price,0)");
             }
 
             sql = string.Format("select " +

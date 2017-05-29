@@ -41,7 +41,25 @@ namespace Ecam.ConsoleApp
             List<tra_company> companies;
             using (EcamContext context = new EcamContext())
             {
-                companies = (from q in context.tra_company orderby q.symbol ascending select q).ToList();
+                IQueryable<tra_company> query = context.tra_company;
+                string IS_NIFTY_50 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_50"];
+                string IS_NIFTY_100 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_100"];
+                string IS_NIFTY_200 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_200"];
+                if (IS_NIFTY_50 == "true")
+                {
+                    query = query.Where(q => (q.is_nifty_50 ?? false) == true);
+                }
+                if (IS_NIFTY_100 == "true")
+                {
+                    query = query.Where(q => (q.is_nifty_100 ?? false) == true);
+                }
+                if (IS_NIFTY_200 == "true")
+                {
+                    query = query.Where(q => (q.is_nifty_200 ?? false) == true);
+                }
+                companies = (from q in query
+                             orderby q.symbol ascending
+                             select q).ToList();
             }
             string url = string.Empty;
             string html = string.Empty;
@@ -132,10 +150,17 @@ namespace Ecam.ConsoleApp
                             try
                             {
                                 string dt = RemoveHTMLTag(collections[0].Groups[2].Value).Replace("- Close", "").Trim();
-                                string[] arr = dt.Split((" ").ToCharArray());
-                                string month = arr[0];
-                                string date = arr[1];
-                                tradeDate = DataTypeHelper.ToDateTime(date + "/" + month + "/" + DateTime.Now.Year);
+                                if (dt.Contains("Real-time") == false)
+                                {
+                                    string[] arr = dt.Split((" ").ToCharArray());
+                                    string month = arr[0];
+                                    string date = arr[1];
+                                    tradeDate = DataTypeHelper.ToDateTime(date + "/" + month + "/" + DateTime.Now.Year);
+                                }
+                                else
+                                {
+                                    tradeDate = DateTime.Now.Date;
+                                }
                             }
                             catch (Exception ex)
                             {
@@ -220,6 +245,10 @@ namespace Ecam.ConsoleApp
                                 Helper.Log("GoogleException symbol 1=" + company.symbol, "GoogleException");
                             }
                             Console.WriteLine("Completed symbol=" + company.symbol);
+                            if (File.Exists(fileName) == true)
+                            {
+                                File.Delete(fileName);
+                            }
                         }
                         else
                         {
