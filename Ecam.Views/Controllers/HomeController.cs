@@ -48,6 +48,11 @@ namespace Ecam.Views.Controllers
             return View();
         }
 
+        public ActionResult Intraday()
+        {
+            return View();
+        }
+
         public ActionResult AddCompany()
         {
             return View();

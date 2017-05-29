@@ -507,7 +507,6 @@ namespace Ecam.Framework.Repository
 
                            ",(ifnull(ct.open_price,0) - ifnull(ct.prev_price,0)) as diff" + Environment.NewLine +
 
-                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as profit_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.high_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as high_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.low_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as low_percentage" + Environment.NewLine +
 
@@ -539,12 +538,14 @@ namespace Ecam.Framework.Repository
 
             if ((criteria.is_sell_to_buy ?? false) == true)
             {
-                where.AppendFormat(" and ifnull(open_price,0)>=ifnull(high_price,0) and ifnull(open_price,0)>=ifnull(low_price,0)");
+                where.AppendFormat(" and ifnull(open_price,0)>=ifnull(low_price,0)");
+                //and ifnull(open_price,0)>=ifnull(low_price,0)");
             }
 
             if ((criteria.is_buy_to_sell ?? false) == true)
             {
-                where.AppendFormat(" and ifnull(open_price,0)<=ifnull(high_price,0) and ifnull(open_price,0)<=ifnull(low_price,0)");
+                where.AppendFormat(" and ifnull(open_price,0)<=ifnull(high_price,0)");
+                //and ifnull(open_price,0)<=ifnull(low_price,0)");
             }
 
             sql = string.Format("select " +
@@ -553,7 +554,7 @@ namespace Ecam.Framework.Repository
             sql + Environment.NewLine +
             ") as tbl {0} {1} {2} {3} ", where, "", orderBy, pageLimit);
 
-            Helper.Log(sql);
+            //Helper.Log(sql);
             List<TRA_COMPANY> rows = new List<TRA_COMPANY>();
             List<tra_company_category> companyCategories;
             using (EcamContext context = new EcamContext())

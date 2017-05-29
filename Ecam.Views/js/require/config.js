@@ -212,6 +212,21 @@ $(function () {
             unload: function () { }
         });
 
+
+        createFinchRoute("/intraday", {
+            setup: function (url) {
+                handleBlockUI();
+            },
+            load: function () {
+                require(['IntradayController'], function (ViewModel) {
+                    document.title = "Intraday - Ecams";
+                    var m = new ViewModel();
+                    app.viewModel(m);
+                });
+            },
+            unload: function () { }
+        });
+
         createFinchRoute("/category", {
             setup: function (url) {
                 handleBlockUI();

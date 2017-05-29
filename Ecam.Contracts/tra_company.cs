@@ -88,9 +88,57 @@ namespace Ecam.Contracts
         public Nullable<decimal> mf_qty_2 { get; set; }
 
         public Nullable<decimal> diff { get; set; }
-        public Nullable<decimal> profit_percentage { get; set; }
         public Nullable<decimal> high_percentage { get; set; }
         public Nullable<decimal> low_percentage { get; set; }
+
+        //public Nullable<decimal> profit_percentage { get; set; }
+        //public Nullable<decimal> stoploss_percentage { get; set; }
+
+        //public Nullable<decimal> available_amount { get; set; }
+        //public Nullable<decimal> investment_amount {
+        //    get {
+        //        return (this.quantity ?? 0) * (this.ltp_price ?? 0);
+        //    }
+        //}
+        //public Nullable<int> quantity {
+        //    get {
+        //        return (int)DataTypeHelper.SafeDivision((this.available_amount ?? 0), (this.ltp_price ?? 0));
+        //    }
+        //}
+
+        //public Nullable<decimal> target_price {
+        //    get {
+        //        return ((this.ltp_price ?? 0) * (this.profit_percentage ?? 0)) / 100;
+        //    }
+        //}
+        //public Nullable<decimal> stop_loss_price {
+        //    get {
+        //        return ((this.ltp_price ?? 0) * (this.stoploss_percentage ?? 0)) / 100;
+        //    }
+        //}
+
+        //public Nullable<decimal> bts_sell_target {
+        //    get {
+        //        return ((this.ltp_price ?? 0) + (this.target_price ?? 0));
+        //    }
+        //}
+        //public Nullable<decimal> bts_stop_loss_target {
+        //    get {
+        //        return ((this.ltp_price ?? 0) - (this.stop_loss_price ?? 0));
+        //    }
+        //}
+         
+        //public Nullable<decimal> stb_sell_target {
+        //    get {
+        //        return ((this.ltp_price ?? 0) - (this.target_price ?? 0));
+        //    }
+        //}
+        //public Nullable<decimal> stb_stop_loss_target {
+        //    get {
+        //        return ((this.ltp_price ?? 0) + (this.stop_loss_price ?? 0));
+        //    }
+        //}
+
     }
 
     public class TRA_COMPANY_SEARCH : TRA_COMPANY
