@@ -685,6 +685,23 @@ RegexOptions.IgnoreCase
                     }
                     if (currentPrice > 0 && tradeDate.Year > 1900)
                     {
+                        if (tradeDate.Date == DateTime.Now.Date)
+                        {
+                            try
+                            {
+                                using (EcamContext context = new EcamContext())
+                                {
+                                    context.tra_market_intra_day.Add(new tra_market_intra_day
+                                    {
+                                        symbol = symbol,
+                                        ltp_price = currentPrice,
+                                        trade_date = DateTime.Now
+                                    });
+                                    context.SaveChanges();
+                                }
+                            }
+                            catch { }
+                        }
                         TradeHelper.ImportPrice(new TempClass
                         {
                             symbol = symbol,

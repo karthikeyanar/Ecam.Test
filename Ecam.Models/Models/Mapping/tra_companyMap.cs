@@ -2,15 +2,12 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.ModelConfiguration;
 // namespace CodeFirstClassGenerate.Models.Mapping
-namespace Ecam.Models
-{
-    public partial class tra_companyMap : EntityTypeConfiguration<tra_company>
-    {
-        public tra_companyMap()
-        {
-            // Primary Key
-            this.HasKey(t => t.id);
-
+namespace Ecam.Models {
+    public partial class tra_companyMap : EntityTypeConfiguration<tra_company> {
+        public tra_companyMap() {
+		            // Primary Key
+		            this.HasKey(t => t.id);
+		
             // Properties
             this.Property(t => t.company_name)
                 .IsRequired()
@@ -21,100 +18,100 @@ namespace Ecam.Models
                 .HasMaxLength(50);
 
             this.Property(t => t.open_price)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.high_price)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.low_price)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.ltp_price)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.close_price)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.prev_price)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.week_52_high)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.week_52_low)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_5)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_10)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_15)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_20)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_25)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_30)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_35)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_60)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_40)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_45)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_50)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_55)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_65)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_70)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_75)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_80)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_85)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_90)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.mf_qty)
-    .HasPrecision(13, 4);
-
-            this.Property(t => t.day_1)
-.HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_2)
-.HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_3)
-.HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.day_4)
-.HasPrecision(13, 4);
+                .HasPrecision(13,4);
+
+            this.Property(t => t.day_1)
+                .HasPrecision(13,4);
 
             // Table & Column Mappings
-            this.ToTable("tra_company");
+			this.ToTable("tra_company");
             this.Property(t => t.id).HasColumnName("company_id");
             this.Property(t => t.company_name).HasColumnName("company_name");
             this.Property(t => t.symbol).HasColumnName("symbol");
@@ -150,15 +147,14 @@ namespace Ecam.Models
             this.Property(t => t.day_90).HasColumnName("day_90");
             this.Property(t => t.mf_cnt).HasColumnName("mf_cnt");
             this.Property(t => t.mf_qty).HasColumnName("mf_qty");
-
-            this.Property(t => t.day_1).HasColumnName("day_1");
             this.Property(t => t.day_2).HasColumnName("day_2");
             this.Property(t => t.day_3).HasColumnName("day_3");
             this.Property(t => t.day_4).HasColumnName("day_4");
-            Ignore(t => t.created_date);
-            Ignore(t => t.created_by);
-            Ignore(t => t.last_updated_date);
-            Ignore(t => t.last_updated_by);
-        }
+            this.Property(t => t.day_1).HasColumnName("day_1");
+			       Ignore(t=>t.created_date);
+						       Ignore(t=>t.created_by);
+						       Ignore(t=>t.last_updated_date);
+						       Ignore(t=>t.last_updated_by);
+			        }
     }
 }
