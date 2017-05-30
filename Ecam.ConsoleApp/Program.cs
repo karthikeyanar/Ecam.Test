@@ -528,27 +528,42 @@ RegexOptions.IgnoreCase
                                                                    , symbol.Replace("&", "%26")
                                                                    );
             string fileName = Program.GOOGLE_DATA + "\\" + symbol + ".html";
-            if (File.Exists(fileName) == false)
+            if (DateTime.Now >= targetTime)
+            {
+                if (File.Exists(fileName) == false)
+                {
+                    try
+                    {
+                        html = client.DownloadString(url);
+                        if (DateTime.Now >= targetTime)
+                        {
+                            File.WriteAllText(fileName, html);
+                        }
+                        Console.WriteLine("Download google data symbol=" + symbol);
+                    }
+                    catch
+                    {
+                        Helper.Log("DownloadErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData_" + rnd.Next(1000, 10000));
+                    }
+                }
+                else
+                {
+                    if (DateTime.Now >= targetTime)
+                    {
+                        html = File.ReadAllText(fileName);
+                    }
+                }
+            }
+            else
             {
                 try
                 {
                     html = client.DownloadString(url);
-                    if (DateTime.Now >= targetTime)
-                    {
-                        File.WriteAllText(fileName, html);
-                    }
                     Console.WriteLine("Download google data symbol=" + symbol);
                 }
                 catch
                 {
                     Helper.Log("DownloadErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData_" + rnd.Next(1000, 10000));
-                }
-            }
-            else
-            {
-                if (DateTime.Now >= targetTime)
-                {
-                    html = File.ReadAllText(fileName);
                 }
             }
             if (string.IsNullOrEmpty(html) == false)
