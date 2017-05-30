@@ -36,7 +36,7 @@ namespace Ecam.ConsoleApp
                 GoogleData();
             }
             Console.WriteLine("Completed");
-            Console.ReadLine();
+            //Console.ReadLine();
         }
 
 
