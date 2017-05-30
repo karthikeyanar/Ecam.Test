@@ -48,20 +48,24 @@ namespace Ecam.ConsoleApp
             using (EcamContext context = new EcamContext())
             {
                 IQueryable<tra_company> query = context.tra_company;
-                string IS_NIFTY_50 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_50"];
-                string IS_NIFTY_100 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_100"];
-                string IS_NIFTY_200 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_200"];
-                if (IS_NIFTY_50 == "true")
+                DateTime targetTime = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 4:00PM");
+                if (DateTime.Now <= targetTime)
                 {
-                    query = query.Where(q => (q.is_nifty_50 ?? false) == true);
-                }
-                if (IS_NIFTY_100 == "true")
-                {
-                    query = query.Where(q => (q.is_nifty_100 ?? false) == true);
-                }
-                if (IS_NIFTY_200 == "true")
-                {
-                    query = query.Where(q => (q.is_nifty_200 ?? false) == true);
+                    string IS_NIFTY_50 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_50"];
+                    string IS_NIFTY_100 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_100"];
+                    string IS_NIFTY_200 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_200"];
+                    if (IS_NIFTY_50 == "true")
+                    {
+                        query = query.Where(q => (q.is_nifty_50 ?? false) == true);
+                    }
+                    if (IS_NIFTY_100 == "true")
+                    {
+                        query = query.Where(q => (q.is_nifty_100 ?? false) == true);
+                    }
+                    if (IS_NIFTY_200 == "true")
+                    {
+                        query = query.Where(q => (q.is_nifty_200 ?? false) == true);
+                    }
                 }
                 companies = (from q in query
                              orderby q.symbol ascending
@@ -519,6 +523,7 @@ RegexOptions.IgnoreCase
             string url = string.Empty;
             string html = string.Empty;
             WebClient client = new WebClient();
+            DateTime targetTime = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 4:00PM");
             url = string.Format("https://www.google.com/finance?q=NSE:{0}"
                                                                    , symbol.Replace("&", "%26")
                                                                    );
@@ -528,7 +533,10 @@ RegexOptions.IgnoreCase
                 try
                 {
                     html = client.DownloadString(url);
-                    //File.WriteAllText(fileName, html);
+                    if (DateTime.Now >= targetTime)
+                    {
+                        File.WriteAllText(fileName, html);
+                    }
                     Console.WriteLine("Download google data symbol=" + symbol);
                 }
                 catch
@@ -536,10 +544,13 @@ RegexOptions.IgnoreCase
                     Helper.Log("DownloadErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData_" + rnd.Next(1000, 10000));
                 }
             }
-            //else
-            //{
-            //    //html = File.ReadAllText(fileName);
-            //}
+            else
+            {
+                if (DateTime.Now >= targetTime)
+                {
+                    html = File.ReadAllText(fileName);
+                }
+            }
             if (string.IsNullOrEmpty(html) == false)
             {
                 try
@@ -685,7 +696,7 @@ RegexOptions.IgnoreCase
                     }
                     if (currentPrice > 0 && tradeDate.Year > 1900)
                     {
-                        if (tradeDate.Date == DateTime.Now.Date)
+                        if (tradeDate.Date == DateTime.Now.Date && DateTime.Now <= targetTime)
                         {
                             try
                             {
@@ -721,10 +732,13 @@ RegexOptions.IgnoreCase
                             Helper.Log("GoogleException symbol 1=" + symbol, "GoogleException_" + rnd.Next(1000, 10000));
                         }
                         Console.WriteLine("Completed symbol=" + symbol);
-                        //if (File.Exists(fileName) == true)
-                        //{
-                        //    File.Delete(fileName);
-                        //}
+                        if (DateTime.Now <= targetTime)
+                        {
+                            if (File.Exists(fileName) == true)
+                            {
+                                File.Delete(fileName);
+                            }
+                        }
                     }
                     else
                     {
