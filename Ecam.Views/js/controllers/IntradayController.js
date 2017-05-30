@@ -156,8 +156,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     row.stb_sell_target(ltpPrice - row.target_price());
                     row.stb_stop_loss_target(ltpPrice + row.stop_loss_price());
 
-                    row.stb_target_profit((row.stb_sell_target() * row.quantity()) - row.investment_amount());
-                    row.stb_stop_loss_profit((row.stb_stop_loss_target() * row.quantity()) - row.investment_amount());
+                    row.stb_target_profit(((row.stb_sell_target() * row.quantity()) - row.investment_amount())*-1);
+                    row.stb_stop_loss_profit(((row.stb_stop_loss_target() * row.quantity()) - row.investment_amount())*-1);
                 });
             }
         }
