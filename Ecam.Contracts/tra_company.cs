@@ -88,6 +88,7 @@ namespace Ecam.Contracts
         public Nullable<decimal> mf_qty_2 { get; set; }
 
         public Nullable<decimal> diff { get; set; }
+        public Nullable<decimal> ltp_percentage { get; set; }
         public Nullable<decimal> high_percentage { get; set; }
         public Nullable<decimal> low_percentage { get; set; }
 

@@ -507,6 +507,7 @@ namespace Ecam.Framework.Repository
 
                            ",(ifnull(ct.open_price,0) - ifnull(ct.prev_price,0)) as diff" + Environment.NewLine +
 
+                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as ltp_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.high_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as high_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.low_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as low_percentage" + Environment.NewLine +
 
@@ -548,6 +549,16 @@ namespace Ecam.Framework.Repository
                 where.AppendFormat(" and ifnull(open_price,0)<=ifnull(low_price,0)");
             }
 
+            string tempsql = string.Format("select " +
+       "tbl.*" + Environment.NewLine +
+       " from(" + Environment.NewLine +
+       sql + Environment.NewLine +
+       ") as tbl {0} {1} {2} {3} ", where, "", "", "");
+
+            tempsql = "select count(*) as cnt from(" + tempsql + ") as tbl2";
+
+            paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString, tempsql));
+
             sql = string.Format("select " +
             "tbl.*" + Environment.NewLine +
             " from(" + Environment.NewLine +
@@ -565,6 +576,7 @@ namespace Ecam.Framework.Repository
                                      where symbols.Contains(q.symbol) == true
                                      select q).ToList();
             }
+
             foreach (var row in rows)
             {
                 row.category_list = (from q in companyCategories
