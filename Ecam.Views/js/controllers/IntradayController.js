@@ -361,7 +361,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             }).done(function (json) {
                 $childTD.empty();
                 $("#detail-template").tmpl(json).appendTo($childTD);
-                $childTD.css("background-color", "#F2F2F2");
+                $childTD.css("padding-left","75px").css("background-color", "#F2F2F2");
                 $childTD.removeClass("loading");
             })
             .always(function () {
