@@ -156,8 +156,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     row.stb_sell_target(ltpPrice - row.target_price());
                     row.stb_stop_loss_target(ltpPrice + row.stop_loss_price());
 
-                    row.stb_target_profit(((row.stb_sell_target() * row.quantity()) - row.investment_amount())*-1);
-                    row.stb_stop_loss_profit(((row.stb_stop_loss_target() * row.quantity()) - row.investment_amount())*-1);
+                    row.stb_target_profit(((row.stb_sell_target() * row.quantity()) - row.investment_amount()) * -1);
+                    row.stb_stop_loss_profit(((row.stb_stop_loss_target() * row.quantity()) - row.investment_amount()) * -1);
                 });
             }
         }
@@ -339,6 +339,36 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
         }
 
+        this.loadTradeDetail = function ($childTD) {
+            $childTD.addClass("loading");
+            if ($.trim($childTD.html()) == '') {
+                $childTD.html("Loading...");
+            }
+            var symbol = $childTD.attr("symbol");
+            handleBlockUI();
+
+            var url = apiUrl("/Company/IntradayList");
+            var arr = [];
+            arr[arr.length] = { "name": "symbols", "value": symbol };
+            arr[arr.length] = { "name": "SortName", "value": "intra.trade_date" };
+            arr[arr.length] = { "name": "SortOrder", "value": "asc" };
+            arr[arr.length] = { "name": "PageSize", "value": "0" };
+            $.ajax({
+                "url": url,
+                "cache": false,
+                "type": "GET",
+                "data": arr
+            }).done(function (json) {
+                $childTD.empty();
+                $("#detail-template").tmpl(json).appendTo($childTD);
+                $childTD.css("background-color", "#F2F2F2");
+                $childTD.removeClass("loading");
+            })
+            .always(function () {
+                unblockUI();
+            });
+        }
+
         this.onElements = function () {
             self.offElements();
             $("body").on("click", "#frmCompanySearch #is_book_mark", function (event) {
@@ -448,6 +478,43 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             });
             $("body").on("keyup", "#stoploss_percentage", function (event) {
                 self.calculateJSON();
+            });
+            $("body").on("click", "#CompanyTable > tbody > tr > td.cls-symbol", function (event) {
+                var $this = $(this);
+                var dataFor = ko.dataFor($this[0]);
+                var fbJson = JSON.parse(ko.toJSON(dataFor));
+                var $tr = $this.parents("tr:first");
+                var $tbl = $this.parents("table:first");
+                var $tbody = $("tbody", $tbl);
+                var companyId = cInt(dataFor.id());
+                var childTRId = "child_" + companyId;
+                var $childTR = $("#" + childTRId, $tbody);
+                var $treeExpand = $(".tree-expand", this);
+                $("#cargoTable .child-rows[cid!='" + companyId + "']").addClass("hide");
+                $("#cargoTable .tree-expand[cid!='" + companyId + "']").removeClass("ex-minus").addClass("ex-plus");
+                if ($treeExpand.hasClass("ex-plus")) {
+                    $treeExpand.removeClass("ex-minus").removeClass("ex-plus");
+                    if (!$childTR[0]) {
+                        $treeExpand.addClass("ex-minus");
+                        $childTR = $("<tr class='child-rows' cid='" + companyId + "'><td symbol='" + dataFor.symbol() + "' company_id='" + companyId + "' colspan='" + $("thead > tr > th", $tbl).length + "' class='child-row-cnt'></td></tr>");
+                        $childTR.attr("id", childTRId).attr("row-key", companyId);
+                        var $childTD = $("td", $childTR);
+                        $tr.after($childTR);
+                        $childTD.data("fbjson", fbJson);
+                        self.loadTradeDetail($childTD);
+                    } else {
+                        if ($childTR.hasClass('hide')) {
+                            $childTR.removeClass("hide");
+                            $treeExpand.addClass("ex-minus");
+                        } else {
+                            $childTR.addClass("hide");
+                            $treeExpand.addClass("ex-plus");
+                        }
+                    }
+                } else {
+                    $childTR.addClass("hide");
+                    $treeExpand.removeClass("ex-minus").addClass("ex-plus");
+                }
             });
         }
 

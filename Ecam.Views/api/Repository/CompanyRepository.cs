@@ -14,6 +14,7 @@ namespace Ecam.Framework.Repository
     public interface ICompanyRepository
     {
         PaginatedListResult<TRA_COMPANY> Get(TRA_COMPANY_SEARCH criteria, Paging paging);
+        PaginatedListResult<TRA_MARKET_INTRA_DAY> GetIntraDay(TRA_COMPANY_SEARCH criteria, Paging paging);
         List<Select2List> GetCompanys(string name, int pageSize = 50, string categories = "");
         List<Select2List> GetCategories(string name, int pageSize = 50);
         List<Select2List> GetMFFunds(string name, int pageSize = 50);
@@ -594,6 +595,67 @@ namespace Ecam.Framework.Repository
                 row.category_name = categoryName;
             }
             return new PaginatedListResult<TRA_COMPANY> { total = paging.Total, rows = rows };
+        }
+
+        public PaginatedListResult<TRA_MARKET_INTRA_DAY> GetIntraDay(TRA_COMPANY_SEARCH criteria, Paging paging)
+        {
+            StringBuilder where = new StringBuilder();
+            string selectFields = "";
+            string pageLimit = "";
+            string orderBy = "";
+            string groupByName = string.Empty;
+            string joinTables = string.Empty;
+            string prefix = "intra";
+            string sqlFormat = "select {0} from tra_market_intra_day " + prefix + " {1} where {2} {3} {4} {5}";
+            string sql = string.Empty;
+            string role = Authentication.CurrentRole;
+
+            where.AppendFormat(" intra.trade_date>='{0}'", DateTime.Now.ToString("yyyy-MM-dd"));
+
+            if (string.IsNullOrEmpty(criteria.symbols) == false)
+            {
+                where.AppendFormat(" and intra.symbol in({0})", Helper.ConvertStringSQLFormat(criteria.symbols));
+            }
+
+            joinTables += " join tra_company c on c.symbol = intra.symbol ";
+
+            selectFields = "count(*) as cnt";
+
+            sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, "", "");
+
+            paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString, sql));
+
+            if (string.IsNullOrEmpty(paging.SortOrder))
+            {
+                paging.SortOrder = "asc";
+            }
+
+            if (paging.PageSize > 0)
+            {
+                int from = (paging.PageIndex > 1) ? ((paging.PageIndex - 1) * paging.PageSize) : 0;
+                int to = paging.PageSize;
+                pageLimit = string.Format("limit {0},{1}", from, to);
+            }
+
+            orderBy = string.Format("order by {0} {1}", paging.SortName, paging.SortOrder);
+
+            selectFields = "intra.symbol" + Environment.NewLine +
+                            ",intra.trade_date" + Environment.NewLine +
+                            ",DATE_FORMAT(intra.trade_date, '%h:%i %p') as time" + Environment.NewLine +
+                            ",c.open_price" + Environment.NewLine +
+                            ",intra.ltp_price" + Environment.NewLine +
+                            ",c.company_id" + Environment.NewLine +
+                            ",(((ifnull(intra.ltp_price, 0) - ifnull(c.open_price, 0)) / ifnull(c.open_price, 0)) * 100) as ltp_percentage" + Environment.NewLine + "";
+
+            sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, orderBy, pageLimit);
+
+            //Helper.Log(sql);
+            List<TRA_MARKET_INTRA_DAY> rows = new List<TRA_MARKET_INTRA_DAY>();
+            using (EcamContext context = new EcamContext())
+            {
+                rows = context.Database.SqlQuery<TRA_MARKET_INTRA_DAY>(sql).ToList();
+            }
+            return new PaginatedListResult<TRA_MARKET_INTRA_DAY> { total = paging.Total, rows = rows };
         }
     }
 }
