@@ -541,13 +541,17 @@ namespace Ecam.Framework.Repository
             if ((criteria.is_sell_to_buy ?? false) == true)
             {
                 where.AppendFormat(" and ifnull(open_price,0)>=ifnull(low_price,0)");
-                where.AppendFormat(" and ifnull(open_price,0)>=ifnull(high_price,0)");
+                //where.AppendFormat(" and ifnull(open_price,0)>=ifnull(high_price,0)");
+                where.AppendFormat(" and ifnull(high_percentage,0)>=0");
+                where.AppendFormat(" and ifnull(high_percentage,0)<=0.5");
             }
 
             if ((criteria.is_buy_to_sell ?? false) == true)
             {
                 where.AppendFormat(" and ifnull(open_price,0)<=ifnull(high_price,0)");
-                where.AppendFormat(" and ifnull(open_price,0)<=ifnull(low_price,0)");
+                where.AppendFormat(" and ifnull(low_percentage,0)<=0");
+                where.AppendFormat(" and ifnull(low_percentage,0)>=-0.5");
+                //where.AppendFormat(" and ifnull(open_price,0)<=ifnull(low_price,0)");
             }
 
             string tempsql = string.Format("select " +
@@ -566,7 +570,7 @@ namespace Ecam.Framework.Repository
             sql + Environment.NewLine +
             ") as tbl {0} {1} {2} {3} ", where, "", orderBy, pageLimit);
 
-            //Helper.Log(sql);
+            Helper.Log(sql);
             List<TRA_COMPANY> rows = new List<TRA_COMPANY>();
             List<tra_company_category> companyCategories;
             using (EcamContext context = new EcamContext())
