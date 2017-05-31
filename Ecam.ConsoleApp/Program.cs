@@ -68,11 +68,13 @@ namespace Ecam.ConsoleApp
                     }
                 }
                 companies = (from q in query
-                             orderby q.symbol ascending
+                             orderby (q.is_nifty_50 ?? false) descending, (q.is_nifty_100 ?? false) descending, (q.is_nifty_200 ?? false) descending, q.symbol ascending
                              select q).ToList();
             }
             _COMPANIES = (from q in companies select q.symbol).ToArray();
             _INDEX = -1;
+            string sql = "update tra_company set is_book_mark=0;";
+            MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
             GoogleDownloadStart();
             //foreach (var company in companies)
             //{
@@ -543,7 +545,7 @@ RegexOptions.IgnoreCase
                     }
                     catch
                     {
-                        Helper.Log("DownloadErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData_" + rnd.Next(1000, 10000));
+                        //Helper.Log("DownloadErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData_" + rnd.Next(1000, 10000));
                     }
                 }
                 else
@@ -563,7 +565,7 @@ RegexOptions.IgnoreCase
                 }
                 catch
                 {
-                    Helper.Log("DownloadErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData_" + rnd.Next(1000, 10000));
+                    //Helper.Log("DownloadErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData_" + rnd.Next(1000, 10000));
                 }
             }
             if (string.IsNullOrEmpty(html) == false)
@@ -649,7 +651,7 @@ RegexOptions.IgnoreCase
                         }
                         catch (Exception ex)
                         {
-                            Helper.Log("Symbol=" + symbol + ",Google date parse=" + ex.Message, "GoogleDateParse_" + rnd.Next(1000, 10000));
+                            //Helper.Log("Symbol=" + symbol + ",Google date parse=" + ex.Message, "GoogleDateParse_" + rnd.Next(1000, 10000));
                         }
                     }
 
@@ -744,9 +746,13 @@ RegexOptions.IgnoreCase
                         MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
                         if (week52High <= 0 || week52Low <= 0)
                         {
-                            Helper.Log("GoogleException symbol 1=" + symbol, "GoogleException_" + rnd.Next(1000, 10000));
+                            //Helper.Log("GoogleException symbol 1=" + symbol, "GoogleException_" + rnd.Next(1000, 10000));
                         }
                         Console.WriteLine("Completed symbol=" + symbol);
+                        sql = string.Format(" update tra_company set is_book_mark=1 where ifnull(open_price,0)>=ifnull(high_price,0) and ifnull(open_price,0)>=ifnull(low_price,0)");
+                        MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+                        sql = string.Format(" update tra_company set is_book_mark=1 where ifnull(open_price,0)<=ifnull(high_price,0) and ifnull(open_price,0)<=ifnull(low_price,0)");
+                        MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
                         if (DateTime.Now <= targetTime)
                         {
                             if (File.Exists(fileName) == true)
@@ -757,13 +763,13 @@ RegexOptions.IgnoreCase
                     }
                     else
                     {
-                        Helper.Log("GoogleException symbol 2=" + symbol, "GoogleException_" + rnd.Next(1000, 10000));
+                        //Helper.Log("GoogleException symbol 2=" + symbol, "GoogleException_" + rnd.Next(1000, 10000));
                     }
                 }
                 catch (Exception ex)
                 {
                     string s = ex.Message;
-                    Helper.Log("GoogleException symbol 3=" + symbol, "GoogleException_" + rnd.Next(1000, 10000));
+                    //Helper.Log("GoogleException symbol 3=" + symbol, "GoogleException_" + rnd.Next(1000, 10000));
                 }
             }
         }
