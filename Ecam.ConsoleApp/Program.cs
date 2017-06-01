@@ -22,23 +22,26 @@ namespace Ecam.ConsoleApp
         {
             IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
-            //List<tra_company> companies;
-            //using (EcamContext context = new EcamContext())
-            //{
-            //    companies = (from q in context.tra_company orderby q.symbol ascending select q).ToList();
-            //}
-            if (IS_DOWNLOAD_HISTORY == "true")
+            DateTime targetTime = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:00AM");
+            if (DateTime.Now >= targetTime)
             {
-                GoogleHistoryData();
+                //List<tra_company> companies;
+                //using (EcamContext context = new EcamContext())
+                //{
+                //    companies = (from q in context.tra_company orderby q.symbol ascending select q).ToList();
+                //}
+                if (IS_DOWNLOAD_HISTORY == "true")
+                {
+                    GoogleHistoryData();
+                }
+                else
+                {
+                    GoogleData();
+                }
+                Console.WriteLine("Completed");
             }
-            else
-            {
-                GoogleData();
-            }
-            Console.WriteLine("Completed");
             //Console.ReadLine();
         }
-
 
         private static int _INDEX = -1;
         private static string[] _COMPANIES;
@@ -73,8 +76,19 @@ namespace Ecam.ConsoleApp
             }
             _COMPANIES = (from q in companies select q.symbol).ToArray();
             _INDEX = -1;
+
+            // Reset book mark
             string sql = "update tra_company set is_book_mark=0;";
             MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+            
+            // Delete yesterday tra_market_intraday
+            sql = "delete from tra_market_intra_day where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(curdate(), '%Y-%m-%d')";
+            MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+
+            // Delete before 3 months tra_market
+            sql = "delete from tra_market where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(DATE_ADD(curdate(), INTERVAL -3 MONTH), '%Y-%m-%d')";
+            MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+
             GoogleDownloadStart();
             //foreach (var company in companies)
             //{
@@ -562,6 +576,10 @@ RegexOptions.IgnoreCase
                 {
                     html = client.DownloadString(url);
                     Console.WriteLine("Download google data symbol=" + symbol);
+                    if (File.Exists(fileName) == true)
+                    {
+                        File.Delete(fileName);
+                    }
                 }
                 catch
                 {
@@ -753,13 +771,6 @@ RegexOptions.IgnoreCase
                         MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
                         sql = string.Format(" update tra_company set is_book_mark=1 where ifnull(open_price,0)<=ifnull(high_price,0) and ifnull(open_price,0)<=ifnull(low_price,0)");
                         MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-                        if (DateTime.Now <= targetTime)
-                        {
-                            if (File.Exists(fileName) == true)
-                            {
-                                File.Delete(fileName);
-                            }
-                        }
                     }
                     else
                     {
@@ -773,8 +784,6 @@ RegexOptions.IgnoreCase
                 }
             }
         }
-
-
 
         public string SYMBOL { get { return _Symbol; } }
         private string _Symbol;
