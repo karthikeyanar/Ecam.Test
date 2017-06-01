@@ -22,10 +22,14 @@ namespace Ecam.ConsoleApp
         {
             IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
-            DateTime targetTime = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:00AM");
-            if (DateTime.Now >= targetTime)
+            DateTime morningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:00AM");
+            DateTime morningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 10:15AM");
+            DateTime eveningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:00PM");
+            DateTime eveningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 10:00PM");
+            DateTime now = DateTime.Now;
+            if ((now >= morningStart && now <= morningEnd) || (now >= eveningStart && now <= eveningEnd))
             {
-                //List<tra_company> companies;
+                //List<tra_company> companies; 
                 //using (EcamContext context = new EcamContext())
                 //{
                 //    companies = (from q in context.tra_company orderby q.symbol ascending select q).ToList();
