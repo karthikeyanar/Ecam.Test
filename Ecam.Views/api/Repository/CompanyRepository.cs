@@ -554,6 +554,16 @@ namespace Ecam.Framework.Repository
                 //where.AppendFormat(" and ifnull(open_price,0)<=ifnull(low_price,0)");
             }
 
+            if (string.IsNullOrEmpty(criteria.ltp_from_percentage) == false)
+            {
+                where.AppendFormat(" and ifnull(ltp_percentage,0)>={0}", criteria.ltp_from_percentage);
+            }
+
+            if (string.IsNullOrEmpty(criteria.ltp_to_percentage) == false)
+            {
+                where.AppendFormat(" and ifnull(ltp_percentage,0)<={0}", criteria.ltp_to_percentage);
+            }
+
             string tempsql = string.Format("select " +
        "tbl.*" + Environment.NewLine +
        " from(" + Environment.NewLine +

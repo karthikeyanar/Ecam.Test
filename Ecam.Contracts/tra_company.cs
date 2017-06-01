@@ -157,6 +157,9 @@ namespace Ecam.Contracts
 
         public Nullable<bool> is_sell_to_buy { get; set; }
         public Nullable<bool> is_buy_to_sell { get; set; }
+
+        public string ltp_from_percentage { get; set; }
+        public string ltp_to_percentage { get; set; }
     }
 }
 
