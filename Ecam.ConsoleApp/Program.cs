@@ -25,7 +25,7 @@ namespace Ecam.ConsoleApp
             DateTime morningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:00AM");
             DateTime morningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 10:15AM");
             DateTime eveningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:00PM");
-            DateTime eveningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 10:00PM");
+            DateTime eveningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 11:00PM");
             DateTime now = DateTime.Now;
             if ((now >= morningStart && now <= morningEnd) || (now >= eveningStart && now <= eveningEnd))
             {
