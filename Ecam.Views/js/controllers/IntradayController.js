@@ -68,6 +68,16 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             if (is_all_time_high_2_days == true) {
                 arr[arr.length] = { "name": "is_all_time_high_2_days", "value": is_all_time_high_2_days };
             }
+
+            var is_low_yesterday = $("#frmCompanySearch #is_low_yesterday")[0].checked;
+            if (is_low_yesterday == true) {
+                arr[arr.length] = { "name": "is_low_yesterday", "value": is_low_yesterday };
+            }
+            var is_high_yesterday = $("#frmCompanySearch #is_high_yesterday")[0].checked;
+            if (is_high_yesterday == true) {
+                arr[arr.length] = { "name": "is_high_yesterday", "value": is_high_yesterday };
+            }
+
             var is_sell_to_buy = $("#frmCompanySearch #is_sell_to_buy")[0].checked;
             if (is_sell_to_buy == true) {
                 arr[arr.length] = { "name": "is_sell_to_buy", "value": is_sell_to_buy };
@@ -407,6 +417,12 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $("body").on("click", "#frmCompanySearch #is_all_time_high_2_days", function (event) {
                 self.loadGrid();
             });
+            $("body").on("click", "#frmCompanySearch #is_low_yesterday", function (event) {
+                self.loadGrid();
+            });
+            $("body").on("click", "#frmCompanySearch #is_high_yesterday", function (event) {
+                self.loadGrid();
+            });
             $("body").on("click", "#frmCompanySearch #is_sell_to_buy", function (event) {
                 self.loadGrid();
             });
@@ -531,6 +547,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $("body").off("click", "#frmCompanySearch #is_all_time_high_5_days");
             $("body").off("click", "#frmCompanySearch #is_all_time_low_2_days");
             $("body").off("click", "#frmCompanySearch #is_all_time_high_2_days");
+            $("body").off("click", "#frmCompanySearch #is_low_yesterday");
+            $("body").off("click", "#frmCompanySearch #is_high_yesterday");
             $("body").off("click", "#frmCompanySearch #is_sell_to_buy");
             $("body").off("click", "#frmCompanySearch #is_buy_to_sell");
             $("body").off("click", "#frmCompanySearch #is_mf");

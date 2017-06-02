@@ -462,6 +462,28 @@ namespace Ecam.Framework.Repository
                 }
             }
 
+            if (criteria.is_low_yesterday.HasValue)
+            {
+                if (criteria.is_low_yesterday == true)
+                {
+                    where.Append(" and (" +
+                            " ifnull(ct.day_1,0)>=ifnull(ct.ltp_price,0)" +
+                            ")" +
+                            "");
+                }
+            }
+
+            if (criteria.is_high_yesterday.HasValue)
+            {
+                if (criteria.is_high_yesterday == true)
+                {
+                    where.Append(" and (" +
+                            " ifnull(ct.day_1,0)<=ifnull(ct.ltp_price,0)" +
+                            ")" +
+                            "");
+                }
+            }
+
             if (criteria.is_mf.HasValue)
             {
                 if (criteria.is_mf == true)

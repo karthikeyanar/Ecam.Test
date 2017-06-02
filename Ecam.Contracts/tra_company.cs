@@ -154,6 +154,8 @@ namespace Ecam.Contracts
         public Nullable<bool> is_all_time_low_5_days { get; set; }
         public Nullable<bool> is_all_time_high_2_days { get; set; }
         public Nullable<bool> is_all_time_low_2_days { get; set; }
+        public Nullable<bool> is_high_yesterday { get; set; }
+        public Nullable<bool> is_low_yesterday { get; set; }
 
         public Nullable<bool> is_sell_to_buy { get; set; }
         public Nullable<bool> is_buy_to_sell { get; set; }
