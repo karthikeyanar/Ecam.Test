@@ -879,6 +879,114 @@ namespace Ecam.Models
                     company.day_85 = CalculateAVG(markets, 85);
                     company.day_90 = CalculateAVG(markets, 90);
 
+                    bool isDay1High = (company.day_1 ?? 0) <= (company.ltp_price ?? 0);
+                    bool isDay2High = (
+                            (company.day_2 ?? 0) < (company.day_1 ?? 0)
+                            && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
+                            );
+                    bool isDay3High = (
+(company.day_3 ?? 0) < (company.day_2 ?? 0)
+&& (company.day_2 ?? 0) < (company.day_1 ?? 0)
+&& (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
+);
+                    bool isDay4High = (
+                        (company.day_4 ?? 0) < (company.day_3 ?? 0)
+&& (company.day_3 ?? 0) < (company.day_2 ?? 0)
+&& (company.day_2 ?? 0) < (company.day_1 ?? 0)
+&& (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
+);
+
+                    bool isDay5High = (
+                        (company.day_5 ?? 0) < (company.day_4 ?? 0)
+                       && (company.day_4 ?? 0) < (company.day_3 ?? 0)
+&& (company.day_3 ?? 0) < (company.day_2 ?? 0)
+&& (company.day_2 ?? 0) < (company.day_1 ?? 0)
+&& (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
+);
+
+                    bool isDay1Low = (company.day_1 ?? 0) >= (company.ltp_price ?? 0);
+                    bool isDay2Low = (
+                            (company.day_2 ?? 0) > (company.day_1 ?? 0)
+                            && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
+                            );
+                    bool isDay3Low = (
+(company.day_3 ?? 0) > (company.day_2 ?? 0)
+&& (company.day_2 ?? 0) > (company.day_1 ?? 0)
+&& (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
+);
+                    bool isDay4Low = (
+                        (company.day_4 ?? 0) > (company.day_3 ?? 0)
+&& (company.day_3 ?? 0) > (company.day_2 ?? 0)
+&& (company.day_2 ?? 0) > (company.day_1 ?? 0)
+&& (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
+);
+                    bool isDay5Low = (
+                        (company.day_5 ?? 0) > (company.day_4 ?? 0)
+                        && (company.day_4 ?? 0) > (company.day_3 ?? 0)
+&& (company.day_3 ?? 0) > (company.day_2 ?? 0)
+&& (company.day_2 ?? 0) > (company.day_1 ?? 0)
+&& (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
+);
+
+                    int highCnt = 0;
+                    int lowCnt = 0;
+                    if (isDay1High == true && isDay2High == true
+                        && isDay3High == true && isDay4High == true
+                        && isDay5High == true)
+                    {
+                        highCnt = 5;
+                    }
+                    else if (isDay1High == true && isDay2High == true
+                        && isDay3High == true && isDay4High == true
+                        )
+                    {
+                        highCnt = 4;
+                    }
+                    else if (isDay1High == true && isDay2High == true
+                        && isDay3High == true  
+                        )
+                    {
+                        highCnt = 3;
+                    }
+                    else if (isDay1High == true && isDay2High == true
+                        )
+                    {
+                        highCnt = 2;
+                    }
+                    else if (isDay1High == true)
+                    {
+                        highCnt = 1;
+                    }
+
+                    if (isDay1Low == true && isDay2Low == true
+                        && isDay3Low == true && isDay4Low == true
+                        && isDay5Low == true)
+                    {
+                        lowCnt = 5;
+                    }
+                    else if (isDay1Low == true && isDay2Low == true
+                        && isDay3Low == true && isDay4Low == true
+                        )
+                    {
+                        lowCnt = 4;
+                    }
+                    else if (isDay1Low == true && isDay2Low == true
+                        && isDay3Low == true
+                        )
+                    {
+                        lowCnt = 3;
+                    }
+                    else if (isDay1Low == true && isDay2Low == true
+                        )
+                    {
+                        lowCnt = 2;
+                    }
+                    else if (isDay1Low == true)
+                    {
+                        lowCnt = 1;
+                    }
+                    company.high_count = highCnt;
+                    company.low_count = lowCnt;
                     context.Entry(company).State = System.Data.Entity.EntityState.Modified;
                     context.SaveChanges();
                 }

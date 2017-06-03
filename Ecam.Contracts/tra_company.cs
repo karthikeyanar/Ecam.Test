@@ -49,6 +49,8 @@ namespace Ecam.Contracts
         public Nullable<decimal> day_2 { get; set; }
         public Nullable<decimal> day_3 { get; set; }
         public Nullable<decimal> day_4 { get; set; }
+        public Nullable<int> high_count { get; set; }
+        public Nullable<int> low_count { get; set; }
 
         public string category_name { get; set; }
         public Nullable<decimal> prev_percentage { get; set; }

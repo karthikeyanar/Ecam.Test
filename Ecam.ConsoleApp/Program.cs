@@ -42,9 +42,241 @@ namespace Ecam.ConsoleApp
                 {
                     GoogleData();
                 }
+                if ((now >= eveningStart && now <= eveningEnd))
+                {
+                    CaculateIntraydayProfit();
+                }
                 Console.WriteLine("Completed");
             }
             //Console.ReadLine();
+        }
+
+        private static void CaculateIntraydayProfit()
+        {
+            List<tra_market_intra_day> rows;
+            List<tra_company> companies;
+            using (EcamContext context = new EcamContext())
+            {
+                rows = (from q in context.tra_market_intra_day orderby q.symbol, q.trade_date ascending select q).ToList();
+                companies = (from q in context.tra_company select q).ToList();
+            }
+            if (rows.Count > 0)
+            {
+                List<string> symbols = (from q in rows select q.symbol).Distinct().ToList();
+                DateTime firstDate = rows.FirstOrDefault().trade_date.Date;
+                DateTime startTime = Convert.ToDateTime(firstDate.ToString("dd/MMM/yyyy") + " 9:25AM");
+                DateTime endTime = Convert.ToDateTime(firstDate.ToString("dd/MMM/yyyy") + " 10:00AM");
+                foreach (string symbol in symbols)
+                {
+                    var company = (from q in companies where q.symbol == symbol select q).FirstOrDefault();
+                    var firstLTP = (from q in rows where q.symbol == symbol && q.trade_date < startTime orderby q.trade_date descending select q).FirstOrDefault();
+                    var lastLTP = (from q in rows where q.symbol == symbol && q.trade_date < endTime orderby q.trade_date descending select q).FirstOrDefault();
+                    if (firstLTP != null && lastLTP != null && company != null)
+                    {
+                        try
+                        {
+                            decimal? firstPrice = firstLTP.ltp_price;
+                            decimal? lastPrice = lastLTP.ltp_price;
+                            decimal? finalPrice = company.ltp_price;
+                            decimal? openPrice = company.open_price;
+
+                            List<decimal> percentageList = new List<decimal>();
+
+                            var nextList = (from q in rows
+                                            where q.symbol == symbol && q.trade_date > firstLTP.trade_date
+                                            orderby q.trade_date ascending
+                                            select q).ToList();
+                            foreach (var nextRow in nextList)
+                            {
+                                decimal? p = ((nextRow.ltp_price - (firstPrice ?? 0)) / (firstPrice ?? 0)) * 100;
+                                percentageList.Add((p ?? 0));
+                            }
+
+                            decimal? percentage = 0;
+                            if (percentageList.Count > 0)
+                            {
+                                percentage = (from q in percentageList orderby q descending select q).FirstOrDefault();
+                            }
+                            else
+                            {
+                                percentage = (((lastPrice ?? 0) - (firstPrice ?? 0)) / (firstPrice ?? 0)) * 100;
+                            }
+
+                            percentageList = new List<decimal>();
+                            foreach (var nextRow in nextList)
+                            {
+                                decimal? p = (((firstPrice ?? 0) - nextRow.ltp_price) / nextRow.ltp_price) * 100;
+                                percentageList.Add((p ?? 0));
+                            }
+                            decimal? reversePercentage = 0;
+                            if (percentageList.Count > 0)
+                            {
+                                reversePercentage = (from q in percentageList orderby q ascending select q).FirstOrDefault();
+                            }
+                            else
+                            {
+                                reversePercentage = (((firstPrice ?? 0) - (lastPrice ?? 0)) / (lastPrice ?? 0)) * 100;
+                            }
+
+                            decimal? finalPercentage = (((finalPrice ?? 0) - (firstPrice ?? 0)) / (firstPrice ?? 0)) * 100;
+
+                            decimal? firstPercentage = (((firstPrice ?? 0) - (openPrice ?? 0)) / (openPrice ?? 0)) * 100;
+
+                            decimal? lastPercentage = (((lastPrice ?? 0) - (openPrice ?? 0)) / (openPrice ?? 0)) * 100;
+
+                            bool isDay1High = (company.day_1 ?? 0) <= (company.ltp_price ?? 0);
+                            bool isDay2High = (
+                                    (company.day_2 ?? 0) < (company.day_1 ?? 0)
+                                    && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
+                                    );
+                            bool isDay3High = (
+        (company.day_3 ?? 0) < (company.day_2 ?? 0)
+        && (company.day_2 ?? 0) < (company.day_1 ?? 0)
+        && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
+        );
+                            bool isDay4High = (
+                                (company.day_4 ?? 0) < (company.day_3 ?? 0)
+       && (company.day_3 ?? 0) < (company.day_2 ?? 0)
+       && (company.day_2 ?? 0) < (company.day_1 ?? 0)
+       && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
+       );
+
+                            bool isDay5High = (
+                                (company.day_5 ?? 0) < (company.day_4 ?? 0)
+                               && (company.day_4 ?? 0) < (company.day_3 ?? 0)
+      && (company.day_3 ?? 0) < (company.day_2 ?? 0)
+      && (company.day_2 ?? 0) < (company.day_1 ?? 0)
+      && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
+      );
+
+                            bool isDay1Low = (company.day_1 ?? 0) >= (company.ltp_price ?? 0);
+                            bool isDay2Low = (
+                                    (company.day_2 ?? 0) > (company.day_1 ?? 0)
+                                    && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
+                                    );
+                            bool isDay3Low = (
+        (company.day_3 ?? 0) > (company.day_2 ?? 0)
+        && (company.day_2 ?? 0) > (company.day_1 ?? 0)
+        && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
+        );
+                            bool isDay4Low = (
+                                (company.day_4 ?? 0) > (company.day_3 ?? 0)
+&& (company.day_3 ?? 0) > (company.day_2 ?? 0)
+&& (company.day_2 ?? 0) > (company.day_1 ?? 0)
+&& (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
+);
+                            bool isDay5Low = (
+                                (company.day_5 ?? 0) > (company.day_4 ?? 0)
+                                && (company.day_4 ?? 0) > (company.day_3 ?? 0)
+&& (company.day_3 ?? 0) > (company.day_2 ?? 0)
+&& (company.day_2 ?? 0) > (company.day_1 ?? 0)
+&& (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
+);
+                            using (EcamContext context = new EcamContext())
+                            {
+                                tra_intra_day_profit profit = (from q in context.tra_intra_day_profit
+                                                               where q.symbol == symbol
+                                                               && q.trade_date == firstDate
+                                                               select q).FirstOrDefault();
+                                bool isNew = false;
+                                if (profit == null)
+                                {
+                                    profit = new tra_intra_day_profit();
+                                    isNew = true;
+                                }
+                                profit.symbol = symbol;
+                                profit.trade_date = firstDate;
+                                profit.profit_percentage = (percentage ?? 0);
+                                profit.reverse_percentage = (reversePercentage ?? 0);
+                                profit.last_percentage = (lastPercentage ?? 0);
+                                profit.first_percentage = (firstPercentage ?? 0);
+                                profit.final_percentage = (finalPercentage ?? 0);
+                                int highCnt = 0;
+                                int lowCnt = 0;
+                                if (isDay1High == true && isDay2High == true
+                                    && isDay3High == true && isDay4High == true
+                                    && isDay5High == true)
+                                {
+                                    highCnt = 5;
+                                }
+                                else if (isDay1High == true && isDay2High == true
+                                    && isDay3High == true && isDay4High == true
+                                    )
+                                {
+                                    highCnt = 4;
+                                }
+                                else if (isDay1High == true && isDay2High == true
+                                    && isDay3High == true
+                                    )
+                                {
+                                    highCnt = 3;
+                                }
+                                else if (isDay1High == true && isDay2High == true
+                                    )
+                                {
+                                    highCnt = 2;
+                                }
+                                else if (isDay1High == true)
+                                {
+                                    highCnt = 1;
+                                }
+
+                                if (isDay1Low == true && isDay2Low == true
+                                    && isDay3Low == true && isDay4Low == true
+                                    && isDay5Low == true)
+                                {
+                                    lowCnt = 5;
+                                }
+                                else if (isDay1Low == true && isDay2Low == true
+                                    && isDay3Low == true && isDay4Low == true
+                                    )
+                                {
+                                    lowCnt = 4;
+                                }
+                                else if (isDay1Low == true && isDay2Low == true
+                                    && isDay3Low == true
+                                    )
+                                {
+                                    lowCnt = 3;
+                                }
+                                else if (isDay1Low == true && isDay2Low == true
+                                    )
+                                {
+                                    lowCnt = 2;
+                                }
+                                else if (isDay1Low == true)
+                                {
+                                    lowCnt = 1;
+                                }
+                                profit.high_count = highCnt;
+                                profit.low_count = lowCnt;
+
+                                if (isNew == true)
+                                {
+                                    context.tra_intra_day_profit.Add(profit);
+                                }
+                                else
+                                {
+                                    context.Entry(profit).State = System.Data.Entity.EntityState.Modified;
+                                }
+                                context.SaveChanges();
+
+                                
+                                var updateCompany = (from q in context.tra_company where q.symbol == symbol select q).FirstOrDefault();
+                                if (updateCompany != null)
+                                {
+                                    updateCompany.high_count = highCnt;
+                                    updateCompany.low_count = lowCnt;
+                                    context.Entry(updateCompany).State = System.Data.Entity.EntityState.Modified;
+                                    context.SaveChanges();
+                                }
+                                Console.WriteLine("Calculate profit completed symbol=" + symbol);
+                            }
+                        }
+                        catch { }
+                    }
+                }
+            }
         }
 
         private static int _INDEX = -1;
@@ -84,7 +316,7 @@ namespace Ecam.ConsoleApp
             // Reset book mark
             string sql = "update tra_company set is_book_mark=0;";
             MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-            
+
             // Delete yesterday tra_market_intraday
             sql = "delete from tra_market_intra_day where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(curdate(), '%Y-%m-%d')";
             MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
