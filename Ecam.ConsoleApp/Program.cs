@@ -28,6 +28,7 @@ namespace Ecam.ConsoleApp
 
         private static void DownloadStart()
         {
+            Helper.Log("DownloadStart=" + DateTime.Now.ToString(),"DOWNLOAD");
             DateTime morningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:00AM");
             DateTime morningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 10:15AM");
             DateTime eveningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:00PM");
@@ -44,6 +45,7 @@ namespace Ecam.ConsoleApp
                     GoogleData();
                 }
                 Console.WriteLine("Completed");
+                Helper.Log("DownloadEnd=" + DateTime.Now.ToString(), "DOWNLOAD");
                 if ((now >= morningStart && now <= morningEnd))
                 {
                     DownloadStart();
