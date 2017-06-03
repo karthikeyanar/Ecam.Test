@@ -20,10 +20,14 @@ namespace Ecam.ConsoleApp
         public static string GOOGLE_DATA = "";
         static void Main(string[] args)
         {
-            CaculateIntraydayProfit();
-            return;
             IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
+            DownloadStart();
+            //Console.ReadLine();
+        }
+
+        private static void DownloadStart()
+        {
             DateTime morningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:00AM");
             DateTime morningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 10:15AM");
             DateTime eveningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:00PM");
@@ -31,11 +35,6 @@ namespace Ecam.ConsoleApp
             DateTime now = DateTime.Now;
             if ((now >= morningStart && now <= morningEnd) || (now >= eveningStart && now <= eveningEnd))
             {
-                //List<tra_company> companies; 
-                //using (EcamContext context = new EcamContext())
-                //{
-                //    companies = (from q in context.tra_company orderby q.symbol ascending select q).ToList();
-                //}
                 if (IS_DOWNLOAD_HISTORY == "true")
                 {
                     GoogleHistoryData();
@@ -45,8 +44,11 @@ namespace Ecam.ConsoleApp
                     GoogleData();
                 }
                 Console.WriteLine("Completed");
+                if ((now >= morningStart && now <= morningEnd))
+                {
+                    DownloadStart();
+                }
             }
-            //Console.ReadLine();
         }
 
         private static void CaculateIntraydayProfit()
@@ -285,7 +287,7 @@ namespace Ecam.ConsoleApp
             using (EcamContext context = new EcamContext())
             {
                 IQueryable<tra_company> query = context.tra_company;
-                DateTime targetTime = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 4:00PM");
+                DateTime targetTime = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 3:30PM");
                 if (DateTime.Now <= targetTime)
                 {
                     string IS_NIFTY_50 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_50"];
