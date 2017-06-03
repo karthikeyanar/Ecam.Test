@@ -28,7 +28,7 @@ namespace Ecam.ConsoleApp
 
         private static void DownloadStart()
         {
-            Helper.Log("DownloadStart=" + DateTime.Now.ToString(),"DOWNLOAD");
+            Helper.Log("DownloadStart=" + DateTime.Now.ToString(), "DOWNLOAD");
             DateTime morningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:00AM");
             DateTime morningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 10:15AM");
             DateTime eveningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:00PM");
@@ -48,6 +48,9 @@ namespace Ecam.ConsoleApp
                 Helper.Log("DownloadEnd=" + DateTime.Now.ToString(), "DOWNLOAD");
                 if ((now >= morningStart && now <= morningEnd))
                 {
+                    int minute1 = (1000 * 60);
+                    Console.WriteLine("Wait till=" + DateTime.Now.AddMinutes(2).ToString());
+                    System.Threading.Thread.Sleep((minute1 * 2));
                     DownloadStart();
                 }
             }
@@ -262,7 +265,6 @@ namespace Ecam.ConsoleApp
                                     context.Entry(profit).State = System.Data.Entity.EntityState.Modified;
                                 }
                                 context.SaveChanges();
-
 
                                 var updateCompany = (from q in context.tra_company where q.symbol == symbol select q).FirstOrDefault();
                                 if (updateCompany != null)
