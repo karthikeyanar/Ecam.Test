@@ -640,13 +640,23 @@ namespace Ecam.Framework.Repository
             string pageLimit = "";
             string orderBy = "";
             string groupByName = string.Empty;
-            string joinTables = string.Empty;
+            string joinTables = string.Empty; 
             string prefix = "intra";
             string sqlFormat = "select {0} from tra_market_intra_day " + prefix + " {1} where {2} {3} {4} {5}";
             string sql = string.Empty;
             string role = Authentication.CurrentRole;
 
-            where.AppendFormat(" intra.trade_date>='{0}'", DateTime.Now.ToString("yyyy-MM-dd"));
+            DateTime lastTradeDate = DateTime.Now.Date;
+            using (EcamContext context = new EcamContext())
+            {
+                var lastTrade = (from q in context.tra_market_intra_day orderby q.trade_date descending select q).FirstOrDefault();
+                if (lastTrade != null)
+                {
+                    lastTradeDate = lastTrade.trade_date;
+                }
+            }
+
+            where.AppendFormat(" intra.trade_date>='{0}'", lastTradeDate.ToString("yyyy-MM-dd"));
 
             if (string.IsNullOrEmpty(criteria.symbols) == false)
             {
