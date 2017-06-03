@@ -20,6 +20,8 @@ namespace Ecam.ConsoleApp
         public static string GOOGLE_DATA = "";
         static void Main(string[] args)
         {
+            CaculateIntraydayProfit();
+            return;
             IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
             DateTime morningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:00AM");
@@ -42,10 +44,6 @@ namespace Ecam.ConsoleApp
                 {
                     GoogleData();
                 }
-                if ((now >= eveningStart && now <= eveningEnd))
-                {
-                    CaculateIntraydayProfit();
-                }
                 Console.WriteLine("Completed");
             }
             //Console.ReadLine();
@@ -64,13 +62,13 @@ namespace Ecam.ConsoleApp
             {
                 List<string> symbols = (from q in rows select q.symbol).Distinct().ToList();
                 DateTime firstDate = rows.FirstOrDefault().trade_date.Date;
-                DateTime startTime = Convert.ToDateTime(firstDate.ToString("dd/MMM/yyyy") + " 9:25AM");
+                DateTime startTime = Convert.ToDateTime(firstDate.ToString("dd/MMM/yyyy") + " 9:20AM");
                 DateTime endTime = Convert.ToDateTime(firstDate.ToString("dd/MMM/yyyy") + " 10:00AM");
                 foreach (string symbol in symbols)
                 {
                     var company = (from q in companies where q.symbol == symbol select q).FirstOrDefault();
-                    var firstLTP = (from q in rows where q.symbol == symbol && q.trade_date < startTime orderby q.trade_date descending select q).FirstOrDefault();
-                    var lastLTP = (from q in rows where q.symbol == symbol && q.trade_date < endTime orderby q.trade_date descending select q).FirstOrDefault();
+                    var firstLTP = (from q in rows where q.symbol == symbol && q.trade_date >= firstDate && q.trade_date < startTime orderby q.trade_date descending select q).FirstOrDefault();
+                    var lastLTP = (from q in rows where q.symbol == symbol && q.trade_date >= firstDate && q.trade_date < endTime orderby q.trade_date descending select q).FirstOrDefault();
                     if (firstLTP != null && lastLTP != null && company != null)
                     {
                         try
@@ -261,7 +259,7 @@ namespace Ecam.ConsoleApp
                                 }
                                 context.SaveChanges();
 
-                                
+
                                 var updateCompany = (from q in context.tra_company where q.symbol == symbol select q).FirstOrDefault();
                                 if (updateCompany != null)
                                 {
