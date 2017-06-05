@@ -60,7 +60,7 @@ namespace Ecam.Framework {
 
         private static string RemoveSymbols(string value) {
             if(string.IsNullOrEmpty(value) == false) {
-                value = value.Replace("$","").Replace("%","").Replace(",","").Replace("(","-").Replace(")","");
+                value = value.Replace("₹", "").Replace("$","").Replace("%","").Replace(",","").Replace("(","-").Replace(")","");
             }
             return (value == null ? "" : value);
         }
