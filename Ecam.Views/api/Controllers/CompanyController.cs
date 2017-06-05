@@ -112,25 +112,26 @@ namespace Ecam.Views.Controllers
         public IHttpActionResult RefreshSymbol()
         {
             string symbol = HttpContext.Current.Request["symbol"];
-            TradeHelper.UpdatePriceUsingGoogle(symbol);
-            TRA_COMPANY company = null;
-            using (EcamContext context = new EcamContext()) 
-            {
-                company = (from q in context.tra_company
-                           where q.symbol == symbol
-                           select new TRA_COMPANY
-                           {
-                               symbol = q.symbol,
-                               open_price = q.open_price,
-                               high_price = q.high_price,
-                               close_price = q.close_price,
-                               low_price = q.low_price,
-                               ltp_price = q.ltp_price,
-                               prev_price = q.prev_price,
-                           }).FirstOrDefault();
+            decimal ltpPrice = TradeHelper.GetUpdatePriceUsingGoogle(symbol);
+            return Ok(ltpPrice);
+            //TRA_COMPANY company = null;
+            //using (EcamContext context = new EcamContext()) 
+            //{
+            //    company = (from q in context.tra_company
+            //               where q.symbol == symbol
+            //               select new TRA_COMPANY
+            //               {
+            //                   symbol = q.symbol,
+            //                   open_price = q.open_price,
+            //                   high_price = q.high_price,
+            //                   close_price = q.close_price,
+            //                   low_price = q.low_price,
+            //                   ltp_price = q.ltp_price,
+            //                   prev_price = q.prev_price,
+            //               }).FirstOrDefault();
 
-            }
-            return Ok(company);
+            //}
+            //return Ok(company);
         }
 
         [HttpGet]

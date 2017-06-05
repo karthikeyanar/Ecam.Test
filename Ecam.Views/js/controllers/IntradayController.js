@@ -547,12 +547,13 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     "data": data
                 }).done(function (json) {
                     if (json != null) {
-                        dataFor.open_price(json.open_price);
-                        dataFor.high_price(json.high_price);
-                        dataFor.low_price(json.low_price);
-                        dataFor.ltp_price(json.ltp_price);
-                        dataFor.close_price(json.close_price);
-                        dataFor.prev_price(json.prev_price);
+                        dataFor.ltp_price(json);
+                        //dataFor.open_price(json.open_price);
+                        //dataFor.high_price(json.high_price);
+                        //dataFor.low_price(json.low_price);
+                        //dataFor.ltp_price(json.ltp_price);
+                        //dataFor.close_price(json.close_price);
+                        //dataFor.prev_price(json.prev_price);
                     }
                     //jAlert("Saved");
                 }).fail(function (jqxhr) {

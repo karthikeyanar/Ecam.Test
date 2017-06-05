@@ -231,16 +231,16 @@
                         Quantity
                     </th>
                     <th class="text-right text-nowrap">
-                        TR
-                    </th>
-                    <th class="text-right text-nowrap">
-                        SL
-                    </th>
-                    <th class="text-right text-nowrap">
                         BTS
                     </th>
                     <th class="text-right text-nowrap">
                         STB
+                    </th>
+                    <th class="text-right text-nowrap">
+                        TR
+                    </th>
+                    <th class="text-right text-nowrap">
+                        SL
                     </th>
                     <th sortname="open_price" class="text-right text-nowrap">
                         Open
@@ -252,14 +252,14 @@
                         High
                     </th>
                     @*<th sortname="prev_percentage" class="text-right text-nowrap">
-                        P%
-                    </th>
-                    <th sortname="high_percentage" class="text-right text-nowrap">
-                        H%
-                    </th>
-                    <th sortname="low_percentage" class="text-right text-nowrap">
-                        L%
-                    </th>*@
+                            P%
+                        </th>
+                        <th sortname="high_percentage" class="text-right text-nowrap">
+                            H%
+                        </th>
+                        <th sortname="low_percentage" class="text-right text-nowrap">
+                            L%
+                        </th>*@
                     <th sortname="high_count" class="text-right text-nowrap">
                         HC
                     </th>
@@ -267,11 +267,11 @@
                         LC
                     </th>
                     @*<th class="text-right text-nowrap">
-                        BTS Profit
-                    </th>
-                    <th class="text-right text-nowrap">
-                        STB Profit
-                    </th>*@
+                            BTS Profit
+                        </th>
+                        <th class="text-right text-nowrap">
+                            STB Profit
+                        </th>*@
                     <th style="width: 50px">
                     </th>
                 </tr>
@@ -297,10 +297,13 @@
                             </div><div class="clearfix"></div>
                         </div>
                     </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:company_name"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:company_name">
+                        <div style="width:150px;overflow:hidden;" data-bind="text:company_name">
+                        </div>
+                    </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:symbol"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit">
-                        <div style="width:100px;overflow:hidden;" data-bind="text:category_name">
+                        <div style="width:150px;overflow:hidden;" data-bind="text:category_name">
                         </div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
@@ -313,18 +316,18 @@
                         <div data-bind="text:formatNumber(quantity())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(target_price(),4)"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(stop_loss_price(),4)"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(bts_sell_target(),4)"></div>
                         <div data-bind="text:formatNumber(bts_stop_loss_target(),4)"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(stb_sell_target(),4)"></div>
                         <div data-bind="text:formatNumber(stb_stop_loss_target(),4)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(target_price(),4)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(stop_loss_price(),4)"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(open_price())"></div>
@@ -336,14 +339,14 @@
                         <div data-bind="text:formatNumber(high_price())"></div>
                     </td>
                     @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(prev_percentage())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(high_percentage())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(low_percentage())"></div>
-                    </td>*@
+                            <div data-bind="text:formatPercentage(prev_percentage())"></div>
+                        </td>
+                        <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                            <div data-bind="text:formatPercentage(high_percentage())"></div>
+                        </td>
+                        <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                            <div data-bind="text:formatPercentage(low_percentage())"></div>
+                        </td>*@
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(high_count())"></div>
                     </td>
@@ -351,13 +354,13 @@
                         <div data-bind="text:formatNumber(low_count())"></div>
                     </td>
                     @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(bts_target_profit(),4)"></div>
-                        <div data-bind="text:formatNumber(bts_stop_loss_profit(),4)"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(stb_target_profit(),4)"></div>
-                        <div data-bind="text:formatNumber(stb_stop_loss_profit(),4)"></div>
-                    </td>*@
+                            <div data-bind="text:formatNumber(bts_target_profit(),4)"></div>
+                            <div data-bind="text:formatNumber(bts_stop_loss_profit(),4)"></div>
+                        </td>
+                        <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                            <div data-bind="text:formatNumber(stb_target_profit(),4)"></div>
+                            <div data-bind="text:formatNumber(stb_stop_loss_profit(),4)"></div>
+                        </td>*@
                     <td style="text-align:center;white-space:nowrap;">
                         <div style="width:80px;">
                             <div class="pull-left">
