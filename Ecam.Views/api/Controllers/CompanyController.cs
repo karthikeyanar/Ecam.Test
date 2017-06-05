@@ -86,7 +86,6 @@ namespace Ecam.Views.Controllers
             return _CompanyRepository.GetCompanys(term, pageSize, categories);
         }
 
-
         [HttpPost]
         [ActionName("UpdateBookMark")]
         public IHttpActionResult UpdateBookMark()
@@ -106,6 +105,32 @@ namespace Ecam.Views.Controllers
                 }
             }
             return Ok();
+        }
+
+        [HttpGet]
+        [ActionName("RefreshSymbol")]
+        public IHttpActionResult RefreshSymbol()
+        {
+            string symbol = HttpContext.Current.Request["symbol"];
+            TradeHelper.UpdatePriceUsingGoogle(symbol);
+            TRA_COMPANY company = null;
+            using (EcamContext context = new EcamContext()) 
+            {
+                company = (from q in context.tra_company
+                           where q.symbol == symbol
+                           select new TRA_COMPANY
+                           {
+                               symbol = q.symbol,
+                               open_price = q.open_price,
+                               high_price = q.high_price,
+                               close_price = q.close_price,
+                               low_price = q.low_price,
+                               ltp_price = q.ltp_price,
+                               prev_price = q.prev_price,
+                           }).FirstOrDefault();
+
+            }
+            return Ok(company);
         }
 
         [HttpGet]
@@ -189,7 +214,6 @@ namespace Ecam.Views.Controllers
                 return BadRequest(ModelState);
             }
         }
-
 
         public override IHttpActionResult Put(int id, TRA_COMPANY contract)
         {

@@ -17,10 +17,10 @@ using DocumentFormat.OpenXml.Drawing;
 using System.Data.Common;
 using Newtonsoft.Json;
 using System.Security.Cryptography;
+using System.Threading;
 
 namespace Ecam.Framework
 {
-
     public static class JsonSerializer
     {
         public static string ToJsonObject(object obj)

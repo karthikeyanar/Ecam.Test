@@ -221,35 +221,11 @@
                     <th>
                         Category
                     </th>
-                    <th sortname="open_price" class="text-right text-nowrap">
-                        Open
-                    </th>
-                    <th sortname="low_price" class="text-right text-nowrap">
-                        Low
-                    </th>
-                    <th sortname="high_price" class="text-right text-nowrap">
-                        High
-                    </th>
                     <th sortname="ltp_price" class="text-right text-nowrap">
                         LTP
                     </th>
-                    <th sortname="prev_percentage" class="text-right text-nowrap">
-                        P%
-                    </th>
-                    <th sortname="high_percentage" class="text-right text-nowrap">
-                        H%
-                    </th>
-                    <th sortname="low_percentage" class="text-right text-nowrap">
-                        L%
-                    </th>
                     <th sortname="ltp_percentage" class="text-right text-nowrap">
                         C%
-                    </th>
-                    <th sortname="high_count" class="text-right text-nowrap">
-                        HC
-                    </th>
-                    <th sortname="high_count" class="text-right text-nowrap">
-                        LC
                     </th>
                     <th class="text-right text-nowrap">
                         Quantity
@@ -266,12 +242,36 @@
                     <th class="text-right text-nowrap">
                         STB
                     </th>
-                    <th class="text-right text-nowrap">
+                    <th sortname="open_price" class="text-right text-nowrap">
+                        Open
+                    </th>
+                    <th sortname="low_price" class="text-right text-nowrap">
+                        Low
+                    </th>
+                    <th sortname="high_price" class="text-right text-nowrap">
+                        High
+                    </th>
+                    @*<th sortname="prev_percentage" class="text-right text-nowrap">
+                        P%
+                    </th>
+                    <th sortname="high_percentage" class="text-right text-nowrap">
+                        H%
+                    </th>
+                    <th sortname="low_percentage" class="text-right text-nowrap">
+                        L%
+                    </th>*@
+                    <th sortname="high_count" class="text-right text-nowrap">
+                        HC
+                    </th>
+                    <th sortname="low_count" class="text-right text-nowrap">
+                        LC
+                    </th>
+                    @*<th class="text-right text-nowrap">
                         BTS Profit
                     </th>
                     <th class="text-right text-nowrap">
                         STB Profit
-                    </th>
+                    </th>*@
                     <th style="width: 50px">
                     </th>
                 </tr>
@@ -279,47 +279,35 @@
             <tbody data-bind="foreach:rows">
                 <tr>
                     <td class="cls-symbol">
-                        <a href="javascript:;" data-bind="attr:{'cid':id()}" class="tree-expand ex-plus pull-left">
-                            <span>&nbsp;</span>
-                        </a>
+                        <div style="width:5px;">
+                            <a href="javascript:;" data-bind="attr:{'cid':id()}" class="tree-expand ex-plus pull-left">
+                                <span>&nbsp;</span>
+                            </a>
+                        </div>
                     </td>
                     <td style="text-align:center;">
-                        <a href="javascript:;" class="is-book-mark">
-                            <i data-bind="css:{'fa-bookmark fg-primary': cBool(is_book_mark())==true,'fa-bookmark-o': cBool(is_book_mark())==false}" class="fa fa-bookmark"></i>
-                        </a>
+                        <div style="width:40px;">
+                            <div class="pull-left">
+                                <a href="javascript:;" class="is-book-mark">
+                                    <i data-bind="css:{'fa-bookmark fg-primary': cBool(is_book_mark())==true,'fa-bookmark-o': cBool(is_book_mark())==false}" class="fa fa-bookmark"></i>
+                                </a>
+                            </div>
+                            <div class="pull-left m-l-15">
+                                <a href="javascript:;" data-bind="attr:{'symbol': symbol()}" class="refresh-symbol"><i class="fa fa-refresh"></i></a>
+                            </div><div class="clearfix"></div>
+                        </div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:company_name"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:symbol"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:category_name"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(open_price())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(low_price())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(high_price())"></div>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit">
+                        <div style="width:100px;overflow:hidden;" data-bind="text:category_name">
+                        </div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(ltp_price())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(prev_percentage())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(high_percentage())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(low_percentage())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(ltp_percentage())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(high_count())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(low_count())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(quantity())"></div>
@@ -339,19 +327,45 @@
                         <div data-bind="text:formatNumber(stb_stop_loss_target(),4)"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(open_price())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(low_price())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(high_price())"></div>
+                    </td>
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(prev_percentage())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(high_percentage())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(low_percentage())"></div>
+                    </td>*@
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(high_count())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(low_count())"></div>
+                    </td>
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(bts_target_profit(),4)"></div>
                         <div data-bind="text:formatNumber(bts_stop_loss_profit(),4)"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(stb_target_profit(),4)"></div>
                         <div data-bind="text:formatNumber(stb_stop_loss_profit(),4)"></div>
-                    </td>
-                    <td style="text-align:center;white-space:nowrap;width:120px;">
-                        <div class="pull-left">
-                            <a data-bind="attr:{'href': 'https://www.google.com/search?q=NSE:'+symbol().replace('&','%26')}" target="_blank">G</a>
-                        </div>
-                        <div class="pull-left m-l-15">
-                            <a data-bind="attr:{'href': 'https://www.google.com/finance?q=NSE:'+symbol().replace('&','%26')}" target="_blank">GF</a>
+                    </td>*@
+                    <td style="text-align:center;white-space:nowrap;">
+                        <div style="width:80px;">
+                            <div class="pull-left">
+                                <a data-bind="attr:{'href': 'https://www.google.com/search?q=NSE:'+symbol().replace('&','%26')}" target="_blank">G</a>
+                            </div>
+                            <div class="pull-left m-l-15">
+                                <a data-bind="attr:{'href': 'https://www.google.com/finance?q=NSE:'+symbol().replace('&','%26')}" target="_blank">GF</a>
+                            </div><div class="clearfix"></div>
                         </div>
                         <div class="clearfix"></div>
                     </td>
@@ -433,7 +447,7 @@
                 </th>
                 <th class="text-right">
                     LTP%
-                </th> 
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -446,7 +460,7 @@
                 <td class="text-right">${formatNumber(row.ltp_price)}</td>
                 <td class="text-right">${formatPercentage(row.ltp_percentage)}</td>
             </tr>
-            {{/each}} 
+            {{/each}}
         </tbody>
     </table>
 </script>

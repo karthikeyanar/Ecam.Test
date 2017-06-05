@@ -371,7 +371,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             }).done(function (json) {
                 $childTD.empty();
                 $("#detail-template").tmpl(json).appendTo($childTD);
-                $childTD.css("padding-left","75px").css("background-color", "#F2F2F2");
+                $childTD.css("padding-left", "75px").css("background-color", "#F2F2F2");
                 $childTD.removeClass("loading");
             })
             .always(function () {
@@ -531,6 +531,34 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     $childTR.addClass("hide");
                     $treeExpand.removeClass("ex-minus").addClass("ex-plus");
                 }
+            });
+            $("body").on("click", ".refresh-symbol", function (event) {
+                var $this = $(this);
+                var dataFor = ko.dataFor(this);
+                var url = apiUrl("/Company/RefreshSymbol");
+                var data = [];
+                data.push({ "name": "symbol", "value": dataFor.symbol() });
+                var type = "GET";
+                handleBlockUI({ "target": $("body"), "message": "Refresh " + dataFor.symbol() + " ..." });
+                $.ajax({
+                    "url": url,
+                    "cache": false,
+                    "type": type,
+                    "data": data
+                }).done(function (json) {
+                    if (json != null) {
+                        dataFor.open_price(json.open_price);
+                        dataFor.high_price(json.high_price);
+                        dataFor.low_price(json.low_price);
+                        dataFor.ltp_price(json.ltp_price);
+                        dataFor.close_price(json.close_price);
+                        dataFor.prev_price(json.prev_price);
+                    }
+                    //jAlert("Saved");
+                }).fail(function (jqxhr) {
+                }).always(function (jqxhr) {
+                    unblockUI();
+                });
             });
         }
 
