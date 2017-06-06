@@ -1262,6 +1262,7 @@ RegexOptions.IgnoreCase
             else
             {
                 html = client.DownloadString(url);
+                Console.WriteLine("Download google data symbol morning=" + symbol);
                 if (File.Exists(fileName) == true)
                 {
                     File.Delete(fileName);

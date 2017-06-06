@@ -29,7 +29,7 @@ namespace Ecam.ConsoleApp
 
         private static void DownloadStart()
         {
-            Helper.Log("DownloadStart=" + DateTime.Now.ToString(), "DOWNLOAD");
+            //Helper.Log("DownloadStart=" + DateTime.Now.ToString(), "DOWNLOAD");
             DateTime morningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:19AM");
             DateTime morningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 10:15AM");
             DateTime eveningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 3:31PM");
@@ -46,14 +46,14 @@ namespace Ecam.ConsoleApp
                     GoogleData();
                 }
                 Console.WriteLine("Completed");
-                Helper.Log("DownloadEnd=" + DateTime.Now.ToString(), "DOWNLOAD");
-                if ((now >= morningStart && now <= morningEnd))
-                {
-                    int minute1 = (1000 * 60);
-                    Console.WriteLine("Wait till=" + DateTime.Now.AddMinutes(5).ToString());
-                    System.Threading.Thread.Sleep((minute1 * 5));
-                    DownloadStart();
-                }
+                //Helper.Log("DownloadEnd=" + DateTime.Now.ToString(), "DOWNLOAD");
+                //if ((now >= morningStart && now <= morningEnd))
+                //{
+                //    int minute1 = (1000 * 60);
+                //    Console.WriteLine("Wait till=" + DateTime.Now.AddMinutes(5).ToString());
+                //    System.Threading.Thread.Sleep((minute1 * 5));
+                //    DownloadStart();
+                //}
             }
         }
 
