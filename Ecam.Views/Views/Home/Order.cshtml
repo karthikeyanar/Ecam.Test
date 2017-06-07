@@ -31,6 +31,8 @@
                     <th class="text-right text-nowrap" style="width:130px;">
                         Stop Loss
                     </th>
+                    <th style="width: 50px">
+                    </th>
                 </tr>
             </thead>
             <tbody data-bind="foreach:rows">
@@ -52,6 +54,9 @@
                     </td>
                     <td data-bind="text:formatNumber(target(),2)" class="text-right"></td>
                     <td data-bind="text:formatNumber(stop_loss(),2)" class="text-right"></td>
+                    <td style="vertical-align:top;" class="text-center">
+                        <a href="javascript:;" class="cursor-pointer fg-black btn-delete" data-placement="top"><i class="fa fa-times p-t-10"></i></a>
+                    </td>
                 </tr>
             </tbody>
         </table>

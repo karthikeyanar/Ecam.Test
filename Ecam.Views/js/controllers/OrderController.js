@@ -39,7 +39,20 @@ define("OrderController", ["knockout", "komapping", "helper"], function (ko, kom
             });
         });
 
+        this.onElements = function () {
+            self.offElements();
+            $("body").on("click", "#OrderTable .btn-delete", function (event) {
+                var dataFor = ko.dataFor(this);
+                self.rows.remove(dataFor);
+            });
+        }
+
+        this.offElements = function () {
+            $("body").off("click", "#OrderTable .btn-delete");
+        }
+
         this.init = function () {
+            self.onElements();
             var i;
             for (i = 0; i < 5; i++) {
                 self.addOrder();
