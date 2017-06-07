@@ -21,16 +21,16 @@ define("OrderController", ["knockout", "komapping", "helper"], function (ko, kom
                 //console.log('amount=', amount);
                 var targetPercentage = cFloat(self.target_percentage());
                 var stopLossPercentage = cFloat(self.stop_loss_percentage());
-                var targetAmount = cFloat(amount * targetPercentage) / 100;
-                var stopLossAmount = cFloat(amount * stopLossPercentage) / 100;
+                var targetAmount = cFloat(price * targetPercentage) / 100;
+                var stopLossAmount = cFloat(price * stopLossPercentage) / 100;
                 var target = '';
                 var stopLoss = '';
                 if (row.type() == "SB") {
-                    target = cFloat(amount - targetAmount);
-                    stopLoss = cFloat(amount + stopLossAmount);
+                    target = cFloat(price - targetAmount);
+                    stopLoss = cFloat(price + stopLossAmount);
                 } else {
-                    target = cFloat(amount + targetAmount);
-                    stopLoss = cFloat(amount - stopLossAmount)
+                    target = cFloat(price + targetAmount);
+                    stopLoss = cFloat(price - stopLossAmount)
                 }
                 if (target <= 0) { target = '' }
                 if (stopLoss <= 0) { stopLoss = '' }
