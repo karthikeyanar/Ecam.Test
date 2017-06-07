@@ -552,6 +552,7 @@
     <Content Include="js\bootstrap\bootstrap.js" />
     <Content Include="js\bootstrap\bootstrap.min.js" />
     <Content Include="js\bootstrap\npm.js" />
+    <Content Include="js\controllers\OrderController.js" />
     <Content Include="js\controllers\CategoryController.js" />
     <Content Include="js\controllers\IntradayController.js" />
     <Content Include="js\controllers\MarketController.js" />
@@ -1185,6 +1186,7 @@
     <Content Include="Views\Home\Category.cshtml" />
     <Content Include="Views\Home\AddCategory.cshtml" />
     <Content Include="Views\Home\Intraday.cshtml" />
+    <Content Include="Views\Home\Order.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

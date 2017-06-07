@@ -58,6 +58,11 @@ namespace Ecam.Views.Controllers
             return View();
         }
 
+        public ActionResult Order()
+        {
+            return View();
+        }
+
         public ActionResult Market()
         {
             return View();

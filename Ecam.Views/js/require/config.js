@@ -227,6 +227,20 @@ $(function () {
             unload: function () { }
         });
 
+        createFinchRoute("/order", {
+            setup: function (url) {
+                handleBlockUI();
+            },
+            load: function () {
+                require(['OrderController'], function (ViewModel) {
+                    document.title = "Order - Ecams";
+                    var m = new ViewModel();
+                    app.viewModel(m);
+                });
+            },
+            unload: function () { }
+        });
+
         createFinchRoute("/category", {
             setup: function (url) {
                 handleBlockUI();
