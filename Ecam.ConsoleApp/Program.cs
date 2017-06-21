@@ -23,7 +23,13 @@ namespace Ecam.ConsoleApp
         {
             IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
-            DownloadStart();
+            string sql = "delete from tra_market_intra_day where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(curdate(), '%Y-%m-%d')";
+            MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+            CalculateRSI();
+            //CaculateIntraydayProfit();
+            Console.ReadLine();
+            return;
+            //DownloadStart();
             //Console.ReadLine();
         }
 
@@ -57,6 +63,96 @@ namespace Ecam.ConsoleApp
             }
         }
 
+        private static void CalculateRSI()
+        {
+            using (EcamContext context = new EcamContext())
+            {
+                List<tra_company> companies = (from q in context.tra_company
+                                               where q.is_nifty_50 == true
+                                               && q.symbol == "ACC"
+                                               orderby q.company_name ascending
+                                               select q).ToList();
+                foreach (var company in companies)
+                {
+                    DateTime fromDate = DateTime.Now.AddDays(-90).Date;
+                    DateTime today = DateTime.Now.Date;
+                    var markets = (from q in context.tra_market
+                                   where q.symbol == company.symbol
+                                   && q.trade_date >= fromDate
+                                   && q.trade_date <= today
+                                   orderby q.trade_date descending
+                                   select q).ToList();
+                    int total = 14 * 2;
+                    int i;
+                    List<TempRSI> values = new List<TempRSI>();
+                    for (i = 0; i < total; i++)
+                    {
+                        var market = markets[i];
+                        values.Add(new ConsoleApp.TempRSI
+                        {
+                            date = market.trade_date,
+                            avg_gain = 0,
+                            avg_loss = 0,
+                            prev = (market.prev_price ?? 0),
+                            close = (market.close_price ?? 0)
+                        });
+                    }
+                    values = (from q in values orderby q.date ascending select q).ToList();
+                    for (i = 0; i < total; i++)
+                    {
+                        if (i > 12)
+                        {
+                            TempRSI value = values[i];
+                            TempRSI prev = values[i - 1];
+                            if (i == 13)
+                            {
+                                //var getPreviousMarket = (from q in markets
+                                //                         where q.trade_date.Date < value.date
+                                //                         select q).FirstOrDefault();
+                                //value.change = value.close - (getPreviousMarket.close_price ?? 0);
+                                int j;
+                                int avgTotal = 14;
+
+                                List<decimal> tempValues = null;
+
+                                tempValues = new List<decimal>();
+                                decimal calcTotal = 0;
+
+                                for (j = 0; j < avgTotal; j++)
+                                {
+                                    tempValues.Add(values[j].gain);
+                                    calcTotal += values[j].gain;
+                                }
+                                value.avg_gain = (calcTotal / tempValues.Count);
+
+                                tempValues = new List<decimal>();
+                                calcTotal = 0;
+                                for (j = 0; j < avgTotal; j++)
+                                {
+                                    tempValues.Add(values[j].loss);
+                                    calcTotal += values[j].loss;
+                                }
+                                value.avg_loss = (calcTotal / tempValues.Count);
+                            }
+                            else if (i > 13)
+                            {
+                                //value.change = value.close - prev.close;
+                                value.avg_gain = (prev.avg_gain * 13 + value.gain) / 14;
+                                value.avg_loss = (prev.avg_loss * 13 + value.loss) / 14;
+                            }
+                        }
+                    }
+                    for (i = 0; i < total; i++)
+                    {
+                        if (i > 12)
+                        {
+                            Console.WriteLine("i=" + i + ",Date=" + values[i].date.ToString("dd/MMM/yyyy") + ",RS=" + FormatHelper.NumberFormat(values[i].rs, 2) + ",RSI=" + FormatHelper.NumberFormat(values[i].rsi, 2));
+                        }
+                    }
+                }
+            }
+        }
+
         private static void CaculateIntraydayProfit()
         {
             List<tra_market_intra_day> rows;
@@ -70,7 +166,7 @@ namespace Ecam.ConsoleApp
             {
                 List<string> symbols = (from q in rows select q.symbol).Distinct().ToList();
                 DateTime firstDate = (from q in rows orderby q.trade_date descending select q).FirstOrDefault().trade_date.Date;
-                DateTime startTime = Convert.ToDateTime(firstDate.ToString("dd/MMM/yyyy") + " 9:21AM");
+                DateTime startTime = Convert.ToDateTime(firstDate.ToString("dd/MMM/yyyy") + " 9:25AM");
                 DateTime endTime = Convert.ToDateTime(firstDate.ToString("dd/MMM/yyyy") + " 10:00AM");
                 foreach (string symbol in symbols)
                 {
@@ -114,10 +210,11 @@ namespace Ecam.ConsoleApp
                                 decimal? p = (((firstPrice ?? 0) - nextRow.ltp_price) / nextRow.ltp_price) * 100;
                                 percentageList.Add((p ?? 0));
                             }
+
                             decimal? reversePercentage = 0;
                             if (percentageList.Count > 0)
                             {
-                                reversePercentage = (from q in percentageList orderby q ascending select q).FirstOrDefault();
+                                reversePercentage = (from q in percentageList orderby q descending select q).FirstOrDefault();
                             }
                             else
                             {
@@ -323,8 +420,8 @@ namespace Ecam.ConsoleApp
             MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
 
             // Delete yesterday tra_market_intraday
-            //sql = "delete from tra_market_intra_day where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(curdate(), '%Y-%m-%d')";
-            //MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+            sql = "delete from tra_market_intra_day where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(curdate(), '%Y-%m-%d')";
+            MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
 
             // Delete before 3 months tra_market
             sql = "delete from tra_market where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(DATE_ADD(curdate(), INTERVAL -3 MONTH), '%Y-%m-%d')";
@@ -370,7 +467,7 @@ namespace Ecam.ConsoleApp
             }
         }
 
-       
+
 
         private static void GoogleHistoryData()
         {
@@ -745,5 +842,40 @@ RegexOptions.IgnoreCase
         }
     }
 
-   
+    class TempRSI
+    {
+        public decimal close { get; set; }
+        public decimal prev { get; set; }
+        public decimal change {
+            get {
+                return this.close - this.prev;
+            }
+        }
+        public decimal gain {
+            get {
+                return (this.change > 0 ? this.change : 0);
+            }
+        }
+        public decimal loss {
+            get {
+                return (this.change < 0 ? this.change * -1 : 0);
+            }
+        }
+        public decimal avg_gain { get; set; }
+        public decimal avg_loss { get; set; }
+        public decimal rs {
+            get {
+                return this.avg_gain / this.avg_loss;
+            }
+        }
+        public decimal rsi {
+            get {
+                if (this.avg_loss == 0)
+                    return 100;
+                else
+                    return (100 - (100 / (1 + this.rs)));
+            }
+        }
+        public DateTime date { get; set; }
+    }
 }
