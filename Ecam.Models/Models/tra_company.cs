@@ -45,5 +45,7 @@ namespace Ecam.Models
         public Nullable<decimal> day_1 { get; set; }
         public Nullable<int> high_count { get; set; }
         public Nullable<int> low_count { get; set; }
+        public Nullable<decimal> rsi { get; set; }
+        public Nullable<decimal> prev_rsi { get; set; }
     }
 }

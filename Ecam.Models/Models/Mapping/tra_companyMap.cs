@@ -113,6 +113,12 @@ namespace Ecam.Models
             this.Property(t => t.day_1)
                 .HasPrecision(13, 4);
 
+            this.Property(t => t.rsi)
+                .HasPrecision(13, 4);
+
+            this.Property(t => t.prev_rsi)
+              .HasPrecision(13, 4);
+
             // Table & Column Mappings
             this.ToTable("tra_company");
             this.Property(t => t.id).HasColumnName("company_id");
@@ -156,6 +162,8 @@ namespace Ecam.Models
             this.Property(t => t.day_1).HasColumnName("day_1");
             this.Property(t => t.high_count).HasColumnName("high_count");
             this.Property(t => t.low_count).HasColumnName("low_count");
+            this.Property(t => t.rsi).HasColumnName("rsi");
+            this.Property(t => t.prev_rsi).HasColumnName("prev_rsi");
             Ignore(t => t.created_date);
             Ignore(t => t.created_by);
             Ignore(t => t.last_updated_date);
