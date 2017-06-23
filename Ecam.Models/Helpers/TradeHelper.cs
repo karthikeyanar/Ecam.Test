@@ -1580,6 +1580,89 @@ RegexOptions.IgnoreCase
         private ManualResetEvent _doneEvent;
     }
 
+    public class GoogleHistoryDownloadData
+    {
+        public GoogleHistoryDownloadData(string symbol, ManualResetEvent doneEvent)
+        {
+            _Symbol = symbol;
+            _doneEvent = doneEvent;
+        }
+
+        public GoogleHistoryDownloadData()
+        {
+         
+        }
+
+        // Wrapper method for use with thread pool.
+        public void ThreadPoolCallback(Object threadContext)
+        {
+            int threadIndex = (int)threadContext;
+            Console.WriteLine("thread {0} started...", threadIndex);
+            GoogleHistoryDataDownload(_Symbol);
+            Console.WriteLine("thread {0} result calculated...", threadIndex);
+            _doneEvent.Set();
+        }
+
+        private void GoogleHistoryDataDownload(string symbol)
+        {
+            string url = string.Empty;
+            string html = string.Empty;
+            string GOOGLE_HISTORY_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_HISTORY_DATA"];
+            WebClient client = new WebClient();
+
+            url = string.Format("https://www.google.com/finance/historical?q=NSE:{0}&num=1000"
+                                                                , symbol.Replace("&", "%26")
+                                                                );
+            string fileName = GOOGLE_HISTORY_DATA + "\\" + symbol + ".html";
+            if (File.Exists(fileName) == false)
+            {
+                html = client.DownloadString(url);
+                File.WriteAllText(fileName, html);
+                Console.WriteLine("Download google data symbol=" + symbol);
+            }
+            else
+            {
+                html = File.ReadAllText(fileName);
+            }
+            if (string.IsNullOrEmpty(html) == false)
+            {
+                string startWord = "<table class=\"gf-table historical_price\">";
+                string endWord = "google.finance.gce";
+                int startIndex = html.IndexOf(startWord);
+                int endIndex = html.IndexOf(endWord);
+                int length = endIndex - startIndex + endWord.Length;
+                if (startIndex > 0 && endIndex > 0)
+                {
+                    html = html.Substring(startIndex, length);
+                }
+                else
+                {
+                    Helper.Log("ErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData");
+                }
+                startWord = "<table class=\"gf-table historical_price\">";
+                endWord = "</table>";
+                startIndex = html.IndexOf(startWord);
+                endIndex = html.IndexOf(endWord);
+                length = endIndex - startIndex + endWord.Length;
+                if (startIndex >= 0 && endIndex > 0)
+                {
+                    string parseContent = html.Substring(startIndex, length);
+                    TradeHelper.GoogleIndiaImport(parseContent, symbol);
+                }
+                else
+                {
+                    Helper.Log("ErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData");
+                }
+            }
+        }
+
+
+        public string SYMBOL { get { return _Symbol; } }
+        private string _Symbol;
+
+        private ManualResetEvent _doneEvent;
+    }
+
     public class PriceDetailJSON
     {
         public string id { get; set; }

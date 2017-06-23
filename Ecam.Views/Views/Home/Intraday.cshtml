@@ -222,6 +222,12 @@
                     <th>
                         Category
                     </th>
+                    <th sortname="prev_rsi" class="text-right text-nowrap">
+                        Prev.RSI
+                    </th>
+                    <th sortname="rsi" class="text-right text-nowrap">
+                        RSI
+                    </th>
                     <th sortname="ltp_percentage" class="text-right text-nowrap">
                         C%
                     </th>
@@ -261,12 +267,12 @@
                         <th sortname="low_percentage" class="text-right text-nowrap">
                             L%
                         </th>*@
-                    <th sortname="high_count" class="text-right text-nowrap">
+                    @*<th sortname="high_count" class="text-right text-nowrap">
                         HC
                     </th>
                     <th sortname="low_count" class="text-right text-nowrap">
                         LC
-                    </th>
+                    </th>*@
                     @*<th class="text-right text-nowrap">
                             BTS Profit
                         </th>
@@ -306,6 +312,12 @@
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit">
                         <div style="width:150px;overflow:hidden;" data-bind="text:category_name">
                         </div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(prev_rsi())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(rsi())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(ltp_percentage())"></div>
@@ -348,12 +360,12 @@
                         <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                             <div data-bind="text:formatPercentage(low_percentage())"></div>
                         </td>*@
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(high_count())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(low_count())"></div>
-                    </td>
+                    </td>*@
                     @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                             <div data-bind="text:formatNumber(bts_target_profit(),4)"></div>
                             <div data-bind="text:formatNumber(bts_stop_loss_profit(),4)"></div>

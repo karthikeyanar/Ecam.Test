@@ -25,18 +25,15 @@ namespace Ecam.ConsoleApp
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
             string sql = "delete from tra_market_intra_day where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(curdate(), '%Y-%m-%d')";
             MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-            CalculateRSI();
             //CaculateIntraydayProfit();
-            Console.ReadLine();
-            return;
-            //DownloadStart();
-            //Console.ReadLine();
+            DownloadStart();
+            //CalculateRSI();
         }
 
         private static void DownloadStart()
         {
             //Helper.Log("DownloadStart=" + DateTime.Now.ToString(), "DOWNLOAD");
-            DateTime morningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:19AM");
+            DateTime morningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:15AM");
             DateTime morningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 10:15AM");
             DateTime eveningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 3:31PM");
             DateTime eveningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 11:59PM");
@@ -50,6 +47,10 @@ namespace Ecam.ConsoleApp
                 else
                 {
                     GoogleData();
+                }
+                if ((now >= eveningStart && now <= eveningEnd))
+                {
+                    CalculateRSI();
                 }
                 Console.WriteLine("Completed");
                 //Helper.Log("DownloadEnd=" + DateTime.Now.ToString(), "DOWNLOAD");
@@ -65,17 +66,21 @@ namespace Ecam.ConsoleApp
 
         private static void CalculateRSI()
         {
+            string sql = "update tra_market set upward = 0, downward = 0, avg_downward = 0, avg_upward = 0, rsi = 0, prev_rsi = 0;";
+            MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+            DateTime today = DateTime.Now.Date;
             using (EcamContext context = new EcamContext())
             {
                 List<tra_company> companies = (from q in context.tra_company
-                                                   //where q.is_nifty_50 == true
-                                                   //&& q.symbol == "ADANIPORTS"
+                                               where q.is_nifty_50 == true
+                                               //&& q.symbol == "ADANIPORTS"
                                                orderby q.company_name ascending
                                                select q).ToList();
                 foreach (var company in companies)
                 {
                     var markets = (from q in context.tra_market
                                    where q.symbol == company.symbol
+                                   && q.trade_date < today
                                    orderby q.trade_date ascending
                                    select q).ToList();
                     foreach (var market in markets)
@@ -84,6 +89,7 @@ namespace Ecam.ConsoleApp
                     }
                     var updateMarket = (from q in context.tra_market
                                         where q.symbol == company.symbol
+                                        && q.trade_date < today 
                                         orderby q.trade_date descending
                                         select q).FirstOrDefault();
                     if (updateMarket != null)
@@ -221,7 +227,7 @@ namespace Ecam.ConsoleApp
                         var market = (from q in context.tra_market where q.id == existValue.id select q).FirstOrDefault();
                         if (market != null)
                         {
-                            var prevRecord = (from q in markets where q.trade_date < existValue.date orderby q.trade_date descending select q).FirstOrDefault();
+                            var prevRecord = (from q in context.tra_market where q.trade_date < existValue.date orderby q.trade_date descending select q).FirstOrDefault();
                             if (prevRecord != null)
                             {
                                 market.prev_rsi = prevRecord.rsi;
@@ -524,8 +530,8 @@ namespace Ecam.ConsoleApp
             MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
 
             // Delete before 3 months tra_market
-            sql = "delete from tra_market where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(DATE_ADD(curdate(), INTERVAL -3 MONTH), '%Y-%m-%d')";
-            MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+            //sql = "delete from tra_market where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(DATE_ADD(curdate(), INTERVAL -3 MONTH), '%Y-%m-%d')";
+            //MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
 
             GoogleDownloadStart();
             //foreach (var company in companies)
@@ -567,6 +573,38 @@ namespace Ecam.ConsoleApp
             }
         }
 
+        private static void GoogleHistoryDownloadStart()
+        {
+            int totalCount = _COMPANIES.Length;
+            int queueCount = 64;
+            // One event is used for each Fibonacci object
+            ManualResetEvent[] doneEvents = new ManualResetEvent[queueCount];
+            GoogleHistoryDownloadData[] downArray = new GoogleHistoryDownloadData[queueCount];
+            //Random r = new Random();
+            // Configure and launch threads using ThreadPool:
+            Console.WriteLine("launching {0} tasks...", totalCount);
+            for (int i = 0; i < queueCount; i++)
+            {
+                _INDEX += 1;
+                string symbol = "";
+                if (_INDEX < _COMPANIES.Length)
+                {
+                    symbol = _COMPANIES[_INDEX];
+                }
+                doneEvents[i] = new ManualResetEvent(false);
+                GoogleHistoryDownloadData f = new GoogleHistoryDownloadData(symbol, doneEvents[i]);
+                downArray[i] = f;
+                ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback, i);
+            }
+            // Wait for all threads in pool to calculation...
+            WaitHandle.WaitAll(doneEvents);
+            if (_INDEX < _COMPANIES.Length)
+            {
+                Console.WriteLine("All calculations are complete.");
+                GoogleHistoryDownloadStart();
+            }
+        }
+
         private static void GoogleHistoryData()
         {
             List<tra_company> companies;
@@ -574,57 +612,9 @@ namespace Ecam.ConsoleApp
             {
                 companies = (from q in context.tra_company orderby q.symbol ascending select q).ToList();
             }
-            string url = string.Empty;
-            string html = string.Empty;
-            string GOOGLE_HISTORY_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_HISTORY_DATA"];
-            WebClient client = new WebClient();
-            foreach (var company in companies)
-            {
-                url = string.Format("https://www.google.com/finance/historical?q=NSE:{0}&num=10"
-                                                                    , company.symbol.Replace("&", "%26")
-                                                                    );
-                string fileName = GOOGLE_HISTORY_DATA + "\\" + company.symbol + ".html";
-                if (File.Exists(fileName) == false)
-                {
-                    html = client.DownloadString(url);
-                    File.WriteAllText(fileName, html);
-                    Console.WriteLine("Download google data symbol=" + company.symbol);
-                }
-                else
-                {
-                    html = File.ReadAllText(fileName);
-                }
-                if (string.IsNullOrEmpty(html) == false)
-                {
-                    string startWord = "<table class=\"gf-table historical_price\">";
-                    string endWord = "google.finance.gce";
-                    int startIndex = html.IndexOf(startWord);
-                    int endIndex = html.IndexOf(endWord);
-                    int length = endIndex - startIndex + endWord.Length;
-                    if (startIndex > 0 && endIndex > 0)
-                    {
-                        html = html.Substring(startIndex, length);
-                    }
-                    else
-                    {
-                        Helper.Log("ErrorOnGoogleData symbol=" + company.symbol, "ErrorOnGoogleData");
-                    }
-                    startWord = "<table class=\"gf-table historical_price\">";
-                    endWord = "</table>";
-                    startIndex = html.IndexOf(startWord);
-                    endIndex = html.IndexOf(endWord);
-                    length = endIndex - startIndex + endWord.Length;
-                    if (startIndex >= 0 && endIndex > 0)
-                    {
-                        string parseContent = html.Substring(startIndex, length);
-                        TradeHelper.GoogleIndiaImport(parseContent, company.symbol);
-                    }
-                    else
-                    {
-                        Helper.Log("ErrorOnGoogleData symbol=" + company.symbol, "ErrorOnGoogleData");
-                    }
-                }
-            }
+            _COMPANIES = (from q in companies select q.symbol).ToArray();
+            _INDEX = -1;
+            GoogleHistoryDownloadStart();
         }
 
         private static void MutualFunds()
