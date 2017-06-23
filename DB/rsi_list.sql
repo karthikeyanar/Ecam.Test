@@ -1,0 +1,2 @@
+select c.is_nifty_50,c.is_nifty_100,c.is_nifty_200,t.*, DATEDIFF(t.sell_date,t.buy_date) as days from tra_rsi_profit t
+join tra_company c on c.symbol = t.symbol order by profit desc,symbol,buy_date limit 0,100
