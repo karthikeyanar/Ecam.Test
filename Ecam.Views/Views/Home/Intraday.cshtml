@@ -185,9 +185,10 @@
                     <span class="pull-left p-t-5 p-r-10">Rows</span>
                     <select id="rows" name="rows" class="pull-left form-control input-sm input-60">
                         <option value="10">10</option>
-                        <option value="20" selected>20</option>
+                        <option value="20">20</option>
                         <option value="50">50</option>
                         <option value="200">200</option>
+                        <option value="210" selected>210</option>
                         <option value="500">500</option>
                     </select>
                 </div>
@@ -443,7 +444,50 @@
     </div>
 </script>
 <script type="text/html" id="detail-template">
-    <table cellpadding="0" cellspacing="0" class="table table-condensed no-margin-bottom" style="width:700px;">
+    <div>
+        <div class="rsi-box pull-left m-r-15" style="width:40%;">
+        </div>
+        <div class="intraday-box pull-left m-l-15" style="width:40%;">
+        </div>
+        <div class="clearfix">&nbsp;</div>
+    </div> 
+</script>
+<script type="text/html" id="detail-rsi-template">
+    <table cellpadding="0" cellspacing="0" class="table table-condensed no-margin-bottom">
+        <thead>
+            <tr>
+                <th>
+                    Symbol
+                </th>
+                <th>
+                    Date
+                </th>
+                <th class="text-right">
+                    Close
+                </th>
+                <th class="text-right">
+                    RSI
+                </th>
+                <th class="text-right">
+                    Prev.RSI
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {{each(j,row) rows}}
+            <tr>
+                <td>${row.symbol}</td>
+                <td>${formatDate(row.trade_date)}</td>
+                <td class="text-right">${formatNumber(row.close_price)}</td>
+                <td class="text-right">${formatNumber(row.rsi)}</td>
+                <td class="text-right">${formatNumber(row.prev_rsi)}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</script>
+<script type="text/html" id="detail-intraday-template">
+    <table cellpadding="0" cellspacing="0" class="table table-condensed no-margin-bottom">
         <thead>
             <tr>
                 <th>

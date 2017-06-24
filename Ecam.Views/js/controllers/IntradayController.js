@@ -351,12 +351,49 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
         this.loadTradeDetail = function ($childTD) {
             $childTD.addClass("loading");
-            if ($.trim($childTD.html()) == '') {
-                $childTD.html("Loading...");
-            }
-            var symbol = $childTD.attr("symbol");
-            handleBlockUI();
+            $childTD.empty();
+            $("#detail-template").tmpl({}).appendTo($childTD);
+            $childTD.css("padding-left", "75px").css("background-color", "#F2F2F2");
+            $childTD.removeClass("loading");
 
+            var symbol = $childTD.attr("symbol");
+            var $rsiBox = $(".rsi-box", $childTD);
+            var $intradayBox = $(".intraday-box", $childTD);
+            self.loadRSI(symbol, $rsiBox, function () {
+                self.loadIntraday(symbol, $intradayBox, function () {
+                });
+            });
+        }
+
+        this.loadRSI = function (symbol, $box, callback) {
+            $box.html('loading...');
+            handleBlockUI();
+            var url = apiUrl("/Company/RSIList");
+            var arr = [];
+            arr[arr.length] = { "name": "symbols", "value": symbol };
+            arr[arr.length] = { "name": "SortName", "value": "m.trade_date" };
+            arr[arr.length] = { "name": "SortOrder", "value": "desc" };
+            arr[arr.length] = { "name": "PageSize", "value": "0" };
+            $.ajax({
+                "url": url,
+                "cache": false,
+                "type": "GET",
+                "data": arr
+            }).done(function (json) {
+                $box.empty();
+                $("#detail-rsi-template").tmpl(json).appendTo($box);
+                $box.removeClass("loading");
+                if (callback)
+                    callback();
+            })
+            .always(function () {
+                unblockUI();
+            });
+        }
+
+        this.loadIntraday = function (symbol, $box, callback) {
+            $box.html('loading...');
+            handleBlockUI();
             var url = apiUrl("/Company/IntradayList");
             var arr = [];
             arr[arr.length] = { "name": "symbols", "value": symbol };
@@ -369,10 +406,11 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 "type": "GET",
                 "data": arr
             }).done(function (json) {
-                $childTD.empty();
-                $("#detail-template").tmpl(json).appendTo($childTD);
-                $childTD.css("padding-left", "75px").css("background-color", "#F2F2F2");
-                $childTD.removeClass("loading");
+                $box.empty();
+                $("#detail-intraday-template").tmpl(json).appendTo($box);
+                $box.removeClass("loading");
+                if (callback)
+                    callback();
             })
             .always(function () {
                 unblockUI();
