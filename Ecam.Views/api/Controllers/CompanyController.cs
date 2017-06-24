@@ -53,6 +53,13 @@ namespace Ecam.Views.Controllers
         }
 
         [HttpGet]
+        [ActionName("RSIList")]
+        public PaginatedListResult<TRA_MARKET_RSI> RSIList([FromUri] TRA_COMPANY_SEARCH criteria, [FromUri] Paging paging)
+        {
+            return _CompanyRepository.GetRSI(criteria, paging);
+        }
+
+        [HttpGet]
         [ActionName("Export")]
         public IHttpActionResult Export([FromUri] TRA_COMPANY_SEARCH criteria, [FromUri] Paging paging)
         {

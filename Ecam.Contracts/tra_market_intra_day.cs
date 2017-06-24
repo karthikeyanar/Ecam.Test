@@ -20,5 +20,15 @@ namespace Ecam.Contracts
         public string time { get; set; }
         public int company_id { get; set; }
     }
+
+    public class TRA_MARKET_RSI
+    {
+        public string symbol { get; set; }
+        public System.DateTime trade_date { get; set; }
+        public decimal? close_price { get; set; }
+        public decimal? rsi { get; set; }
+        public decimal? prev_rsi { get; set; }
+        public int company_id { get; set; }
+    }
 }
 
