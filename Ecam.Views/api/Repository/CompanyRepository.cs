@@ -603,7 +603,7 @@ namespace Ecam.Framework.Repository
             sql + Environment.NewLine +
             ") as tbl {0} {1} {2} {3} ", where, "", orderBy, pageLimit);
 
-            Helper.Log(sql);
+            //Helper.Log(sql);
             List<TRA_COMPANY> rows = new List<TRA_COMPANY>();
             List<tra_company_category> companyCategories;
             using (EcamContext context = new EcamContext())
@@ -718,7 +718,7 @@ namespace Ecam.Framework.Repository
             string sql = string.Empty;
             string role = Authentication.CurrentRole;
 
-            where.AppendFormat(" m.trade_date>='{0}'", DateTime.Now.Date.AddDays(-90).ToString("yyyy-MM-dd"));
+            where.AppendFormat(" m.trade_date>='{0}'", DateTime.Now.Date.AddDays(-400).ToString("yyyy-MM-dd"));
 
             where.AppendFormat(" and m.trade_date<='{0}'", DateTime.Now.Date.ToString("yyyy-MM-dd"));
 

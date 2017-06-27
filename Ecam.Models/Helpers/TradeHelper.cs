@@ -1495,6 +1495,33 @@ RegexOptions.IgnoreCase
                         MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
                         sql = string.Format(" update tra_company set is_book_mark=1 where ifnull(open_price,0)<=ifnull(high_price,0) and ifnull(open_price,0)<=ifnull(low_price,0)");
                         MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+
+                        using (EcamContext context = new EcamContext())
+                        {
+                            var market = (from q in context.tra_market where q.symbol == symbol orderby q.trade_date descending select q).FirstOrDefault();
+                            if (market != null)
+                            {
+                                var prev = (from q in context.tra_market
+                                            where q.symbol == symbol
+                                            && q.trade_date < market.trade_date
+                                            orderby q.trade_date descending
+                                            select q).FirstOrDefault();
+                                TempRSI value = new TempRSI
+                                {
+                                    symbol = market.symbol,
+                                    close = (market.close_price ?? 0),
+                                    prev = (prev.close_price ?? 0),
+                                    date = market.trade_date,
+                                    id = market.id,
+                                };
+                                value.avg_downward = (((prev.avg_downward ?? 0) * (14 - 1) + value.downward) / 14);
+                                value.avg_upward = (((prev.avg_upward ?? 0) * (14 - 1) + value.upward) / 14);
+                                market.prev_rsi = prev.rsi;
+                                market.rsi = value.rsi;
+                                context.Entry(market).State = System.Data.Entity.EntityState.Modified;
+                                context.SaveChanges();
+                            }
+                        }
                     }
                     else
                     {
@@ -1580,6 +1607,45 @@ RegexOptions.IgnoreCase
         private ManualResetEvent _doneEvent;
     }
 
+    public class TempRSI
+    {
+        public int id { get; set; }
+        public string symbol { get; set; }
+        public decimal close { get; set; }
+        public decimal prev { get; set; }
+        public decimal change {
+            get {
+                return this.close - this.prev;
+            }
+        }
+        public decimal upward {
+            get {
+                return (this.change > 0 ? this.change : 0);
+            }
+        }
+        public decimal downward {
+            get {
+                return (this.change < 0 ? this.change * -1 : 0);
+            }
+        }
+        public decimal avg_upward { get; set; }
+        public decimal avg_downward { get; set; }
+        public decimal rs {
+            get {
+                return this.avg_upward / this.avg_downward;
+            }
+        }
+        public decimal rsi {
+            get {
+                if (this.avg_downward == 0)
+                    return 100;
+                else
+                    return (100 - (100 / (1 + this.rs)));
+            }
+        }
+        public DateTime date { get; set; }
+    }
+
     public class GoogleHistoryDownloadData
     {
         public GoogleHistoryDownloadData(string symbol, ManualResetEvent doneEvent)
@@ -1590,7 +1656,7 @@ RegexOptions.IgnoreCase
 
         public GoogleHistoryDownloadData()
         {
-         
+
         }
 
         // Wrapper method for use with thread pool.

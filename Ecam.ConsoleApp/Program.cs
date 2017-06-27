@@ -27,7 +27,6 @@ namespace Ecam.ConsoleApp
             MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
             //CaculateIntraydayProfit();
             DownloadStart();
-            //CalculateRSI();
         }
 
         private static void DownloadStart()
@@ -43,14 +42,11 @@ namespace Ecam.ConsoleApp
                 if (IS_DOWNLOAD_HISTORY == "true")
                 {
                     GoogleHistoryData();
+                    CalculateRSI();
                 }
                 else
                 {
                     GoogleData();
-                }
-                if ((now >= eveningStart && now <= eveningEnd))
-                {
-                    CalculateRSI();
                 }
                 Console.WriteLine("Completed");
                 //Helper.Log("DownloadEnd=" + DateTime.Now.ToString(), "DOWNLOAD");
@@ -66,21 +62,20 @@ namespace Ecam.ConsoleApp
 
         private static void CalculateRSI()
         {
-            string sql = "update tra_market set upward = 0, downward = 0, avg_downward = 0, avg_upward = 0, rsi = 0, prev_rsi = 0;";
-            MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-            DateTime today = DateTime.Now.Date;
             using (EcamContext context = new EcamContext())
             {
                 List<tra_company> companies = (from q in context.tra_company
-                                               where q.is_nifty_50 == true
-                                               //&& q.symbol == "ADANIPORTS"
+                                               where (q.is_nifty_200 ?? false) == true
                                                orderby q.company_name ascending
                                                select q).ToList();
                 foreach (var company in companies)
                 {
+                    DateTime today = DateTime.Now.Date;
+                    DateTime endDate = DateTime.Now.Date.AddDays(-120);
                     var markets = (from q in context.tra_market
                                    where q.symbol == company.symbol
-                                   && q.trade_date < today
+                                   && q.trade_date <= today
+                                   && q.trade_date >= endDate
                                    orderby q.trade_date ascending
                                    select q).ToList();
                     foreach (var market in markets)
@@ -89,7 +84,6 @@ namespace Ecam.ConsoleApp
                     }
                     var updateMarket = (from q in context.tra_market
                                         where q.symbol == company.symbol
-                                        && q.trade_date < today 
                                         orderby q.trade_date descending
                                         select q).FirstOrDefault();
                     if (updateMarket != null)
@@ -136,6 +130,7 @@ namespace Ecam.ConsoleApp
                     values.Add(new TempRSI
                     {
                         id = market.id,
+                        symbol = market.symbol,
                         date = market.trade_date,
                         avg_upward = (market.avg_upward ?? 0),
                         avg_downward = (market.avg_downward ?? 0),
@@ -224,10 +219,10 @@ namespace Ecam.ConsoleApp
                 {
                     using (EcamContext context = new EcamContext())
                     {
-                        var market = (from q in context.tra_market where q.id == existValue.id select q).FirstOrDefault();
+                        var market = (from q in context.tra_market where q.id == existValue.id && q.symbol == existValue.symbol select q).FirstOrDefault();
                         if (market != null)
                         {
-                            var prevRecord = (from q in context.tra_market where q.trade_date < existValue.date orderby q.trade_date descending select q).FirstOrDefault();
+                            var prevRecord = (from q in context.tra_market where q.symbol == existValue.symbol && q.trade_date < existValue.date orderby q.trade_date descending select q).FirstOrDefault();
                             if (prevRecord != null)
                             {
                                 market.prev_rsi = prevRecord.rsi;
@@ -240,11 +235,13 @@ namespace Ecam.ConsoleApp
                             market.rs = existValue.rs;
                             context.Entry(market).State = System.Data.Entity.EntityState.Modified;
                             context.SaveChanges();
-                            var preMarket = (from q in markets where q.id == existValue.id select q).FirstOrDefault();
+                            var preMarket = (from q in markets where q.symbol == existValue.symbol && q.id == existValue.id select q).FirstOrDefault();
                             preMarket.avg_downward = existValue.avg_downward;
                             preMarket.avg_upward = existValue.avg_upward;
                             preMarket.upward = existValue.upward;
                             preMarket.downward = existValue.downward;
+                            preMarket.rs = existValue.rs;
+                            preMarket.rsi = existValue.rsi;
                             Console.WriteLine("Update RSI Symbol=" + market.symbol + ",Date=" + market.trade_date.ToString("dd-MMM-yyy") + ",id=" + market.id + ",rsi=" + existValue.rsi);
                         }
                     }
@@ -930,41 +927,5 @@ namespace Ecam.ConsoleApp
         }
     }
 
-    class TempRSI
-    {
-        public int id { get; set; }
-        public decimal close { get; set; }
-        public decimal prev { get; set; }
-        public decimal change {
-            get {
-                return this.close - this.prev;
-            }
-        }
-        public decimal upward {
-            get {
-                return (this.change > 0 ? this.change : 0);
-            }
-        }
-        public decimal downward {
-            get {
-                return (this.change < 0 ? this.change * -1 : 0);
-            }
-        }
-        public decimal avg_upward { get; set; }
-        public decimal avg_downward { get; set; }
-        public decimal rs {
-            get {
-                return this.avg_upward / this.avg_downward;
-            }
-        }
-        public decimal rsi {
-            get {
-                if (this.avg_downward == 0)
-                    return 100;
-                else
-                    return (100 - (100 / (1 + this.rs)));
-            }
-        }
-        public DateTime date { get; set; }
-    }
+    
 }
