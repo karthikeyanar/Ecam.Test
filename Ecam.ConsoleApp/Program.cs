@@ -269,7 +269,7 @@ namespace Ecam.ConsoleApp
             {
                 List<string> symbols = (from q in rows select q.symbol).Distinct().ToList();
                 DateTime firstDate = (from q in rows orderby q.trade_date descending select q).FirstOrDefault().trade_date.Date;
-                DateTime startTime = Convert.ToDateTime(firstDate.ToString("dd/MMM/yyyy") + " 9:25AM");
+                DateTime startTime = Convert.ToDateTime(firstDate.ToString("dd/MMM/yyyy") + " 9:15AM");
                 DateTime endTime = Convert.ToDateTime(firstDate.ToString("dd/MMM/yyyy") + " 10:00AM");
                 foreach (string symbol in symbols)
                 {

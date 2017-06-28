@@ -528,8 +528,8 @@ namespace Ecam.Framework.Repository
                    "";
             }
             selectFields += ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.prev_price, 0)) / ifnull(ct.prev_price, 0)) * 100) as prev_percentage" + Environment.NewLine +
-
                            ",(ifnull(ct.open_price,0) - ifnull(ct.prev_price,0)) as diff" + Environment.NewLine +
+                           ",(ifnull(ct.rsi,0) - ifnull(ct.prev_rsi,0)) as rsi_diff" + Environment.NewLine +
 
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as ltp_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.high_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as high_percentage" + Environment.NewLine +

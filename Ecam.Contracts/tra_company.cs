@@ -53,6 +53,7 @@ namespace Ecam.Contracts
         public Nullable<int> low_count { get; set; }
         public Nullable<decimal> rsi { get; set; }
         public Nullable<decimal> prev_rsi { get; set; }
+        public Nullable<decimal> rsi_diff { get; set; }
 
         public string category_name { get; set; }
         public Nullable<decimal> prev_percentage { get; set; }
