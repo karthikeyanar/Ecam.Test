@@ -338,6 +338,27 @@ namespace Ecam.Framework.Repository
                 where.AppendFormat(" and ifnull(ct.close_price,0)<={0}", criteria.to_price);
             }
 
+
+            if (criteria.from_rsi.HasValue)
+            {
+                where.AppendFormat(" and ifnull(ct.rsi,0)>={0}", criteria.from_rsi);
+            }
+
+            if (criteria.to_rsi.HasValue)
+            {
+                where.AppendFormat(" and ifnull(ct.rsi,0)<={0}", criteria.to_rsi);
+            }
+
+            if (criteria.from_prev_rsi.HasValue)
+            {
+                where.AppendFormat(" and ifnull(ct.prev_rsi,0)>={0}", criteria.from_prev_rsi);
+            }
+
+            if (criteria.to_prev_rsi.HasValue)
+            {
+                where.AppendFormat(" and ifnull(ct.prev_rsi,0)<={0}", criteria.to_prev_rsi);
+            }
+
             if (criteria.is_nifty_50.HasValue)
             {
                 where.AppendFormat(" and ifnull(ct.is_nifty_50,0)={0}", ((criteria.is_nifty_50 ?? false) == true ? "1" : "0"));
@@ -351,146 +372,6 @@ namespace Ecam.Framework.Repository
             if (criteria.is_nifty_200.HasValue)
             {
                 where.AppendFormat(" and ifnull(ct.is_nifty_200,0)={0}", ((criteria.is_nifty_200 ?? false) == true ? "1" : "0"));
-            }
-
-            if (criteria.is_all_time_low.HasValue)
-            {
-                if (criteria.is_all_time_low == true)
-                {
-                    where.Append(" and (" +
-                            " ifnull(ct.day_30,0)>ifnull(ct.day_25,0)" +
-                            " and ifnull(ct.day_25,0)>ifnull(ct.day_20,0)" +
-                            " and ifnull(ct.day_20,0)>ifnull(ct.day_15,0)" +
-                            " and ifnull(ct.day_15,0)>ifnull(ct.day_10,0)" +
-                            " and ifnull(ct.day_10,0)>ifnull(ct.day_5,0)" +
-                            " and ifnull(ct.day_5,0)>=ifnull(ct.ltp_price,0)" +
-                            ")" +
-                            "");
-                }
-            }
-
-            if (criteria.is_all_time_high.HasValue)
-            {
-                if (criteria.is_all_time_high == true)
-                {
-                    where.Append(" and (" +
-                            " ifnull(ct.day_30,0)<ifnull(ct.day_25,0)" +
-                            " and ifnull(ct.day_25,0)<ifnull(ct.day_20,0)" +
-                            " and ifnull(ct.day_20,0)<ifnull(ct.day_15,0)" +
-                            " and ifnull(ct.day_15,0)<ifnull(ct.day_10,0)" +
-                            " and ifnull(ct.day_10,0)<ifnull(ct.day_5,0)" +
-                            " and ifnull(ct.day_5,0)<=ifnull(ct.ltp_price,0)" +
-                            ")" +
-                            "");
-                }
-            }
-
-            if (criteria.is_all_time_low_15_days.HasValue)
-            {
-                if (criteria.is_all_time_low_15_days == true)
-                {
-                    where.Append(" and (" +
-                            " ifnull(ct.day_15,0)>ifnull(ct.day_10,0)" +
-                            " and ifnull(ct.day_10,0)>ifnull(ct.day_5,0)" +
-                            " and ifnull(ct.day_5,0)>=ifnull(ct.ltp_price,0)" +
-                            ")" +
-                            "");
-                }
-            }
-
-            if (criteria.is_all_time_high_15_days.HasValue)
-            {
-                if (criteria.is_all_time_high_15_days == true)
-                {
-                    where.Append(" and (" +
-                            " ifnull(ct.day_15,0)<ifnull(ct.day_10,0)" +
-                            " and ifnull(ct.day_10,0)<ifnull(ct.day_5,0)" +
-                            " and ifnull(ct.day_5,0)<=ifnull(ct.ltp_price,0)" +
-                            ")" +
-                            "");
-                }
-            }
-
-            if (criteria.is_all_time_low_5_days.HasValue)
-            {
-                if (criteria.is_all_time_low_5_days == true)
-                {
-                    where.Append(" and (" +
-                            " ifnull(ct.day_4,0)>ifnull(ct.day_3,0)" +
-                            " and ifnull(ct.day_3,0)>ifnull(ct.day_2,0)" +
-                            " and ifnull(ct.day_2,0)>ifnull(ct.day_1,0)" +
-                            " and ifnull(ct.day_1,0)>=ifnull(ct.ltp_price,0)" +
-                            ")" +
-                            "");
-                }
-            }
-
-            if (criteria.is_all_time_high_5_days.HasValue)
-            {
-                if (criteria.is_all_time_high_5_days == true)
-                {
-                    where.Append(" and (" +
-                            " ifnull(ct.day_4,0)<ifnull(ct.day_3,0)" +
-                            " and ifnull(ct.day_3,0)<ifnull(ct.day_2,0)" +
-                            " and ifnull(ct.day_2,0)<ifnull(ct.day_1,0)" +
-                            " and ifnull(ct.day_1,0)<=ifnull(ct.ltp_price,0)" +
-                            ")" +
-                            "");
-                }
-            }
-
-            if (criteria.is_all_time_low_2_days.HasValue)
-            {
-                if (criteria.is_all_time_low_2_days == true)
-                {
-                    where.Append(" and (" +
-                            " ifnull(ct.day_2,0)>ifnull(ct.day_1,0)" +
-                            " and ifnull(ct.day_1,0)>=ifnull(ct.ltp_price,0)" +
-                            ")" +
-                            "");
-                }
-            }
-
-            if (criteria.is_all_time_high_2_days.HasValue)
-            {
-                if (criteria.is_all_time_high_2_days == true)
-                {
-                    where.Append(" and (" +
-                            " ifnull(ct.day_2,0)<ifnull(ct.day_1,0)" +
-                            " and ifnull(ct.day_1,0)<=ifnull(ct.ltp_price,0)" +
-                            ")" +
-                            "");
-                }
-            }
-
-            if (criteria.is_low_yesterday.HasValue)
-            {
-                if (criteria.is_low_yesterday == true)
-                {
-                    where.Append(" and (" +
-                            " ifnull(ct.day_1,0)>=ifnull(ct.ltp_price,0)" +
-                            ")" +
-                            "");
-                }
-            }
-
-            if (criteria.is_high_yesterday.HasValue)
-            {
-                if (criteria.is_high_yesterday == true)
-                {
-                    where.Append(" and (" +
-                            " ifnull(ct.day_1,0)<=ifnull(ct.ltp_price,0)" +
-                            ")" +
-                            "");
-                }
-            }
-
-            if (criteria.is_mf.HasValue)
-            {
-                if (criteria.is_mf == true)
-                {
-                    where.Append(" and ifnull(ct.mf_cnt,0)>0");
-                }
             }
 
             selectFields = "count(*) as cnt";
@@ -527,27 +408,14 @@ namespace Ecam.Framework.Repository
                    ",(select sum(ifnull(mpf.stock_value, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_qty_2" + Environment.NewLine +
                    "";
             }
-            selectFields += ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.prev_price, 0)) / ifnull(ct.prev_price, 0)) * 100) as prev_percentage" + Environment.NewLine +
+            selectFields += "" +
+                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.prev_price, 0)) / ifnull(ct.prev_price, 0)) * 100) as prev_percentage" + Environment.NewLine +
                            ",(ifnull(ct.open_price,0) - ifnull(ct.prev_price,0)) as diff" + Environment.NewLine +
                            ",(ifnull(ct.rsi,0) - ifnull(ct.prev_rsi,0)) as rsi_diff" + Environment.NewLine +
 
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as ltp_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.high_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as high_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.low_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as low_percentage" + Environment.NewLine +
-
-                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_1, 0)) / ifnull(ct.day_1, 0)) * 100) as day_1_percentage" + Environment.NewLine +
-                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_2, 0)) / ifnull(ct.day_2, 0)) * 100) as day_2_percentage" + Environment.NewLine +
-                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_3, 0)) / ifnull(ct.day_3, 0)) * 100) as day_3_percentage" + Environment.NewLine +
-                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_4, 0)) / ifnull(ct.day_4, 0)) * 100) as day_4_percentage" + Environment.NewLine +
-                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_5, 0)) / ifnull(ct.day_5, 0)) * 100) as day_5_percentage" + Environment.NewLine +
-                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_10, 0)) / ifnull(ct.day_10, 0)) * 100) as day_10_percentage" + Environment.NewLine +
-                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_15, 0)) / ifnull(ct.day_15, 0)) * 100) as day_15_percentage" + Environment.NewLine +
-                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_20, 0)) / ifnull(ct.day_20, 0)) * 100) as day_20_percentage" + Environment.NewLine +
-                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_25, 0)) / ifnull(ct.day_25, 0)) * 100) as day_25_percentage" + Environment.NewLine +
-
-                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_30, 0)) / ifnull(ct.day_30, 0)) * 100) as day_30_percentage" + Environment.NewLine +
-                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_60, 0)) / ifnull(ct.day_60, 0)) * 100) as day_60_percentage" + Environment.NewLine +
-                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.day_90, 0)) / ifnull(ct.day_90, 0)) * 100) as day_90_percentage" + Environment.NewLine +
 
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.week_52_high, 0)) / ifnull(ct.week_52_high, 0)) * 100) as week_52_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.week_52_high, 0) - ifnull(ct.ltp_price, 0)) / ifnull(ct.ltp_price, 0)) * 100) as week_52_positive_percentage" + Environment.NewLine +

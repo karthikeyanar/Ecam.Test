@@ -61,75 +61,11 @@
             <div class="clearfix"></div>
             <div class="m-l-15">
                 <div class="form-group m-r-10 m-t-10">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="is_all_time_low" />Low Last Month
-                        </label>
-                    </div>
+                    <input type="text" name="from_prev_rsi" class="form-control input-sm" placeholder="From Prev RSI" style="width:100px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="is_all_time_high" />High Last Month
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group m-r-10 m-t-10">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="is_all_time_low_15_days" /> Low 15 Days
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group m-r-10 m-t-10">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="is_all_time_high_15_days" /> High 15 Days
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group m-r-10 m-t-10">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="is_all_time_low_5_days" /> Low 5 Days
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group m-r-10 m-t-10">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="is_all_time_high_5_days" /> High 5 Days
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group m-r-10 m-t-10">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="is_all_time_low_2_days" /> Low 2 Days
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group m-r-10 m-t-10">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="is_all_time_high_2_days" /> High 2 Days
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group m-r-10 m-t-10">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="is_low_yesterday" /> Low 1 Days
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group m-r-10 m-t-10">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="is_high_yesterday" /> High 1 Days
-                        </label>
-                    </div>
-                </div>
+                    <input type="text" name="to_prev_rsi" class="form-control input-sm" placeholder="To Prev RSI" style="width:100px" />
+                </div> 
                 <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
@@ -143,6 +79,12 @@
                             <input type="checkbox" id="is_buy_to_sell" /> Buy To Sell
                         </label>
                     </div>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <input type="text" name="from_rsi" class="form-control input-sm" placeholder="From RSI" style="width:100px" />
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <input type="text" name="to_rsi" class="form-control input-sm" placeholder="To RSI" style="width:100px" />
                 </div>
                 <div class="clearfix"></div>
                 <div class="form-group m-r-10 m-t-10">
@@ -261,28 +203,7 @@
                     </th>
                     <th sortname="high_price" class="text-right text-nowrap">
                         High
-                    </th>
-                    @*<th sortname="prev_percentage" class="text-right text-nowrap">
-                            P%
-                        </th>
-                        <th sortname="high_percentage" class="text-right text-nowrap">
-                            H%
-                        </th>
-                        <th sortname="low_percentage" class="text-right text-nowrap">
-                            L%
-                        </th>*@
-                    @*<th sortname="high_count" class="text-right text-nowrap">
-                        HC
-                    </th>
-                    <th sortname="low_count" class="text-right text-nowrap">
-                        LC
-                    </th>*@
-                    @*<th class="text-right text-nowrap">
-                            BTS Profit
-                        </th>
-                        <th class="text-right text-nowrap">
-                            STB Profit
-                        </th>*@
+                    </th>   
                     <th style="width: 50px">
                     </th>
                 </tr>
@@ -357,30 +278,7 @@
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(high_price())"></div>
-                    </td>
-                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                            <div data-bind="text:formatPercentage(prev_percentage())"></div>
-                        </td>
-                        <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                            <div data-bind="text:formatPercentage(high_percentage())"></div>
-                        </td>
-                        <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                            <div data-bind="text:formatPercentage(low_percentage())"></div>
-                        </td>*@
-                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(high_count())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(low_count())"></div>
-                    </td>*@
-                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                            <div data-bind="text:formatNumber(bts_target_profit(),4)"></div>
-                            <div data-bind="text:formatNumber(bts_stop_loss_profit(),4)"></div>
-                        </td>
-                        <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                            <div data-bind="text:formatNumber(stb_target_profit(),4)"></div>
-                            <div data-bind="text:formatNumber(stb_stop_loss_profit(),4)"></div>
-                        </td>*@
+                    </td>   
                     <td style="text-align:center;white-space:nowrap;">
                         <div style="width:80px;">
                             <div class="pull-left">

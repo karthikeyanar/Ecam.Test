@@ -34,49 +34,6 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             if (isNifty200 == true) {
                 arr[arr.length] = { "name": "is_nifty_200", "value": isNifty200 };
             }
-            var is_all_time_low = $("#frmCompanySearch #is_all_time_low")[0].checked;
-            if (is_all_time_low == true) {
-                arr[arr.length] = { "name": "is_all_time_low", "value": is_all_time_low };
-            }
-            var is_all_time_high = $("#frmCompanySearch #is_all_time_high")[0].checked;
-            if (is_all_time_high == true) {
-                arr[arr.length] = { "name": "is_all_time_high", "value": is_all_time_high };
-            }
-            var is_all_time_low_15_days = $("#frmCompanySearch #is_all_time_low_15_days")[0].checked;
-            if (is_all_time_low_15_days == true) {
-                arr[arr.length] = { "name": "is_all_time_low_15_days", "value": is_all_time_low_15_days };
-            }
-            var is_all_time_high_15_days = $("#frmCompanySearch #is_all_time_high_15_days")[0].checked;
-            if (is_all_time_high_15_days == true) {
-                arr[arr.length] = { "name": "is_all_time_high_15_days", "value": is_all_time_high_15_days };
-            }
-
-            var is_all_time_low_5_days = $("#frmCompanySearch #is_all_time_low_5_days")[0].checked;
-            if (is_all_time_low_5_days == true) {
-                arr[arr.length] = { "name": "is_all_time_low_5_days", "value": is_all_time_low_5_days };
-            }
-            var is_all_time_high_5_days = $("#frmCompanySearch #is_all_time_high_5_days")[0].checked;
-            if (is_all_time_high_5_days == true) {
-                arr[arr.length] = { "name": "is_all_time_high_5_days", "value": is_all_time_high_5_days };
-            }
-
-            var is_all_time_low_2_days = $("#frmCompanySearch #is_all_time_low_2_days")[0].checked;
-            if (is_all_time_low_2_days == true) {
-                arr[arr.length] = { "name": "is_all_time_low_2_days", "value": is_all_time_low_2_days };
-            }
-            var is_all_time_high_2_days = $("#frmCompanySearch #is_all_time_high_2_days")[0].checked;
-            if (is_all_time_high_2_days == true) {
-                arr[arr.length] = { "name": "is_all_time_high_2_days", "value": is_all_time_high_2_days };
-            }
-
-            var is_low_yesterday = $("#frmCompanySearch #is_low_yesterday")[0].checked;
-            if (is_low_yesterday == true) {
-                arr[arr.length] = { "name": "is_low_yesterday", "value": is_low_yesterday };
-            }
-            var is_high_yesterday = $("#frmCompanySearch #is_high_yesterday")[0].checked;
-            if (is_high_yesterday == true) {
-                arr[arr.length] = { "name": "is_high_yesterday", "value": is_high_yesterday };
-            }
 
             var is_sell_to_buy = $("#frmCompanySearch #is_sell_to_buy")[0].checked;
             if (is_sell_to_buy == true) {

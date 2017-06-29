@@ -833,165 +833,164 @@ namespace Ecam.Models
                     //Console.WriteLine("CalculatedPrice Update Company=" + company.company_name);
                 }
             }
-            CalculateMovingAVG(symbol);
             #endregion
         }
 
-        public static void CalculateMovingAVG(string symbol)
-        {
-            using (EcamContext context = new EcamContext())
-            {
-                tra_company company = (from q in context.tra_company
-                                       where q.symbol == symbol
-                                       select q).FirstOrDefault();
-                if (company != null)
-                {
-                    DateTime startDate = DateTime.Now.AddDays(-120);
-                    DateTime endDate = DateTime.Now.Date;
-                    List<tra_market> markets = (from q in context.tra_market
-                                                where q.trade_date >= startDate
-                                                && q.trade_date < endDate
-                                                && q.symbol == symbol
-                                                orderby q.trade_date descending
-                                                select q).ToList();
+//        public static void CalculateMovingAVG(string symbol)
+//        {
+//            using (EcamContext context = new EcamContext())
+//            {
+//                tra_company company = (from q in context.tra_company
+//                                       where q.symbol == symbol
+//                                       select q).FirstOrDefault();
+//                if (company != null)
+//                {
+//                    DateTime startDate = DateTime.Now.AddDays(-120);
+//                    DateTime endDate = DateTime.Now.Date;
+//                    List<tra_market> markets = (from q in context.tra_market
+//                                                where q.trade_date >= startDate
+//                                                && q.trade_date < endDate
+//                                                && q.symbol == symbol
+//                                                orderby q.trade_date descending
+//                                                select q).ToList();
 
-                    company.day_1 = CalculateAVG(markets, 1);
-                    company.day_2 = CalculateAVG(markets, 2);
-                    company.day_3 = CalculateAVG(markets, 3);
-                    company.day_4 = CalculateAVG(markets, 4);
+//                    company.day_1 = CalculateAVG(markets, 1);
+//                    company.day_2 = CalculateAVG(markets, 2);
+//                    company.day_3 = CalculateAVG(markets, 3);
+//                    company.day_4 = CalculateAVG(markets, 4);
 
-                    company.day_5 = CalculateAVG(markets, 5);
-                    company.day_10 = CalculateAVG(markets, 10);
-                    company.day_15 = CalculateAVG(markets, 15);
-                    company.day_20 = CalculateAVG(markets, 20);
-                    company.day_25 = CalculateAVG(markets, 25);
-                    company.day_30 = CalculateAVG(markets, 30);
-                    company.day_35 = CalculateAVG(markets, 35);
-                    company.day_40 = CalculateAVG(markets, 40);
-                    company.day_45 = CalculateAVG(markets, 45);
-                    company.day_50 = CalculateAVG(markets, 50);
-                    company.day_55 = CalculateAVG(markets, 55);
-                    company.day_60 = CalculateAVG(markets, 60);
-                    company.day_65 = CalculateAVG(markets, 65);
-                    company.day_70 = CalculateAVG(markets, 70);
-                    company.day_75 = CalculateAVG(markets, 75);
-                    company.day_80 = CalculateAVG(markets, 80);
-                    company.day_85 = CalculateAVG(markets, 85);
-                    company.day_90 = CalculateAVG(markets, 90);
+//                    company.day_5 = CalculateAVG(markets, 5);
+//                    company.day_10 = CalculateAVG(markets, 10);
+//                    company.day_15 = CalculateAVG(markets, 15);
+//                    company.day_20 = CalculateAVG(markets, 20);
+//                    company.day_25 = CalculateAVG(markets, 25);
+//                    company.day_30 = CalculateAVG(markets, 30);
+//                    company.day_35 = CalculateAVG(markets, 35);
+//                    company.day_40 = CalculateAVG(markets, 40);
+//                    company.day_45 = CalculateAVG(markets, 45);
+//                    company.day_50 = CalculateAVG(markets, 50);
+//                    company.day_55 = CalculateAVG(markets, 55);
+//                    company.day_60 = CalculateAVG(markets, 60);
+//                    company.day_65 = CalculateAVG(markets, 65);
+//                    company.day_70 = CalculateAVG(markets, 70);
+//                    company.day_75 = CalculateAVG(markets, 75);
+//                    company.day_80 = CalculateAVG(markets, 80);
+//                    company.day_85 = CalculateAVG(markets, 85);
+//                    company.day_90 = CalculateAVG(markets, 90);
 
-                    bool isDay1High = (company.day_1 ?? 0) <= (company.ltp_price ?? 0);
-                    bool isDay2High = (
-                            (company.day_2 ?? 0) < (company.day_1 ?? 0)
-                            && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
-                            );
-                    bool isDay3High = (
-(company.day_3 ?? 0) < (company.day_2 ?? 0)
-&& (company.day_2 ?? 0) < (company.day_1 ?? 0)
-&& (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
-);
-                    bool isDay4High = (
-                        (company.day_4 ?? 0) < (company.day_3 ?? 0)
-&& (company.day_3 ?? 0) < (company.day_2 ?? 0)
-&& (company.day_2 ?? 0) < (company.day_1 ?? 0)
-&& (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
-);
+//                    bool isDay1High = (company.day_1 ?? 0) <= (company.ltp_price ?? 0);
+//                    bool isDay2High = (
+//                            (company.day_2 ?? 0) < (company.day_1 ?? 0)
+//                            && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
+//                            );
+//                    bool isDay3High = (
+//(company.day_3 ?? 0) < (company.day_2 ?? 0)
+//&& (company.day_2 ?? 0) < (company.day_1 ?? 0)
+//&& (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
+//);
+//                    bool isDay4High = (
+//                        (company.day_4 ?? 0) < (company.day_3 ?? 0)
+//&& (company.day_3 ?? 0) < (company.day_2 ?? 0)
+//&& (company.day_2 ?? 0) < (company.day_1 ?? 0)
+//&& (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
+//);
 
-                    bool isDay5High = (
-                        (company.day_5 ?? 0) < (company.day_4 ?? 0)
-                       && (company.day_4 ?? 0) < (company.day_3 ?? 0)
-&& (company.day_3 ?? 0) < (company.day_2 ?? 0)
-&& (company.day_2 ?? 0) < (company.day_1 ?? 0)
-&& (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
-);
+//                    bool isDay5High = (
+//                        (company.day_5 ?? 0) < (company.day_4 ?? 0)
+//                       && (company.day_4 ?? 0) < (company.day_3 ?? 0)
+//&& (company.day_3 ?? 0) < (company.day_2 ?? 0)
+//&& (company.day_2 ?? 0) < (company.day_1 ?? 0)
+//&& (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
+//);
 
-                    bool isDay1Low = (company.day_1 ?? 0) >= (company.ltp_price ?? 0);
-                    bool isDay2Low = (
-                            (company.day_2 ?? 0) > (company.day_1 ?? 0)
-                            && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
-                            );
-                    bool isDay3Low = (
-(company.day_3 ?? 0) > (company.day_2 ?? 0)
-&& (company.day_2 ?? 0) > (company.day_1 ?? 0)
-&& (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
-);
-                    bool isDay4Low = (
-                        (company.day_4 ?? 0) > (company.day_3 ?? 0)
-&& (company.day_3 ?? 0) > (company.day_2 ?? 0)
-&& (company.day_2 ?? 0) > (company.day_1 ?? 0)
-&& (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
-);
-                    bool isDay5Low = (
-                        (company.day_5 ?? 0) > (company.day_4 ?? 0)
-                        && (company.day_4 ?? 0) > (company.day_3 ?? 0)
-&& (company.day_3 ?? 0) > (company.day_2 ?? 0)
-&& (company.day_2 ?? 0) > (company.day_1 ?? 0)
-&& (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
-);
+//                    bool isDay1Low = (company.day_1 ?? 0) >= (company.ltp_price ?? 0);
+//                    bool isDay2Low = (
+//                            (company.day_2 ?? 0) > (company.day_1 ?? 0)
+//                            && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
+//                            );
+//                    bool isDay3Low = (
+//(company.day_3 ?? 0) > (company.day_2 ?? 0)
+//&& (company.day_2 ?? 0) > (company.day_1 ?? 0)
+//&& (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
+//);
+//                    bool isDay4Low = (
+//                        (company.day_4 ?? 0) > (company.day_3 ?? 0)
+//&& (company.day_3 ?? 0) > (company.day_2 ?? 0)
+//&& (company.day_2 ?? 0) > (company.day_1 ?? 0)
+//&& (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
+//);
+//                    bool isDay5Low = (
+//                        (company.day_5 ?? 0) > (company.day_4 ?? 0)
+//                        && (company.day_4 ?? 0) > (company.day_3 ?? 0)
+//&& (company.day_3 ?? 0) > (company.day_2 ?? 0)
+//&& (company.day_2 ?? 0) > (company.day_1 ?? 0)
+//&& (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
+//);
 
-                    int highCnt = 0;
-                    int lowCnt = 0;
-                    if (isDay1High == true && isDay2High == true
-                        && isDay3High == true && isDay4High == true
-                        && isDay5High == true)
-                    {
-                        highCnt = 5;
-                    }
-                    else if (isDay1High == true && isDay2High == true
-                        && isDay3High == true && isDay4High == true
-                        )
-                    {
-                        highCnt = 4;
-                    }
-                    else if (isDay1High == true && isDay2High == true
-                        && isDay3High == true
-                        )
-                    {
-                        highCnt = 3;
-                    }
-                    else if (isDay1High == true && isDay2High == true
-                        )
-                    {
-                        highCnt = 2;
-                    }
-                    else if (isDay1High == true)
-                    {
-                        highCnt = 1;
-                    }
+//                    int highCnt = 0;
+//                    int lowCnt = 0;
+//                    if (isDay1High == true && isDay2High == true
+//                        && isDay3High == true && isDay4High == true
+//                        && isDay5High == true)
+//                    {
+//                        highCnt = 5;
+//                    }
+//                    else if (isDay1High == true && isDay2High == true
+//                        && isDay3High == true && isDay4High == true
+//                        )
+//                    {
+//                        highCnt = 4;
+//                    }
+//                    else if (isDay1High == true && isDay2High == true
+//                        && isDay3High == true
+//                        )
+//                    {
+//                        highCnt = 3;
+//                    }
+//                    else if (isDay1High == true && isDay2High == true
+//                        )
+//                    {
+//                        highCnt = 2;
+//                    }
+//                    else if (isDay1High == true)
+//                    {
+//                        highCnt = 1;
+//                    }
 
-                    if (isDay1Low == true && isDay2Low == true
-                        && isDay3Low == true && isDay4Low == true
-                        && isDay5Low == true)
-                    {
-                        lowCnt = 5;
-                    }
-                    else if (isDay1Low == true && isDay2Low == true
-                        && isDay3Low == true && isDay4Low == true
-                        )
-                    {
-                        lowCnt = 4;
-                    }
-                    else if (isDay1Low == true && isDay2Low == true
-                        && isDay3Low == true
-                        )
-                    {
-                        lowCnt = 3;
-                    }
-                    else if (isDay1Low == true && isDay2Low == true
-                        )
-                    {
-                        lowCnt = 2;
-                    }
-                    else if (isDay1Low == true)
-                    {
-                        lowCnt = 1;
-                    }
-                    company.high_count = highCnt;
-                    company.low_count = lowCnt;
-                    context.Entry(company).State = System.Data.Entity.EntityState.Modified;
-                    context.SaveChanges();
-                }
-            }
-        }
+//                    if (isDay1Low == true && isDay2Low == true
+//                        && isDay3Low == true && isDay4Low == true
+//                        && isDay5Low == true)
+//                    {
+//                        lowCnt = 5;
+//                    }
+//                    else if (isDay1Low == true && isDay2Low == true
+//                        && isDay3Low == true && isDay4Low == true
+//                        )
+//                    {
+//                        lowCnt = 4;
+//                    }
+//                    else if (isDay1Low == true && isDay2Low == true
+//                        && isDay3Low == true
+//                        )
+//                    {
+//                        lowCnt = 3;
+//                    }
+//                    else if (isDay1Low == true && isDay2Low == true
+//                        )
+//                    {
+//                        lowCnt = 2;
+//                    }
+//                    else if (isDay1Low == true)
+//                    {
+//                        lowCnt = 1;
+//                    }
+//                    company.high_count = highCnt;
+//                    company.low_count = lowCnt;
+//                    context.Entry(company).State = System.Data.Entity.EntityState.Modified;
+//                    context.SaveChanges();
+//                }
+//            }
+//        }
 
         private static decimal CalculateAVG(List<tra_market> markets, int dayCount)
         {
