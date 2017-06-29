@@ -14,6 +14,13 @@ namespace Ecam.Contracts
         public string symbol { get; set; }
         public System.DateTime trade_date { get; set; }
         public decimal ltp_price { get; set; }
+        public decimal? rsi { get; set; }
+        public decimal? prev_rsi { get; set; }
+        public decimal? diff_rsi {
+            get {
+                return (this.rsi ?? 0) - (this.prev_rsi ?? 0);
+            }
+        }
 
         public decimal open_price { get; set; }
         public decimal ltp_percentage { get; set; }

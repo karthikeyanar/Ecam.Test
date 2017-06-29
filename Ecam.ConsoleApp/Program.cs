@@ -69,12 +69,39 @@ namespace Ecam.ConsoleApp
             {
                 rows = (from q in context.tra_market_intra_day orderby q.symbol, q.trade_date ascending select q).ToList();
                 companies = (from q in context.tra_company select q).ToList();
+                //foreach (var market in rows)
+                //{
+                //    DateTime tradeDate = market.trade_date.Date;
+                //    var prev = (from q in context.tra_market
+                //                where q.symbol == market.symbol
+                //                && q.trade_date < tradeDate
+                //                orderby q.trade_date descending
+                //                select q).FirstOrDefault();
+                //    if (prev != null)
+                //    {
+                //        TempRSI value = new TempRSI
+                //        {
+                //            symbol = market.symbol,
+                //            close = market.ltp_price,
+                //            prev = (prev.close_price ?? 0),
+                //            date = market.trade_date,
+                //        };
+                //        value.avg_downward = (((prev.avg_downward ?? 0) * (14 - 1) + value.downward) / 14);
+                //        value.avg_upward = (((prev.avg_upward ?? 0) * (14 - 1) + value.upward) / 14);
+                //        //market.avg_upward = value.avg_upward;
+                //        //market.avg_downward = value.avg_downward;
+                //        //market.prev_rsi = prev.rsi;
+                //        market.rsi = value.rsi;
+                //        context.Entry(market).State = System.Data.Entity.EntityState.Modified;
+                //        context.SaveChanges();
+                //    }
+                //}
             }
             if (rows.Count > 0)
             {
                 List<string> symbols = (from q in rows select q.symbol).Distinct().ToList();
                 DateTime firstDate = (from q in rows orderby q.trade_date descending select q).FirstOrDefault().trade_date.Date;
-                DateTime startTime = Convert.ToDateTime(firstDate.ToString("dd/MMM/yyyy") + " 9:15AM");
+                DateTime startTime = Convert.ToDateTime(firstDate.ToString("dd/MMM/yyyy") + " 9:19AM");
                 DateTime endTime = Convert.ToDateTime(firstDate.ToString("dd/MMM/yyyy") + " 10:00AM");
                 foreach (string symbol in symbols)
                 {
@@ -89,6 +116,22 @@ namespace Ecam.ConsoleApp
                             decimal? lastPrice = lastLTP.ltp_price;
                             decimal? finalPrice = company.ltp_price;
                             decimal? openPrice = company.open_price;
+
+                            decimal? rsi = firstLTP.rsi;
+                            decimal? prevRSI = 0;
+                            using(EcamContext context = new EcamContext())
+                            {
+                                DateTime dt = firstLTP.trade_date.Date;
+                                var prev = (from q in context.tra_market
+                                            where q.symbol == firstLTP.symbol
+                                            && q.trade_date < dt
+                                            orderby q.trade_date descending
+                                            select q).FirstOrDefault();
+                                if (prev != null)
+                                {
+                                    prevRSI = prev.rsi;
+                                }
+                            }
 
                             List<decimal> percentageList = new List<decimal>();
 
@@ -141,24 +184,24 @@ namespace Ecam.ConsoleApp
                                     && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
                                     );
                             bool isDay3High = (
-        (company.day_3 ?? 0) < (company.day_2 ?? 0)
-        && (company.day_2 ?? 0) < (company.day_1 ?? 0)
-        && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
-        );
+                            (company.day_3 ?? 0) < (company.day_2 ?? 0)
+                            && (company.day_2 ?? 0) < (company.day_1 ?? 0)
+                            && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
+                            );
                             bool isDay4High = (
                                 (company.day_4 ?? 0) < (company.day_3 ?? 0)
-       && (company.day_3 ?? 0) < (company.day_2 ?? 0)
-       && (company.day_2 ?? 0) < (company.day_1 ?? 0)
-       && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
-       );
+                            && (company.day_3 ?? 0) < (company.day_2 ?? 0)
+                            && (company.day_2 ?? 0) < (company.day_1 ?? 0)
+                            && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
+                            );
 
                             bool isDay5High = (
                                 (company.day_5 ?? 0) < (company.day_4 ?? 0)
                                && (company.day_4 ?? 0) < (company.day_3 ?? 0)
-      && (company.day_3 ?? 0) < (company.day_2 ?? 0)
-      && (company.day_2 ?? 0) < (company.day_1 ?? 0)
-      && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
-      );
+                            && (company.day_3 ?? 0) < (company.day_2 ?? 0)
+                            && (company.day_2 ?? 0) < (company.day_1 ?? 0)
+                            && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
+                            );
 
                             bool isDay1Low = (company.day_1 ?? 0) >= (company.ltp_price ?? 0);
                             bool isDay2Low = (
@@ -166,23 +209,23 @@ namespace Ecam.ConsoleApp
                                     && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
                                     );
                             bool isDay3Low = (
-        (company.day_3 ?? 0) > (company.day_2 ?? 0)
-        && (company.day_2 ?? 0) > (company.day_1 ?? 0)
-        && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
-        );
+                            (company.day_3 ?? 0) > (company.day_2 ?? 0)
+                            && (company.day_2 ?? 0) > (company.day_1 ?? 0)
+                            && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
+                            );
                             bool isDay4Low = (
                                 (company.day_4 ?? 0) > (company.day_3 ?? 0)
-    && (company.day_3 ?? 0) > (company.day_2 ?? 0)
-    && (company.day_2 ?? 0) > (company.day_1 ?? 0)
-    && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
-    );
+                            && (company.day_3 ?? 0) > (company.day_2 ?? 0)
+                            && (company.day_2 ?? 0) > (company.day_1 ?? 0)
+                            && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
+                            );
                             bool isDay5Low = (
                                 (company.day_5 ?? 0) > (company.day_4 ?? 0)
                                 && (company.day_4 ?? 0) > (company.day_3 ?? 0)
-    && (company.day_3 ?? 0) > (company.day_2 ?? 0)
-    && (company.day_2 ?? 0) > (company.day_1 ?? 0)
-    && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
-    );
+                            && (company.day_3 ?? 0) > (company.day_2 ?? 0)
+                            && (company.day_2 ?? 0) > (company.day_1 ?? 0)
+                            && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
+                            );
                             using (EcamContext context = new EcamContext())
                             {
                                 tra_intra_day_profit profit = (from q in context.tra_intra_day_profit
@@ -202,6 +245,9 @@ namespace Ecam.ConsoleApp
                                 profit.last_percentage = (lastPercentage ?? 0);
                                 profit.first_percentage = (firstPercentage ?? 0);
                                 profit.final_percentage = (finalPercentage ?? 0);
+                                profit.rsi = rsi;
+                                profit.prev_rsi = prevRSI;
+                                profit.diff_rsi = (rsi ?? 0) - (prevRSI ?? 0);
                                 int highCnt = 0;
                                 int lowCnt = 0;
                                 if (isDay1High == true && isDay2High == true
@@ -705,12 +751,12 @@ namespace Ecam.ConsoleApp
                     //string fileName = "C:\\Users\\kart\\Desktop\\MF\\relianceindustries_RI.html";
                     //content = System.IO.File.ReadAllText(fileName);
                     regex = new Regex(
-    @"NSE:(?<symbol>\s*\w*&*\w*)",
-    RegexOptions.IgnoreCase
-    | RegexOptions.Multiline
-    | RegexOptions.IgnorePatternWhitespace
-    | RegexOptions.Compiled
-    );
+        @"NSE:(?<symbol>\s*\w*&*\w*)",
+        RegexOptions.IgnoreCase
+        | RegexOptions.Multiline
+        | RegexOptions.IgnorePatternWhitespace
+        | RegexOptions.Compiled
+        );
                     collections = regex.Matches(content);
                     if (collections.Count > 0)
                     {

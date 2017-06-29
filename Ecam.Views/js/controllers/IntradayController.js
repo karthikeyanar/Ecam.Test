@@ -353,7 +353,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $childTD.addClass("loading");
             $childTD.empty();
             $("#detail-template").tmpl({}).appendTo($childTD);
-            $childTD.css("padding-left", "75px").css("background-color", "#F2F2F2");
+            $childTD.css("padding-left", "25px").css("background-color", "#F2F2F2");
             $childTD.removeClass("loading");
 
             var symbol = $childTD.attr("symbol");

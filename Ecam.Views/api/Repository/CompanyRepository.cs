@@ -692,6 +692,8 @@ namespace Ecam.Framework.Repository
                             ",c.open_price" + Environment.NewLine +
                             ",intra.ltp_price" + Environment.NewLine +
                             ",c.company_id" + Environment.NewLine +
+                            ",intra.rsi" + Environment.NewLine +
+                            ",(select ifnull(m.rsi,0) from tra_market m where m.symbol = intra.symbol and m.trade_date < date(intra.trade_date) order by m.trade_date desc limit 0,1) as prev_rsi" +
                             ",(((ifnull(intra.ltp_price, 0) - ifnull(c.open_price, 0)) / ifnull(c.open_price, 0)) * 100) as ltp_percentage" + Environment.NewLine + "";
 
             sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, orderBy, pageLimit);

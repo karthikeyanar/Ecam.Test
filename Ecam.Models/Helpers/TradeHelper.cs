@@ -1461,11 +1461,30 @@ RegexOptions.IgnoreCase
                             {
                                 using (EcamContext context = new EcamContext())
                                 {
+                                    TempRSI value = new TempRSI
+                                    {
+                                        symbol = symbol,
+                                        close = currentPrice,
+                                        prev = 0,
+                                        date = tradeDate.Date
+                                    };
+                                    var prev = (from q in context.tra_market
+                                                where q.symbol == symbol
+                                                && q.trade_date < tradeDate.Date
+                                                orderby q.trade_date descending
+                                                select q).FirstOrDefault();
+                                    if (prev != null)
+                                    {
+                                        value.prev = (prev.close_price ?? 0);
+                                        value.avg_downward = (((prev.avg_downward ?? 0) * (14 - 1) + value.downward) / 14);
+                                        value.avg_upward = (((prev.avg_upward ?? 0) * (14 - 1) + value.upward) / 14);
+                                    }
                                     context.tra_market_intra_day.Add(new tra_market_intra_day
                                     {
                                         symbol = symbol,
                                         ltp_price = currentPrice,
-                                        trade_date = DateTime.Now
+                                        trade_date = DateTime.Now,
+                                        rsi = value.rsi,
                                     });
                                     context.SaveChanges();
                                 }

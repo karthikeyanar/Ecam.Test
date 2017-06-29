@@ -451,9 +451,9 @@
 </script>
 <script type="text/html" id="detail-template">
     <div>
-        <div class="rsi-box pull-left m-r-15" style="width:40%;">
+        <div class="rsi-box pull-left m-r-15" style="width:45%;">
         </div>
-        <div class="intraday-box pull-left m-l-15" style="width:40%;">
+        <div class="intraday-box pull-left m-l-15" style="width:45%;">
         </div>
         <div class="clearfix">&nbsp;</div>
     </div> 
@@ -514,6 +514,15 @@
                 <th class="text-right">
                     LTP%
                 </th>
+                <th class="text-right">
+                    RSI
+                </th>
+                <th class="text-right">
+                    Prev.RSI
+                </th>
+                <th class="text-right">
+                    Diff.RSI
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -525,6 +534,9 @@
                 <td class="text-right">${formatNumber(row.open_price)}</td>
                 <td class="text-right">${formatNumber(row.ltp_price)}</td>
                 <td class="text-right">${formatPercentage(row.ltp_percentage)}</td>
+                <td class="text-right">${formatNumber(row.rsi)}</td>
+                <td class="text-right">${formatNumber(row.prev_rsi)}</td>
+                <td class="text-right">${formatNumber(row.diff_rsi)}</td>
             </tr>
             {{/each}}
         </tbody>
