@@ -61,279 +61,279 @@ namespace Ecam.ConsoleApp
 
 
 
-        private static void CaculateIntraydayProfit()
-        {
-            List<tra_market_intra_day> rows;
-            List<tra_company> companies;
-            using (EcamContext context = new EcamContext())
-            {
-                rows = (from q in context.tra_market_intra_day orderby q.symbol, q.trade_date ascending select q).ToList();
-                companies = (from q in context.tra_company select q).ToList();
-                //foreach (var market in rows)
-                //{
-                //    DateTime tradeDate = market.trade_date.Date;
-                //    var prev = (from q in context.tra_market
-                //                where q.symbol == market.symbol
-                //                && q.trade_date < tradeDate
-                //                orderby q.trade_date descending
-                //                select q).FirstOrDefault();
-                //    if (prev != null)
-                //    {
-                //        TempRSI value = new TempRSI
-                //        {
-                //            symbol = market.symbol,
-                //            close = market.ltp_price,
-                //            prev = (prev.close_price ?? 0),
-                //            date = market.trade_date,
-                //        };
-                //        value.avg_downward = (((prev.avg_downward ?? 0) * (14 - 1) + value.downward) / 14);
-                //        value.avg_upward = (((prev.avg_upward ?? 0) * (14 - 1) + value.upward) / 14);
-                //        //market.avg_upward = value.avg_upward;
-                //        //market.avg_downward = value.avg_downward;
-                //        //market.prev_rsi = prev.rsi;
-                //        market.rsi = value.rsi;
-                //        context.Entry(market).State = System.Data.Entity.EntityState.Modified;
-                //        context.SaveChanges();
-                //    }
-                //}
-            }
-            if (rows.Count > 0)
-            {
-                List<string> symbols = (from q in rows select q.symbol).Distinct().ToList();
-                DateTime firstDate = (from q in rows orderby q.trade_date descending select q).FirstOrDefault().trade_date.Date;
-                DateTime startTime = Convert.ToDateTime(firstDate.ToString("dd/MMM/yyyy") + " 9:19AM");
-                DateTime endTime = Convert.ToDateTime(firstDate.ToString("dd/MMM/yyyy") + " 10:00AM");
-                foreach (string symbol in symbols)
-                {
-                    var company = (from q in companies where q.symbol == symbol select q).FirstOrDefault();
-                    var firstLTP = (from q in rows where q.symbol == symbol && q.trade_date >= firstDate && q.trade_date <= startTime orderby q.trade_date descending select q).FirstOrDefault();
-                    var lastLTP = (from q in rows where q.symbol == symbol && q.trade_date >= firstDate && q.trade_date <= endTime orderby q.trade_date descending select q).FirstOrDefault();
-                    if (firstLTP != null && lastLTP != null && company != null)
-                    {
-                        try
-                        {
-                            decimal? firstPrice = firstLTP.ltp_price;
-                            decimal? lastPrice = lastLTP.ltp_price;
-                            decimal? finalPrice = company.ltp_price;
-                            decimal? openPrice = company.open_price;
+        //private static void CaculateIntraydayProfit()
+        //{
+        //    List<tra_market_intra_day> rows;
+        //    List<tra_company> companies;
+        //    using (EcamContext context = new EcamContext())
+        //    {
+        //        rows = (from q in context.tra_market_intra_day orderby q.symbol, q.trade_date ascending select q).ToList();
+        //        companies = (from q in context.tra_company select q).ToList();
+        //        //foreach (var market in rows)
+        //        //{
+        //        //    DateTime tradeDate = market.trade_date.Date;
+        //        //    var prev = (from q in context.tra_market
+        //        //                where q.symbol == market.symbol
+        //        //                && q.trade_date < tradeDate
+        //        //                orderby q.trade_date descending
+        //        //                select q).FirstOrDefault();
+        //        //    if (prev != null)
+        //        //    {
+        //        //        TempRSI value = new TempRSI
+        //        //        {
+        //        //            symbol = market.symbol,
+        //        //            close = market.ltp_price,
+        //        //            prev = (prev.close_price ?? 0),
+        //        //            date = market.trade_date,
+        //        //        };
+        //        //        value.avg_downward = (((prev.avg_downward ?? 0) * (14 - 1) + value.downward) / 14);
+        //        //        value.avg_upward = (((prev.avg_upward ?? 0) * (14 - 1) + value.upward) / 14);
+        //        //        //market.avg_upward = value.avg_upward;
+        //        //        //market.avg_downward = value.avg_downward;
+        //        //        //market.prev_rsi = prev.rsi;
+        //        //        market.rsi = value.rsi;
+        //        //        context.Entry(market).State = System.Data.Entity.EntityState.Modified;
+        //        //        context.SaveChanges();
+        //        //    }
+        //        //}
+        //    }
+        //    if (rows.Count > 0)
+        //    {
+        //        List<string> symbols = (from q in rows select q.symbol).Distinct().ToList();
+        //        DateTime firstDate = (from q in rows orderby q.trade_date descending select q).FirstOrDefault().trade_date.Date;
+        //        DateTime startTime = Convert.ToDateTime(firstDate.ToString("dd/MMM/yyyy") + " 9:19AM");
+        //        DateTime endTime = Convert.ToDateTime(firstDate.ToString("dd/MMM/yyyy") + " 10:00AM");
+        //        foreach (string symbol in symbols)
+        //        {
+        //            var company = (from q in companies where q.symbol == symbol select q).FirstOrDefault();
+        //            var firstLTP = (from q in rows where q.symbol == symbol && q.trade_date >= firstDate && q.trade_date <= startTime orderby q.trade_date descending select q).FirstOrDefault();
+        //            var lastLTP = (from q in rows where q.symbol == symbol && q.trade_date >= firstDate && q.trade_date <= endTime orderby q.trade_date descending select q).FirstOrDefault();
+        //            if (firstLTP != null && lastLTP != null && company != null)
+        //            {
+        //                try
+        //                {
+        //                    decimal? firstPrice = firstLTP.ltp_price;
+        //                    decimal? lastPrice = lastLTP.ltp_price;
+        //                    decimal? finalPrice = company.ltp_price;
+        //                    decimal? openPrice = company.open_price;
 
-                            decimal? rsi = firstLTP.rsi;
-                            decimal? prevRSI = 0;
-                            using(EcamContext context = new EcamContext())
-                            {
-                                DateTime dt = firstLTP.trade_date.Date;
-                                var prev = (from q in context.tra_market
-                                            where q.symbol == firstLTP.symbol
-                                            && q.trade_date < dt
-                                            orderby q.trade_date descending
-                                            select q).FirstOrDefault();
-                                if (prev != null)
-                                {
-                                    prevRSI = prev.rsi;
-                                }
-                            }
+        //                    decimal? rsi = firstLTP.rsi;
+        //                    decimal? prevRSI = 0;
+        //                    using(EcamContext context = new EcamContext())
+        //                    {
+        //                        DateTime dt = firstLTP.trade_date.Date;
+        //                        var prev = (from q in context.tra_market
+        //                                    where q.symbol == firstLTP.symbol
+        //                                    && q.trade_date < dt
+        //                                    orderby q.trade_date descending
+        //                                    select q).FirstOrDefault();
+        //                        if (prev != null)
+        //                        {
+        //                            prevRSI = prev.rsi;
+        //                        }
+        //                    }
 
-                            List<decimal> percentageList = new List<decimal>();
+        //                    List<decimal> percentageList = new List<decimal>();
 
-                            var nextList = (from q in rows
-                                            where q.symbol == symbol && q.trade_date > firstLTP.trade_date
-                                            orderby q.trade_date ascending
-                                            select q).ToList();
-                            foreach (var nextRow in nextList)
-                            {
-                                decimal? p = ((nextRow.ltp_price - (firstPrice ?? 0)) / (firstPrice ?? 0)) * 100;
-                                percentageList.Add((p ?? 0));
-                            }
+        //                    var nextList = (from q in rows
+        //                                    where q.symbol == symbol && q.trade_date > firstLTP.trade_date
+        //                                    orderby q.trade_date ascending
+        //                                    select q).ToList();
+        //                    foreach (var nextRow in nextList)
+        //                    {
+        //                        decimal? p = ((nextRow.ltp_price - (firstPrice ?? 0)) / (firstPrice ?? 0)) * 100;
+        //                        percentageList.Add((p ?? 0));
+        //                    }
 
-                            decimal? percentage = 0;
-                            if (percentageList.Count > 0)
-                            {
-                                percentage = (from q in percentageList orderby q descending select q).FirstOrDefault();
-                            }
-                            else
-                            {
-                                percentage = (((lastPrice ?? 0) - (firstPrice ?? 0)) / (firstPrice ?? 0)) * 100;
-                            }
+        //                    decimal? percentage = 0;
+        //                    if (percentageList.Count > 0)
+        //                    {
+        //                        percentage = (from q in percentageList orderby q descending select q).FirstOrDefault();
+        //                    }
+        //                    else
+        //                    {
+        //                        percentage = (((lastPrice ?? 0) - (firstPrice ?? 0)) / (firstPrice ?? 0)) * 100;
+        //                    }
 
-                            percentageList = new List<decimal>();
-                            foreach (var nextRow in nextList)
-                            {
-                                decimal? p = (((firstPrice ?? 0) - nextRow.ltp_price) / nextRow.ltp_price) * 100;
-                                percentageList.Add((p ?? 0));
-                            }
+        //                    percentageList = new List<decimal>();
+        //                    foreach (var nextRow in nextList)
+        //                    {
+        //                        decimal? p = (((firstPrice ?? 0) - nextRow.ltp_price) / nextRow.ltp_price) * 100;
+        //                        percentageList.Add((p ?? 0));
+        //                    }
 
-                            decimal? reversePercentage = 0;
-                            if (percentageList.Count > 0)
-                            {
-                                reversePercentage = (from q in percentageList orderby q descending select q).FirstOrDefault();
-                            }
-                            else
-                            {
-                                reversePercentage = (((firstPrice ?? 0) - (lastPrice ?? 0)) / (lastPrice ?? 0)) * 100;
-                            }
+        //                    decimal? reversePercentage = 0;
+        //                    if (percentageList.Count > 0)
+        //                    {
+        //                        reversePercentage = (from q in percentageList orderby q descending select q).FirstOrDefault();
+        //                    }
+        //                    else
+        //                    {
+        //                        reversePercentage = (((firstPrice ?? 0) - (lastPrice ?? 0)) / (lastPrice ?? 0)) * 100;
+        //                    }
 
-                            decimal? finalPercentage = (((finalPrice ?? 0) - (firstPrice ?? 0)) / (firstPrice ?? 0)) * 100;
+        //                    decimal? finalPercentage = (((finalPrice ?? 0) - (firstPrice ?? 0)) / (firstPrice ?? 0)) * 100;
 
-                            decimal? firstPercentage = (((firstPrice ?? 0) - (openPrice ?? 0)) / (openPrice ?? 0)) * 100;
+        //                    decimal? firstPercentage = (((firstPrice ?? 0) - (openPrice ?? 0)) / (openPrice ?? 0)) * 100;
 
-                            decimal? lastPercentage = (((lastPrice ?? 0) - (openPrice ?? 0)) / (openPrice ?? 0)) * 100;
+        //                    decimal? lastPercentage = (((lastPrice ?? 0) - (openPrice ?? 0)) / (openPrice ?? 0)) * 100;
 
-                            bool isDay1High = (company.day_1 ?? 0) <= (company.ltp_price ?? 0);
-                            bool isDay2High = (
-                                    (company.day_2 ?? 0) < (company.day_1 ?? 0)
-                                    && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
-                                    );
-                            bool isDay3High = (
-                            (company.day_3 ?? 0) < (company.day_2 ?? 0)
-                            && (company.day_2 ?? 0) < (company.day_1 ?? 0)
-                            && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
-                            );
-                            bool isDay4High = (
-                                (company.day_4 ?? 0) < (company.day_3 ?? 0)
-                            && (company.day_3 ?? 0) < (company.day_2 ?? 0)
-                            && (company.day_2 ?? 0) < (company.day_1 ?? 0)
-                            && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
-                            );
+        //                    bool isDay1High = (company.day_1 ?? 0) <= (company.ltp_price ?? 0);
+        //                    bool isDay2High = (
+        //                            (company.day_2 ?? 0) < (company.day_1 ?? 0)
+        //                            && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
+        //                            );
+        //                    bool isDay3High = (
+        //                    (company.day_3 ?? 0) < (company.day_2 ?? 0)
+        //                    && (company.day_2 ?? 0) < (company.day_1 ?? 0)
+        //                    && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
+        //                    );
+        //                    bool isDay4High = (
+        //                        (company.day_4 ?? 0) < (company.day_3 ?? 0)
+        //                    && (company.day_3 ?? 0) < (company.day_2 ?? 0)
+        //                    && (company.day_2 ?? 0) < (company.day_1 ?? 0)
+        //                    && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
+        //                    );
 
-                            bool isDay5High = (
-                                (company.day_5 ?? 0) < (company.day_4 ?? 0)
-                               && (company.day_4 ?? 0) < (company.day_3 ?? 0)
-                            && (company.day_3 ?? 0) < (company.day_2 ?? 0)
-                            && (company.day_2 ?? 0) < (company.day_1 ?? 0)
-                            && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
-                            );
+        //                    bool isDay5High = (
+        //                        (company.day_5 ?? 0) < (company.day_4 ?? 0)
+        //                       && (company.day_4 ?? 0) < (company.day_3 ?? 0)
+        //                    && (company.day_3 ?? 0) < (company.day_2 ?? 0)
+        //                    && (company.day_2 ?? 0) < (company.day_1 ?? 0)
+        //                    && (company.day_1 ?? 0) <= (company.ltp_price ?? 0)
+        //                    );
 
-                            bool isDay1Low = (company.day_1 ?? 0) >= (company.ltp_price ?? 0);
-                            bool isDay2Low = (
-                                    (company.day_2 ?? 0) > (company.day_1 ?? 0)
-                                    && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
-                                    );
-                            bool isDay3Low = (
-                            (company.day_3 ?? 0) > (company.day_2 ?? 0)
-                            && (company.day_2 ?? 0) > (company.day_1 ?? 0)
-                            && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
-                            );
-                            bool isDay4Low = (
-                                (company.day_4 ?? 0) > (company.day_3 ?? 0)
-                            && (company.day_3 ?? 0) > (company.day_2 ?? 0)
-                            && (company.day_2 ?? 0) > (company.day_1 ?? 0)
-                            && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
-                            );
-                            bool isDay5Low = (
-                                (company.day_5 ?? 0) > (company.day_4 ?? 0)
-                                && (company.day_4 ?? 0) > (company.day_3 ?? 0)
-                            && (company.day_3 ?? 0) > (company.day_2 ?? 0)
-                            && (company.day_2 ?? 0) > (company.day_1 ?? 0)
-                            && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
-                            );
-                            using (EcamContext context = new EcamContext())
-                            {
-                                tra_intra_day_profit profit = (from q in context.tra_intra_day_profit
-                                                               where q.symbol == symbol
-                                                               && q.trade_date == firstDate
-                                                               select q).FirstOrDefault();
-                                bool isNew = false;
-                                if (profit == null)
-                                {
-                                    profit = new tra_intra_day_profit();
-                                    isNew = true;
-                                }
-                                profit.symbol = symbol;
-                                profit.trade_date = firstDate;
-                                profit.profit_percentage = (percentage ?? 0);
-                                profit.reverse_percentage = (reversePercentage ?? 0);
-                                profit.last_percentage = (lastPercentage ?? 0);
-                                profit.first_percentage = (firstPercentage ?? 0);
-                                profit.final_percentage = (finalPercentage ?? 0);
-                                profit.rsi = rsi;
-                                profit.prev_rsi = prevRSI;
-                                profit.diff_rsi = (rsi ?? 0) - (prevRSI ?? 0);
-                                int highCnt = 0;
-                                int lowCnt = 0;
-                                if (isDay1High == true && isDay2High == true
-                                    && isDay3High == true && isDay4High == true
-                                    && isDay5High == true)
-                                {
-                                    highCnt = 5;
-                                }
-                                else if (isDay1High == true && isDay2High == true
-                                    && isDay3High == true && isDay4High == true
-                                    )
-                                {
-                                    highCnt = 4;
-                                }
-                                else if (isDay1High == true && isDay2High == true
-                                    && isDay3High == true
-                                    )
-                                {
-                                    highCnt = 3;
-                                }
-                                else if (isDay1High == true && isDay2High == true
-                                    )
-                                {
-                                    highCnt = 2;
-                                }
-                                else if (isDay1High == true)
-                                {
-                                    highCnt = 1;
-                                }
+        //                    bool isDay1Low = (company.day_1 ?? 0) >= (company.ltp_price ?? 0);
+        //                    bool isDay2Low = (
+        //                            (company.day_2 ?? 0) > (company.day_1 ?? 0)
+        //                            && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
+        //                            );
+        //                    bool isDay3Low = (
+        //                    (company.day_3 ?? 0) > (company.day_2 ?? 0)
+        //                    && (company.day_2 ?? 0) > (company.day_1 ?? 0)
+        //                    && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
+        //                    );
+        //                    bool isDay4Low = (
+        //                        (company.day_4 ?? 0) > (company.day_3 ?? 0)
+        //                    && (company.day_3 ?? 0) > (company.day_2 ?? 0)
+        //                    && (company.day_2 ?? 0) > (company.day_1 ?? 0)
+        //                    && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
+        //                    );
+        //                    bool isDay5Low = (
+        //                        (company.day_5 ?? 0) > (company.day_4 ?? 0)
+        //                        && (company.day_4 ?? 0) > (company.day_3 ?? 0)
+        //                    && (company.day_3 ?? 0) > (company.day_2 ?? 0)
+        //                    && (company.day_2 ?? 0) > (company.day_1 ?? 0)
+        //                    && (company.day_1 ?? 0) >= (company.ltp_price ?? 0)
+        //                    );
+        //                    using (EcamContext context = new EcamContext())
+        //                    {
+        //                        tra_intra_day_profit profit = (from q in context.tra_intra_day_profit
+        //                                                       where q.symbol == symbol
+        //                                                       && q.trade_date == firstDate
+        //                                                       select q).FirstOrDefault();
+        //                        bool isNew = false;
+        //                        if (profit == null)
+        //                        {
+        //                            profit = new tra_intra_day_profit();
+        //                            isNew = true;
+        //                        }
+        //                        profit.symbol = symbol;
+        //                        profit.trade_date = firstDate;
+        //                        profit.profit_percentage = (percentage ?? 0);
+        //                        profit.reverse_percentage = (reversePercentage ?? 0);
+        //                        profit.last_percentage = (lastPercentage ?? 0);
+        //                        profit.first_percentage = (firstPercentage ?? 0);
+        //                        profit.final_percentage = (finalPercentage ?? 0);
+        //                        profit.rsi = rsi;
+        //                        profit.prev_rsi = prevRSI;
+        //                        profit.diff_rsi = (rsi ?? 0) - (prevRSI ?? 0);
+        //                        int highCnt = 0;
+        //                        int lowCnt = 0;
+        //                        if (isDay1High == true && isDay2High == true
+        //                            && isDay3High == true && isDay4High == true
+        //                            && isDay5High == true)
+        //                        {
+        //                            highCnt = 5;
+        //                        }
+        //                        else if (isDay1High == true && isDay2High == true
+        //                            && isDay3High == true && isDay4High == true
+        //                            )
+        //                        {
+        //                            highCnt = 4;
+        //                        }
+        //                        else if (isDay1High == true && isDay2High == true
+        //                            && isDay3High == true
+        //                            )
+        //                        {
+        //                            highCnt = 3;
+        //                        }
+        //                        else if (isDay1High == true && isDay2High == true
+        //                            )
+        //                        {
+        //                            highCnt = 2;
+        //                        }
+        //                        else if (isDay1High == true)
+        //                        {
+        //                            highCnt = 1;
+        //                        }
 
-                                if (isDay1Low == true && isDay2Low == true
-                                    && isDay3Low == true && isDay4Low == true
-                                    && isDay5Low == true)
-                                {
-                                    lowCnt = 5;
-                                }
-                                else if (isDay1Low == true && isDay2Low == true
-                                    && isDay3Low == true && isDay4Low == true
-                                    )
-                                {
-                                    lowCnt = 4;
-                                }
-                                else if (isDay1Low == true && isDay2Low == true
-                                    && isDay3Low == true
-                                    )
-                                {
-                                    lowCnt = 3;
-                                }
-                                else if (isDay1Low == true && isDay2Low == true
-                                    )
-                                {
-                                    lowCnt = 2;
-                                }
-                                else if (isDay1Low == true)
-                                {
-                                    lowCnt = 1;
-                                }
-                                profit.high_count = highCnt;
-                                profit.low_count = lowCnt;
+        //                        if (isDay1Low == true && isDay2Low == true
+        //                            && isDay3Low == true && isDay4Low == true
+        //                            && isDay5Low == true)
+        //                        {
+        //                            lowCnt = 5;
+        //                        }
+        //                        else if (isDay1Low == true && isDay2Low == true
+        //                            && isDay3Low == true && isDay4Low == true
+        //                            )
+        //                        {
+        //                            lowCnt = 4;
+        //                        }
+        //                        else if (isDay1Low == true && isDay2Low == true
+        //                            && isDay3Low == true
+        //                            )
+        //                        {
+        //                            lowCnt = 3;
+        //                        }
+        //                        else if (isDay1Low == true && isDay2Low == true
+        //                            )
+        //                        {
+        //                            lowCnt = 2;
+        //                        }
+        //                        else if (isDay1Low == true)
+        //                        {
+        //                            lowCnt = 1;
+        //                        }
+        //                        profit.high_count = highCnt;
+        //                        profit.low_count = lowCnt;
 
-                                if (isNew == true)
-                                {
-                                    context.tra_intra_day_profit.Add(profit);
-                                }
-                                else
-                                {
-                                    context.Entry(profit).State = System.Data.Entity.EntityState.Modified;
-                                }
-                                context.SaveChanges();
+        //                        if (isNew == true)
+        //                        {
+        //                            context.tra_intra_day_profit.Add(profit);
+        //                        }
+        //                        else
+        //                        {
+        //                            context.Entry(profit).State = System.Data.Entity.EntityState.Modified;
+        //                        }
+        //                        context.SaveChanges();
 
-                                var updateCompany = (from q in context.tra_company where q.symbol == symbol select q).FirstOrDefault();
-                                if (updateCompany != null)
-                                {
-                                    updateCompany.high_count = highCnt;
-                                    updateCompany.low_count = lowCnt;
-                                    context.Entry(updateCompany).State = System.Data.Entity.EntityState.Modified;
-                                    context.SaveChanges();
-                                }
-                                Console.WriteLine("Calculate profit completed symbol=" + symbol);
-                            }
-                        }
-                        catch { }
-                    }
-                }
-            }
-        }
+        //                        var updateCompany = (from q in context.tra_company where q.symbol == symbol select q).FirstOrDefault();
+        //                        if (updateCompany != null)
+        //                        {
+        //                            updateCompany.high_count = highCnt;
+        //                            updateCompany.low_count = lowCnt;
+        //                            context.Entry(updateCompany).State = System.Data.Entity.EntityState.Modified;
+        //                            context.SaveChanges();
+        //                        }
+        //                        Console.WriteLine("Calculate profit completed symbol=" + symbol);
+        //                    }
+        //                }
+        //                catch { }
+        //            }
+        //        }
+        //    }
+        //}
 
         private static int _INDEX = -1;
         private static string[] _COMPANIES;
@@ -465,38 +465,38 @@ namespace Ecam.ConsoleApp
             GoogleHistoryDownloadStart();
         }
 
-        private static void MutualFunds()
-        {
-            string linkFileName = System.Configuration.ConfigurationManager.AppSettings["LINK_FILE_NAME"];
-            if (string.IsNullOrEmpty(linkFileName) == false)
-            {
-                string content = System.IO.File.ReadAllText(linkFileName);
-                string[] arr = content.Split(("\r\n").ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                foreach (string url in arr)
-                {
-                    if (string.IsNullOrEmpty(url) == false)
-                    {
-                        ParseMainHTML(url);
-                    }
-                }
-            }
-            using (EcamContext context = new EcamContext())
-            {
-                var companies = (from q in context.tra_company select q).ToList();
-                var funds = (from q in context.tra_mutual_fund_pf select q).ToList();
-                foreach (var company in companies)
-                {
-                    company.mf_cnt = (from q in funds
-                                      where q.symbol == company.symbol
-                                      select q.fund_id).Count();
-                    company.mf_qty = (from q in funds
-                                      where q.symbol == company.symbol
-                                      select q.quantity).Sum();
-                    context.Entry(company).State = System.Data.Entity.EntityState.Modified;
-                }
-                context.SaveChanges();
-            }
-        }
+        //private static void MutualFunds()
+        //{
+        //    string linkFileName = System.Configuration.ConfigurationManager.AppSettings["LINK_FILE_NAME"];
+        //    if (string.IsNullOrEmpty(linkFileName) == false)
+        //    {
+        //        string content = System.IO.File.ReadAllText(linkFileName);
+        //        string[] arr = content.Split(("\r\n").ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+        //        foreach (string url in arr)
+        //        {
+        //            if (string.IsNullOrEmpty(url) == false)
+        //            {
+        //                ParseMainHTML(url);
+        //            }
+        //        }
+        //    }
+        //    using (EcamContext context = new EcamContext())
+        //    {
+        //        var companies = (from q in context.tra_company select q).ToList();
+        //        var funds = (from q in context.tra_mutual_fund_pf select q).ToList();
+        //        foreach (var company in companies)
+        //        {
+        //            company.mf_cnt = (from q in funds
+        //                              where q.symbol == company.symbol
+        //                              select q.fund_id).Count();
+        //            company.mf_qty = (from q in funds
+        //                              where q.symbol == company.symbol
+        //                              select q.quantity).Sum();
+        //            context.Entry(company).State = System.Data.Entity.EntityState.Modified;
+        //        }
+        //        context.SaveChanges();
+        //    }
+        //}
 
         private static void ParseMainHTML(string url)
         {
