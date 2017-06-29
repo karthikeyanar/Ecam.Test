@@ -1516,6 +1516,8 @@ RegexOptions.IgnoreCase
                                 };
                                 value.avg_downward = (((prev.avg_downward ?? 0) * (14 - 1) + value.downward) / 14);
                                 value.avg_upward = (((prev.avg_upward ?? 0) * (14 - 1) + value.upward) / 14);
+                                market.avg_upward = value.avg_upward;
+                                market.avg_downward = value.avg_downward;
                                 market.prev_rsi = prev.rsi;
                                 market.rsi = value.rsi;
                                 context.Entry(market).State = System.Data.Entity.EntityState.Modified;
@@ -1732,7 +1734,7 @@ RegexOptions.IgnoreCase
         }
 
 
-        private static void CalculateRSI(string symbol)
+        public static void CalculateRSI(string symbol)
         {
             using (EcamContext context = new EcamContext())
             {
@@ -1777,7 +1779,7 @@ RegexOptions.IgnoreCase
             }
         }
 
-        private static void CalculateRSI(List<tra_market> fullMarkets, DateTime date, int id)
+        public static void CalculateRSI(List<tra_market> fullMarkets, DateTime date, int id)
         {
             List<tra_market> markets = (from q in fullMarkets
                                         where q.trade_date.Date <= date
