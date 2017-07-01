@@ -26,6 +26,17 @@ namespace Ecam.ConsoleApp
             string sql = "delete from tra_market_intra_day where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(curdate(), '%Y-%m-%d')";
             MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
             //CaculateIntraydayProfit();
+            using (EcamContext context = new EcamContext())
+            {
+                List<tra_company> companies = (from q in context.tra_company
+                                               where (q.is_nifty_200 ?? false) == false
+                                               orderby q.symbol ascending
+                                               select q).ToList();
+                foreach (var company in companies)
+                {
+                    GoogleHistoryDownloadData.CalculateRSI(company.symbol);
+                }
+            }
             DownloadStart();
         }
 

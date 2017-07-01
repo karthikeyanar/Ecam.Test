@@ -523,7 +523,7 @@ namespace Ecam.Framework.Repository
                 {
                     lastTradeDate = lastTrade.trade_date;
                 }
-            }
+            } 
 
             where.AppendFormat(" intra.trade_date>='{0}'", lastTradeDate.ToString("yyyy-MM-dd"));
 
