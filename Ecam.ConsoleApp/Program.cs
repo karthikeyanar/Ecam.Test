@@ -469,7 +469,17 @@ namespace Ecam.ConsoleApp
             List<tra_company> companies;
             using (EcamContext context = new EcamContext())
             {
-                companies = (from q in context.tra_company orderby q.symbol ascending select q).ToList();
+                IQueryable<tra_company> query = context.tra_company;
+                string SYMBOLS = System.Configuration.ConfigurationManager.AppSettings["SYMBOLS"];
+                if (string.IsNullOrEmpty(SYMBOLS) == false)
+                {
+                    List<string> symbolList = Helper.ConvertStringList(SYMBOLS);
+                    if (symbolList.Count > 0)
+                    {
+                        query = (from q in query where symbolList.Contains(q.symbol) == true select q);
+                    }
+                }
+                companies = (from q in query orderby q.symbol ascending select q).ToList();
             }
             _COMPANIES = (from q in companies select q.symbol).ToArray();
             _INDEX = -1;
