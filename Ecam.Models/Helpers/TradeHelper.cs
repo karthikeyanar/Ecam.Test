@@ -1089,14 +1089,16 @@ RegexOptions.IgnoreCase
             return regex.Replace(html, "");
         }
 
-        public static decimal GetUpdatePriceUsingGoogle(string symbol)
+        public static void GetUpdatePriceUsingGoogle(string symbol)
         {
-            string type = "NSE";
-            string url = string.Format("http://finance.google.com/finance/info?client=ig&q={0}:{1}", type, symbol.Replace("&", "%26"));
-            WebClient client = new WebClient();
-            string html = client.DownloadString(url);
+            //string type = "NSE";
+            //string url = string.Format("http://finance.google.com/finance/info?client=ig&q={0}:{1}", type, symbol.Replace("&", "%26"));
+            //WebClient client = new WebClient();
+            //string html = client.DownloadString(url);
+            //GoogleDownloadData gd = new GoogleDownloadData();
+            //return gd.GetPrice(html);
             GoogleDownloadData gd = new GoogleDownloadData();
-            return gd.GetPrice(html);
+            gd.GoogleDataDownload(symbol);
         }
 
         //private static void CalculatedPrice(TempClass import)
@@ -1194,7 +1196,7 @@ RegexOptions.IgnoreCase
             _doneEvent.Set();
         }
 
-        private void GoogleDataDownload(string symbol)
+        public void GoogleDataDownload(string symbol)
         {
             if (string.IsNullOrEmpty(symbol) == true) { return; }
             Random rnd = new Random();

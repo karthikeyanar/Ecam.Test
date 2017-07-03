@@ -541,6 +541,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     "type": type,
                     "data": data
                 }).done(function (json) {
+                    self.refresh();
+                    /*
                     if (json != null) {
                         dataFor.ltp_price(json);
                         //dataFor.open_price(json.open_price);
@@ -550,6 +552,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         //dataFor.close_price(json.close_price);
                         //dataFor.prev_price(json.prev_price);
                     }
+                    */
                     //jAlert("Saved");
                 }).fail(function (jqxhr) {
                 }).always(function (jqxhr) {

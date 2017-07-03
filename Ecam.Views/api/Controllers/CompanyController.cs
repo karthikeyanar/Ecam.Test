@@ -119,8 +119,8 @@ namespace Ecam.Views.Controllers
         public IHttpActionResult RefreshSymbol()
         {
             string symbol = HttpContext.Current.Request["symbol"];
-            decimal ltpPrice = TradeHelper.GetUpdatePriceUsingGoogle(symbol);
-            return Ok(ltpPrice);
+            TradeHelper.GetUpdatePriceUsingGoogle(symbol);
+            return Ok();
             //TRA_COMPANY company = null;
             //using (EcamContext context = new EcamContext()) 
             //{
