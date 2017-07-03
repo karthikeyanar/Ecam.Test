@@ -370,6 +370,9 @@
                     Close
                 </th>
                 <th class="text-right">
+                   %
+                </th>
+                <th class="text-right">
                     RSI
                 </th>
                 <th class="text-right">
@@ -383,6 +386,7 @@
                 <td>${row.symbol}</td>
                 <td>${formatDate(row.trade_date)}</td>
                 <td class="text-right">${formatNumber(row.close_price)}</td>
+                <td class="text-right">${formatPercentage(row.prev_percentage)}</td>
                 <td class="text-right">${formatNumber(row.rsi)}</td>
                 <td class="text-right">${formatNumber(row.prev_rsi)}</td>
             </tr>

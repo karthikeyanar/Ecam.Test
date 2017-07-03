@@ -624,6 +624,8 @@ namespace Ecam.Framework.Repository
                             ",m.close_price" + Environment.NewLine +
                             ",m.rsi" + Environment.NewLine +
                             ",m.prev_rsi" + Environment.NewLine +
+                            ",(((ifnull(m.ltp_price, 0) - ifnull(m.open_price, 0)) / ifnull(m.open_price, 0)) * 100) as ltp_percentage" + Environment.NewLine +
+                            ",(((ifnull(m.ltp_price, 0) - ifnull(m.prev_price, 0)) / ifnull(m.prev_price, 0)) * 100) as prev_percentage" + Environment.NewLine +
                             ",c.company_id" + Environment.NewLine +
                             "";
 
