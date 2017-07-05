@@ -25,7 +25,7 @@
                 <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" id="is_book_mark" /> Show Book Mark
+                            <input type="checkbox" id="is_book_mark" checked /> Show Book Mark
                         </label>
                     </div>
                 </div>
@@ -46,7 +46,7 @@
                 <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" id="is_nifty_200" checked /> Nifty 200
+                            <input type="checkbox" id="is_nifty_200" /> Nifty 200
                         </label>
                     </div>
                 </div>
@@ -65,7 +65,7 @@
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <input type="text" name="to_prev_rsi" class="form-control input-sm" placeholder="To Prev RSI" style="width:100px" />
-                </div> 
+                </div>
                 <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
@@ -203,7 +203,7 @@
                     </th>
                     <th sortname="high_price" class="text-right text-nowrap">
                         High
-                    </th>   
+                    </th>
                     <th style="width: 50px">
                     </th>
                 </tr>
@@ -219,11 +219,11 @@
                     </td>
                     <td style="text-align:center;">
                         <div style="width:40px;">
-                            <div class="pull-left">
-                                <a href="javascript:;" class="is-book-mark">
-                                    <i data-bind="css:{'fa-bookmark fg-primary': cBool(is_book_mark())==true,'fa-bookmark-o': cBool(is_book_mark())==false}" class="fa fa-bookmark"></i>
-                                </a>
-                            </div>
+                            @*<div class="pull-left">
+                                    <a href="javascript:;" class="is-book-mark">
+                                        <i data-bind="css:{'fa-bookmark fg-primary': cBool(is_book_mark())==true,'fa-bookmark-o': cBool(is_book_mark())==false}" class="fa fa-bookmark"></i>
+                                    </a>
+                                </div>*@
                             <div class="pull-left m-l-15">
                                 <a href="javascript:;" data-bind="attr:{'symbol': symbol()}" class="refresh-symbol"><i class="fa fa-refresh"></i></a>
                             </div><div class="clearfix"></div>
@@ -278,7 +278,7 @@
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(high_price())"></div>
-                    </td>   
+                    </td>
                     <td style="text-align:center;white-space:nowrap;">
                         <div style="width:80px;">
                             <div class="pull-left">
@@ -354,7 +354,7 @@
         <div class="intraday-box pull-left m-l-15" style="width:45%;">
         </div>
         <div class="clearfix">&nbsp;</div>
-    </div> 
+    </div>
 </script>
 <script type="text/html" id="detail-rsi-template">
     <table cellpadding="0" cellspacing="0" class="table table-condensed no-margin-bottom">
@@ -370,7 +370,7 @@
                     Close
                 </th>
                 <th class="text-right">
-                   %
+                    %
                 </th>
                 <th class="text-right">
                     RSI

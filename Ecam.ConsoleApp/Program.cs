@@ -26,18 +26,36 @@ namespace Ecam.ConsoleApp
             string sql = "delete from tra_market_intra_day where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(curdate(), '%Y-%m-%d')";
             MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
             //CaculateIntraydayProfit();
-            //using (EcamContext context = new EcamContext())
-            //{
-            //    List<tra_company> companies = (from q in context.tra_company
-            //                                   where (q.is_nifty_200 ?? false) == false
-            //                                   orderby q.symbol ascending
-            //                                   select q).ToList();
-            //    foreach (var company in companies)
-            //    {
-            //        GoogleHistoryDownloadData.CalculateRSI(company.symbol);
-            //    }
-            //}
-            DownloadStart();
+            using (EcamContext context = new EcamContext())
+            {
+                List<tra_market> markets = (from q in context.tra_market
+                                            orderby q.symbol ascending
+                                            select q).ToList();
+                foreach (var market in markets)
+                {
+                    tra_market prev = (from q in context.tra_market
+                                       where q.symbol == market.symbol
+                                       && q.trade_date < market.trade_date
+                                       orderby q.trade_date descending
+                                       select q).FirstOrDefault();
+                    if (prev != null)
+                    {
+                        market.prev_price = prev.close_price;
+                        sql = string.Format("update tra_market set prev_price={0} where market_id={1}", prev.close_price, market.id);
+                        MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+                        Console.WriteLine("Update market price symbol=" + market.symbol + ",Date=" + market.trade_date.ToString("MMM/dd/yyyy"));
+                    }
+                }
+                List<tra_company> companies = (from q in context.tra_company
+                                               orderby q.symbol ascending
+                                               select q).ToList();
+                foreach (var company in companies)
+                {
+                    TradeHelper.UpdateCompanyPrice(company.symbol);
+                    Console.WriteLine("Update company price symbol=" + company.symbol);
+                }
+            }
+            //DownloadStart();
         }
 
         private static void DownloadStart()
@@ -354,24 +372,34 @@ namespace Ecam.ConsoleApp
             using (EcamContext context = new EcamContext())
             {
                 IQueryable<tra_company> query = context.tra_company;
+
+                DateTime morningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:15AM");
+                DateTime morningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 10:15AM");
+                DateTime eveningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 3:31PM");
+                DateTime eveningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 11:59PM");
+                DateTime now = DateTime.Now;
                 DateTime targetTime = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 3:30PM");
-                if (DateTime.Now <= targetTime)
+
+                if ((now >= morningStart && now <= eveningStart))
                 {
-                    string IS_NIFTY_50 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_50"];
-                    string IS_NIFTY_100 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_100"];
-                    string IS_NIFTY_200 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_200"];
-                    if (IS_NIFTY_50 == "true")
-                    {
-                        query = query.Where(q => (q.is_nifty_50 ?? false) == true);
-                    }
-                    if (IS_NIFTY_100 == "true")
-                    {
-                        query = query.Where(q => (q.is_nifty_100 ?? false) == true);
-                    }
-                    if (IS_NIFTY_200 == "true")
-                    {
-                        query = query.Where(q => (q.is_nifty_200 ?? false) == true);
-                    }
+                    query = (from q in query
+                             where (q.prev_rsi ?? 0) >= 70 || (q.prev_rsi ?? 0) <= 30
+                             select q);
+                    //string IS_NIFTY_50 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_50"];
+                    //string IS_NIFTY_100 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_100"];
+                    //string IS_NIFTY_200 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_200"];
+                    //if (IS_NIFTY_50 == "true")
+                    //{
+                    //    query = query.Where(q => (q.is_nifty_50 ?? false) == true);
+                    //}
+                    //if (IS_NIFTY_100 == "true")
+                    //{
+                    //    query = query.Where(q => (q.is_nifty_100 ?? false) == true);
+                    //}
+                    //if (IS_NIFTY_200 == "true")
+                    //{
+                    //    query = query.Where(q => (q.is_nifty_200 ?? false) == true);
+                    //}
                 }
                 companies = (from q in query
                              orderby (q.prev_rsi ?? 0) descending
@@ -382,6 +410,9 @@ namespace Ecam.ConsoleApp
 
             // Reset book mark
             string sql = "update tra_company set is_book_mark=0;";
+            MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+
+            sql = "update tra_company set is_book_mark=1 where ifnull(prev_rsi,0)>=70 or ifnull(prev_rsi,0)<=30;";
             MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
 
             // Delete yesterday tra_market_intraday
