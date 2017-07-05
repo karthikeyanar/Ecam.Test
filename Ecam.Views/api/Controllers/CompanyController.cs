@@ -72,13 +72,6 @@ namespace Ecam.Views.Controllers
             columnFormats.Add(new CSVColumn { DisplayName = "Category", PropertyName = "category_name" });
             columnFormats.Add(new CSVColumn { DisplayName = "LTP", PropertyName = "ltp_price", IsNumber = true });
             columnFormats.Add(new CSVColumn { DisplayName = "Change %", PropertyName = "prev_percentage", IsPercentage = true });
-            columnFormats.Add(new CSVColumn { DisplayName = "5 Days %", PropertyName = "day_5_percentage", IsPercentage = true });
-            columnFormats.Add(new CSVColumn { DisplayName = "10 Days %", PropertyName = "day_10_percentage", IsPercentage = true });
-            columnFormats.Add(new CSVColumn { DisplayName = "15 Days %", PropertyName = "day_15_percentage", IsPercentage = true });
-            columnFormats.Add(new CSVColumn { DisplayName = "20 Days %", PropertyName = "day_20_percentage", IsPercentage = true });
-            columnFormats.Add(new CSVColumn { DisplayName = "25 Days %", PropertyName = "day_25_percentage", IsPercentage = true });
-            columnFormats.Add(new CSVColumn { DisplayName = "30 Days %", PropertyName = "day_30_percentage", IsPercentage = true });
-            columnFormats.Add(new CSVColumn { DisplayName = "35 Days", PropertyName = "day_35", IsPercentage = true });
             columnFormats.Add(new CSVColumn { DisplayName = "Week 52 Low", PropertyName = "week_52_low", IsPercentage = true });
             columnFormats.Add(new CSVColumn { DisplayName = "Week 52 Low %", PropertyName = "week_52_low_percentage", IsPercentage = true });
             columnFormats.Add(new CSVColumn { DisplayName = "Week 52 High", PropertyName = "week_52_high", IsPercentage = true });
@@ -168,12 +161,18 @@ namespace Ecam.Views.Controllers
             string companyName = contract.company_name;
             string symbol = contract.symbol;
             string categoryName = contract.category_name;
+            bool isNifty50 = (contract.is_nifty_50 ?? false);
+            bool isNifty100 = (contract.is_nifty_100 ?? false);
+            bool isNifty200 = (contract.is_nifty_200 ?? false);
             if ((contract.id ?? 0) > 0)
             {
                 contract = _CompanyRepository.Get(new TRA_COMPANY_SEARCH { id = contract.id }, new Paging { }).rows.FirstOrDefault();
                 contract.company_name = companyName;
                 contract.symbol = symbol;
                 contract.category_name = categoryName;
+                contract.is_nifty_50 = isNifty50;
+                contract.is_nifty_100 = isNifty100;
+                contract.is_nifty_200 = isNifty200;
             }
             var saveContract = Repository.Save(contract);
             if (saveContract.Errors == null)
