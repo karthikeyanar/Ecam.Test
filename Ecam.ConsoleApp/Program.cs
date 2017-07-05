@@ -467,6 +467,10 @@ namespace Ecam.ConsoleApp
         {
             int totalCount = _COMPANIES.Length;
             int queueCount = 64;
+            if (totalCount <= queueCount)
+            {
+                queueCount = totalCount;
+            }
             // One event is used for each Fibonacci object
             ManualResetEvent[] doneEvents = new ManualResetEvent[queueCount];
             GoogleHistoryDownloadData[] downArray = new GoogleHistoryDownloadData[queueCount];

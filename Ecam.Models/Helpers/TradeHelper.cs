@@ -1767,8 +1767,8 @@ RegexOptions.IgnoreCase
                     DateTime endDate = DateTime.Now.Date.AddDays(-120);
                     var markets = (from q in context.tra_market
                                    where q.symbol == company.symbol
-                                   && q.trade_date <= today
-                                   && q.trade_date >= endDate
+                                   //&& q.trade_date <= today
+                                   //&& q.trade_date >= endDate
                                    orderby q.trade_date ascending
                                    select q).ToList();
                     foreach (var market in markets)
