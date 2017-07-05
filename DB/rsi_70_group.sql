@@ -1,0 +1,1 @@
+select * from (select symbol,count(*) as cnt from tra_market where rsi >=70 group by symbol) as tbl order by cnt desc limit 0,100
