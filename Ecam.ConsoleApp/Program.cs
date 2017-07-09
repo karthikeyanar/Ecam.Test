@@ -382,9 +382,9 @@ namespace Ecam.ConsoleApp
 
                 if ((now >= morningStart && now <= eveningStart))
                 {
-                    query = (from q in query
-                             where (q.prev_rsi ?? 0) >= 70 || (q.prev_rsi ?? 0) <= 30
-                             select q);
+                    //query = (from q in query
+                    //         where (q.prev_rsi ?? 0) >= 70 || (q.prev_rsi ?? 0) <= 30
+                    //         select q);
                     //string IS_NIFTY_50 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_50"];
                     //string IS_NIFTY_100 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_100"];
                     //string IS_NIFTY_200 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_200"];
