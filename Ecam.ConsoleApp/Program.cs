@@ -26,36 +26,36 @@ namespace Ecam.ConsoleApp
             string sql = "delete from tra_market_intra_day where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(curdate(), '%Y-%m-%d')";
             MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
             //CaculateIntraydayProfit();
-            using (EcamContext context = new EcamContext())
-            {
-                List<tra_market> markets = (from q in context.tra_market
-                                            orderby q.symbol ascending
-                                            select q).ToList();
-                foreach (var market in markets)
-                {
-                    tra_market prev = (from q in context.tra_market
-                                       where q.symbol == market.symbol
-                                       && q.trade_date < market.trade_date
-                                       orderby q.trade_date descending
-                                       select q).FirstOrDefault();
-                    if (prev != null)
-                    {
-                        market.prev_price = prev.close_price;
-                        sql = string.Format("update tra_market set prev_price={0} where market_id={1}", prev.close_price, market.id);
-                        MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-                        Console.WriteLine("Update market price symbol=" + market.symbol + ",Date=" + market.trade_date.ToString("MMM/dd/yyyy"));
-                    }
-                }
-                List<tra_company> companies = (from q in context.tra_company
-                                               orderby q.symbol ascending
-                                               select q).ToList();
-                foreach (var company in companies)
-                {
-                    TradeHelper.UpdateCompanyPrice(company.symbol);
-                    Console.WriteLine("Update company price symbol=" + company.symbol);
-                }
-            }
-            //DownloadStart();
+            //using (EcamContext context = new EcamContext())
+            //{
+            //    List<tra_market> markets = (from q in context.tra_market
+            //                                orderby q.symbol ascending
+            //                                select q).ToList();
+            //    foreach (var market in markets)
+            //    {
+            //        tra_market prev = (from q in context.tra_market
+            //                           where q.symbol == market.symbol
+            //                           && q.trade_date < market.trade_date
+            //                           orderby q.trade_date descending
+            //                           select q).FirstOrDefault();
+            //        if (prev != null)
+            //        {
+            //            market.prev_price = prev.close_price;
+            //            sql = string.Format("update tra_market set prev_price={0} where market_id={1}", prev.close_price, market.id);
+            //            MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+            //            Console.WriteLine("Update market price symbol=" + market.symbol + ",Date=" + market.trade_date.ToString("MMM/dd/yyyy"));
+            //        }
+            //    }
+            //    List<tra_company> companies = (from q in context.tra_company
+            //                                   orderby q.symbol ascending
+            //                                   select q).ToList();
+            //    foreach (var company in companies)
+            //    {
+            //        TradeHelper.UpdateCompanyPrice(company.symbol);
+            //        Console.WriteLine("Update company price symbol=" + company.symbol);
+            //    }
+            //}
+            DownloadStart();
         }
 
         private static void DownloadStart()
