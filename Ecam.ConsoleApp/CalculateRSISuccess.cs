@@ -25,7 +25,7 @@ namespace Ecam.ConsoleApp
             using (EcamContext context = new EcamContext())
             {
                 companies = (from q in context.tra_company
-                             ///where q.is_nifty_200 == true
+                                 ///where q.is_nifty_200 == true
                              orderby q.symbol ascending
                              select q).ToList();
             }
@@ -37,7 +37,7 @@ namespace Ecam.ConsoleApp
                     markets = (from q in contex.tra_market
                                where q.symbol == company.symbol
                                && (q.rsi ?? 0) > 0
-                               && (q.rsi ?? 0) < 45
+                               && (q.rsi ?? 0) <= 20
                                orderby q.trade_date ascending
                                select q).ToList();
                 }
@@ -46,7 +46,7 @@ namespace Ecam.ConsoleApp
                     List<tra_market> tempMarkets = null;
                     using (EcamContext contex = new EcamContext())
                     {
-                        DateTime endDate = market.trade_date.AddDays(1000);
+                        DateTime endDate = market.trade_date.AddDays(30);
                         tempMarkets = (from q in contex.tra_market
                                        where q.symbol == market.symbol
                                        && q.trade_date >= market.trade_date
@@ -54,30 +54,20 @@ namespace Ecam.ConsoleApp
                                        orderby q.trade_date ascending
                                        select q).ToList();
                     }
-                    int total = 30;
-                    int i;
                     List<TempRSI> values = new List<TempRSI>();
                     List<decimal> tempValues = new List<decimal>();
-                    if (tempMarkets.Count < total)
+                    foreach (var tempMarket in tempMarkets)
                     {
-                        string s = string.Empty;
-                    }
-                    else
-                    {
-                        for (i = 0; i < total; i++)
+                        values.Add(new TempRSI
                         {
-                            var tempMarket = tempMarkets[i];
-                            values.Add(new TempRSI
-                            {
-                                id = tempMarket.id,
-                                date = tempMarket.trade_date,
-                                avg_upward = (tempMarket.avg_upward ?? 0),
-                                avg_downward = (tempMarket.avg_downward ?? 0),
-                                prev = 0, // (tempMarket.prev_price ?? 0),
-                                close = (tempMarket.close_price ?? 0)
-                            });
-                            tempValues.Add((tempMarket.close_price ?? 0));
-                        }
+                            id = tempMarket.id,
+                            date = tempMarket.trade_date,
+                            avg_upward = (tempMarket.avg_upward ?? 0),
+                            avg_downward = (tempMarket.avg_downward ?? 0),
+                            prev = 0, // (tempMarket.prev_price ?? 0),
+                            close = (tempMarket.close_price ?? 0)
+                        });
+                        tempValues.Add((tempMarket.close_price ?? 0));
                     }
 
                     if (values.Count > 0)
@@ -86,7 +76,7 @@ namespace Ecam.ConsoleApp
                         TempRSI value = (from q in values where q.close > market.close_price orderby q.close descending select q).FirstOrDefault();
                         if (value == null)
                         {
-                            value = (from q in values where q.close <= market.close_price orderby q.close descending select q).FirstOrDefault();
+                            value = (from q in values where q.close < market.close_price orderby q.close descending select q).FirstOrDefault();
                         }
                         else
                         {
@@ -94,7 +84,7 @@ namespace Ecam.ConsoleApp
                         }
                         if (value != null)
                         {
-                            
+
                             decimal profit = (((value.close - (market.close_price ?? 0)) / (market.close_price ?? 0)) * 100);
                             using (EcamContext context = new EcamContext())
                             {
