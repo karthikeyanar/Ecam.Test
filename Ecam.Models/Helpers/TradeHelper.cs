@@ -1325,7 +1325,7 @@ RegexOptions.IgnoreCase
                     }
                     else
                     {
-                        Helper.Log("ErrorOnGoogleData symbol=" + symbol, "DownloadErrorOnGoogleData_" + rnd.Next(1000, 10000));
+                       // Helper.Log("ErrorOnGoogleData symbol=" + symbol, "DownloadErrorOnGoogleData_" + rnd.Next(1000, 10000));
                     }
                     html = html.Replace("\n", "").Replace("\r", "").Replace("\r\n", "");
 
@@ -1733,7 +1733,7 @@ RegexOptions.IgnoreCase
                 }
                 else
                 {
-                    Helper.Log("ErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData");
+                    //Helper.Log("ErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData");
                 }
                 startWord = "<table class=\"gf-table historical_price\">";
                 endWord = "</table>";
@@ -1747,7 +1747,7 @@ RegexOptions.IgnoreCase
                 }
                 else
                 {
-                    Helper.Log("ErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData");
+                    //Helper.Log("ErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData");
                 }
             }
         }
