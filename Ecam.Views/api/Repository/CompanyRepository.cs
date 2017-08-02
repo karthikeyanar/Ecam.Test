@@ -432,17 +432,17 @@ namespace Ecam.Framework.Repository
             if ((criteria.is_sell_to_buy ?? false) == true)
             {
                 where.AppendFormat(" and ifnull(open_price,0)>=ifnull(low_price,0)");
-                //where.AppendFormat(" and ifnull(open_price,0)>=ifnull(high_price,0)");
-                where.AppendFormat(" and ifnull(high_percentage,0)>=0");
-                where.AppendFormat(" and ifnull(high_percentage,0)<=0.5");
+                where.AppendFormat(" and ifnull(open_price,0)>=ifnull(high_price,0)");
+                //where.AppendFormat(" and ifnull(high_percentage,0)>=0");
+                //where.AppendFormat(" and ifnull(high_percentage,0)<=0.5");
             }
 
             if ((criteria.is_buy_to_sell ?? false) == true)
             {
                 where.AppendFormat(" and ifnull(open_price,0)<=ifnull(high_price,0)");
-                where.AppendFormat(" and ifnull(low_percentage,0)<=0");
-                where.AppendFormat(" and ifnull(low_percentage,0)>=-0.5");
-                //where.AppendFormat(" and ifnull(open_price,0)<=ifnull(low_price,0)");
+                //where.AppendFormat(" and ifnull(low_percentage,0)<=0");
+                //where.AppendFormat(" and ifnull(low_percentage,0)>=-0.5");
+                where.AppendFormat(" and ifnull(open_price,0)<=ifnull(low_price,0)");
             }
 
             if (string.IsNullOrEmpty(criteria.ltp_from_percentage) == false)

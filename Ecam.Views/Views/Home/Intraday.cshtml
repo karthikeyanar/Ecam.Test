@@ -87,7 +87,7 @@
                     <input type="text" name="to_rsi" class="form-control input-sm" placeholder="To RSI" style="width:100px" />
                 </div>
                 <div class="clearfix"></div>
-                <div class="form-group m-r-10 m-t-10">
+                @*<div class="form-group m-r-10 m-t-10">
                     <input type="text" name="available_amount" id="available_amount" placeholder="Available Amount" class="form-control input-sm" style="width:100px;" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
@@ -101,7 +101,7 @@
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <input type="text" name="ltp_to_percentage" id="ltp_to_percentage" placeholder="To %" class="form-control input-sm" style="width:100px;" />
-                </div>
+                </div>*@
                 <div class="form-group m-r-10 m-t-10">
                     <button type="button" id="btn" class="btn btn-success btn-sm" data-bind="click:refresh">Refresh</button>
                 </div>
@@ -177,7 +177,10 @@
                     <th sortname="prev_percentage" class="text-right text-nowrap">
                         C%
                     </th>
-                    <th class="text-right text-nowrap">
+                    <th sortname="ltp_percentage" class="text-right text-nowrap">
+                        LTP%
+                    </th>
+                    @*<th class="text-right text-nowrap">
                         Quantity
                     </th>
                     <th sortname="ltp_price" class="text-right text-nowrap">
@@ -194,7 +197,7 @@
                     </th>
                     <th class="text-right text-nowrap">
                         SL
-                    </th>
+                    </th>*@
                     <th sortname="open_price" class="text-right text-nowrap">
                         Open
                     </th>
@@ -251,6 +254,9 @@
                         <div data-bind="text:formatPercentage(prev_percentage())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(ltp_percentage())"></div>
+                    </td>
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(quantity())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
@@ -269,7 +275,7 @@
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(stop_loss_price(),4)"></div>
-                    </td>
+                    </td>*@
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(open_price())"></div>
                     </td>
