@@ -25,6 +25,7 @@ namespace Ecam.ConsoleApp
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
             string sql = "delete from tra_market_intra_day where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(curdate(), '%Y-%m-%d')";
             MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+            MutualFunds();
             //CaculateIntraydayProfit();
             //using (EcamContext context = new EcamContext())
             //{
@@ -55,7 +56,7 @@ namespace Ecam.ConsoleApp
             //        Console.WriteLine("Update company price symbol=" + company.symbol);
             //    }
             //}
-            DownloadStart();
+            //DownloadStart();
         }
 
         private static void DownloadStart()
@@ -521,38 +522,38 @@ namespace Ecam.ConsoleApp
             GoogleHistoryDownloadStart();
         }
 
-        //private static void MutualFunds()
-        //{
-        //    string linkFileName = System.Configuration.ConfigurationManager.AppSettings["LINK_FILE_NAME"];
-        //    if (string.IsNullOrEmpty(linkFileName) == false)
-        //    {
-        //        string content = System.IO.File.ReadAllText(linkFileName);
-        //        string[] arr = content.Split(("\r\n").ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-        //        foreach (string url in arr)
-        //        {
-        //            if (string.IsNullOrEmpty(url) == false)
-        //            {
-        //                ParseMainHTML(url);
-        //            }
-        //        }
-        //    }
-        //    using (EcamContext context = new EcamContext())
-        //    {
-        //        var companies = (from q in context.tra_company select q).ToList();
-        //        var funds = (from q in context.tra_mutual_fund_pf select q).ToList();
-        //        foreach (var company in companies)
-        //        {
-        //            company.mf_cnt = (from q in funds
-        //                              where q.symbol == company.symbol
-        //                              select q.fund_id).Count();
-        //            company.mf_qty = (from q in funds
-        //                              where q.symbol == company.symbol
-        //                              select q.quantity).Sum();
-        //            context.Entry(company).State = System.Data.Entity.EntityState.Modified;
-        //        }
-        //        context.SaveChanges();
-        //    }
-        //}
+        private static void MutualFunds()
+        {
+            //string linkFileName = System.Configuration.ConfigurationManager.AppSettings["LINK_FILE_NAME"];
+            //if (string.IsNullOrEmpty(linkFileName) == false)
+            //{
+            //    string content = System.IO.File.ReadAllText(linkFileName);
+            //    string[] arr = content.Split(("\r\n").ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            //    foreach (string url in arr)
+            //    {
+            //        if (string.IsNullOrEmpty(url) == false)
+            //        {
+            //            ParseMainHTML(url);
+            //        }
+            //    }
+            //}
+            using (EcamContext context = new EcamContext())
+            {
+                var companies = (from q in context.tra_company select q).ToList();
+                var funds = (from q in context.tra_mutual_fund_pf select q).ToList();
+                foreach (var company in companies)
+                {
+                    company.mf_cnt = (from q in funds
+                                      where q.symbol == company.symbol
+                                      select q.fund_id).Count();
+                    company.mf_qty = (from q in funds
+                                      where q.symbol == company.symbol
+                                      select q.quantity).Sum();
+                    context.Entry(company).State = System.Data.Entity.EntityState.Modified;
+                }
+                context.SaveChanges();
+            }
+        }
 
         private static void ParseMainHTML(string url)
         {

@@ -180,24 +180,6 @@
                     <th sortname="ltp_percentage" class="text-right text-nowrap">
                         LTP%
                     </th>
-                    @*<th class="text-right text-nowrap">
-                            Quantity
-                        </th>
-                        <th sortname="ltp_price" class="text-right text-nowrap">
-                            LTP
-                        </th>
-                        <th class="text-right text-nowrap">
-                            BTS
-                        </th>
-                        <th class="text-right text-nowrap">
-                            STB
-                        </th>
-                        <th class="text-right text-nowrap">
-                            TR
-                        </th>
-                        <th class="text-right text-nowrap">
-                            SL
-                        </th>*@
                     <th sortname="open_price" class="text-right text-nowrap">
                         Open
                     </th>
@@ -206,6 +188,24 @@
                     </th>
                     <th sortname="high_price" class="text-right text-nowrap">
                         High
+                    </th>
+                    <th sortname="mf_cnt" class="text-right">
+                        MFCNT
+                    </th>
+                    <th sortname="mf_qty" class="text-right">
+                        MFQTY
+                    </th>
+                    <th sortname="week_52_low" class="text-right">
+                        W52 Low
+                    </th>
+                    <th sortname="week_52_low_percentage" class="text-right">
+                        W52 Low %
+                    </th>
+                    <th sortname="week_52_high" class="text-right">
+                        W52 High
+                    </th>
+                    <th sortname="week_52_percentage" class="text-right">
+                        W52 High %
                     </th>
                     <th style="width: 50px">
                     </th>
@@ -255,27 +255,7 @@
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(ltp_percentage())"></div>
-                    </td>
-                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                            <div data-bind="text:formatNumber(quantity())"></div>
-                        </td>
-                        <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                            <div data-bind="text:formatNumber(ltp_price())"></div>
-                        </td>
-                        <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                            <div data-bind="text:formatNumber(bts_sell_target(),4)"></div>
-                            <div data-bind="text:formatNumber(bts_stop_loss_target(),4)"></div>
-                        </td>
-                        <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                            <div data-bind="text:formatNumber(stb_sell_target(),4)"></div>
-                            <div data-bind="text:formatNumber(stb_stop_loss_target(),4)"></div>
-                        </td>
-                        <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                            <div data-bind="text:formatNumber(target_price(),4)"></div>
-                        </td>
-                        <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                            <div data-bind="text:formatNumber(stop_loss_price(),4)"></div>
-                        </td>*@
+                    </td> 
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(open_price())"></div>
                     </td>
@@ -284,6 +264,24 @@
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(high_price())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(mf_cnt())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(mf_qty())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(week_52_low())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(week_52_low_percentage())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(week_52_high())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(week_52_percentage())"></div>
                     </td>
                     <td style="text-align:center;white-space:nowrap;">
                         <div style="width:80px;">
@@ -428,9 +426,6 @@
                 <th class="text-right">
                     Prev.RSI
                 </th>
-                <th class="text-right">
-                    Diff.RSI
-                </th>
             </tr>
         </thead>
         <tbody>
@@ -443,8 +438,7 @@
                 <td class="text-right">${formatNumber(row.ltp_price)}</td>
                 <td class="text-right">${formatPercentage(row.ltp_percentage)}</td>
                 <td class="text-right">${formatNumber(row.rsi)}</td>
-                <td class="text-right">${formatNumber(row.prev_rsi)}</td>
-                <td class="text-right">${formatNumber(row.diff_rsi)}</td>
+                <td class="text-right">${formatNumber(row.prev_rsi)}</td> 
             </tr>
             {{/each}}
         </tbody>
