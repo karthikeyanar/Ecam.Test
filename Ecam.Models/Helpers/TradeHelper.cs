@@ -1246,7 +1246,11 @@ RegexOptions.IgnoreCase
                     try
                     {
                         html = client.DownloadString(url);
-                        File.WriteAllText(fileName, html);
+                        try
+                        {
+                            File.WriteAllText(fileName, html);
+                        }
+                        catch { }
                         Console.WriteLine("Download google data symbol evening=" + symbol);
                     }
                     catch
@@ -1701,53 +1705,60 @@ RegexOptions.IgnoreCase
 
         private void GoogleHistoryDataDownload(string symbol)
         {
-            string url = string.Empty;
-            string html = string.Empty;
-            string GOOGLE_HISTORY_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_HISTORY_DATA"];
-            WebClient client = new WebClient();
-            int numberOfRows = DataTypeHelper.ToInt32(System.Configuration.ConfigurationManager.AppSettings["NUMBER_OF_ROWS"]);
-            url = string.Format("https://www.google.com/finance/historical?q=NSE:{0}&num=" + numberOfRows
-                                                                , symbol.Replace("&", "%26")
-                                                                );
-            string fileName = GOOGLE_HISTORY_DATA + "\\" + symbol + ".html";
-            if (File.Exists(fileName) == false)
+            if (string.IsNullOrEmpty(symbol) == false)
             {
-                html = client.DownloadString(url);
-                File.WriteAllText(fileName, html);
-                Console.WriteLine("Download google data symbol=" + symbol);
-            }
-            else
-            {
-                html = File.ReadAllText(fileName);
-            }
-            if (string.IsNullOrEmpty(html) == false)
-            {
-                string startWord = "<table class=\"gf-table historical_price\">";
-                string endWord = "google.finance.gce";
-                int startIndex = html.IndexOf(startWord);
-                int endIndex = html.IndexOf(endWord);
-                int length = endIndex - startIndex + endWord.Length;
-                if (startIndex > 0 && endIndex > 0)
+                string url = string.Empty;
+                string html = string.Empty;
+                string GOOGLE_HISTORY_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_HISTORY_DATA"];
+                WebClient client = new WebClient();
+                int numberOfRows = DataTypeHelper.ToInt32(System.Configuration.ConfigurationManager.AppSettings["NUMBER_OF_ROWS"]);
+                url = string.Format("https://www.google.com/finance/historical?q=NSE:{0}&num=" + numberOfRows
+                                                                    , symbol.Replace("&", "%26")
+                                                                    );
+                string fileName = GOOGLE_HISTORY_DATA + "\\" + symbol + ".html";
+                if (File.Exists(fileName) == false)
                 {
-                    html = html.Substring(startIndex, length);
+                    html = client.DownloadString(url);
+                    try
+                    {
+                        File.WriteAllText(fileName, html);
+                    }
+                    catch { }
+                    Console.WriteLine("Download google data symbol=" + symbol);
                 }
                 else
                 {
-                    //Helper.Log("ErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData");
+                    html = File.ReadAllText(fileName);
                 }
-                startWord = "<table class=\"gf-table historical_price\">";
-                endWord = "</table>";
-                startIndex = html.IndexOf(startWord);
-                endIndex = html.IndexOf(endWord);
-                length = endIndex - startIndex + endWord.Length;
-                if (startIndex >= 0 && endIndex > 0)
+                if (string.IsNullOrEmpty(html) == false)
                 {
-                    string parseContent = html.Substring(startIndex, length);
-                    TradeHelper.GoogleIndiaImport(parseContent, symbol);
-                }
-                else
-                {
-                    //Helper.Log("ErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData");
+                    string startWord = "<table class=\"gf-table historical_price\">";
+                    string endWord = "google.finance.gce";
+                    int startIndex = html.IndexOf(startWord);
+                    int endIndex = html.IndexOf(endWord);
+                    int length = endIndex - startIndex + endWord.Length;
+                    if (startIndex > 0 && endIndex > 0)
+                    {
+                        html = html.Substring(startIndex, length);
+                    }
+                    else
+                    {
+                        //Helper.Log("ErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData");
+                    }
+                    startWord = "<table class=\"gf-table historical_price\">";
+                    endWord = "</table>";
+                    startIndex = html.IndexOf(startWord);
+                    endIndex = html.IndexOf(endWord);
+                    length = endIndex - startIndex + endWord.Length;
+                    if (startIndex >= 0 && endIndex > 0)
+                    {
+                        string parseContent = html.Substring(startIndex, length);
+                        TradeHelper.GoogleIndiaImport(parseContent, symbol);
+                    }
+                    else
+                    {
+                        //Helper.Log("ErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData");
+                    }
                 }
             }
         }
