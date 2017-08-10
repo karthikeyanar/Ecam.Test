@@ -25,7 +25,7 @@ namespace Ecam.ConsoleApp
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
             string sql = "delete from tra_market_intra_day where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(curdate(), '%Y-%m-%d')";
             MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-            MutualFunds();
+            //MutualFunds();
             //CaculateIntraydayProfit();
             //using (EcamContext context = new EcamContext())
             //{
@@ -56,7 +56,7 @@ namespace Ecam.ConsoleApp
             //        Console.WriteLine("Update company price symbol=" + company.symbol);
             //    }
             //}
-            //DownloadStart();
+            DownloadStart();
         }
 
         private static void DownloadStart()
