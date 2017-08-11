@@ -394,18 +394,35 @@ namespace Ecam.Framework.Repository
 
             orderBy = string.Format("order by {0} {1}", paging.SortName, paging.SortOrder);
 
-            selectFields = "ct.*" + Environment.NewLine + "";
+            selectFields = "ct.company_id" + Environment.NewLine  +
+                           ",ct.company_name" + Environment.NewLine +
+                           ",ct.symbol" + Environment.NewLine +
+                           ",ct.open_price" + Environment.NewLine +
+                           ",ct.high_price" + Environment.NewLine +
+                           ",ct.low_price" + Environment.NewLine +
+                           ",ct.ltp_price" + Environment.NewLine +
+                           ",ct.close_price" + Environment.NewLine +
+                           ",ct.prev_price" + Environment.NewLine +
+                           ",ct.week_52_high" + Environment.NewLine +
+                           ",ct.week_52_low" + Environment.NewLine +
+                           ",ct.is_book_mark" + Environment.NewLine +
+                           ",ct.is_nifty_50" + Environment.NewLine +
+                           ",ct.is_nifty_100" + Environment.NewLine +
+                           ",ct.is_nifty_200" + Environment.NewLine +
+                           ",ct.rsi" + Environment.NewLine +
+                           ",ct.prev_rsi" + Environment.NewLine +
+                           "";
 
             if (string.IsNullOrEmpty(criteria.mf_ids) == false)
             {
-                selectFields += ",(select count(mpf.fund_id) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol and mpf.fund_id in(" + criteria.mf_ids + ")) as mf_cnt_2" + Environment.NewLine +
-                    ",(select sum(ifnull(mpf.stock_value, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol and mpf.fund_id in(" + criteria.mf_ids + ")) as mf_qty_2" + Environment.NewLine +
+                selectFields += ",(select count(mpf.fund_id) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol and mpf.fund_id in(" + criteria.mf_ids + ")) as mf_cnt" + Environment.NewLine +
+                    ",(select sum(ifnull(mpf.stock_value, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol and mpf.fund_id in(" + criteria.mf_ids + ")) as mf_qty" + Environment.NewLine +
                     "";
             }
             else
             {
-                selectFields += ",(select count(mpf.fund_id) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_cnt_2" + Environment.NewLine +
-                   ",(select sum(ifnull(mpf.stock_value, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_qty_2" + Environment.NewLine +
+                selectFields += ",(select count(mpf.fund_id) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_cnt" + Environment.NewLine +
+                   ",(select sum(ifnull(mpf.stock_value, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_qty" + Environment.NewLine +
                    "";
             }
             selectFields += "" +
