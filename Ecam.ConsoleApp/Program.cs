@@ -524,19 +524,19 @@ namespace Ecam.ConsoleApp
 
         private static void MutualFunds()
         {
-            //string linkFileName = System.Configuration.ConfigurationManager.AppSettings["LINK_FILE_NAME"];
-            //if (string.IsNullOrEmpty(linkFileName) == false)
-            //{
-            //    string content = System.IO.File.ReadAllText(linkFileName);
-            //    string[] arr = content.Split(("\r\n").ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-            //    foreach (string url in arr)
-            //    {
-            //        if (string.IsNullOrEmpty(url) == false)
-            //        {
-            //            ParseMainHTML(url);
-            //        }
-            //    }
-            //}
+            string linkFileName = System.Configuration.ConfigurationManager.AppSettings["LINK_FILE_NAME"];
+            if (string.IsNullOrEmpty(linkFileName) == false)
+            {
+                string content = System.IO.File.ReadAllText(linkFileName);
+                string[] arr = content.Split(("\r\n").ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                foreach (string url in arr)
+                {
+                    if (string.IsNullOrEmpty(url) == false)
+                    {
+                        ParseMainHTML(url);
+                    }
+                }
+            }
             using (EcamContext context = new EcamContext())
             {
                 var companies = (from q in context.tra_company select q).ToList();
