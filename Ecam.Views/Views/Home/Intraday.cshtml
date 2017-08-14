@@ -86,6 +86,13 @@
                 <div class="form-group m-r-10 m-t-10">
                     <input type="text" name="to_rsi" class="form-control input-sm" placeholder="To RSI" style="width:100px" />
                 </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="is_all_category" /> All Categories
+                        </label>
+                    </div>
+                </div>
                 <div class="clearfix"></div>
                 @*<div class="form-group m-r-10 m-t-10">
                         <input type="text" name="available_amount" id="available_amount" placeholder="Available Amount" class="form-control input-sm" style="width:100px;" />
@@ -232,7 +239,7 @@
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:symbol"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit">
-                        <div style="width:150px;overflow:hidden;" data-bind="text:category_name">
+                        <div style="width:250px;overflow:hidden;" data-bind="text:category_name">
                         </div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
@@ -323,6 +330,34 @@
                                 </label>
                                 <div class="col-md-7">
                                     <input type="hidden" name="category_name" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">
+                                    &nbsp;
+                                </label>
+                                <div class="col-md-8">
+                                    <div class="pull-left">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="is_nifty_50" id="is_nifty_50" value="true" data-bind="checked:is_nifty_50,checkedValue:true" /> Nifty 50
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="pull-left m-l-15">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="is_nifty_100" id="is_nifty_100" value="true" data-bind="checked:is_nifty_100,checkedValue:true" /> Nifty 100
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="pull-left m-l-15">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="is_nifty_200" id="is_nifty_200" value="true" data-bind="checked:is_nifty_200,checkedValue:true" /> Nifty 200
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="form-group">

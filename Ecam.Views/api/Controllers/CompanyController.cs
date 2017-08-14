@@ -102,6 +102,31 @@ namespace Ecam.Views.Controllers
                     company.is_book_mark = (is_book_mark == "true");
                     context.Entry(company).State = System.Data.Entity.EntityState.Modified;
                     context.SaveChanges();
+                    string categoryName = "FAVOURITES";
+                    tra_company_category category = (from q in context.tra_company_category
+                                                     where q.category_name == categoryName
+                                                     && q.symbol == company.symbol
+                                                     select q).FirstOrDefault();
+                    if((company.is_book_mark ?? false) == false)
+                    {
+                        if (category != null)
+                        {
+                            context.tra_company_category.Remove(category);
+                            context.SaveChanges();
+                        }
+                    }
+                    else
+                    {
+                        if (category == null)
+                        {
+                            context.tra_company_category.Add(new tra_company_category
+                            {
+                                 category_name = categoryName,
+                                 symbol = symbol
+                            });
+                            context.SaveChanges();
+                        }
+                    }
                 }
             }
             return Ok();

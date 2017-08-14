@@ -39,9 +39,15 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             if (is_sell_to_buy == true) {
                 arr[arr.length] = { "name": "is_sell_to_buy", "value": is_sell_to_buy };
             }
+
             var is_buy_to_sell = $("#frmCompanySearch #is_buy_to_sell")[0].checked;
             if (is_buy_to_sell == true) {
                 arr[arr.length] = { "name": "is_buy_to_sell", "value": is_buy_to_sell };
+            }
+
+            var is_all_category = $("#frmCompanySearch #is_all_category")[0].checked;
+            if (is_all_category == true) {
+                arr[arr.length] = { "name": "is_all_category", "value": is_all_category };
             }
 
             var is_mf = $("#frmCompanySearch #is_mf")[0].checked;
@@ -226,7 +232,6 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
         }
 
         this.openItem = function (row) {
-            return;
             $('#temp-modal-container').remove();
             var $cnt = $("<div id='temp-modal-container'></div>");
             $('body').append($cnt);
@@ -239,6 +244,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $("#modal-template").tmpl(data).appendTo($cnt);
             var $modal = $("#modal-" + data.name, $cnt);
             $modal.modal('show');
+            var isNew = false;
             if (row == null) {
                 row = {
                     'company_name': ''
@@ -247,6 +253,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     , 'id': 0
                     , 'category_list': []
                 };
+                isNew = true;
             }
             ko.applyBindings(row, $modal[0]);
 
@@ -272,11 +279,14 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
               , onChange: function (e, ui) {
               }
             });
-            var arr = [];
-            $.each(row.category_list, function (i, cat) {
-                arr.push({ "id": cat, "text": cat });
-            });
-            $categories.select2Refresh("data", arr);
+            if (isNew == false) {
+                var arr = [];
+                console.log(row.category_list);
+                $.each(row.category_list(), function (i, cat) {
+                    arr.push({ "id": cat, "text": cat });
+                });
+                $categories.select2Refresh("data", arr);
+            }
             var $btn = $("#save", $frm);
             $btn.click(function () {
                 if ($frm.valid()) {
@@ -303,7 +313,6 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     });
                 }
             });
-
         }
 
         this.loadTradeDetail = function ($childTD) {
@@ -422,6 +431,9 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 self.loadGrid();
             });
             $("body").on("click", "#frmCompanySearch #is_buy_to_sell", function (event) {
+                self.loadGrid();
+            });
+            $("body").on("click", "#frmCompanySearch #is_all_category", function (event) {
                 self.loadGrid();
             });
             $("body").on("click", "#frmCompanySearch #is_mf", function (event) {
@@ -578,6 +590,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $("body").off("click", "#frmCompanySearch #is_high_yesterday");
             $("body").off("click", "#frmCompanySearch #is_sell_to_buy");
             $("body").off("click", "#frmCompanySearch #is_buy_to_sell");
+            $("body").off("click", "#frmCompanySearch #is_all_category");
             $("body").off("click", "#frmCompanySearch #is_mf");
             $("body").off("click", "#Company .btn-add");
             $("body").off("click", "#Company .btn-edit");

@@ -232,17 +232,12 @@ namespace Ecam.Framework.Repository
                 using (EcamContext context = new EcamContext())
                 {
                     List<string> categoryList = Helper.ConvertStringList(criteria.categories);
-                    var isAllCategory = false;
-                    //if (categoryList.Count > 1)
-                    //{
-                    //    isAllCategory = true;
-                    //}
                     List<tra_company_category> categories = null;
                     List<string> categorySymbolList = null;
                     categories = (from q in context.tra_company_category
                                   where categoryList.Contains(q.category_name) == true
                                   select q).ToList();
-                    if (isAllCategory == true)
+                    if ((criteria.is_all_category ?? false) == true)
                     {
                         categorySymbolList = new List<string>();
                         foreach (var row in categories)

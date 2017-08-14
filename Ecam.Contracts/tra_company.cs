@@ -61,6 +61,7 @@ namespace Ecam.Contracts
 
         public string ltp_from_percentage { get; set; }
         public string ltp_to_percentage { get; set; }
+        public Nullable<bool> is_all_category { get; set; }
     }
 }
 
