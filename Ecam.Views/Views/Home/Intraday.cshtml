@@ -137,8 +137,8 @@
                         <option value="20">20</option>
                         <option value="50">50</option>
                         <option value="200">200</option>
-                        <option value="210" selected>210</option>
-                        <option value="500">500</option>
+                        <option value="210">210</option>
+                        <option value="500" selected>500</option>
                     </select>
                 </div>
                 <div class="pull-left">
@@ -228,9 +228,10 @@
                                     <i data-bind="css:{'fa-bookmark fg-primary': cBool(is_book_mark())==true,'fa-bookmark-o': cBool(is_book_mark())==false}" class="fa fa-bookmark"></i>
                                 </a>
                             </div>
-                            <div class="pull-left m-l-15">
+                            @*<div class="pull-left m-l-15">
                                 <a href="javascript:;" data-bind="attr:{'symbol': symbol()}" class="refresh-symbol"><i class="fa fa-refresh"></i></a>
-                            </div><div class="clearfix"></div>
+                            </div>*@
+                            <div class="clearfix"></div>
                         </div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:company_name">
