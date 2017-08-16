@@ -37,6 +37,8 @@ namespace Ecam.Contracts
         public decimal? prev_rsi { get; set; }
         public decimal? ltp_percentage { get; set; }
         public decimal? prev_percentage { get; set; }
+        public decimal? open_percentage { get; set; }
+        public decimal? high_percentage { get; set; }
         public int company_id { get; set; }
     }
 }

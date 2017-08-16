@@ -371,6 +371,8 @@ namespace Ecam.Framework.Repository
 
             selectFields = "count(*) as cnt";
 
+            joinTables += " left outer join tra_prev_calc pcl on pcl.symbol = ct.symbol ";
+
             sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, "", "");
 
             paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString, sql));
@@ -406,6 +408,10 @@ namespace Ecam.Framework.Repository
                            ",ct.is_nifty_200" + Environment.NewLine +
                            ",ct.rsi" + Environment.NewLine +
                            ",ct.prev_rsi" + Environment.NewLine +
+                           ",pcl.positive_count" + Environment.NewLine +
+                           ",pcl.negative_count" + Environment.NewLine +
+                           ",pcl.success_count" + Environment.NewLine +
+                           ",pcl.fail_count" + Environment.NewLine +
                            "";
 
             if (string.IsNullOrEmpty(criteria.mf_ids) == false)
@@ -638,6 +644,8 @@ namespace Ecam.Framework.Repository
                             ",m.prev_rsi" + Environment.NewLine +
                             ",(((ifnull(m.ltp_price, 0) - ifnull(m.open_price, 0)) / ifnull(m.open_price, 0)) * 100) as ltp_percentage" + Environment.NewLine +
                             ",(((ifnull(m.ltp_price, 0) - ifnull(m.prev_price, 0)) / ifnull(m.prev_price, 0)) * 100) as prev_percentage" + Environment.NewLine +
+                            ",(((ifnull(m.open_price, 0) - ifnull(m.prev_price, 0)) / ifnull(m.prev_price, 0)) * 100) as open_percentage" + Environment.NewLine +
+                            ",(((ifnull(m.high_price, 0) - ifnull(m.prev_price, 0)) / ifnull(m.prev_price, 0)) * 100) as high_percentage" + Environment.NewLine +
                             ",c.company_id" + Environment.NewLine +
                             "";
 

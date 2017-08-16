@@ -192,9 +192,9 @@
                     </th>
                     <th sortname="mf_cnt" class="text-right">
                         MFCNT
-                    </th>
-                    <th sortname="mf_qty" class="text-right">
-                        MFQTY
+                    </th> 
+                    <th sortname="success_count" class="text-right">
+                        PO.CNT
                     </th>
                     <th sortname="week_52_low" class="text-right">
                         W52 Low
@@ -267,7 +267,7 @@
                         <div data-bind="text:formatNumber(mf_cnt())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(mf_qty())"></div>
+                        <div data-bind="text:formatNumber(success_count())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(week_52_low())"></div>
@@ -411,6 +411,12 @@
                 <th class="text-right">
                     Prev.RSI
                 </th>
+                <th class="text-right">
+                    Open %
+                </th>
+                <th class="text-right">
+                    High %
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -422,6 +428,8 @@
                 <td class="text-right">${formatPercentage(row.prev_percentage)}</td>
                 <td class="text-right">${formatNumber(row.rsi)}</td>
                 <td class="text-right">${formatNumber(row.prev_rsi)}</td>
+                <td class="text-right">${formatPercentage(row.open_percentage)}</td>
+                <td class="text-right">${formatPercentage(row.high_percentage)}</td>
             </tr>
             {{/each}}
         </tbody>

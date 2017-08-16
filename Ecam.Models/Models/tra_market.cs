@@ -19,5 +19,6 @@ namespace Ecam.Models {
 				        public Nullable<decimal> avg_upward { get; set; }
 				        public Nullable<decimal> avg_downward { get; set; }
 				        public Nullable<decimal> rs { get; set; }
+				        public Nullable<decimal> prev_ltp_price { get; set; }
     }
 }

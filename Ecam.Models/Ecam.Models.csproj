@@ -110,6 +110,8 @@
     <Compile Include="Models\Mapping\tra_market_intra_dayMap.cs" />
     <Compile Include="Models\Mapping\tra_mutual_fundMap.cs" />
     <Compile Include="Models\Mapping\tra_mutual_fund_pfMap.cs" />
+    <Compile Include="Models\Mapping\tra_prev_calcMap.cs" />
+    <Compile Include="Models\Mapping\tra_pre_calc_itemMap.cs" />
     <Compile Include="Models\Mapping\tra_rsi_profitMap.cs" />
     <Compile Include="Models\tra_category.cs" />
     <Compile Include="Models\tra_company.cs" />
@@ -119,6 +121,8 @@
     <Compile Include="Models\tra_market_intra_day.cs" />
     <Compile Include="Models\tra_mutual_fund.cs" />
     <Compile Include="Models\tra_mutual_fund_pf.cs" />
+    <Compile Include="Models\tra_prev_calc.cs" />
+    <Compile Include="Models\tra_pre_calc_item.cs" />
     <Compile Include="Models\tra_rsi_profit.cs" />
     <Compile Include="Partial\BaseEntity.cs" />
     <Compile Include="Partial\tra_company.cs" />

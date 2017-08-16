@@ -40,6 +40,10 @@ namespace Ecam.Contracts
         public List<string> category_list { get; set; }
         public Nullable<int> mf_cnt { get; set; }
         public Nullable<decimal> mf_qty { get; set; }
+        public Nullable<int> positive_count { get; set; }
+        public Nullable<int> negative_count { get; set; }
+        public Nullable<int> success_count { get; set; }
+        public Nullable<int> fail_count { get; set; }
     }
 
     public class TRA_COMPANY_SEARCH : TRA_COMPANY

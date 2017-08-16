@@ -56,6 +56,9 @@ namespace Ecam.Models {
             this.Property(t => t.rs)
                 .HasPrecision(13,4);
 
+            this.Property(t => t.prev_ltp_price)
+                .HasPrecision(13,4);
+
             // Table & Column Mappings
 			this.ToTable("tra_market");
             this.Property(t => t.id).HasColumnName("market_id");
@@ -75,6 +78,7 @@ namespace Ecam.Models {
             this.Property(t => t.avg_upward).HasColumnName("avg_upward");
             this.Property(t => t.avg_downward).HasColumnName("avg_downward");
             this.Property(t => t.rs).HasColumnName("rs");
+            this.Property(t => t.prev_ltp_price).HasColumnName("prev_ltp_price");
 			       Ignore(t=>t.created_date);
 						       Ignore(t=>t.created_by);
 						       Ignore(t=>t.last_updated_date);
