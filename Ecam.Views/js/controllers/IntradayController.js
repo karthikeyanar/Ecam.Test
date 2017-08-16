@@ -451,8 +451,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $("body").on("click", "#Company .btn-delete", function (event) {
                 var dataFor = ko.dataFor(this);
                 jConfirm({
-                    "message": "Are you sure?", "ok": function () {
-                        var url = apiUrl("/Company/Delete/" + dataFor.id);
+                    "message": "Are you sure " + dataFor.company_name() + " : " + dataFor.symbol() + "?", "ok": function () {
+                        var url = apiUrl("/Company/Delete/" + dataFor.id());
                         $.ajax({
                             "url": url,
                             "cache": false,
