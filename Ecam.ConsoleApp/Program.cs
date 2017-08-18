@@ -25,161 +25,161 @@ namespace Ecam.ConsoleApp
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
             string sql = "delete from tra_market_intra_day where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(curdate(), '%Y-%m-%d')";
             MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-            using (EcamContext context = new EcamContext())
-            {
-                //sql = "delete from tra_pre_calc_item";
-                //MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-                var totalMarkets = (from q in context.tra_market
-                                    where (q.prev_price ?? 0) > 0
-                                    //&& q.symbol == "3MINDIA"
-                                    orderby q.trade_date descending, q.symbol ascending
-                                    select q).ToList();
-                List<string> symbols = (from q in totalMarkets
-                                        select q.symbol).Distinct().ToList();
-                int total = symbols.Count();
-                int index = 0;
-                foreach (string symbol in symbols)
-                {
-                    index += 1;
-                    tra_prev_calc calc = (from q in context.tra_prev_calc
-                                          where q.symbol == symbol
-                                          select q).FirstOrDefault();
-                    if (calc == null)
-                    {
-                        calc = new tra_prev_calc
-                        {
-                            symbol = symbol,
-                            positive_count = 0,
-                            negative_count = 0,
-                            success_count = 0,
-                            fail_count = 0,
-                            high_profit = 0,
-                            open_profit = 0,
-                            id = 0
-                        };
-                    }
-                    else
-                    {
-                        calc.symbol = symbol;
-                        calc.positive_count = 0;
-                        calc.negative_count = 0;
-                        calc.success_count = 0;
-                        calc.fail_count = 0;
-                        calc.high_profit = 0;
-                        calc.open_profit = 0;
-                    }
-                    var markets = (from q in totalMarkets
-                                   where q.symbol == symbol
-                                   orderby q.trade_date descending
-                                   select q).ToList();
-                    foreach (var market in markets)
-                    {
-                        if ((market.prev_price ?? 0) < (market.open_price ?? 0))
-                        {
-                            calc.positive_count += 1;
-                        }
-                        else
-                        {
-                            calc.negative_count += 1;
-                        }
-                        decimal? open_profit = (((market.open_price ?? 0) - (market.prev_price ?? 0)) / (market.prev_price ?? 0)) * 100;
-                        decimal? high_profit = (((market.high_price ?? 0) - (market.prev_price ?? 0)) / (market.prev_price ?? 0)) * 100;
-                        if ((calc.open_profit ?? 0) <= (open_profit ?? 0))
-                        {
-                            calc.open_profit = open_profit;
-                        }
-                        if ((calc.high_profit ?? 0) <= (high_profit ?? 0))
-                        {
-                            calc.high_profit = high_profit;
-                        }
-                        if ((open_profit ?? 0) > 0 && (high_profit ?? 0) >= (decimal)0.5)
-                        {
-                            calc.success_count += 1;
-                        }
-                        else
-                        {
-                            calc.fail_count += 1;
-                        }
-                        //var prev = (from q in markets
-                        //            where q.symbol == market.symbol
-                        //            && q.trade_date < market.trade_date
-                        //            orderby q.trade_date descending
-                        //            select q).FirstOrDefault();
-                        //if (prev != null)
-                        //{
-                        //    decimal? profit = (((prev.ltp_price ?? 0) - (prev.prev_price ?? 0)) / (prev.prev_price ?? 0)) * 100;
-                        //    int intProfit = 0;
-                        //    intProfit = (int)profit;
-                        //    if (intProfit == 0 && (profit ?? 0) < 0)
-                        //    {
-                        //        intProfit = -100000;
-                        //    }
-                        //    tra_pre_calc_item item = (from q in context.tra_pre_calc_item
-                        //                              where q.percentage == intProfit
-                        //                              select q).FirstOrDefault();
-                        //    if (item == null)
-                        //    {
-                        //        item = new tra_pre_calc_item
-                        //        {
-                        //            success_count = 0,
-                        //            percentage = 0,
-                        //            fail_count = 0,
-                        //        };
-                        //    }
-                        //    item.percentage = intProfit;
-                        //    if ((open_profit ?? 0) > 0)
-                        //    {
-                        //        item.success_count += 1;
-                        //    }
-                        //    else
-                        //    {
-                        //        item.fail_count += 1;
-                        //    }
-                        //    if (item.id <= 0)
-                        //    {
-                        //        context.tra_pre_calc_item.Add(item);
-                        //    }
-                        //    else
-                        //    {
-                        //        context.Entry(item).State = System.Data.Entity.EntityState.Modified;
-                        //    }
-                        //    context.SaveChanges();
-                        //}
-                    }
-                    if (calc.id <= 0)
-                    {
-                        context.tra_prev_calc.Add(calc);
-                    }
-                    else
-                    {
-                        context.Entry(calc).State = System.Data.Entity.EntityState.Modified;
-                    }
-                    context.SaveChanges();
-                    Console.WriteLine("Total=" + total + ",Index=" + index);
-                }
-                //int total = markets.Count();
-                //int index = 0;
-                //foreach(var market in markets)
-                //{
-                //    index += 1;
-                //    var prev = (from q in markets
-                //                where q.symbol == market.symbol
-                //                && q.trade_date < market.trade_date
-                //                orderby q.trade_date descending
-                //                select q).FirstOrDefault();
-                //    if (prev != null)
-                //    {
-                //        market.prev_ltp_price = prev.ltp_price;
-                //        sql = string.Format("update tra_market set prev_ltp_price={0} where market_id={1}", prev.ltp_price, market.id);
-                //        MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-                //        //context.Entry(market).State = System.Data.Entity.EntityState.Modified;
-                //        //context.SaveChanges();
-                //    }
-                //    Console.WriteLine("Total=" + total + ",Index=" + index);
-                //}
-            }
-            Console.WriteLine("Completed");
-            Console.ReadLine();
+            //using (EcamContext context = new EcamContext())
+            //{
+            //    //sql = "delete from tra_pre_calc_item";
+            //    //MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+            //    var totalMarkets = (from q in context.tra_market
+            //                        where (q.prev_price ?? 0) > 0
+            //                        //&& q.symbol == "3MINDIA"
+            //                        orderby q.trade_date descending, q.symbol ascending
+            //                        select q).ToList();
+            //    List<string> symbols = (from q in totalMarkets
+            //                            select q.symbol).Distinct().ToList();
+            //    int total = symbols.Count();
+            //    int index = 0;
+            //    foreach (string symbol in symbols)
+            //    {
+            //        index += 1;
+            //        tra_prev_calc calc = (from q in context.tra_prev_calc
+            //                              where q.symbol == symbol
+            //                              select q).FirstOrDefault();
+            //        if (calc == null)
+            //        {
+            //            calc = new tra_prev_calc
+            //            {
+            //                symbol = symbol,
+            //                positive_count = 0,
+            //                negative_count = 0,
+            //                success_count = 0,
+            //                fail_count = 0,
+            //                high_profit = 0,
+            //                open_profit = 0,
+            //                id = 0
+            //            };
+            //        }
+            //        else
+            //        {
+            //            calc.symbol = symbol;
+            //            calc.positive_count = 0;
+            //            calc.negative_count = 0;
+            //            calc.success_count = 0;
+            //            calc.fail_count = 0;
+            //            calc.high_profit = 0;
+            //            calc.open_profit = 0;
+            //        }
+            //        var markets = (from q in totalMarkets
+            //                       where q.symbol == symbol
+            //                       orderby q.trade_date descending
+            //                       select q).ToList();
+            //        foreach (var market in markets)
+            //        {
+            //            if ((market.prev_price ?? 0) < (market.open_price ?? 0))
+            //            {
+            //                calc.positive_count += 1;
+            //            }
+            //            else
+            //            {
+            //                calc.negative_count += 1;
+            //            }
+            //            decimal? open_profit = (((market.open_price ?? 0) - (market.prev_price ?? 0)) / (market.prev_price ?? 0)) * 100;
+            //            decimal? high_profit = (((market.high_price ?? 0) - (market.prev_price ?? 0)) / (market.prev_price ?? 0)) * 100;
+            //            if ((calc.open_profit ?? 0) <= (open_profit ?? 0))
+            //            {
+            //                calc.open_profit = open_profit;
+            //            }
+            //            if ((calc.high_profit ?? 0) <= (high_profit ?? 0))
+            //            {
+            //                calc.high_profit = high_profit;
+            //            }
+            //            if ((open_profit ?? 0) > 0 && (high_profit ?? 0) >= (decimal)0.5)
+            //            {
+            //                calc.success_count += 1;
+            //            }
+            //            else
+            //            {
+            //                calc.fail_count += 1;
+            //            }
+            //            //var prev = (from q in markets
+            //            //            where q.symbol == market.symbol
+            //            //            && q.trade_date < market.trade_date
+            //            //            orderby q.trade_date descending
+            //            //            select q).FirstOrDefault();
+            //            //if (prev != null)
+            //            //{
+            //            //    decimal? profit = (((prev.ltp_price ?? 0) - (prev.prev_price ?? 0)) / (prev.prev_price ?? 0)) * 100;
+            //            //    int intProfit = 0;
+            //            //    intProfit = (int)profit;
+            //            //    if (intProfit == 0 && (profit ?? 0) < 0)
+            //            //    {
+            //            //        intProfit = -100000;
+            //            //    }
+            //            //    tra_pre_calc_item item = (from q in context.tra_pre_calc_item
+            //            //                              where q.percentage == intProfit
+            //            //                              select q).FirstOrDefault();
+            //            //    if (item == null)
+            //            //    {
+            //            //        item = new tra_pre_calc_item
+            //            //        {
+            //            //            success_count = 0,
+            //            //            percentage = 0,
+            //            //            fail_count = 0,
+            //            //        };
+            //            //    }
+            //            //    item.percentage = intProfit;
+            //            //    if ((open_profit ?? 0) > 0)
+            //            //    {
+            //            //        item.success_count += 1;
+            //            //    }
+            //            //    else
+            //            //    {
+            //            //        item.fail_count += 1;
+            //            //    }
+            //            //    if (item.id <= 0)
+            //            //    {
+            //            //        context.tra_pre_calc_item.Add(item);
+            //            //    }
+            //            //    else
+            //            //    {
+            //            //        context.Entry(item).State = System.Data.Entity.EntityState.Modified;
+            //            //    }
+            //            //    context.SaveChanges();
+            //            //}
+            //        }
+            //        if (calc.id <= 0)
+            //        {
+            //            context.tra_prev_calc.Add(calc);
+            //        }
+            //        else
+            //        {
+            //            context.Entry(calc).State = System.Data.Entity.EntityState.Modified;
+            //        }
+            //        context.SaveChanges();
+            //        Console.WriteLine("Total=" + total + ",Index=" + index);
+            //    }
+            //    //int total = markets.Count();
+            //    //int index = 0;
+            //    //foreach(var market in markets)
+            //    //{
+            //    //    index += 1;
+            //    //    var prev = (from q in markets
+            //    //                where q.symbol == market.symbol
+            //    //                && q.trade_date < market.trade_date
+            //    //                orderby q.trade_date descending
+            //    //                select q).FirstOrDefault();
+            //    //    if (prev != null)
+            //    //    {
+            //    //        market.prev_ltp_price = prev.ltp_price;
+            //    //        sql = string.Format("update tra_market set prev_ltp_price={0} where market_id={1}", prev.ltp_price, market.id);
+            //    //        MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+            //    //        //context.Entry(market).State = System.Data.Entity.EntityState.Modified;
+            //    //        //context.SaveChanges();
+            //    //    }
+            //    //    Console.WriteLine("Total=" + total + ",Index=" + index);
+            //    //}
+            //}
+            //Console.WriteLine("Completed");
+            //Console.ReadLine();
             //MutualFunds();
             //CaculateIntraydayProfit();
             //using (EcamContext context = new EcamContext())
@@ -211,7 +211,7 @@ namespace Ecam.ConsoleApp
             //        Console.WriteLine("Update company price symbol=" + company.symbol);
             //    }
             //}
-            //DownloadStart();
+            DownloadStart();
         }
 
         private static void DownloadStart()
