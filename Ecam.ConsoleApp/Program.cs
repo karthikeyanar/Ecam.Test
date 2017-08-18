@@ -30,8 +30,8 @@ namespace Ecam.ConsoleApp
                 //sql = "delete from tra_pre_calc_item";
                 //MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
                 var totalMarkets = (from q in context.tra_market
-                                    where (q.prev_price ?? 0) > 0
-                                    //&& q.symbol == "3MINDIA"
+                                    where (q.rsi ?? 0) >= 80
+                                    && (q.rsi ?? 0) <= 100
                                     orderby q.trade_date descending, q.symbol ascending
                                     select q).ToList();
                 List<string> symbols = (from q in totalMarkets
@@ -92,7 +92,7 @@ namespace Ecam.ConsoleApp
                         {
                             calc.high_profit = high_profit;
                         }
-                        if ((open_profit ?? 0) > 0 && (high_profit ?? 0) >= (decimal)0.5)
+                        if ((high_profit ?? 0) >= (decimal)1)
                         {
                             calc.success_count += 1;
                         }

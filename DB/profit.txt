@@ -1,0 +1,9 @@
+select tbl2.* from (select (((last_price - first_price)/first_price) * 100) as profit,tbl.rsi,tbl.first_price,tbl.last_price,tbl.company_name,tbl.symbol from (
+select 
+(select ltp_price from tra_market m where m.symbol = c.symbol order by m.trade_date asc limit 0,1) as first_price
+,(select ltp_price from tra_market m where m.symbol = c.symbol order by m.trade_date desc limit 0,1) as last_price
+,c.company_name
+,c.symbol 
+,c.rsi
+from tra_company c 
+) as tbl) as tbl2 where profit >= 100 order by rsi asc limit 0,1000
