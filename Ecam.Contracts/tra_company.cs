@@ -44,6 +44,9 @@ namespace Ecam.Contracts
         public Nullable<int> negative_count { get; set; }
         public Nullable<int> success_count { get; set; }
         public Nullable<int> fail_count { get; set; }
+        public Nullable<decimal> first_price { get; set; }
+        public Nullable<decimal> last_price { get; set; }
+        public Nullable<decimal> profit { get; set; }
     }
 
     public class TRA_COMPANY_SEARCH : TRA_COMPANY

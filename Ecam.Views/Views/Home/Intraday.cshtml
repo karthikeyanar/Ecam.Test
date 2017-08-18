@@ -177,37 +177,25 @@
                     </th>
                     <th sortname="rsi" class="text-right text-nowrap">
                         RSI
-                    </th>
-                    <th sortname="rsi_diff" class="text-right text-nowrap">
-                        Diff.RSI
-                    </th>
+                    </th> 
                     <th sortname="prev_percentage" class="text-right text-nowrap">
                         C%
-                    </th>
-                    <th sortname="ltp_percentage" class="text-right text-nowrap">
-                        LTP%
-                    </th>
+                    </th> 
                     <th sortname="ltp_price" class="text-right text-nowrap">
                         LTP
                     </th>
                     <th sortname="mf_cnt" class="text-right">
                         MFCNT
-                    </th> 
-                    <th sortname="success_count" class="text-right">
-                        PO.CNT
+                    </th>
+                    <th sortname="profit" class="text-right">
+                        Profit
                     </th>
                     <th sortname="week_52_low" class="text-right">
                         W52 Low
                     </th>
-                    <th sortname="week_52_low_percentage" class="text-right">
-                        W52 Low %
-                    </th>
                     <th sortname="week_52_high" class="text-right">
-                        W52 High
-                    </th>
-                    <th sortname="week_52_percentage" class="text-right">
                         W52 High %
-                    </th>
+                    </th> 
                     <th style="width: 20px">
                     </th>
                     <th style="width: 10px">
@@ -252,13 +240,7 @@
                         <div data-bind="text:formatNumber(rsi())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(rsi_diff())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(prev_percentage())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(ltp_percentage())"></div>
                     </td> 
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(ltp_price())"></div>
@@ -267,20 +249,14 @@
                         <div data-bind="text:formatNumber(mf_cnt())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(success_count())"></div>
+                        <div data-bind="text:formatPercentage(profit())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(week_52_low())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(week_52_low_percentage())"></div>
-                    </td>
+                    </td> 
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(week_52_high())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(week_52_percentage())"></div>
-                    </td>
+                    </td> 
                     <td style="text-align:center;white-space:nowrap;">
                         <div style="width:80px;">
                             <div class="pull-left">

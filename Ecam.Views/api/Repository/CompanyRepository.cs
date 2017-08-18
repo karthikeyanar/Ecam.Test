@@ -439,6 +439,8 @@ namespace Ecam.Framework.Repository
                            ",(((ifnull(ct.week_52_high, 0) - ifnull(ct.ltp_price, 0)) / ifnull(ct.ltp_price, 0)) * 100) as week_52_positive_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.week_52_low, 0)) / ifnull(ct.week_52_low, 0)) * 100) as week_52_low_percentage" + Environment.NewLine +
                            ",ct.company_id as id" + Environment.NewLine +
+                           ",(select ltp_price from tra_market m where m.symbol = ct.symbol order by m.trade_date asc limit 0,1) as first_price" +
+                           ",(select ltp_price from tra_market m where m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_price" +
                            "";
 
             sql = string.Format(sqlFormat, selectFields, joinTables, where, "", "", "");
@@ -484,7 +486,7 @@ namespace Ecam.Framework.Repository
             paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString, tempsql));
 
             sql = string.Format("select " +
-            "tbl.*" + Environment.NewLine +
+            "(((last_price - first_price)/first_price) * 100) as profit,tbl.*" + Environment.NewLine +
             " from(" + Environment.NewLine +
             sql + Environment.NewLine +
             ") as tbl {0} {1} {2} {3} ", where, "", orderBy, pageLimit);
