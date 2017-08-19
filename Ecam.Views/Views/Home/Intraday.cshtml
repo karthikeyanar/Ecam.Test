@@ -87,6 +87,18 @@
                     <input type="text" name="to_rsi" class="form-control input-sm" placeholder="To RSI" style="width:100px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
+                    <input type="text" name="from_profit" class="form-control input-sm" placeholder="From Profit" style="width:100px" />
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <input type="text" name="to_profit" class="form-control input-sm" placeholder="To Profit" style="width:100px" />
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <button id="reportrange" type="button" class="btn btn-sm btn-default">
+                        <i class="fa fa-calendar cursor-pointer m-r-10"></i><span class="m-r-10">
+                        </span><b class="caret"></b>
+                    </button>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" id="is_all_category" /> All Categories
@@ -113,6 +125,8 @@
                     <button type="button" id="btn" class="btn btn-success btn-sm" data-bind="click:refresh">Refresh</button>
                 </div>
             </div>
+            <input type="hidden" name="start_date" data-bind="value:start_date" />
+            <input type="hidden" name="end_date" data-bind="value:end_date" />
         </form>
     </div>
 </div>
@@ -172,9 +186,9 @@
                     <th>
                         Category
                     </th>
-                    <th sortname="prev_rsi" class="text-right text-nowrap">
+                    @*<th sortname="prev_rsi" class="text-right text-nowrap">
                         Prev.RSI
-                    </th>
+                    </th>*@
                     <th sortname="rsi" class="text-right text-nowrap">
                         RSI
                     </th> 
@@ -194,6 +208,9 @@
                         W52 Low
                     </th>
                     <th sortname="week_52_high" class="text-right">
+                        W52 High
+                    </th>
+                    <th sortname="week_52_positive_percentage" class="text-right">
                         W52 High %
                     </th> 
                     <th style="width: 20px">
@@ -233,9 +250,9 @@
                         <div style="width:250px;overflow:hidden;" data-bind="text:category_name">
                         </div>
                     </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(prev_rsi())"></div>
-                    </td>
+                    </td>*@
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(rsi())"></div>
                     </td>
@@ -256,6 +273,9 @@
                     </td> 
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(week_52_high())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(week_52_positive_percentage())"></div>
                     </td> 
                     <td style="text-align:center;white-space:nowrap;">
                         <div style="width:80px;">
@@ -384,9 +404,9 @@
                 <th class="text-right">
                     RSI
                 </th>
-                <th class="text-right">
+                @*<th class="text-right">
                     Prev.RSI
-                </th>
+                </th>*@
                 <th class="text-right">
                     Open %
                 </th>
@@ -403,7 +423,7 @@
                 <td class="text-right">${formatNumber(row.close_price)}</td>
                 <td class="text-right">${formatPercentage(row.prev_percentage)}</td>
                 <td class="text-right">${formatNumber(row.rsi)}</td>
-                <td class="text-right">${formatNumber(row.prev_rsi)}</td>
+                @*<td class="text-right">${formatNumber(row.prev_rsi)}</td>*@
                 <td class="text-right">${formatPercentage(row.open_percentage)}</td>
                 <td class="text-right">${formatPercentage(row.high_percentage)}</td>
             </tr>

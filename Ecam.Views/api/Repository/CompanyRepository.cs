@@ -426,6 +426,10 @@ namespace Ecam.Framework.Repository
                    ",(select sum(ifnull(mpf.stock_value, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_qty" + Environment.NewLine +
                    "";
             }
+
+            DateTime? minDate = Convert.ToDateTime("01/01/1900");
+            string dateFilter = string.Format(" and m.trade_date>='{0}' and m.trade_date<='{1}' ", criteria.start_date.Value.ToString("yyyy-MM-dd"), criteria.end_date.Value.ToString("yyyy-MM-dd"));
+
             selectFields += "" +
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.prev_price, 0)) / ifnull(ct.prev_price, 0)) * 100) as prev_percentage" + Environment.NewLine +
                            ",(ifnull(ct.open_price,0) - ifnull(ct.prev_price,0)) as diff" + Environment.NewLine +
@@ -439,8 +443,8 @@ namespace Ecam.Framework.Repository
                            ",(((ifnull(ct.week_52_high, 0) - ifnull(ct.ltp_price, 0)) / ifnull(ct.ltp_price, 0)) * 100) as week_52_positive_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.week_52_low, 0)) / ifnull(ct.week_52_low, 0)) * 100) as week_52_low_percentage" + Environment.NewLine +
                            ",ct.company_id as id" + Environment.NewLine +
-                           ",(select ltp_price from tra_market m where m.symbol = ct.symbol order by m.trade_date asc limit 0,1) as first_price" +
-                           ",(select ltp_price from tra_market m where m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_price" +
+                           ",(select ltp_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date asc limit 0,1) as first_price" +
+                           ",(select ltp_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date desc limit 0,1) as last_price" +
                            "";
 
             sql = string.Format(sqlFormat, selectFields, joinTables, where, "", "", "");
@@ -473,6 +477,16 @@ namespace Ecam.Framework.Repository
             if (string.IsNullOrEmpty(criteria.ltp_to_percentage) == false)
             {
                 where.AppendFormat(" and ifnull(ltp_percentage,0)<={0}", criteria.ltp_to_percentage);
+            }
+
+            if((criteria.from_profit ?? 0) > 0)
+            {
+                where.AppendFormat(" and ifnull((((last_price - first_price)/first_price) * 100),0)>={0}", criteria.from_profit);
+            }
+
+            if ((criteria.to_profit ?? 0) > 0)
+            {
+                where.AppendFormat(" and ifnull((((last_price - first_price)/first_price) * 100),0)<={0}", criteria.to_profit);
             }
 
             string tempsql = string.Format("select " +

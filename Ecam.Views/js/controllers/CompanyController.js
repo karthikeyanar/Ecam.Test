@@ -4,6 +4,8 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
         var self = this;
         this.template = "/Home/Company";
 
+       
+
         this.rows = ko.observableArray([]);
 
         this.refresh = function () {
@@ -207,6 +209,7 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
                    self.loadGrid();
                }
             });
+
         }
 
         this.openItem = function (row) {

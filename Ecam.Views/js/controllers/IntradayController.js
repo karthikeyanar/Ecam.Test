@@ -6,6 +6,9 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
         this.rows = ko.observableArray([]);
 
+        this.start_date = ko.observable("");
+        this.end_date = ko.observable("");
+
         this.refresh = function () {
             self.loadGrid();
         }
@@ -229,6 +232,31 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                    self.loadGrid();
                }
             });
+
+
+            var arrlastsixmonths = helper.getLastSixMonths();
+            var start = moment(arrlastsixmonths[0]);
+            var end = moment(arrlastsixmonths[1]);
+            self.start_date(start.format('MM/DD/YYYY'));
+            self.end_date(end.format('MM/DD/YYYY'));
+
+            var $pageContent = $(".page-content");
+            //console.log('$pageContent=',$pageContent[0]);
+            var $reportRange = $('#reportrange', $pageContent);
+            //console.log('reportrange=',$reportRange[0]);
+            helper.handleDateRangePicker($reportRange, {
+                'opens': 'left',
+                'start': start,
+                'end': end,
+                'changeDate': function (start, end) {
+                    var daysDiff = helper.getTimeDiff(start.format('MM/DD/YYYY'), end.format('MM/DD/YYYY')).days;
+                    self.start_date(start.format('MM/DD/YYYY'));
+                    self.end_date(end.format('MM/DD/YYYY'));
+                    helper.changeDateRangeLabel($('span', $reportRange), start, end, self.start_date(), self.end_date());
+                    self.loadGrid();
+                }
+            });
+            helper.changeDateRangeLabel($('span', $reportRange), start, end, self.start_date(), self.end_date());
         }
 
         this.openItem = function (row) {

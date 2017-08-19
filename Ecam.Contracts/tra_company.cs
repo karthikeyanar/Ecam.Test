@@ -57,6 +57,8 @@ namespace Ecam.Contracts
         public decimal? to_price { get; set; }
         public decimal? from_rsi { get; set; }
         public decimal? to_rsi { get; set; }
+        public decimal? from_profit { get; set; }
+        public decimal? to_profit { get; set; }
 
         public decimal? from_prev_rsi { get; set; }
         public decimal? to_prev_rsi { get; set; }
@@ -69,6 +71,9 @@ namespace Ecam.Contracts
         public string ltp_from_percentage { get; set; }
         public string ltp_to_percentage { get; set; }
         public Nullable<bool> is_all_category { get; set; }
+
+        public DateTime? start_date { get; set; }
+        public DateTime? end_date { get; set; }
     }
 }
 
