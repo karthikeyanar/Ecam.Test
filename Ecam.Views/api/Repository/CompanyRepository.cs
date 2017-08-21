@@ -15,6 +15,7 @@ namespace Ecam.Framework.Repository
     {
         PaginatedListResult<TRA_COMPANY> Get(TRA_COMPANY_SEARCH criteria, Paging paging);
         PaginatedListResult<TRA_MARKET_INTRA_DAY> GetIntraDay(TRA_COMPANY_SEARCH criteria, Paging paging);
+        PaginatedListResult<TRA_MARKET_AVG> GetAvg(TRA_COMPANY_SEARCH criteria, Paging paging);
         PaginatedListResult<TRA_MARKET_RSI> GetRSI(TRA_COMPANY_SEARCH criteria, Paging paging);
         List<Select2List> GetCompanys(string name, int pageSize = 50, string categories = "");
         List<Select2List> GetCategories(string name, int pageSize = 50);
@@ -389,7 +390,7 @@ namespace Ecam.Framework.Repository
 
             orderBy = string.Format("order by {0} {1}", paging.SortName, paging.SortOrder);
 
-            selectFields = "ct.company_id" + Environment.NewLine  +
+            selectFields = "ct.company_id" + Environment.NewLine +
                            ",ct.company_name" + Environment.NewLine +
                            ",ct.symbol" + Environment.NewLine +
                            ",ct.open_price" + Environment.NewLine +
@@ -475,7 +476,7 @@ namespace Ecam.Framework.Repository
                 where.AppendFormat(" and ifnull(ltp_percentage,0)<={0}", criteria.ltp_to_percentage);
             }
 
-            if((criteria.from_profit ?? 0) > 0)
+            if ((criteria.from_profit ?? 0) > 0)
             {
                 where.AppendFormat(" and ifnull((((last_price - first_price)/first_price) * 100),0)>={0}", criteria.from_profit);
             }
@@ -553,7 +554,7 @@ namespace Ecam.Framework.Repository
                 {
                     lastTradeDate = lastTrade.trade_date;
                 }
-            } 
+            }
 
             where.AppendFormat(" intra.trade_date>='{0}'", lastTradeDate.ToString("yyyy-MM-dd"));
 
@@ -670,6 +671,58 @@ namespace Ecam.Framework.Repository
                 rows = context.Database.SqlQuery<TRA_MARKET_RSI>(sql).ToList();
             }
             return new PaginatedListResult<TRA_MARKET_RSI> { total = paging.Total, rows = rows };
+        }
+
+
+        public PaginatedListResult<TRA_MARKET_AVG> GetAvg(TRA_COMPANY_SEARCH criteria, Paging paging)
+        {
+            StringBuilder where = new StringBuilder();
+            string selectFields = "";
+            string pageLimit = "";
+            string orderBy = "";
+            string groupByName = string.Empty;
+            string joinTables = string.Empty;
+            string prefix = "intra";
+            string sqlFormat = "select {0} from tra_market_avg " + prefix + " {1} where {2} {3} {4} {5}";
+            string sql = string.Empty;
+            string role = Authentication.CurrentRole;
+
+            where.AppendFormat(" intra.symbol in({0})", Helper.ConvertStringSQLFormat(criteria.symbols));
+
+            joinTables += " join tra_company c on c.symbol = intra.symbol ";
+
+            selectFields = "count(*) as cnt";
+
+            sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, "", "");
+
+            paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString, sql));
+
+            if (string.IsNullOrEmpty(paging.SortOrder))
+            {
+                paging.SortOrder = "asc";
+            }
+
+            if (paging.PageSize > 0)
+            {
+                int from = (paging.PageIndex > 1) ? ((paging.PageIndex - 1) * paging.PageSize) : 0;
+                int to = paging.PageSize;
+                pageLimit = string.Format("limit {0},{1}", from, to);
+            }
+
+            orderBy = string.Format("order by {0} {1}", paging.SortName, paging.SortOrder);
+
+            selectFields = "intra.*" + Environment.NewLine +
+                "";
+
+            sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, orderBy, pageLimit);
+
+            //Helper.Log(sql);
+            List<TRA_MARKET_AVG> rows = new List<TRA_MARKET_AVG>();
+            using (EcamContext context = new EcamContext())
+            {
+                rows = context.Database.SqlQuery<TRA_MARKET_AVG>(sql).ToList();
+            }
+            return new PaginatedListResult<TRA_MARKET_AVG> { total = paging.Total, rows = rows };
         }
     }
 }

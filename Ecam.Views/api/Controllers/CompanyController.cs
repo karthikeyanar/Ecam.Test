@@ -53,6 +53,13 @@ namespace Ecam.Views.Controllers
         }
 
         [HttpGet]
+        [ActionName("AvgList")]
+        public PaginatedListResult<TRA_MARKET_AVG> AvgList([FromUri] TRA_COMPANY_SEARCH criteria, [FromUri] Paging paging)
+        {
+            return _CompanyRepository.GetAvg(criteria, paging);
+        }
+
+        [HttpGet]
         [ActionName("RSIList")]
         public PaginatedListResult<TRA_MARKET_RSI> RSIList([FromUri] TRA_COMPANY_SEARCH criteria, [FromUri] Paging paging)
         {

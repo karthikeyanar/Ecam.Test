@@ -352,9 +352,9 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
             var symbol = $childTD.attr("symbol");
             var $rsiBox = $(".rsi-box", $childTD);
-            var $intradayBox = $(".intraday-box", $childTD);
+            var $avgMonthBox = $(".avg-month-box", $childTD);
             self.loadRSI(symbol, $rsiBox, function () {
-                self.loadIntraday(symbol, $intradayBox, function () {
+                self.loadAVG(symbol, $avgMonthBox, function () {
                 });
             });
         }
@@ -385,14 +385,14 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             });
         }
 
-        this.loadIntraday = function (symbol, $box, callback) {
+        this.loadAVG = function (symbol, $box, callback) {
             $box.html('loading...');
             handleBlockUI();
-            var url = apiUrl("/Company/IntradayList");
+            var url = apiUrl("/Company/AvgList");
             var arr = [];
             arr[arr.length] = { "name": "symbols", "value": symbol };
-            arr[arr.length] = { "name": "SortName", "value": "intra.trade_date" };
-            arr[arr.length] = { "name": "SortOrder", "value": "asc" };
+            arr[arr.length] = { "name": "SortName", "value": "intra.avg_date" };
+            arr[arr.length] = { "name": "SortOrder", "value": "desc" };
             arr[arr.length] = { "name": "PageSize", "value": "0" };
             $.ajax({
                 "url": url,
@@ -401,7 +401,21 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 "data": arr
             }).done(function (json) {
                 $box.empty();
-                $("#detail-intraday-template").tmpl(json).appendTo($box);
+                var months = [];
+                var weeks = [];
+                $.each(json.rows, function (i, row) {
+                    if (row.avg_type == "M") {
+                        months.push(row);
+                    } else {
+                        weeks.push(row);
+                    }
+                });
+                var $divMonth = $("<div class='pull-left m-r-15'></div>");
+                $box.append($divMonth);
+                $("#detail-avg-month-template").tmpl({ "rows": months }).appendTo($divMonth);
+                var $divWeek = $("<div class='pull-left m-l-15'></div>");
+                $box.append($divWeek);
+                $("#detail-avg-month-template").tmpl({ "rows": weeks }).appendTo($divWeek);
                 $box.removeClass("loading");
                 if (callback)
                     callback();

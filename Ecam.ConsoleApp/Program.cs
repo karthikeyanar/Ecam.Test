@@ -37,7 +37,7 @@ namespace Ecam.ConsoleApp
             foreach (string symbol in symbols)
             {
                 index += 1;
-                TradeHelper.CreateAVG(symbol);
+                TradeHelper._CreateAVG(symbol);
                 TradeHelper.UpdateCompanyPrice(symbol);
                 Console.WriteLine("Total=" + total + ",Index=" + index);
             }

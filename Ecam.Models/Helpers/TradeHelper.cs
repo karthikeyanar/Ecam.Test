@@ -1157,7 +1157,7 @@ namespace Ecam.Models
                         CreateAVGRecord(symbol, "M", openPrice, lastPrice, monthStartDate);
                     }
                 }
-
+                 
                 var weekFirstTrade = (from q in markets where q.trade_date >= weekFirstDate orderby q.trade_date ascending select q).FirstOrDefault();
                 var weekLastTrade = (from q in markets where q.trade_date <= weekLastDate orderby q.trade_date descending select q).FirstOrDefault();
                 if (weekFirstTrade != null && weekLastTrade != null)
