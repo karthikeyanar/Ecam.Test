@@ -73,21 +73,16 @@ namespace Ecam.Models
                 foreach (tra_company_category row in companyCategories)
                 {
                     context.tra_company_category.Remove(row);
-                }
-                List<tra_intra_day_profit> profits = (from q in context.tra_intra_day_profit where q.symbol == this.symbol select q).ToList();
-                foreach (tra_intra_day_profit row in profits)
-                {
-                    context.tra_intra_day_profit.Remove(row);
-                }
+                } 
                 List<tra_mutual_fund_pf> mfs = (from q in context.tra_mutual_fund_pf where q.symbol == this.symbol select q).ToList();
                 foreach (tra_mutual_fund_pf row in mfs)
                 {
                     context.tra_mutual_fund_pf.Remove(row);
                 }
-                List<tra_rsi_profit> rsi = (from q in context.tra_rsi_profit where q.symbol == this.symbol select q).ToList();
-                foreach (tra_rsi_profit row in rsi)
+                List<tra_market_avg> avg = (from q in context.tra_market_avg where q.symbol == this.symbol select q).ToList();
+                foreach (tra_market_avg row in avg)
                 {
-                    context.tra_rsi_profit.Remove(row);
+                    context.tra_market_avg.Remove(row);
                 }
                 context.SaveChanges();
             }

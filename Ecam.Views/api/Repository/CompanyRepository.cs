@@ -371,8 +371,6 @@ namespace Ecam.Framework.Repository
 
             selectFields = "count(*) as cnt";
 
-            joinTables += " left outer join tra_prev_calc pcl on pcl.symbol = ct.symbol ";
-
             sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, "", "");
 
             paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString, sql));
@@ -408,10 +406,8 @@ namespace Ecam.Framework.Repository
                            ",ct.is_nifty_200" + Environment.NewLine +
                            ",ct.rsi" + Environment.NewLine +
                            ",ct.prev_rsi" + Environment.NewLine +
-                           ",pcl.positive_count" + Environment.NewLine +
-                           ",pcl.negative_count" + Environment.NewLine +
-                           ",pcl.success_count" + Environment.NewLine +
-                           ",pcl.fail_count" + Environment.NewLine +
+                           ",ct.monthly_avg" + Environment.NewLine +
+                           ",ct.weekly_avg" + Environment.NewLine +
                            "";
 
             if (string.IsNullOrEmpty(criteria.mf_ids) == false)

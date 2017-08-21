@@ -50,6 +50,12 @@ namespace Ecam.Models {
             this.Property(t => t.mf_qty)
                 .HasPrecision(13,4);
 
+            this.Property(t => t.monthly_avg)
+                .HasPrecision(13,4);
+
+            this.Property(t => t.weekly_avg)
+                .HasPrecision(13,4);
+
             // Table & Column Mappings
 			this.ToTable("tra_company");
             this.Property(t => t.id).HasColumnName("company_id");
@@ -71,6 +77,8 @@ namespace Ecam.Models {
             this.Property(t => t.prev_rsi).HasColumnName("prev_rsi");
             this.Property(t => t.mf_cnt).HasColumnName("mf_cnt");
             this.Property(t => t.mf_qty).HasColumnName("mf_qty");
+            this.Property(t => t.monthly_avg).HasColumnName("monthly_avg");
+            this.Property(t => t.weekly_avg).HasColumnName("weekly_avg");
 			       Ignore(t=>t.created_date);
 						       Ignore(t=>t.created_by);
 						       Ignore(t=>t.last_updated_date);

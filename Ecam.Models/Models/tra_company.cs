@@ -21,5 +21,7 @@ namespace Ecam.Models {
 				        public Nullable<decimal> prev_rsi { get; set; }
 				        public Nullable<int> mf_cnt { get; set; }
 				        public Nullable<decimal> mf_qty { get; set; }
+				        public Nullable<decimal> monthly_avg { get; set; }
+				        public Nullable<decimal> weekly_avg { get; set; }
     }
 }

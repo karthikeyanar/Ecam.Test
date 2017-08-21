@@ -204,6 +204,12 @@
                     <th sortname="profit" class="text-right">
                         Profit
                     </th>
+                    <th sortname="monthly_avg" class="text-right">
+                        M.AVG
+                    </th>
+                    <th sortname="weekly_avg" class="text-right">
+                        W.AVG
+                    </th>
                     <th sortname="week_52_low" class="text-right">
                         W52 Low
                     </th>
@@ -267,6 +273,12 @@
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(profit())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(monthly_avg())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(weekly_avg())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(week_52_low())"></div>
