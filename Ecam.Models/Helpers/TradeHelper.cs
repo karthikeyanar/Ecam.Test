@@ -1141,6 +1141,10 @@ namespace Ecam.Models
             }
             foreach (var market in markets)
             {
+                if (market.trade_date.ToString("dd/MMM/yyyy") == "24/Aug/2017")
+                {
+                    string s = string.Empty;
+                }
                 DateTime monthStartDate = DataTypeHelper.GetFirstDayOfMonth(market.trade_date);
                 DateTime monthEndDate = DataTypeHelper.GetLastDayOfMonth(market.trade_date);
                 DateTime weekFirstDate = DataTypeHelper.GetFirstDayOfWeek(market.trade_date);

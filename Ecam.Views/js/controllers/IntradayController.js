@@ -343,6 +343,36 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             });
         }
 
+        this.loadTradeDetailChart = function ($childTD) {
+            $childTD.addClass("loading");
+            $childTD.empty();
+            $("#detail-template").tmpl({}).appendTo($childTD);
+            $childTD.css("padding-left", "25px").css("background-color", "#F2F2F2");
+            $childTD.removeClass("loading");
+
+            var symbol = $childTD.attr("symbol");
+            var $rsiBox = $(".box-cnt", $childTD);
+            self.loadRSIChart(symbol, $rsiBox, function (json) {
+                google.charts.load('current', { 'packages': ['corechart'] });
+                google.charts.setOnLoadCallback(function () {
+                    var arr = [['Date', 'Trades']];
+                    $.each(json.rows, function (i, row) {
+                        arr.push([row.trade_date, row.close_price]);
+                    });
+                    var data = google.visualization.arrayToDataTable(arr);
+
+                    var options = {
+                        title: 'Company Performance',
+                        curveType: 'function',
+                        legend: { position: 'bottom' }
+                    };
+                    //console.log($('#curve_chart', $rsiBox)[0]);
+                    var chart = new google.visualization.LineChart($('#curve_chart', $rsiBox)[0]);
+                    chart.draw(data, options);
+                });
+            });
+        }
+
         this.loadTradeDetail = function ($childTD) {
             $childTD.addClass("loading");
             $childTD.empty();
@@ -356,6 +386,32 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             self.loadRSI(symbol, $rsiBox, function () {
                 self.loadAVG(symbol, $avgMonthBox, function () {
                 });
+            });
+        }
+
+        this.loadRSIChart = function (symbol, $box, callback) {
+            $box.html('loading...');
+            handleBlockUI();
+            var url = apiUrl("/Company/RSIList");
+            var arr = [];
+            arr[arr.length] = { "name": "symbols", "value": symbol };
+            arr[arr.length] = { "name": "SortName", "value": "m.trade_date" };
+            arr[arr.length] = { "name": "SortOrder", "value": "asc" };
+            arr[arr.length] = { "name": "PageSize", "value": "0" };
+            $.ajax({
+                "url": url,
+                "cache": false,
+                "type": "GET",
+                "data": arr
+            }).done(function (json) {
+                $box.empty();
+                $("#detail-rsi-chart-template").tmpl(json).appendTo($box);
+                $box.removeClass("loading");
+                if (callback)
+                    callback(json);
+            })
+            .always(function () {
+                unblockUI();
             });
         }
 
@@ -613,6 +669,45 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     unblockUI();
                 });
             });
+            $("body").on("click", ".open-chart", function (event) {
+                var $this = $(this);
+                var dataFor = ko.dataFor($this[0]);
+                var fbJson = JSON.parse(ko.toJSON(dataFor));
+                var $tr = $this.parents("tr:first");
+                var $tbl = $this.parents("table:first");
+                var $tbody = $("tbody", $tbl);
+                var companyId = cInt(dataFor.id());
+                var childTRId = "child_chart_" + companyId;
+                var $childTR = $("#" + childTRId, $tbody);
+                $("#cargoTable .child-rows[cid!='" + companyId + "']").addClass("hide");
+                $("#cargoTable .tree-expand[cid!='" + companyId + "']").removeClass("ex-minus").addClass("ex-plus");
+                if ($this.hasClass("ex-plus") == false && $this.hasClass("ex-minus") == false) {
+                    $this.addClass("ex-plus");
+                }
+                if ($this.hasClass("ex-plus")) {
+                    $this.removeClass("ex-minus").removeClass("ex-plus");
+                    if (!$childTR[0]) {
+                        $this.addClass("ex-minus");
+                        $childTR = $("<tr class='child-rows' cid='" + companyId + "'><td symbol='" + dataFor.symbol() + "' company_id='" + companyId + "' colspan='" + $("thead > tr > th", $tbl).length + "' class='child-row-cnt'></td></tr>");
+                        $childTR.attr("id", childTRId).attr("row-key", companyId);
+                        var $childTD = $("td", $childTR);
+                        $tr.after($childTR);
+                        $childTD.data("fbjson", fbJson);
+                        self.loadTradeDetailChart($childTD);
+                    } else {
+                        if ($childTR.hasClass('hide')) {
+                            $childTR.removeClass("hide");
+                            $this.addClass("ex-minus");
+                        } else {
+                            $childTR.addClass("hide");
+                            $this.addClass("ex-plus");
+                        }
+                    }
+                } else {
+                    $childTR.addClass("hide");
+                    $this.removeClass("ex-minus").addClass("ex-plus");
+                }
+            });
         }
 
         this.offElements = function () {
@@ -643,6 +738,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $("body").off("keyup", "#available_amount");
             $("body").off("keyup", "#profit_percentage");
             $("body").off("keyup", "#stoploss_percentage");
+            $("body").off("click", ".open-chart");
         }
 
         this.unInit = function () {

@@ -29,6 +29,7 @@ namespace Ecam.ConsoleApp
             using (EcamContext context = new EcamContext())
             {
                 symbols = (from q in context.tra_company
+                           where q.symbol == "NIFTY"
                            orderby q.symbol
                            select q.symbol).ToList();
             }

@@ -409,6 +409,8 @@ define("helper", function () {
                     'Last Two Weeks': [moment(lastFnStartDate), moment(lastFnEndDate), ['left']],
                     //'Last Two Weeks': [moment(_TODAYDATE).startOf('week').subtract('day',14),moment(_TODAYDATE).startOf('week').subtract('day',7).endOf('week'),['left']],
                     'Last Month': [moment(_TODAYDATE).subtract('month', 1).startOf('month'), moment(_TODAYDATE).subtract('month', 1).endOf('month'), ['left']],
+                    'Last 2 Month': [moment(_TODAYDATE).subtract('month', 2).startOf('month'), moment(_TODAYDATE).subtract('month', 1).endOf('month'), ['left']],
+                    'Last 3 Month': [moment(_TODAYDATE).subtract('month', 3).startOf('month'), moment(_TODAYDATE).subtract('month', 1).endOf('month'), ['left']],
                     'Last Year': [moment(_TODAYDATE).subtract('year', 1).startOf('year'), moment(_TODAYDATE).subtract('year', 1).endOf('year'), ['left']],
                     'Last Six Months': [moment(arrlastsixmonths[0]), moment(arrlastsixmonths[1]), ['left']],
 
