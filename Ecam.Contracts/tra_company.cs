@@ -28,7 +28,8 @@ namespace Ecam.Contracts
         public Nullable<decimal> rsi { get; set; }
         public Nullable<decimal> prev_rsi { get; set; }
         public Nullable<decimal> rsi_diff { get; set; }
-
+        public Nullable<bool> is_current_stock { get; set; }
+        
         public string category_name { get; set; }
         public Nullable<decimal> ltp_percentage { get; set; }
         public Nullable<decimal> prev_percentage { get; set; }

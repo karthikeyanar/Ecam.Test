@@ -324,6 +324,11 @@ namespace Ecam.Framework.Repository
                 where.AppendFormat(" and ifnull(ct.is_book_mark,0)={0}", ((criteria.is_book_mark ?? false) == true ? "1" : "0"));
             }
 
+            if (criteria.is_current_stock.HasValue)
+            {
+                where.AppendFormat(" and ifnull(ct.is_current_stock,0)={0}", ((criteria.is_current_stock ?? false) == true ? "1" : "0"));
+            }
+
             if (criteria.from_price.HasValue)
             {
                 where.AppendFormat(" and ifnull(ct.close_price,0)>={0}", criteria.from_price);
@@ -402,6 +407,7 @@ namespace Ecam.Framework.Repository
                            ",ct.week_52_high" + Environment.NewLine +
                            ",ct.week_52_low" + Environment.NewLine +
                            ",ct.is_book_mark" + Environment.NewLine +
+                           ",ct.is_current_stock" + Environment.NewLine +
                            ",ct.is_nifty_50" + Environment.NewLine +
                            ",ct.is_nifty_100" + Environment.NewLine +
                            ",ct.is_nifty_200" + Environment.NewLine +

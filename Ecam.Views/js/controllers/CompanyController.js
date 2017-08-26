@@ -24,6 +24,10 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             if (isbookmark == true) {
                 arr[arr.length] = { "name": "is_book_mark", "value": isbookmark };
             }
+            var is_current_stock = $("#frmCompanySearch #is_current_stock")[0].checked;
+            if (is_current_stock == true) {
+                arr[arr.length] = { "name": "is_current_stock", "value": is_current_stock };
+            }
             var isNifty50 = $("#frmCompanySearch #is_nifty_50")[0].checked;
             if (isNifty50 == true) {
                 arr[arr.length] = { "name": "is_nifty_50", "value": isNifty50 };
@@ -125,6 +129,10 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             var isbookmark = $("#frmCompanySearch #is_book_mark")[0].checked;
             if (isbookmark == true) {
                 arr[arr.length] = { "name": "is_book_mark", "value": isbookmark };
+            }
+            var is_current_stock = $("#frmCompanySearch #is_current_stock")[0].checked;
+            if (is_current_stock == true) {
+                arr[arr.length] = { "name": "is_current_stock", "value": is_current_stock };
             }
             arr[arr.length] = { "name": "is_export_excel", "value": true };
             var url = apiUrl("/Company/Export?t=1");
@@ -298,6 +306,9 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             $("body").on("click", "#frmCompanySearch #is_book_mark", function (event) {
                 self.loadGrid();
             });
+            $("body").on("click", "#frmCompanySearch #is_current_stock", function (event) {
+                self.loadGrid();
+            });
             $("body").on("click", "#frmCompanySearch #is_nifty_50", function (event) {
                 self.loadGrid();
             });
@@ -394,10 +405,34 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
                 }).done(function (json) {
                 });
             });
+            $("body").on("click", ".is-current-stock", function (event) {
+                var $this = $(this);
+                var $i = $("i", $this);
+                var dataFor = ko.dataFor(this);
+                var url = apiUrl('/Company/UpdateCurrentStock');
+                var arr = [];
+                var is_current_stock = $i.hasClass('fa-user');
+                arr.push({ "name": "symbol", "value": dataFor.symbol });
+                arr.push({ "name": "is_current_stock", "value": !is_current_stock });
+                $i.removeClass('fa-user').removeClass('fa-user-o').removeClass('fg-primary');
+                if (is_current_stock == true) {
+                    $i.addClass('fa-user-o');
+                } else {
+                    $i.addClass('fa-user fg-primary');
+                }
+                $.ajax({
+                    "url": url,
+                    "cache": false,
+                    "type": "POST",
+                    "data": arr
+                }).done(function (json) {
+                });
+            });
         }
 
         this.offElements = function () {
             $("body").off("click", "#frmCompanySearch #is_book_mark");
+            $("body").off("click", "#frmCompanySearch #is_current_stock");
             $("body").off("click", "#frmCompanySearch #is_nifty_50");
             $("body").off("click", "#frmCompanySearch #is_nifty_100");
             $("body").off("click", "#frmCompanySearch #is_nifty_200");
@@ -417,6 +452,7 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             $("body").off("click", "#Company .btn-delete");
             $("body").off("change", "#Company #rows");
             $("body").off("click", ".is-book-mark");
+            $("body").off("click", ".is-current-stock");
             $("body").off("click", "#Company .btn-export");
         }
 

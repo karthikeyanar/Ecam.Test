@@ -99,6 +99,21 @@ namespace Ecam.Views.Controllers
         {
             string symbol = HttpContext.Current.Request["symbol"];
             string is_book_mark = HttpContext.Current.Request["is_book_mark"];
+            this.UpdateBookMark(symbol, (is_book_mark == "true"));
+            return Ok();
+        }
+
+        public IHttpActionResult UpdateCurrentStock()
+        {
+            string symbol = HttpContext.Current.Request["symbol"];
+            string is_current_stock = HttpContext.Current.Request["is_current_stock"];
+            this.UpdateCurrentStock(symbol, (is_current_stock == "true"));
+            this.UpdateBookMark(symbol, true);
+            return Ok();
+        }
+
+        private void UpdateBookMark(string symbol, bool is_book_mark)
+        {
             using (EcamContext context = new EcamContext())
             {
                 tra_company company = (from q in context.tra_company
@@ -106,7 +121,7 @@ namespace Ecam.Views.Controllers
                                        select q).FirstOrDefault();
                 if (company != null)
                 {
-                    company.is_book_mark = (is_book_mark == "true");
+                    company.is_book_mark = is_book_mark;
                     context.Entry(company).State = System.Data.Entity.EntityState.Modified;
                     context.SaveChanges();
                     string categoryName = "2_FAVOURITES";
@@ -114,7 +129,7 @@ namespace Ecam.Views.Controllers
                                                      where q.category_name == categoryName
                                                      && q.symbol == company.symbol
                                                      select q).FirstOrDefault();
-                    if((company.is_book_mark ?? false) == false)
+                    if ((company.is_book_mark ?? false) == false)
                     {
                         if (category != null)
                         {
@@ -128,15 +143,55 @@ namespace Ecam.Views.Controllers
                         {
                             context.tra_company_category.Add(new tra_company_category
                             {
-                                 category_name = categoryName,
-                                 symbol = symbol
+                                category_name = categoryName,
+                                symbol = symbol
                             });
                             context.SaveChanges();
                         }
                     }
                 }
             }
-            return Ok();
+        }
+
+        private void UpdateCurrentStock(string symbol, bool is_current_stock)
+        {
+            using (EcamContext context = new EcamContext())
+            {
+                tra_company company = (from q in context.tra_company
+                                       where q.symbol == symbol
+                                       select q).FirstOrDefault();
+                if (company != null)
+                {
+                    company.is_current_stock = is_current_stock;
+                    context.Entry(company).State = System.Data.Entity.EntityState.Modified;
+                    context.SaveChanges();
+                    string categoryName = "1_CURRENT_STOCKS";
+                    tra_company_category category = (from q in context.tra_company_category
+                                                     where q.category_name == categoryName
+                                                     && q.symbol == company.symbol
+                                                     select q).FirstOrDefault();
+                    if ((company.is_book_mark ?? false) == false)
+                    {
+                        if (category != null)
+                        {
+                            context.tra_company_category.Remove(category);
+                            context.SaveChanges();
+                        }
+                    }
+                    else
+                    {
+                        if (category == null)
+                        {
+                            context.tra_company_category.Add(new tra_company_category
+                            {
+                                category_name = categoryName,
+                                symbol = symbol
+                            });
+                            context.SaveChanges();
+                        }
+                    }
+                }
+            }
         }
 
         [HttpGet]

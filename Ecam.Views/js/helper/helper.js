@@ -402,23 +402,22 @@ define("helper", function () {
             if (!ranges) {
                 ranges = {
                     'Today': [moment(_TODAYDATE), moment(_TODAYDATE)],
-                    //'Last 7 Days': [moment(_TODAYDATE).subtract('days', 6), moment(_TODAYDATE)],
-                    //'Last 30 Days': [moment(_TODAYDATE).subtract('days', 29), moment(_TODAYDATE)],
-                    //'This Week': [moment(_TODAYDATE).startOf('week'),moment(_TODAYDATE).endOf('week')],
                     'Last Week': [moment(_TODAYDATE).startOf('week').subtract('day', 7), moment(_TODAYDATE).startOf('week').subtract('day', 7).endOf('week'), ['left']],
-                    'Last Two Weeks': [moment(lastFnStartDate), moment(lastFnEndDate), ['left']],
-                    //'Last Two Weeks': [moment(_TODAYDATE).startOf('week').subtract('day',14),moment(_TODAYDATE).startOf('week').subtract('day',7).endOf('week'),['left']],
+                    'Last Two Weeks': [moment(_TODAYDATE).startOf('week').subtract('day', 14), moment(_TODAYDATE).startOf('week').subtract('day', 7).endOf('week'), ['left']],
                     'Last Month': [moment(_TODAYDATE).subtract('month', 1).startOf('month'), moment(_TODAYDATE).subtract('month', 1).endOf('month'), ['left']],
                     'Last 2 Month': [moment(_TODAYDATE).subtract('month', 2).startOf('month'), moment(_TODAYDATE).subtract('month', 1).endOf('month'), ['left']],
                     'Last 3 Month': [moment(_TODAYDATE).subtract('month', 3).startOf('month'), moment(_TODAYDATE).subtract('month', 1).endOf('month'), ['left']],
                     'Last Year': [moment(_TODAYDATE).subtract('year', 1).startOf('year'), moment(_TODAYDATE).subtract('year', 1).endOf('year'), ['left']],
                     'Last Six Months': [moment(arrlastsixmonths[0]), moment(arrlastsixmonths[1]), ['left']],
+                    'This Month': [moment(_TODAYDATE).startOf('month'), moment(_TODAYDATE).endOf('month'), ['left']],
 
                     'Yesterday': [moment(_TODAYDATE).subtract('days', 1), moment(_TODAYDATE).subtract('days', 1), ['right']],
                     'This Week': [moment(_TODAYDATE).startOf('week'), moment(_TODAYDATE).endOf('week'), ['right']],
-                    'Current Two Weeks': [moment(fnStartDate), moment(fnEndDate), ['right']],
-                    //'Current Two Weeks': [moment(_TODAYDATE).startOf('week').subtract('day',7),moment(_TODAYDATE).endOf('week'),['right']],
-                    'This Month': [moment(_TODAYDATE).startOf('month'), moment(_TODAYDATE).endOf('month'), ['right']],
+                    'Last 30 Days': [moment(_TODAYDATE).subtract('days', 30), moment(_TODAYDATE), ['right']],
+                    'Last 60 Days': [moment(_TODAYDATE).subtract('days', 60), moment(_TODAYDATE), ['right']],
+                    'Last 90 Days': [moment(_TODAYDATE).subtract('days', 90), moment(_TODAYDATE), ['right']],
+                    'Last 120 Days': [moment(_TODAYDATE).subtract('days', 120), moment(_TODAYDATE), ['right']],
+                    'Current Two Weeks': [moment(_TODAYDATE).startOf('week').subtract('day', 7), moment(_TODAYDATE).endOf('week'), ['right']],
                     'This Year': [moment(_TODAYDATE).startOf('year'), moment(_TODAYDATE).endOf('year'), ['right']]
                 };
             }

@@ -1641,11 +1641,7 @@ RegexOptions.IgnoreCase
                         {
                             //Helper.Log("GoogleException symbol 1=" + symbol, "GoogleException_" + rnd.Next(1000, 10000));
                         }
-                        Console.WriteLine("Completed symbol=" + symbol);
-                        //sql = string.Format(" update tra_company set is_book_mark=1 where ifnull(open_price,0)>=ifnull(high_price,0) and ifnull(open_price,0)>=ifnull(low_price,0)");
-                        //MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-                        //sql = string.Format(" update tra_company set is_book_mark=1 where ifnull(open_price,0)<=ifnull(high_price,0) and ifnull(open_price,0)<=ifnull(low_price,0)");
-                        //MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+                        Console.WriteLine("Completed symbol=" + symbol); 
 
                         using (EcamContext context = new EcamContext())
                         {

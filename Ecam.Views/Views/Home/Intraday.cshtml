@@ -25,7 +25,14 @@
                 <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" id="is_book_mark" /> Show Book Mark
+                            <input type="checkbox" id="is_book_mark" checked /> Show Book Mark
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="is_current_stock" /> Show Current Stock
                         </label>
                     </div>
                 </div>
@@ -149,10 +156,10 @@
                     <select id="rows" name="rows" class="pull-left form-control input-sm input-60">
                         <option value="10">10</option>
                         <option value="20">20</option>
-                        <option value="50">50</option>
+                        <option value="50" selected>50</option>
                         <option value="200">200</option>
                         <option value="210">210</option>
-                        <option value="500" selected>500</option>
+                        <option value="500">500</option>
                     </select>
                 </div>
                 <div class="pull-left">
@@ -166,7 +173,7 @@
             </div>
             <input type="hidden" name="page_index" value="1" />
             <input type="hidden" name="sort_name" value="rsi" />
-            <input type="hidden" name="sort_order" value="desc" />
+            <input type="hidden" name="sort_order" value="asc" />
         </div>
         <table id="CompanyTable" class="table table-striped table-bordered table-hover table-condensed table-gray">
             <thead>
@@ -176,6 +183,9 @@
                     </th>
                     <th style="width: 50px" sortname="is_book_mark">
                         Mark
+                    </th>
+                    <th style="width: 50px" sortname="is_current_stock">
+                        CS
                     </th>
                     <th sortname="company_name">
                         Company
@@ -238,17 +248,14 @@
                         </div>
                     </td>
                     <td style="text-align:center;">
-                        <div style="width:40px;">
-                            <div class="pull-left">
-                                <a href="javascript:;" class="is-book-mark">
-                                    <i data-bind="css:{'fa-bookmark fg-primary': cBool(is_book_mark())==true,'fa-bookmark-o': cBool(is_book_mark())==false}" class="fa fa-bookmark"></i>
-                                </a>
-                            </div>
-                            @*<div class="pull-left m-l-15">
-                                    <a href="javascript:;" data-bind="attr:{'symbol': symbol()}" class="refresh-symbol"><i class="fa fa-refresh"></i></a>
-                                </div>*@
-                            <div class="clearfix"></div>
-                        </div>
+                        <a href="javascript:;" class="is-book-mark">
+                            <i data-bind="css:{'fa-bookmark fg-primary': cBool(is_book_mark())==true,'fa-bookmark-o': cBool(is_book_mark())==false}" class="fa fa-bookmark"></i>
+                        </a>
+                    </td>
+                    <td style="text-align:center;">
+                        <a href="javascript:;" class="is-current-stock">
+                            <i data-bind="css:{'fa-user fg-primary': cBool(is_current_stock())==true,'fa-user-o': cBool(is_current_stock())==false}" class="fa fa-user"></i>
+                        </a>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:company_name">
                         <div style="width:150px;overflow:hidden;" data-bind="text:company_name">
