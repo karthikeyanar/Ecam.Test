@@ -108,7 +108,6 @@ namespace Ecam.Views.Controllers
             string symbol = HttpContext.Current.Request["symbol"];
             string is_current_stock = HttpContext.Current.Request["is_current_stock"];
             this.UpdateCurrentStock(symbol, (is_current_stock == "true"));
-            this.UpdateBookMark(symbol, true);
             return Ok();
         }
 
@@ -170,7 +169,7 @@ namespace Ecam.Views.Controllers
                                                      where q.category_name == categoryName
                                                      && q.symbol == company.symbol
                                                      select q).FirstOrDefault();
-                    if ((company.is_book_mark ?? false) == false)
+                    if ((company.is_current_stock ?? false) == false)
                     {
                         if (category != null)
                         {
