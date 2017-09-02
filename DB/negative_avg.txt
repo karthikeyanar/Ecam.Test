@@ -1,0 +1,19 @@
+select tbl.*,(((last_price - first_price)/first_price) * 100) as profit from (
+select 
+c.company_name
+,av.symbol
+,c.monthly_avg
+,c.weekly_avg
+,c.rsi
+,(select open_price from tra_market m where m.symbol = av.symbol order by m.trade_date asc limit 0,1) as first_price
+,(select open_price from tra_market m where m.symbol = av.symbol order by m.trade_date desc limit 0,1) as last_price
+,(select count(*) from tra_market_avg m where m.symbol = av.symbol and m.avg_type = 'M' and ifnull(m.percentage,0) < 0) as negative
+,(select count(*) from tra_market_avg m where m.symbol = av.symbol and m.avg_type = 'M' and ifnull(m.percentage,0) > 0) as positive
+,(select count(*) from tra_market_avg m where m.symbol = av.symbol and m.avg_type = 'M') as total
+from tra_market_avg av 
+join tra_company c on c.symbol = av.symbol
+where  avg_type = 'M' 
+group by av.symbol
+) as tbl  where first_price > 0 and last_price > 0 and (((last_price - first_price)/first_price) * 100) > 25
+order by negative asc,positive desc,profit desc,monthly_avg desc,weekly_avg desc
+limit 0,50

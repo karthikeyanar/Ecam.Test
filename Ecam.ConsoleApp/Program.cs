@@ -23,26 +23,98 @@ namespace Ecam.ConsoleApp
         {
             IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
-            string sql = "delete from tra_market_intra_day where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(curdate(), '%Y-%m-%d')";
-            MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-            List<string> symbols;
-            using (EcamContext context = new EcamContext())
+            DownloadStart();
+        }
+
+        private static void ImportOldSymbols()
+        {
+            //string sql = "select c.symbol from tra_company c left outer join tra_market t on t.symbol = c.symbol where ifnull(t.market_id, 0) <= 0 group by c.symbol,c.company_name limit 0,1000";
+            //List<string> rows = new List<string>();
+            //using (EcamContext context = new EcamContext())
+            //{
+            //    rows = context.Database.SqlQuery<string>(sql).ToList();
+            //}
+            //string symbols = "";
+            //foreach (string symbol in rows)
+            //{
+            //    symbols += symbol + ",";
+            //}
+            //if (string.IsNullOrEmpty(symbols) == false)
+            //{
+            //    symbols = symbols.Substring(0, symbols.Length - 1);
+            //}
+            string oldConnectionString = "server=localhost;port=3306;database=eb_2;uid=root;password=raga";
+            string sql = "select * from tra_company";
+            MySqlDataReader dr = MySqlHelper.ExecuteReader(oldConnectionString, sql);
+            List<tra_company> oldCompanies = new List<tra_company>();
+            List<tra_company_category> oldCompanyCategories = new List<tra_company_category>();
+            using (dr)
             {
-                symbols = (from q in context.tra_company
-                           where q.symbol == "NIFTY"
-                           orderby q.symbol
-                           select q.symbol).ToList();
+                while (dr.Read())
+                {
+                    oldCompanies.Add(new tra_company
+                    {
+                        company_name = Convert.ToString(dr["company_name"]),
+                        symbol = Convert.ToString(dr["symbol"]),
+                        is_nifty_50 = DataTypeHelper.ToBoolean(Convert.ToString(dr["is_nifty_50"])),
+                        is_nifty_100 = DataTypeHelper.ToBoolean(Convert.ToString(dr["is_nifty_100"])),
+                        is_nifty_200 = DataTypeHelper.ToBoolean(Convert.ToString(dr["is_nifty_200"])),
+                    });
+                }
             }
-            int total = symbols.Count();
-            int index = 0;
-            foreach (string symbol in symbols)
+            sql = "select * from tra_company_category";
+            dr = MySqlHelper.ExecuteReader(oldConnectionString, sql);
+            using (dr)
             {
-                index += 1;
-                TradeHelper._CreateAVG(symbol);
-                TradeHelper.UpdateCompanyPrice(symbol);
-                Console.WriteLine("Total=" + total + ",Index=" + index);
+                while (dr.Read())
+                {
+                    oldCompanyCategories.Add(new tra_company_category
+                    {
+                        category_name = Convert.ToString(dr["category_name"]),
+                        symbol = Convert.ToString(dr["symbol"]),
+                    });
+                }
             }
-            //DownloadStart();
+            foreach (var oldCompany in oldCompanies)
+            {
+                using (EcamContext context = new EcamContext())
+                {
+                    var company = (from q in context.tra_company
+                                   where q.symbol == oldCompany.symbol
+                                   select q).FirstOrDefault();
+                    if (company == null)
+                    {
+                        context.tra_company.Add(new tra_company
+                        {
+                            company_name = oldCompany.company_name,
+                            symbol = oldCompany.symbol,
+                            is_nifty_50 = oldCompany.is_nifty_50,
+                            is_nifty_100 = oldCompany.is_nifty_100,
+                            is_nifty_200 = oldCompany.is_nifty_200,
+                        });
+                        context.SaveChanges();
+                        var rows = (from q in oldCompanyCategories
+                                    where q.symbol == oldCompany.symbol
+                                    select q).ToList();
+                        foreach (var row in rows)
+                        {
+                            var companyCategory = (from q in context.tra_company_category
+                                                   where q.symbol == row.symbol
+                                                   && q.category_name == row.category_name
+                                                   select q).FirstOrDefault();
+                            if (companyCategory == null)
+                            {
+                                context.tra_company_category.Add(new tra_company_category
+                                {
+                                    category_name = row.category_name,
+                                    symbol = row.symbol
+                                });
+                                context.SaveChanges();
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private static void DownloadStart()

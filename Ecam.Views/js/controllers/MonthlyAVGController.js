@@ -1,13 +1,14 @@
 ﻿"use strict";
-define("IntradayController", ["knockout", "komapping", "helper", "service"], function (ko, komapping, helper, service) {
+define("MonthlyAVGController", ["knockout", "komapping", "helper", "service"], function (ko, komapping, helper, service) {
     return function () {
         var self = this;
-        this.template = "/Home/Intraday";
+        this.template = "/Home/MonthlyAVG";
 
         this.rows = ko.observableArray([]);
 
         this.start_date = ko.observable("");
         this.end_date = ko.observable("");
+
         this.avg_profit = ko.observable();
 
         this.refresh = function () {
@@ -62,7 +63,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             if (is_mf == true) {
                 arr[arr.length] = { "name": "is_mf", "value": is_mf };
             }
-            var url = apiUrl("/Company/List");
+            var url = apiUrl("/Company/MonthlyAVG");
             $.ajax({
                 "url": url,
                 "cache": false,
@@ -122,7 +123,6 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 unblockUI();
             });
         }
-
 
         this.calculateJSON = function () {
             var $frmSearch = $("#frmCompanySearch");

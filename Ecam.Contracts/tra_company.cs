@@ -50,6 +50,8 @@ namespace Ecam.Contracts
         public Nullable<decimal> profit { get; set; }
         public Nullable<decimal> monthly_avg { get; set; }
         public Nullable<decimal> weekly_avg { get; set; }
+        public Nullable<int> negative { get; set; }
+        public Nullable<int> positive { get; set; }
     }
 
     public class TRA_COMPANY_SEARCH : TRA_COMPANY

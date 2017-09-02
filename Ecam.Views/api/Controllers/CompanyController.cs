@@ -46,6 +46,13 @@ namespace Ecam.Views.Controllers
         }
 
         [HttpGet]
+        [ActionName("MonthlyAVG")]
+        public PaginatedListResult<TRA_COMPANY> MonthlyAVG([FromUri] TRA_COMPANY_SEARCH criteria, [FromUri] Paging paging)
+        {
+            return _CompanyRepository.GetMonthlyAVG(criteria, paging);
+        }
+
+        [HttpGet]
         [ActionName("IntradayList")]
         public PaginatedListResult<TRA_MARKET_INTRA_DAY> IntradayList([FromUri] TRA_COMPANY_SEARCH criteria, [FromUri] Paging paging)
         {
