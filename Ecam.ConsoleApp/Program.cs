@@ -23,26 +23,26 @@ namespace Ecam.ConsoleApp
         {
             IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
-            string sql = "delete from tra_market_intra_day where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(curdate(), '%Y-%m-%d')";
-            MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-            List<string> symbols;
-            using (EcamContext context = new EcamContext())
-            {
-                symbols = (from q in context.tra_company
-                           where q.symbol == "NIFTY"
-                           orderby q.symbol
-                           select q.symbol).ToList();
-            }
-            int total = symbols.Count();
-            int index = 0;
-            foreach (string symbol in symbols)
-            {
-                index += 1;
-                TradeHelper._CreateAVG(symbol);
-                TradeHelper.UpdateCompanyPrice(symbol);
-                Console.WriteLine("Total=" + total + ",Index=" + index);
-            }
-            //DownloadStart();
+            //string sql = "delete from tra_market_intra_day where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(curdate(), '%Y-%m-%d')";
+            //MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+            //List<string> symbols;
+            //using (EcamContext context = new EcamContext())
+            //{
+            //    symbols = (from q in context.tra_company
+            //               where q.symbol == "NIFTY"
+            //               orderby q.symbol
+            //               select q.symbol).ToList();
+            //}
+            //int total = symbols.Count();
+            //int index = 0;
+            //foreach (string symbol in symbols)
+            //{
+            //    index += 1;
+            //    TradeHelper._CreateAVG(symbol);
+            //    TradeHelper.UpdateCompanyPrice(symbol);
+            //    Console.WriteLine("Total=" + total + ",Index=" + index);
+            //}
+            DownloadStart();
         }
 
         private static void DownloadStart()
