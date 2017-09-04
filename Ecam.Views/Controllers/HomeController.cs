@@ -53,6 +53,11 @@ namespace Ecam.Views.Controllers
             return View();
         }
 
+        public ActionResult MonthlyAVG()
+        {
+            return View();
+        }
+
         public ActionResult AddCompany()
         {
             return View();

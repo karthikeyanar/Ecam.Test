@@ -227,6 +227,20 @@ $(function () {
             unload: function () { }
         });
 
+        createFinchRoute("/monthlyavg", {
+            setup: function (url) {
+                handleBlockUI();
+            },
+            load: function () {
+                require(['MonthlyAVGController'], function (ViewModel) {
+                    document.title = "Monthly AVG - Ecams";
+                    var m = new ViewModel();
+                    app.viewModel(m);
+                });
+            },
+            unload: function () { }
+        });
+
         createFinchRoute("/order", {
             setup: function (url) {
                 handleBlockUI();
