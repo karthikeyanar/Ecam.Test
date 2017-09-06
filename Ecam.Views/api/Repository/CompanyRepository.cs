@@ -948,8 +948,11 @@ namespace Ecam.Framework.Repository
                 dateFilter = string.Format(" and m.trade_date>='{0}' and m.trade_date<='{1}' ", criteria.start_date.Value.ToString("yyyy-MM-dd"), criteria.end_date.Value.ToString("yyyy-MM-dd"));
             }
 
+            string totalDateFilter = string.Empty;
+            totalDateFilter = string.Format(" and m.trade_date>='{0}' and m.trade_date<='{1}' ", DateTime.Now.Date.AddDays(-365).ToString("yyyy-MM-dd"), DateTime.Now.Date.ToString("yyyy-MM-dd"));
+
             selectFields = "c.company_name" +
-                            ",av.symbol" +
+                            ",av.symbol" + 
                             ",c.company_id" +
                             ",c.company_id as id" +
                             ",c.is_book_mark" +
@@ -958,8 +961,8 @@ namespace Ecam.Framework.Repository
                             ",c.weekly_avg" +
                             ",c.rsi" +
                             ",c.ltp_price" +
-                            ",(select open_price from tra_market m where m.symbol = av.symbol order by m.trade_date asc limit 0,1) as total_first_price" +
-                            ",(select ltp_price from tra_market m where m.symbol = av.symbol order by m.trade_date desc limit 0,1) as total_last_price" +
+                            ",(select open_price from tra_market m where m.symbol = av.symbol " + totalDateFilter + " order by m.trade_date asc limit 0,1) as total_first_price" +
+                            ",(select ltp_price from tra_market m where m.symbol = av.symbol " + totalDateFilter + " order by m.trade_date desc limit 0,1) as total_last_price" +
                             ",(select open_price from tra_market m where m.symbol = av.symbol " + dateFilter + " order by m.trade_date asc limit 0,1) as first_price" +
                             ",(select ltp_price from tra_market m where m.symbol = av.symbol " + dateFilter + " order by m.trade_date desc limit 0,1) as last_price" +
                             ",(select count(*) from tra_market_avg m where m.symbol = av.symbol and m.avg_type = 'M' and ifnull(m.percentage, 0) < 0) as negative" +
@@ -1009,15 +1012,7 @@ namespace Ecam.Framework.Repository
                 where.AppendFormat(" and ifnull((((last_price - first_price)/first_price) * 100),0)<={0}", criteria.to_profit);
             }
 
-       //     string tempsql = string.Format("select " +
-       //"tbl.*" + Environment.NewLine +
-       //" from(" + Environment.NewLine +
-       //sql + Environment.NewLine + 
-       //") as tbl {0} {1} {2} {3} ", where, "", "", "");
-
-       //     tempsql = "select count(*) as cnt from(" + tempsql + ") as tbl2";
-
-       //     paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString, tempsql));
+       
 
             orderBy = " order by negative asc,positive desc,monthly_avg desc,weekly_avg desc ";
 
@@ -1027,7 +1022,17 @@ namespace Ecam.Framework.Repository
             sql + Environment.NewLine +
             ") as tbl {0} {1} {2} {3} ", where, "", orderBy, pageLimit);
 
-            Helper.Log(sql);
+       //     string tempsql = string.Format("select " +
+       //"tbl22.*" + Environment.NewLine +
+       //" from(" + Environment.NewLine +
+       //sql + Environment.NewLine +
+       //") as tbl22 {0} {1} {2} {3} ", where, "", "", "");
+
+       //     tempsql = "select count(*) as cnt from(" + tempsql + ") as tbl2";
+
+       //     paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString, tempsql));
+
+            //Helper.Log(sql);
             List<TRA_COMPANY> rows = new List<TRA_COMPANY>();
             List<tra_company_category> companyCategories;
             using (EcamContext context = new EcamContext())
