@@ -38,10 +38,10 @@ namespace Ecam.Framework.Repository
             {
                 where.AppendFormat(" and ct.symbol in({0})", Helper.ConvertStringSQLFormat(criteria.symbols));
             }
-            if ((criteria.id ?? 0) > 0)
-            {
-                where.AppendFormat(" and ct.market_id={0}", criteria.id);
-            }
+            //if ((criteria.id ?? 0) > 0)
+            //{
+            //    where.AppendFormat(" and ct.market_id={0}", criteria.id);
+            //}
            
             if (string.IsNullOrEmpty(criteria.categories) == false)
             {

@@ -18,30 +18,13 @@ namespace Ecam.ConsoleApp
     class Program
     {
         public static string IS_DOWNLOAD_HISTORY = "";
+        public static string IS_IMPORT_CSV = "";
         public static string GOOGLE_DATA = "";
         static void Main(string[] args)
         {
+            IS_IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_IMPORT_CSV"];
             IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
-            //string sql = "delete from tra_market_intra_day where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(curdate(), '%Y-%m-%d')";
-            //MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-            //List<string> symbols;
-            //using (EcamContext context = new EcamContext())
-            //{
-            //    symbols = (from q in context.tra_company
-            //               where q.symbol == "NIFTY"
-            //               orderby q.symbol
-            //               select q.symbol).ToList();
-            //}
-            //int total = symbols.Count();
-            //int index = 0;
-            //foreach (string symbol in symbols)
-            //{
-            //    index += 1;
-            //    TradeHelper._CreateAVG(symbol);
-            //    TradeHelper.UpdateCompanyPrice(symbol);
-            //    Console.WriteLine("Total=" + total + ",Index=" + index);
-            //}
             DownloadStart();
         }
 
@@ -56,6 +39,10 @@ namespace Ecam.ConsoleApp
             if (IS_DOWNLOAD_HISTORY == "true")
             {
                 GoogleHistoryData();
+            }
+            else if (IS_IMPORT_CSV == "true")
+            {
+                CSVData();
             }
             else
             {
@@ -74,7 +61,6 @@ namespace Ecam.ConsoleApp
                 }
             }
         }
-
 
         //using (EcamContext context = new EcamContext())
         //{
@@ -1004,6 +990,61 @@ namespace Ecam.ConsoleApp
                 Helper.Log(msg, "GetSymbol_Error");
             }
             return symbol;
+        }
+
+
+        private static void CSVData()
+        {
+            string isImportCSV = System.Configuration.ConfigurationManager.AppSettings["IS_IMPORT_CSV"];
+            string importCSVDirectoryPath = System.Configuration.ConfigurationManager.AppSettings["IMPORT_CSV"];
+            List<string> symbols = new List<string>();
+            if (isImportCSV == "true")
+            {
+                string[] files = System.IO.Directory.GetFiles(importCSVDirectoryPath);
+                foreach (string fullFileName in files)
+                {
+                    symbols.Add(System.IO.Path.GetFileNameWithoutExtension(fullFileName));
+                }
+            }
+            _COMPANIES = symbols.ToArray();
+            _INDEX = -1;
+            CSVDownloadStart();
+        }
+
+        private static void CSVDownloadStart()
+        {
+            int totalCount = _COMPANIES.Length;
+            int queueCount = 64;
+            if (totalCount <= queueCount)
+            {
+                queueCount = totalCount;
+            }
+            // One event is used for each Fibonacci object
+            ManualResetEvent[] doneEvents = new ManualResetEvent[queueCount];
+            CSVDownloadData[] downArray = new CSVDownloadData[queueCount];
+            //Random r = new Random();
+            // Configure and launch threads using ThreadPool:
+            Console.WriteLine("launching {0} tasks...", totalCount);
+            for (int i = 0; i < queueCount; i++)
+            {
+                _INDEX += 1;
+                string symbol = "";
+                if (_INDEX < _COMPANIES.Length)
+                {
+                    symbol = _COMPANIES[_INDEX];
+                }
+                doneEvents[i] = new ManualResetEvent(false);
+                CSVDownloadData f = new CSVDownloadData(symbol, doneEvents[i]);
+                downArray[i] = f;
+                ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback, i);
+            }
+            // Wait for all threads in pool to calculation...
+            WaitHandle.WaitAll(doneEvents);
+            if (_INDEX < _COMPANIES.Length)
+            {
+                Console.WriteLine("All calculations are complete.");
+                CSVDownloadStart();
+            }
         }
     }
 

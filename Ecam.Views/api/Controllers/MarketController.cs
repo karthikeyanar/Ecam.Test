@@ -12,7 +12,7 @@ using System.Web.Http;
 
 namespace Ecam.Views.Controllers
 {
-    public class MarketController : BaseApiController<TRA_MARKET, tra_market>
+    public class MarketController  
     {
 
         public MarketController()
@@ -27,15 +27,15 @@ namespace Ecam.Views.Controllers
 
         IMarketRepository _MarketRepository;
          
-        public override TRA_MARKET Get(int? id)
-        {
-            return _MarketRepository.Get(new TRA_MARKET_SEARCH { id = id }, new Paging { }).rows.FirstOrDefault();
-        }
+        //public override TRA_MARKET Get(int? id)
+        //{
+        //    return _MarketRepository.Get(new TRA_MARKET_SEARCH { id = id }, new Paging { }).rows.FirstOrDefault();
+        //}
 
-        public override PaginatedListResult<TRA_MARKET> Search([FromUri] TRA_MARKET criteria, [FromUri] Paging paging)
-        {
-            throw new Exception("Not available");
-        }
+        //public override PaginatedListResult<TRA_MARKET> Search([FromUri] TRA_MARKET criteria, [FromUri] Paging paging)
+        //{
+        //    throw new Exception("Not available");
+        //}
 
         [HttpGet]
         [ActionName("List")]
@@ -45,23 +45,23 @@ namespace Ecam.Views.Controllers
         }
 
         
-        public override IHttpActionResult Post(TRA_MARKET contract)
-        {
-            base.Post(contract);
-            return Ok(_MarketRepository.Get(new TRA_MARKET_SEARCH { id = contract.id }, new Paging { }).rows.FirstOrDefault());
-        }
+        //public override IHttpActionResult Post(TRA_MARKET contract)
+        //{
+        //    base.Post(contract);
+        //    return Ok(_MarketRepository.Get(new TRA_MARKET_SEARCH { id = contract.id }, new Paging { }).rows.FirstOrDefault());
+        //}
 
         
-        public override IHttpActionResult Put(int id, TRA_MARKET contract)
-        {
-            base.Post(contract);
-            return Ok(_MarketRepository.Get(new TRA_MARKET_SEARCH { id = contract.id }, new Paging { }).rows.FirstOrDefault());
-        }
+        //public override IHttpActionResult Put(int id, TRA_MARKET contract)
+        //{
+        //    base.Post(contract);
+        //    return Ok(_MarketRepository.Get(new TRA_MARKET_SEARCH { id = contract.id }, new Paging { }).rows.FirstOrDefault());
+        //}
 
         
-        public override IHttpActionResult Delete(int id)
-        {
-            return base.Delete(id);
-        }
+        //public override IHttpActionResult Delete(int id)
+        //{
+        //    return base.Delete(id);
+        //}
     }
 }

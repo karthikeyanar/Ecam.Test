@@ -29,7 +29,6 @@ namespace Ecam.Models{
             modelBuilder.Configurations.Add(new tra_mutual_fundMap());
             modelBuilder.Configurations.Add(new tra_mutual_fund_pfMap());
 			modelBuilder.Configurations.Add(new aspnetuserrolesMap());
-             
         }
     }
 }
