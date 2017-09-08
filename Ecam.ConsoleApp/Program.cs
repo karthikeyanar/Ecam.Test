@@ -46,8 +46,8 @@ namespace Ecam.ConsoleApp
             }
             else
             {
-                if ((now >= morningStart && now <= morningEnd) || (now >= eveningStart && now <= eveningEnd))
-                {
+                //if ((now >= morningStart && now <= morningEnd) || (now >= eveningStart && now <= eveningEnd))
+                //{
                     GoogleData();
                     Console.WriteLine("Completed");
                     //Helper.Log("DownloadEnd=" + DateTime.Now.ToString(), "DOWNLOAD");
@@ -58,7 +58,7 @@ namespace Ecam.ConsoleApp
                     //    System.Threading.Thread.Sleep((minute1 * 5));
                     //    DownloadStart();
                     //}
-                }
+                //}
             }
         }
 
