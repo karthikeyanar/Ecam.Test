@@ -949,10 +949,10 @@ namespace Ecam.Framework.Repository
             }
 
             string totalDateFilter = string.Empty;
-            totalDateFilter = string.Format(" and m.trade_date>='{0}' and m.trade_date<='{1}' ", DateTime.Now.Date.AddDays(-365).ToString("yyyy-MM-dd"), DateTime.Now.Date.ToString("yyyy-MM-dd"));
+            totalDateFilter = string.Format(" and m.trade_date>='{0}' and m.trade_date<='{1}' ", DateTime.Now.Date.AddDays(-(365 * 3)).ToString("yyyy-MM-dd"), DateTime.Now.Date.ToString("yyyy-MM-dd"));
 
             selectFields = "c.company_name" +
-                            ",av.symbol" + 
+                            ",av.symbol" +
                             ",c.company_id" +
                             ",c.company_id as id" +
                             ",c.is_book_mark" +
@@ -969,12 +969,12 @@ namespace Ecam.Framework.Repository
                             ",(select count(*) from tra_market_avg m where m.symbol = av.symbol and m.avg_type = 'M' and ifnull(m.percentage, 0) > 0) as positive" +
                             ",(select count(*) from tra_market_avg m where m.symbol = av.symbol and m.avg_type = 'M') as total" +
                             "";
-        
+
             sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, "", "");
 
             where = new StringBuilder();
 
-            where.AppendFormat(" where first_price > 0 and last_price > 0 and (((total_last_price - total_first_price)/total_first_price) * 100) > 25 ");
+            where.AppendFormat(" where first_price > 0 and last_price > 0 and (((total_last_price - total_first_price)/total_first_price) * 100) >= " + ((criteria.min_profit ?? 0) > 0 ? criteria.min_profit : 25));
 
             if ((criteria.is_sell_to_buy ?? false) == true)
             {
@@ -1012,25 +1012,30 @@ namespace Ecam.Framework.Repository
                 where.AppendFormat(" and ifnull((((last_price - first_price)/first_price) * 100),0)<={0}", criteria.to_profit);
             }
 
-       
+            if ((criteria.max_negative_count ?? 0) > 0)
+            {
+                where.AppendFormat(" and ifnull(negative,0)<={0}", criteria.max_negative_count);
+            }
 
             orderBy = " order by negative asc,positive desc,monthly_avg desc,weekly_avg desc ";
 
             sql = string.Format("select " +
-            "(((last_price - first_price)/first_price) * 100) as profit,tbl.*" + Environment.NewLine +
+            "(((last_price - first_price)/first_price) * 100) as profit" +
+            ",(((total_last_price - total_first_price)/total_first_price) * 100) as total_profit" +
+            ",tbl.*" + Environment.NewLine +
             " from(" + Environment.NewLine +
             sql + Environment.NewLine +
             ") as tbl {0} {1} {2} {3} ", where, "", orderBy, pageLimit);
 
-       //     string tempsql = string.Format("select " +
-       //"tbl22.*" + Environment.NewLine +
-       //" from(" + Environment.NewLine +
-       //sql + Environment.NewLine +
-       //") as tbl22 {0} {1} {2} {3} ", where, "", "", "");
+            //     string tempsql = string.Format("select " +
+            //"tbl22.*" + Environment.NewLine +
+            //" from(" + Environment.NewLine +
+            //sql + Environment.NewLine +
+            //") as tbl22 {0} {1} {2} {3} ", where, "", "", "");
 
-       //     tempsql = "select count(*) as cnt from(" + tempsql + ") as tbl2";
+            //     tempsql = "select count(*) as cnt from(" + tempsql + ") as tbl2";
 
-       //     paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString, tempsql));
+            //     paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString, tempsql));
 
             //Helper.Log(sql);
             List<TRA_COMPANY> rows = new List<TRA_COMPANY>();
@@ -1062,6 +1067,28 @@ namespace Ecam.Framework.Repository
                     categoryName = categoryName.Substring(0, categoryName.Length - 1);
                 }
                 row.category_name = categoryName;
+            }
+            paging.Total = rows.Count();
+            switch (paging.SortName) 
+            {
+                case "profit":
+                    if (paging.SortOrder == "asc")
+                        rows = (from q in rows orderby q.profit  select q).ToList();
+                    else
+                        rows = (from q in rows orderby q.profit descending select q).ToList();
+                    break;
+                case "total_profit":
+                    if (paging.SortOrder == "asc")
+                        rows = (from q in rows orderby q.total_profit select q).ToList();
+                    else
+                        rows = (from q in rows orderby q.total_profit descending select q).ToList();
+                    break;
+                case "rsi":
+                    if (paging.SortOrder == "asc")
+                        rows = (from q in rows orderby q.rsi select q).ToList();
+                    else
+                        rows = (from q in rows orderby q.rsi descending select q).ToList();
+                    break;
             }
             return new PaginatedListResult<TRA_COMPANY> { total = paging.Total, rows = rows };
         }

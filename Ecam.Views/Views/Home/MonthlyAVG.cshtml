@@ -67,13 +67,13 @@
             </div>
             <div class="clearfix"></div>
             <div class="m-l-15">
-                <div class="form-group m-r-10 m-t-10">
+                @*<div class="form-group m-r-10 m-t-10">
                     <input type="text" name="from_prev_rsi" class="form-control input-sm" placeholder="From Prev RSI" style="width:100px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <input type="text" name="to_prev_rsi" class="form-control input-sm" placeholder="To Prev RSI" style="width:100px" />
-                </div>
-                <div class="form-group m-r-10 m-t-10">
+                </div>*@
+                @*<div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" id="is_sell_to_buy" /> Sell To Buy
@@ -86,18 +86,24 @@
                             <input type="checkbox" id="is_buy_to_sell" /> Buy To Sell
                         </label>
                     </div>
-                </div>
-                <div class="form-group m-r-10 m-t-10">
+                </div>*@
+                @*<div class="form-group m-r-10 m-t-10">
                     <input type="text" name="from_rsi" class="form-control input-sm" placeholder="From RSI" style="width:100px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <input type="text" name="to_rsi" class="form-control input-sm" placeholder="To RSI" style="width:100px" />
-                </div>
-                <div class="form-group m-r-10 m-t-10">
+                </div>*@
+                @*<div class="form-group m-r-10 m-t-10">
                     <input type="text" name="from_profit" class="form-control input-sm" placeholder="From Profit" style="width:100px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <input type="text" name="to_profit" class="form-control input-sm" placeholder="To Profit" style="width:100px" />
+                </div>*@
+                <div class="form-group m-r-10 m-t-10">
+                    <input type="text" name="min_profit" class="form-control input-sm" placeholder="Total Min Profit" style="width:150px" />
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <input type="text" name="max_negative_count" class="form-control input-sm" value="3" placeholder="Max Negative Count" style="width:150px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <button id="reportrange" type="button" class="btn btn-sm btn-default">
@@ -157,14 +163,14 @@
                 <div class="pull-left m-r-15">
                     <span class="pull-left p-t-5 p-r-10">Rows</span>
                     <select id="rows" name="rows" class="pull-left form-control input-sm input-60">
-                        <option value="10" selected>10</option>
+                        <option value="10">10</option>
                         <option value="15">15</option>
                         <option value="20">20</option>
                         <option value="25">25</option>
                         <option value="50">50</option>
                         <option value="200">200</option>
                         <option value="210">210</option>
-                        <option value="500">500</option>
+                        <option value="500" selected>500</option>
                     </select>
                 </div>
                 <div class="pull-left">
@@ -177,8 +183,8 @@
                 </div>
             </div>
             <input type="hidden" name="page_index" value="1" />
-            <input type="hidden" name="sort_name" value="rsi" />
-            <input type="hidden" name="sort_order" value="asc" />
+            <input type="hidden" name="sort_name" value="" />
+            <input type="hidden" name="sort_order" value="" />
         </div>
         <table id="CompanyTable" class="table table-striped table-bordered table-hover table-condensed table-gray">
             <thead>
@@ -201,14 +207,17 @@
                     <th>
                         Category
                     </th>
-                    <th class="text-right text-nowrap">
+                    <th class="text-right text-nowrap" sortname="rsi">
                         RSI
                     </th>
                     <th class="text-right text-nowrap">
                         LTP
                     </th>
-                    <th class="text-right">
+                    <th class="text-right" sortname="profit">
                         Profit
+                    </th>
+                    <th class="text-right" sortname="total_profit">
+                        Total Profit
                     </th>
                     <th class="text-right">
                         Ne-
@@ -264,6 +273,9 @@
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(profit())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(total_profit())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatInteger(negative())"></div>

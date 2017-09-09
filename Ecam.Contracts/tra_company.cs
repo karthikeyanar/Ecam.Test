@@ -52,6 +52,7 @@ namespace Ecam.Contracts
         public Nullable<decimal> weekly_avg { get; set; }
         public Nullable<int> negative { get; set; }
         public Nullable<int> positive { get; set; }
+        public Nullable<decimal> total_profit { get; set; }
     }
 
     public class TRA_COMPANY_SEARCH : TRA_COMPANY
@@ -79,6 +80,9 @@ namespace Ecam.Contracts
 
         public DateTime? start_date { get; set; }
         public DateTime? end_date { get; set; }
+
+        public decimal? min_profit { get; set; }
+        public int? max_negative_count { get; set; }
     }
 }
 
