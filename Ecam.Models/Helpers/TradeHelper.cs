@@ -1089,7 +1089,7 @@ namespace Ecam.Models
                 context.SaveChanges();
                 CreateAVG(row.symbol, row.trade_date);
                 //lblError.Text = "ImportPrice Price Index symbol=" + row.symbol + ",Date=" + row.trade_date;
-                //Console.WriteLine("ImportPrice Price Index symbol=" + row.symbol + ",Date=" + row.trade_date);
+                Console.WriteLine("ImportPrice Price Index symbol=" + row.symbol + ",Date=" + row.trade_date);
             }
             UpdateCompanyPrice(import.symbol);
         }
@@ -2062,8 +2062,10 @@ RegexOptions.IgnoreCase
                             market.rs = existValue.rs;
                             context.Entry(market).State = System.Data.Entity.EntityState.Modified;
                             context.SaveChanges();
-                            var preMarket = (from q in markets where q.symbol == existValue.symbol 
-                                             && q.trade_date == existValue.date select q).FirstOrDefault();
+                            var preMarket = (from q in markets
+                                             where q.symbol == existValue.symbol
+                           && q.trade_date == existValue.date
+                                             select q).FirstOrDefault();
                             preMarket.avg_downward = existValue.avg_downward;
                             preMarket.avg_upward = existValue.avg_upward;
                             preMarket.upward = existValue.upward;
@@ -2095,6 +2097,7 @@ RegexOptions.IgnoreCase
     {
         public CSVDownloadData(string symbol, ManualResetEvent doneEvent)
         {
+            _OriginalSymbol = symbol;
             _Symbol = symbol;
             _doneEvent = doneEvent;
         }
@@ -2114,6 +2117,12 @@ RegexOptions.IgnoreCase
                 CalculateRSI(_Symbol);
             }
             Console.WriteLine("thread {0} result calculated...", threadIndex);
+            string IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IMPORT_CSV"];
+            string fileName = IMPORT_CSV + "\\" + _OriginalSymbol + ".csv";
+            if (File.Exists(fileName) == true)
+            {
+                File.Delete(fileName);
+            }
             _doneEvent.Set();
         }
 
@@ -2344,8 +2353,10 @@ RegexOptions.IgnoreCase
                             market.rs = existValue.rs;
                             context.Entry(market).State = System.Data.Entity.EntityState.Modified;
                             context.SaveChanges();
-                            var preMarket = (from q in markets where q.symbol == existValue.symbol 
-                                             && q.trade_date == existValue.date select q).FirstOrDefault();
+                            var preMarket = (from q in markets
+                                             where q.symbol == existValue.symbol
+                           && q.trade_date == existValue.date
+                                             select q).FirstOrDefault();
                             preMarket.avg_downward = existValue.avg_downward;
                             preMarket.avg_upward = existValue.avg_upward;
                             preMarket.upward = existValue.upward;
@@ -2368,6 +2379,7 @@ RegexOptions.IgnoreCase
 
         public string SYMBOL { get { return _Symbol; } }
         private string _Symbol;
+        private string _OriginalSymbol;
 
         private ManualResetEvent _doneEvent;
     }

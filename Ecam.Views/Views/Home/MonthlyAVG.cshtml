@@ -103,7 +103,7 @@
                     <input type="text" name="min_profit" class="form-control input-sm" placeholder="Total Min Profit" style="width:150px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="max_negative_count" class="form-control input-sm" value="3" placeholder="Max Negative Count" style="width:150px" />
+                    <input type="text" name="max_negative_count" class="form-control input-sm" value="" placeholder="Max Negative Count" style="width:150px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <button id="reportrange" type="button" class="btn btn-sm btn-default">
@@ -165,12 +165,13 @@
                     <select id="rows" name="rows" class="pull-left form-control input-sm input-60">
                         <option value="10">10</option>
                         <option value="15">15</option>
-                        <option value="20">20</option>
+                        <option value="20" selected>20</option>
                         <option value="25">25</option>
                         <option value="50">50</option>
+                        <option value="100">100</option>
                         <option value="200">200</option>
                         <option value="210">210</option>
-                        <option value="500" selected>500</option>
+                        <option value="500">500</option>
                     </select>
                 </div>
                 <div class="pull-left">
@@ -278,10 +279,10 @@
                         <div data-bind="text:formatPercentage(total_profit())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatInteger(negative())"></div>
+                        <div data-bind="text:formatPercentage(negative_percentage())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatInteger(positive())"></div>
+                        <div data-bind="text:formatPercentage(positive_percentage())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(monthly_avg())"></div>

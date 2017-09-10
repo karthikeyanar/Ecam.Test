@@ -52,6 +52,8 @@ namespace Ecam.Contracts
         public Nullable<decimal> weekly_avg { get; set; }
         public Nullable<int> negative { get; set; }
         public Nullable<int> positive { get; set; }
+        public Nullable<int> negative_percentage { get; set; }
+        public Nullable<int> positive_percentage { get; set; }
         public Nullable<decimal> total_profit { get; set; }
     }
 
