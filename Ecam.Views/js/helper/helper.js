@@ -417,7 +417,7 @@ define("helper", function () {
                     'Last 60 Days': [moment(_TODAYDATE).subtract('days', 60), moment(_TODAYDATE), ['right']],
                     'Last 90 Days': [moment(_TODAYDATE).subtract('days', 90), moment(_TODAYDATE), ['right']],
                     'Last 120 Days': [moment(_TODAYDATE).subtract('days', 120), moment(_TODAYDATE), ['right']],
-                    'Current Two Weeks': [moment(_TODAYDATE).startOf('week').subtract('day', 7), moment(_TODAYDATE).endOf('week'), ['right']],
+                    'Last 365 Days': [moment(_TODAYDATE).subtract('days', 365), moment(_TODAYDATE), ['right']],
                     'This Year': [moment(_TODAYDATE).startOf('year'), moment(_TODAYDATE).endOf('year'), ['right']]
                 };
             }

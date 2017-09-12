@@ -118,6 +118,15 @@
                         </label>
                     </div>
                 </div>
+                <div class="form-group m-r-10 m-t-10 p-t-5">
+                    <label>Total Profit Dates:</label>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <button id="total_reportrange" type="button" class="btn btn-sm btn-default">
+                        <i class="fa fa-calendar cursor-pointer m-r-10"></i><span class="m-r-10">
+                        </span><b class="caret"></b>
+                    </button>
+                </div>
                 <div class="clearfix"></div>
                 @*<div class="form-group m-r-10 m-t-10">
                         <input type="text" name="available_amount" id="available_amount" placeholder="Available Amount" class="form-control input-sm" style="width:100px;" />
@@ -140,6 +149,8 @@
             </div>
             <input type="hidden" name="start_date" data-bind="value:start_date" />
             <input type="hidden" name="end_date" data-bind="value:end_date" />
+            <input type="hidden" name="total_start_date" data-bind="value:total_start_date" />
+            <input type="hidden" name="total_end_date" data-bind="value:total_end_date" />
         </form>
     </div>
 </div>

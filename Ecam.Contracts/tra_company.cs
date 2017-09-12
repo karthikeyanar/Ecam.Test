@@ -85,6 +85,9 @@ namespace Ecam.Contracts
 
         public decimal? min_profit { get; set; }
         public int? max_negative_count { get; set; }
+
+        public DateTime? total_start_date { get; set; }
+        public DateTime? total_end_date { get; set; }
     }
 }
 
