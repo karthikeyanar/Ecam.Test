@@ -225,6 +225,12 @@
                     <th class="text-right text-nowrap">
                         LTP
                     </th>
+                    <th class="text-right">
+                        High
+                    </th>
+                    <th class="text-right">
+                        Low
+                    </th>
                     <th class="text-right" sortname="profit">
                         Profit
                     </th>
@@ -284,16 +290,24 @@
                         <div data-bind="text:formatNumber(ltp_price())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(profit_high_price())"></div>
+                        <div data-bind="text:formatPercentage(((cFloat(profit_high_price())-cFloat(ltp_price()))/cFloat(ltp_price()))*100)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(profit_low_price())"></div>
+                        <div data-bind="text:formatPercentage(((cFloat(profit_low_price())-cFloat(ltp_price()))/cFloat(ltp_price()))*100)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(profit())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(total_profit())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(negative_percentage())"></div>
+                        <div data-bind="text:formatInteger(negative())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(positive_percentage())"></div>
+                        <div data-bind="text:formatInteger(positive())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(monthly_avg())"></div>

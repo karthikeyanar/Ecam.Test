@@ -967,9 +967,13 @@ namespace Ecam.Framework.Repository
                             ",c.is_book_mark" + Environment.NewLine +
                             ",c.is_current_stock" + Environment.NewLine +
                             ",c.monthly_avg" + Environment.NewLine +
-                            ",c.weekly_avg" + Environment.NewLine +
+                            ",c.weekly_avg" + Environment.NewLine + 
                             ",c.rsi" + Environment.NewLine +
                             ",c.ltp_price" + Environment.NewLine +
+                            ",(select high_price from tra_market m where m.symbol = c.symbol " + totalDateFilter + " and m.high_price > 0 order by m.high_price desc limit 0,1) as total_high_price" + Environment.NewLine +
+                            ",(select low_price from tra_market m where m.symbol = c.symbol " + totalDateFilter + " and m.low_price > 0 order by m.low_price asc limit 0,1) as total_low_price" + Environment.NewLine +
+                            ",(select high_price from tra_market m where m.symbol = c.symbol " + dateFilter + " and m.high_price > 0 order by m.high_price desc limit 0,1) as profit_high_price" + Environment.NewLine +
+                            ",(select low_price from tra_market m where m.symbol = c.symbol " + dateFilter + " and m.low_price > 0 order by m.low_price asc limit 0,1) as profit_low_price" + Environment.NewLine +
                             ",(select open_price from tra_market m where m.symbol = c.symbol " + totalDateFilter + " order by m.trade_date asc limit 0,1) as total_first_price" + Environment.NewLine +
                             ",(select ltp_price from tra_market m where m.symbol = c.symbol " + totalDateFilter + " order by m.trade_date desc limit 0,1) as total_last_price" + Environment.NewLine +
                             ",(select open_price from tra_market m where m.symbol = c.symbol " + dateFilter + " order by m.trade_date asc limit 0,1) as first_price" + Environment.NewLine +
@@ -1028,7 +1032,9 @@ namespace Ecam.Framework.Repository
                 where.AppendFormat(" and ifnull(negative,0)<={0}", criteria.max_negative_count).Append(Environment.NewLine);
             }
 
-            orderBy = " order by (negative/(negative+positive) * 100) asc,(positive/(negative+positive) * 100) desc,monthly_avg desc,weekly_avg desc,(((total_last_price - total_first_price)/total_first_price) * 100) desc " + Environment.NewLine;
+            //orderBy = " order by (negative/(negative+positive) * 100) asc,(positive/(negative+positive) * 100) desc,(((total_last_price - total_first_price)/total_first_price) * 100) desc,monthly_avg desc,weekly_avg desc " + Environment.NewLine;
+
+            orderBy = " order by negative asc,positive desc,monthly_avg desc,weekly_avg desc,(((total_last_price - total_first_price)/total_first_price) * 100) desc " + Environment.NewLine;
 
             sql = string.Format("select " + Environment.NewLine +
             "(((last_price - first_price)/first_price) * 100) as profit" + Environment.NewLine +

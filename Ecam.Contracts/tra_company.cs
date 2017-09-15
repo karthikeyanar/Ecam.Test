@@ -55,6 +55,11 @@ namespace Ecam.Contracts
         public Nullable<int> negative_percentage { get; set; }
         public Nullable<int> positive_percentage { get; set; }
         public Nullable<decimal> total_profit { get; set; }
+
+        public Nullable<decimal> total_high_price { get; set; }
+        public Nullable<decimal> total_low_price { get; set; }
+        public Nullable<decimal> profit_high_price { get; set; }
+        public Nullable<decimal> profit_low_price { get; set; }
     }
 
     public class TRA_COMPANY_SEARCH : TRA_COMPANY
