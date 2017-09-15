@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Ecam.Framework.Repository
-{
+{ 
 
     public interface IMarketRepository
     {

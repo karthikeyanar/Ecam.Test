@@ -89,5 +89,5 @@ namespace Ecam.Contracts
         public DateTime? total_start_date { get; set; }
         public DateTime? total_end_date { get; set; }
     }
-}
+} 
 

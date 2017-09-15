@@ -1011,7 +1011,7 @@ namespace Ecam.Framework.Repository
             if (string.IsNullOrEmpty(criteria.ltp_to_percentage) == false)
             {
                 where.AppendFormat(" and ifnull(ltp_percentage,0)<={0}", criteria.ltp_to_percentage).Append(Environment.NewLine);
-            }
+            } 
 
             if ((criteria.from_profit ?? 0) != 0)
             {

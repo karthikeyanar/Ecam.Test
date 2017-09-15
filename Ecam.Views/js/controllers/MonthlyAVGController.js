@@ -281,7 +281,7 @@ define("MonthlyAVGController", ["knockout", "komapping", "helper", "service"], f
             helper.changeDateRangeLabel($('span', $reportRange), start, end, self.start_date(), self.end_date());
 
 
-            var start = moment(_TODAYDATE).subtract('years', 3);
+            var start = moment(_TODAYDATE).subtract('days', 365);
             var end = moment(_TODAYDATE);
             self.total_start_date(start.format('MM/DD/YYYY'));
             self.total_end_date(end.format('MM/DD/YYYY'));
@@ -305,7 +305,7 @@ define("MonthlyAVGController", ["knockout", "komapping", "helper", "service"], f
             helper.changeDateRangeLabel($('span', $totalReportRange), start, end, self.total_start_date(), self.total_end_date());
         }
 
-        this.openItem = function (row) {
+        this.openItem = function (row) { 
             $('#temp-modal-container').remove();
             var $cnt = $("<div id='temp-modal-container'></div>");
             $('body').append($cnt);

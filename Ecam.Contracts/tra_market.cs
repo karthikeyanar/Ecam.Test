@@ -19,7 +19,7 @@ namespace Ecam.Contracts
         public Nullable<decimal> close_price { get; set; }
         public Nullable<decimal> prev_price { get; set; }
         public Nullable<int> ltp_price { get; set; }
-
+         
         public string company_name { get; set; }
         public Nullable<decimal> week_52_low { get; set; }
         public Nullable<decimal> week_52_high { get; set; }

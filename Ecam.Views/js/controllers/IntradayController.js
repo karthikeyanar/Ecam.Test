@@ -251,7 +251,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                    var $target = $(".page-content");
                    self.loadGrid();
                }
-            });
+            }); 
 
 
             var arrlastsixmonths = helper.getLastSixMonths();

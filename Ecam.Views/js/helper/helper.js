@@ -398,7 +398,7 @@ define("helper", function () {
                 openMode = options.opens;
             }
             var ranges = options.ranges;
-
+             
             if (!ranges) {
                 ranges = {
                     'Today': [moment(_TODAYDATE), moment(_TODAYDATE)],
