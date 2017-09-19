@@ -11,6 +11,7 @@ define("HoldingController", ["knockout", "komapping", "helper", "service"], func
         }
 
         this.profit = ko.observable();
+        this.profit_percentage = ko.observable();
         this.total_investment = ko.observable();
         this.total_market_value = ko.observable();
 
@@ -33,15 +34,16 @@ define("HoldingController", ["knockout", "komapping", "helper", "service"], func
                 self.rows(json.rows);
                 var totalInvestment = 0;
                 var totalMarketValue = 0;
-                var profit = 0;
+                var profitPercentage = 0;
                 $.each(json.rows, function (i, row) {
                     totalInvestment += cFloat(row.investment);
                     totalMarketValue += cFloat(row.current_market_value);
                 });
-                profit = ((cFloat(totalMarketValue) - cFloat(totalInvestment)) / cFloat(totalInvestment)) * 100;
+                profitPercentage = ((cFloat(totalMarketValue) - cFloat(totalInvestment)) / cFloat(totalInvestment)) * 100;
                 self.total_investment(totalInvestment);
                 self.total_market_value(totalMarketValue);
-                self.profit(profit);
+                self.profit(cFloat(totalMarketValue) - cFloat(totalInvestment));
+                self.profit_percentage(profitPercentage);
                 $(".manual-pagination", $Holding).each(function () {
                     var element = this;
                     $(element).twbsPagination({
@@ -88,6 +90,7 @@ define("HoldingController", ["knockout", "komapping", "helper", "service"], func
                     , 'quantity': 0
                     , 'trade_date': formatDate(new Date())
                     , 'avg_price': 0
+                    , 'ltp_price': 0
                 };
             }
             ko.applyBindings(row, $modal[0]);
@@ -117,7 +120,6 @@ define("HoldingController", ["knockout", "komapping", "helper", "service"], func
                     });
                 }
             });
-
         }
 
         this.onElements = function () {

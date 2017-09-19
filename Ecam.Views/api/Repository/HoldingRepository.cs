@@ -72,6 +72,9 @@ namespace Ecam.Framework.Repository
             selectFields = "h.holding_id as id" + Environment.NewLine +
                            ",h.*" + Environment.NewLine +
                            ",(((ifnull(c.ltp_price, 0) - ifnull(h.avg_price, 0)) / ifnull(h.avg_price, 0)) * 100) as change_percentage" + Environment.NewLine +
+                           ",(ifnull(h.quantity, 0) * ifnull(h.avg_price, 0)) as investment" + Environment.NewLine +
+                           ",(ifnull(h.quantity, 0) * ifnull(c.ltp_price, 0)) as current_market_value" + Environment.NewLine +
+                           ",(ifnull(h.quantity, 0) * ifnull(c.ltp_price, 0)) - (ifnull(h.quantity, 0) * ifnull(h.avg_price, 0)) as change_value" + Environment.NewLine +
                            ",c.company_name" + Environment.NewLine +
                            ",c.ltp_price" + Environment.NewLine +
                            "";

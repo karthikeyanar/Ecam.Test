@@ -57,6 +57,21 @@ namespace Ecam.Views.Controllers
             var saveContract = Repository.Save(contract);
             if (saveContract.Errors == null)
             {
+                if (string.IsNullOrEmpty(contract.symbol) == false)
+                {
+                    using (EcamContext context = new EcamContext())
+                    {
+                        tra_company company = (from q in context.tra_company
+                                               where q.symbol == contract.symbol
+                                               select q).FirstOrDefault();
+                        if (company != null)
+                        {
+                            company.ltp_price = contract.ltp_price;
+                            context.Entry(company).State = System.Data.Entity.EntityState.Modified;
+                            context.SaveChanges();
+                        }
+                    }
+                }
                 return Ok(_HoldingRepository.Get(new TRA_HOLDING_SEARCH { id = saveContract.id }, new Paging { }).rows.FirstOrDefault());
             }
             else

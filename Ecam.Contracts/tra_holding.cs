@@ -19,18 +19,9 @@ namespace Ecam.Contracts
         public string company_name { get; set; }
         public decimal? ltp_price { get; set; }
 
-        public decimal? investment {
-            get {
-                return (this.quantity) * (this.avg_price ?? 0);
-            }
-        }
-
-        public decimal? current_market_value {
-            get {
-                return (this.quantity) * (this.ltp_price ?? 0);
-            }
-        }
-
+        public decimal? investment { get; set; }
+        public decimal? current_market_value { get; set; }
+        public decimal? change_value { get; set; }
         public decimal? change_percentage { get; set; }
     }
 
