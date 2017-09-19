@@ -269,6 +269,20 @@ $(function () {
             unload: function () { }
         });
 
+        createFinchRoute("/holding", {
+            setup: function (url) {
+                handleBlockUI();
+            },
+            load: function () {
+                require(['HoldingController'], function (ViewModel) {
+                    document.title = "Holding - Ecams";
+                    var m = new ViewModel();
+                    app.viewModel(m);
+                });
+            },
+            unload: function () { }
+        });
+
         createFinchRoute("/market", {
             setup: function (url) {
                 handleBlockUI();

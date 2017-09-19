@@ -43,6 +43,11 @@ namespace Ecam.Views.Controllers
             return View();
         }
 
+        public ActionResult Holding()
+        {
+            return View();
+        }
+
         public ActionResult Company()
         {
             return View();

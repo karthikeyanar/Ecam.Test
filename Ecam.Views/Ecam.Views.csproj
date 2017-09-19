@@ -290,6 +290,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="api\Controllers\BaseApiController.cs" />
+    <Compile Include="api\Controllers\HoldingController.cs" />
     <Compile Include="api\Controllers\MFController.cs" />
     <Compile Include="api\Controllers\CategoryController.cs" />
     <Compile Include="api\Controllers\MarketController.cs" />
@@ -307,6 +308,7 @@
     <Compile Include="api\Models\AirlineInvitationModel.cs" />
     <Compile Include="api\Models\IdentityModels.cs" />
     <Compile Include="api\Models\ImportExcelTableModel.cs" />
+    <Compile Include="api\Repository\HoldingRepository.cs" />
     <Compile Include="api\Repository\MarketRepository.cs" />
     <Compile Include="api\Repository\CompanyRepository.cs" />
     <Compile Include="api\Repository\BaseRepository.cs" />
@@ -552,6 +554,7 @@
     <Content Include="js\bootstrap\bootstrap.js" />
     <Content Include="js\bootstrap\bootstrap.min.js" />
     <Content Include="js\bootstrap\npm.js" />
+    <Content Include="js\controllers\HoldingController.js" />
     <Content Include="js\controllers\MonthlyAVGController.js" />
     <Content Include="js\controllers\OrderController.js" />
     <Content Include="js\controllers\CategoryController.js" />
@@ -1189,6 +1192,7 @@
     <Content Include="Views\Home\Intraday.cshtml" />
     <Content Include="Views\Home\Order.cshtml" />
     <Content Include="Views\Home\MonthlyAVG.cshtml" />
+    <Content Include="Views\Home\Holding.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

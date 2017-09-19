@@ -48,16 +48,16 @@ namespace Ecam.ConsoleApp
             {
                 //if ((now >= morningStart && now <= morningEnd) || (now >= eveningStart && now <= eveningEnd))
                 //{
-                    GoogleData();
-                    Console.WriteLine("Completed");
-                    //Helper.Log("DownloadEnd=" + DateTime.Now.ToString(), "DOWNLOAD");
-                    //if ((now >= morningStart && now <= morningEnd))
-                    //{
-                    //    int minute1 = (1000 * 60);
-                    //    Console.WriteLine("Wait till=" + DateTime.Now.AddMinutes(5).ToString());
-                    //    System.Threading.Thread.Sleep((minute1 * 5));
-                    //    DownloadStart();
-                    //}
+                GoogleData();
+                Console.WriteLine("Completed");
+                //Helper.Log("DownloadEnd=" + DateTime.Now.ToString(), "DOWNLOAD");
+                //if ((now >= morningStart && now <= morningEnd))
+                //{
+                //    int minute1 = (1000 * 60);
+                //    Console.WriteLine("Wait till=" + DateTime.Now.AddMinutes(5).ToString());
+                //    System.Threading.Thread.Sleep((minute1 * 5));
+                //    DownloadStart();
+                //}
                 //}
             }
         }
@@ -540,9 +540,9 @@ namespace Ecam.ConsoleApp
 
                 if ((now >= morningStart && now <= eveningStart))
                 {
-                    //query = (from q in query
-                    //         where (q.prev_rsi ?? 0) >= 70 || (q.prev_rsi ?? 0) <= 30
-                    //         select q);
+                    query = (from q in query
+                             join h in context.tra_holding on q.symbol equals h.symbol
+                             select q);
                     //string IS_NIFTY_50 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_50"];
                     //string IS_NIFTY_100 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_100"];
                     //string IS_NIFTY_200 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_200"];
@@ -560,7 +560,7 @@ namespace Ecam.ConsoleApp
                     //}
                 }
                 companies = (from q in query
-                             orderby (q.prev_rsi ?? 0) descending
+                             orderby q.symbol ascending
                              select q).ToList();
             }
             _COMPANIES = (from q in companies select q.symbol).ToArray();

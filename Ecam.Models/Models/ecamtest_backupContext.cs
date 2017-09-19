@@ -11,6 +11,7 @@ namespace Ecam.Models{
         public DbSet<tra_category> tra_category { get; set; }
         public DbSet<tra_company> tra_company { get; set; }
         public DbSet<tra_company_category> tra_company_category { get; set; }
+        public DbSet<tra_holding> tra_holding { get; set; }
         public DbSet<tra_market> tra_market { get; set; }
         public DbSet<tra_market_avg> tra_market_avg { get; set; }
         public DbSet<tra_market_intra_day> tra_market_intra_day { get; set; }
@@ -23,6 +24,7 @@ namespace Ecam.Models{
             modelBuilder.Configurations.Add(new tra_categoryMap());
             modelBuilder.Configurations.Add(new tra_companyMap());
             modelBuilder.Configurations.Add(new tra_company_categoryMap());
+            modelBuilder.Configurations.Add(new tra_holdingMap());
             modelBuilder.Configurations.Add(new tra_marketMap());
             modelBuilder.Configurations.Add(new tra_market_avgMap());
             modelBuilder.Configurations.Add(new tra_market_intra_dayMap());
