@@ -414,7 +414,7 @@ define("helper", function () {
 
                     'Yesterday': [moment(_TODAYDATE).subtract('days', 1), moment(_TODAYDATE).subtract('days', 1), ['right']],
                     'This Week': [moment(_TODAYDATE).startOf('week'), moment(_TODAYDATE).endOf('week'), ['right']],
-                    'Last 15 Days': [moment(_TODAYDATE).subtract('days', 15), moment(_TODAYDATE), ['right']],
+                    'Last 19 Days': [moment(_TODAYDATE).subtract('days', 19), moment(_TODAYDATE), ['right']],
                     'Last 30 Days': [moment(_TODAYDATE).subtract('days', 30), moment(_TODAYDATE), ['right']],
                     'Last 60 Days': [moment(_TODAYDATE).subtract('days', 60), moment(_TODAYDATE), ['right']],
                     'Last 90 Days': [moment(_TODAYDATE).subtract('days', 90), moment(_TODAYDATE), ['right']],

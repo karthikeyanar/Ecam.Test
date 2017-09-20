@@ -276,7 +276,7 @@ define("MonthlyAVGController", ["knockout", "komapping", "helper", "service"], f
 
 
             var arrlastsixmonths = helper.getLastSixMonths();
-            var start = moment(_TODAYDATE).subtract('days', 15);// moment(arrlastsixmonths[0]);
+            var start = moment(_TODAYDATE).subtract('days', 19);// moment(arrlastsixmonths[0]);
             var end = moment(_TODAYDATE);//moment(arrlastsixmonths[1]);
             self.start_date(start.format('MM/DD/YYYY'));
             self.end_date(end.format('MM/DD/YYYY'));
