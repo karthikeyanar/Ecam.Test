@@ -960,16 +960,8 @@ namespace Ecam.Framework.Repository
                 , DataTypeHelper.GetFirstDayOfMonth(criteria.total_start_date.Value).ToString("yyyy-MM-dd")
                 , DataTypeHelper.GetLastDayOfMonth(criteria.total_end_date.Value).ToString("yyyy-MM-dd")) + Environment.NewLine;
 
-            selectFields = "c.company_name" + Environment.NewLine +
-                            ",c.symbol" + Environment.NewLine +
-                            ",c.company_id" + Environment.NewLine +
+            selectFields = " c.*" + Environment.NewLine +
                             ",c.company_id as id" + Environment.NewLine +
-                            ",c.is_book_mark" + Environment.NewLine +
-                            ",c.is_current_stock" + Environment.NewLine +
-                            ",c.monthly_avg" + Environment.NewLine +
-                            ",c.weekly_avg" + Environment.NewLine + 
-                            ",c.rsi" + Environment.NewLine +
-                            ",c.ltp_price" + Environment.NewLine +
                             ",(select high_price from tra_market m where m.symbol = c.symbol " + totalDateFilter + " and m.high_price > 0 order by m.high_price desc limit 0,1) as total_high_price" + Environment.NewLine +
                             ",(select low_price from tra_market m where m.symbol = c.symbol " + totalDateFilter + " and m.low_price > 0 order by m.low_price asc limit 0,1) as total_low_price" + Environment.NewLine +
                             ",(select high_price from tra_market m where m.symbol = c.symbol " + dateFilter + " and m.high_price > 0 order by m.high_price desc limit 0,1) as profit_high_price" + Environment.NewLine +

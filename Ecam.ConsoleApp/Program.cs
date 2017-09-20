@@ -1,4 +1,5 @@
-﻿using Ecam.Framework;
+﻿using CsvHelper;
+using Ecam.Framework;
 using Ecam.Models;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
@@ -19,9 +20,11 @@ namespace Ecam.ConsoleApp
     {
         public static string IS_DOWNLOAD_HISTORY = "";
         public static string IS_IMPORT_CSV = "";
+        public static string IS_NIFTY_FLAG_CSV = "";
         public static string GOOGLE_DATA = "";
         static void Main(string[] args)
         {
+            IS_NIFTY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_FLAG_CSV"];
             IS_IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_IMPORT_CSV"];
             IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
@@ -43,6 +46,10 @@ namespace Ecam.ConsoleApp
             else if (IS_IMPORT_CSV == "true")
             {
                 CSVData();
+            }
+            else if (IS_NIFTY_FLAG_CSV == "true")
+            {
+                UpdateNiftyFlagCSV();
             }
             else
             {
@@ -992,7 +999,6 @@ namespace Ecam.ConsoleApp
             return symbol;
         }
 
-
         private static void CSVData()
         {
             string isImportCSV = System.Configuration.ConfigurationManager.AppSettings["IS_IMPORT_CSV"];
@@ -1009,6 +1015,60 @@ namespace Ecam.ConsoleApp
             _COMPANIES = symbols.ToArray();
             _INDEX = -1;
             CSVDownloadStart();
+        }
+
+        private static void UpdateNiftyFlagCSV()
+        {
+            string niftyFlagCSVDirectoryPath = System.Configuration.ConfigurationManager.AppSettings["NIFTY_FLAG_CSV"];
+            List<string> symbols = new List<string>();
+            if (IS_NIFTY_FLAG_CSV == "true")
+            {
+                string[] files = System.IO.Directory.GetFiles(niftyFlagCSVDirectoryPath);
+                foreach (string fullFileName in files)
+                {
+                    string flag = System.IO.Path.GetFileNameWithoutExtension(fullFileName);
+                    int i;
+                    using (TextReader reader = File.OpenText(fullFileName))
+                    {
+                        CsvReader csv = new CsvReader(reader);
+                        i = 0;
+                        while (csv.Read())
+                        {
+                            i += 1;
+                            string symbol = csv.GetField<string>("Symbol");
+                            string series = csv.GetField<string>("Series");
+                            if (string.IsNullOrEmpty(symbol) == false
+                                && series == "EQ")
+                            {
+                                using (EcamContext context = new EcamContext())
+                                {
+                                    tra_company company = (from q in context.tra_company
+                                                           where q.symbol == symbol
+                                                           select q).FirstOrDefault();
+                                    if (company != null)
+                                    {
+                                        switch (flag)
+                                        {
+                                            case "200":
+                                                company.is_nifty_200 = true;
+                                                break;
+                                            case "100":
+                                                company.is_nifty_100 = true;
+                                                break;
+                                            case "50":
+                                                company.is_nifty_50 = true;
+                                                break;
+                                        }
+                                        context.Entry(company).State = System.Data.Entity.EntityState.Modified;
+                                        context.SaveChanges();
+                                        Console.WriteLine("Update flag=" + flag + ",symbol=" + company.symbol);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private static void CSVDownloadStart()
