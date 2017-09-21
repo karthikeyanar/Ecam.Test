@@ -280,11 +280,11 @@
                             <i data-bind="css:{'fa-user fg-primary': cBool(is_current_stock())==true,'fa-user-o': cBool(is_current_stock())==false}" class="fa fa-user"></i>
                         </a>
                     </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit">
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:company_name">
                         <div style="width:150px;overflow:hidden;" data-bind="text:company_name">
                         </div>
-                        <div style="font-size:11px;font-weight:bold;">
-                            <span>Nifty 50:</span><span data-bind="text:is_nifty_50"></span>&nbsp;&nbsp;&nbsp;<span>Nifty 100:</span><span data-bind="text:is_nifty_100"></span>&nbsp;&nbsp;&nbsp;<span>Nifty 200:</span><span data-bind="text:is_nifty_200"></span>
+                        <div style="font-size:10px;">
+                            <span>Nifty 50:</span><span data-bind="text:is_nifty_50"></span><span>Nifty 100:</span><span data-bind="text:is_nifty_100"></span><span>Nifty 200:</span><span data-bind="text:is_nifty_200"></span>
                         </div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:symbol"></td>

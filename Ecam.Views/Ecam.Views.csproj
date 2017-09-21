@@ -15,7 +15,7 @@
     <AssemblyName>Ecam.Views</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
@@ -1138,6 +1138,7 @@
     <Content Include="Views\Home\Blank.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\LoadingPage.cshtml" />
+    <Content Include="Views\Home\MonthlyAVG.cshtml" />
     <Content Include="Views\Home\MyProfile.cshtml" />
     <Content Include="Views\Home\SQLChecking.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
@@ -1191,8 +1192,12 @@
     <Content Include="Views\Home\AddCategory.cshtml" />
     <Content Include="Views\Home\Intraday.cshtml" />
     <Content Include="Views\Home\Order.cshtml" />
-    <Content Include="Views\Home\MonthlyAVG.cshtml" />
     <Content Include="Views\Home\Holding.cshtml" />
+    <Content Include="Views\Home\s.cshtml" />
+    <Content Include="Views\Home\ExpertsRecommend.cshtml" />
+    <Content Include="Views\Home\Experts.cshtml" />
+    <Content Include="Views\Home\AddExperts.cshtml" />
+    <Content Include="Views\Home\AddExpertsRecommend.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
