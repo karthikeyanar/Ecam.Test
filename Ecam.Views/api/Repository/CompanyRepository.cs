@@ -451,6 +451,8 @@ namespace Ecam.Framework.Repository
                            ",(((ifnull(ct.week_52_high, 0) - ifnull(ct.ltp_price, 0)) / ifnull(ct.ltp_price, 0)) * 100) as week_52_positive_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.week_52_low, 0)) / ifnull(ct.week_52_low, 0)) * 100) as week_52_low_percentage" + Environment.NewLine +
                            ",ct.company_id as id" + Environment.NewLine +
+                           ",(select high_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.high_price desc limit 0,1) as profit_high_price" +
+                           ",(select low_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.low_price asc limit 0,1) as profit_low_price" +
                            ",(select open_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date asc limit 0,1) as first_price" +
                            ",(select ltp_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date desc limit 0,1) as last_price" +
                            "";
@@ -508,7 +510,10 @@ namespace Ecam.Framework.Repository
             paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString, tempsql));
 
             sql = string.Format("select " +
-            "(((last_price - first_price)/first_price) * 100) as profit,tbl.*" + Environment.NewLine +
+            "(((last_price - first_price)/first_price) * 100) as profit" + Environment.NewLine +
+            ",(((profit_high_price - ltp_price)/ltp_price) * 100) as profit_high_percentage" + Environment.NewLine +
+            ",(((profit_low_price - ltp_price)/ltp_price) * 100) as profit_low_percentage" + Environment.NewLine +
+            ",tbl.*" + Environment.NewLine +
             " from(" + Environment.NewLine +
             sql + Environment.NewLine +
             ") as tbl {0} {1} {2} {3} ", where, "", orderBy, pageLimit);
@@ -1026,7 +1031,7 @@ namespace Ecam.Framework.Repository
 
             //orderBy = " order by (negative/(negative+positive) * 100) asc,(positive/(negative+positive) * 100) desc,(((total_last_price - total_first_price)/total_first_price) * 100) desc,monthly_avg desc,weekly_avg desc " + Environment.NewLine;
 
-            orderBy = " order by negative asc,positive desc,monthly_avg desc,weekly_avg desc,(((total_last_price - total_first_price)/total_first_price) * 100) desc " + Environment.NewLine;
+            orderBy = " order by negative asc,(((last_price - first_price)/first_price) * 100) desc,(((total_last_price - total_first_price)/total_first_price) * 100) desc,monthly_avg desc,weekly_avg desc " + Environment.NewLine;
 
             sql = string.Format("select " + Environment.NewLine +
             "(((last_price - first_price)/first_price) * 100) as profit" + Environment.NewLine +

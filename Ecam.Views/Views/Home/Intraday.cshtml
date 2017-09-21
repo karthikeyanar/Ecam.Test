@@ -211,30 +211,36 @@
                     <th sortname="ltp_price" class="text-right text-nowrap">
                         LTP
                     </th>
-                    <th sortname="mf_cnt" class="text-right">
+                    @*<th sortname="mf_cnt" class="text-right">
                         MFCNT
                     </th>
                     <th sortname="mf_qty" class="text-right">
                         MFQTY
+                    </th>*@ 
+                    <th sortname="profit_high_percentage" class="text-right">
+                        Profit High %
+                    </th> 
+                    <th sortname="profit_low_percentage" class="text-right">
+                        Profit Low %
                     </th>
                     <th sortname="profit" class="text-right">
                         Profit
                     </th>
-                    <th sortname="monthly_avg" class="text-right">
+                    @*<th sortname="monthly_avg" class="text-right">
                         M.AVG
                     </th>
                     <th sortname="weekly_avg" class="text-right">
                         W.AVG
-                    </th>
+                    </th>*@
                     <th sortname="week_52_low" class="text-right">
                         W52 Low
                     </th>
                     <th sortname="week_52_high" class="text-right">
                         W52 High
                     </th>
-                    <th sortname="week_52_positive_percentage" class="text-right">
+                    @*<th sortname="week_52_positive_percentage" class="text-right">
                         W52 High %
-                    </th>
+                    </th>*@
                     <th style="width: 20px">
                     </th>
                     <th style="width: 10px">
@@ -281,30 +287,38 @@
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(ltp_price())"></div>
                     </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(mf_cnt())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(mf_qty())"></div>
+                    </td>*@
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(profit_high_percentage())"></div>
+                        <div data-bind="text:formatNumber(profit_high_price())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(profit_low_percentage())"></div>
+                        <div data-bind="text:formatNumber(profit_low_price())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(profit())"></div>
                     </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(monthly_avg())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(weekly_avg())"></div>
-                    </td>
+                    </td>*@
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(week_52_low())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(week_52_high())"></div>
                     </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(week_52_positive_percentage())"></div>
-                    </td>
+                    </td>*@
                     <td style="text-align:center;white-space:nowrap;">
                         <div style="width:80px;">
                             <div class="pull-left">
