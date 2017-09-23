@@ -22,11 +22,13 @@ namespace Ecam.ConsoleApp
         public static string IS_IMPORT_CSV = "";
         public static string IS_NIFTY_FLAG_CSV = "";
         public static string GOOGLE_DATA = "";
+        public static string MC = "";
         static void Main(string[] args)
         {
             IS_NIFTY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_FLAG_CSV"];
             IS_IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_IMPORT_CSV"];
             IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
+            MC = System.Configuration.ConfigurationManager.AppSettings["MC"];
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
             DownloadStart();
         }
@@ -67,6 +69,194 @@ namespace Ecam.ConsoleApp
                 //}
                 //}
             }
+        }
+
+
+        private static string GetString(string html, string startWord, string endWord)
+        {
+            int startIndex = html.IndexOf(startWord);
+            int endIndex = html.IndexOf(endWord);
+            int length = endIndex - startIndex + endWord.Length;
+            if (startIndex > 0 && endIndex > 0)
+            {
+                html = html.Substring(startIndex, length);
+            }
+            else
+            {
+                html = "";
+                Helper.Log("ErrorOnGoogleData DownloadMC");
+            }
+            return html;
+        }
+        private static void DownloadMC()
+        {
+            string originalHtml = File.ReadAllText(Path.Combine(MC, "DMART.html"));
+            string html = GetString(originalHtml, "<div id=\"mktdet_1\" name=\"mktdet_1\">", "<div id=\"mktdet_2\"");
+            html = html.Replace("\n", "").Replace("\r", "").Replace("\r\n", "");
+            decimal marketValue = 0;
+            decimal pe = 0;
+            decimal bookValue = 0;
+            decimal dividend = 0;
+            decimal marketLot = 0;
+            decimal industryPE = 0;
+            decimal eps = 0;
+            decimal pc = 0;
+            decimal priceBook = 0;
+            decimal divYield = 0;
+            decimal faceValue = 0;
+            decimal delivarable = 0;
+            Regex regex = null;
+            if (string.IsNullOrEmpty(html) == false)
+            {
+                html = Regex.Replace(html, @"\s*(<[^>]+>)\s*", "$1", RegexOptions.Singleline);
+                regex = new Regex(
+                          @"<div\s+class=\""PA7\s+brdb\""(.*?)>(.*?)<div\s+class=\""CL\"""
+                          + @">",
+                          RegexOptions.IgnoreCase
+                          | RegexOptions.Multiline
+                          | RegexOptions.IgnorePatternWhitespace
+                          | RegexOptions.Compiled
+                          );
+                MatchCollection mc = regex.Matches(html);
+                foreach (Match m in mc)
+                {
+                    regex = new Regex(
+  @"<div(.*?)>(.*?)</div>",
+  RegexOptions.IgnoreCase
+  | RegexOptions.Multiline
+  | RegexOptions.IgnorePatternWhitespace
+  | RegexOptions.Compiled
+  );
+                    MatchCollection rowMatches = regex.Matches(m.Value);
+                    if (rowMatches.Count >= 2)
+                    {
+                        Match m1 = rowMatches[0];
+                        Match m2 = rowMatches[1];
+                        string colName = TradeHelper.RemoveHTMLTag(m1.Groups[2].Value);
+                        switch (colName)
+                        {
+                            case "MARKET CAP (Rs Cr)":
+                                marketValue = GetDecimalValue(m2.Groups[2].Value);
+                                break;
+                            case "P/E":
+                                pe = GetDecimalValue(m2.Groups[2].Value);
+                                break;
+                            case "BOOK VALUE (Rs)":
+                                bookValue = GetDecimalValue(m2.Groups[2].Value);
+                                break;
+                            case "DIV (%)":
+                                dividend = GetDecimalValue(m2.Groups[2].Value);
+                                break;
+                            case "Market Lot":
+                                marketLot = GetDecimalValue(m2.Groups[2].Value);
+                                break;
+                            case "INDUSTRY P/E":
+                                industryPE = GetDecimalValue(m2.Groups[2].Value);
+                                break;
+                            case "EPS (TTM)":
+                                eps = GetDecimalValue(m2.Groups[2].Value);
+                                break;
+                            case "P/C":
+                                pc = GetDecimalValue(m2.Groups[2].Value);
+                                break;
+                            case "PRICE/BOOK":
+                                priceBook = GetDecimalValue(m2.Groups[2].Value);
+                                break;
+                            case "DIV YIELD.(%)":
+                                divYield = GetDecimalValue(m2.Groups[2].Value);
+                                break;
+                            case "FACE VALUE (Rs)":
+                                faceValue = GetDecimalValue(m2.Groups[2].Value);
+                                break;
+                            case "DELIVERABLES (%)":
+                                delivarable = GetDecimalValue(m2.Groups[2].Value);
+                                break;
+                        }
+                    }
+                }
+            }
+            List<RowCollections> rows = new List<RowCollections>();
+            html = GetString(originalHtml, "<div id=\"findet_1\"", "<div id=\"findet_2\"");
+            html = html.Replace("\n", "").Replace("\r", "").Replace("\r\n", "");
+            regex = new Regex(
+  @">\s*<",
+  RegexOptions.IgnoreCase
+  | RegexOptions.Multiline
+  | RegexOptions.IgnorePatternWhitespace
+  | RegexOptions.Compiled
+  );
+            html = regex.Replace(html, "><");
+
+            regex = new Regex(
+   @"<table(.*?)>(.*?)</table>",
+   RegexOptions.IgnoreCase
+   | RegexOptions.Multiline
+   | RegexOptions.IgnorePatternWhitespace
+   | RegexOptions.Compiled
+   );
+            MatchCollection collections = regex.Matches(html);
+            if (collections.Count > 0)
+            {
+                string tableContent = collections[0].Groups[2].Value;
+
+                regex = new Regex(
+@"<tr(.*?)>(.*?)</tr>",
+RegexOptions.IgnoreCase
+| RegexOptions.Multiline
+| RegexOptions.IgnorePatternWhitespace
+| RegexOptions.Compiled
+);
+                MatchCollection trCollections = regex.Matches(tableContent);
+                int i, j;
+                for (i = 0; i < trCollections.Count; i++)
+                {
+                    Match trMatch = trCollections[i];
+                    string tr = trMatch.Value;
+                    regex = new Regex(
+@"<td(.*?)>(.*?)</td>",
+RegexOptions.IgnoreCase
+| RegexOptions.Multiline
+| RegexOptions.IgnorePatternWhitespace
+| RegexOptions.Compiled
+);
+                    MatchCollection tdCollections = regex.Matches(tr);
+                    RowCollections row = new RowCollections();
+                    for (j = 0; j < tdCollections.Count; j++)
+                    {
+                        string v = TradeHelper.RemoveHTMLTag(tdCollections[j].Groups[2].Value);
+                        if (j <= 0)
+                        {
+                            row.name = v;
+                        }
+                        row.cells.Add(v);
+                    }
+                    rows.Add(row);
+                }
+            }
+            
+        }
+
+        private static decimal GetDecimalValue(string html)
+        {
+            Regex regex = new Regex(
+    @"(?<d>(\d{1,3},\d{3}(,\d{3})*)(\.\d*)?|\d+\.?\d*)",
+    RegexOptions.IgnoreCase
+    | RegexOptions.Multiline
+    | RegexOptions.IgnorePatternWhitespace
+    | RegexOptions.Compiled
+    );
+            string removeHTML = TradeHelper.RemoveHTMLTag(html);
+            decimal v = 0;
+            try
+            {
+                MatchCollection mc = regex.Matches(removeHTML);
+                foreach (Match m in mc)
+                {
+                    v = DataTypeHelper.ToDecimal(m.Groups["d"].Value);
+                }
+            }
+            catch { }
+            return v;
         }
 
         //using (EcamContext context = new EcamContext())

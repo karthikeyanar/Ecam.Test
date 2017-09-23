@@ -1207,7 +1207,9 @@ RegexOptions.IgnoreCase
 | RegexOptions.IgnorePatternWhitespace
 | RegexOptions.Compiled
 );
-            return regex.Replace(html, "");
+            string result = regex.Replace(html, "");
+            result = result.Replace("&nbsp;", "");
+            return result;
         }
 
         public static void GetUpdatePriceUsingGoogle(string symbol)
@@ -1472,6 +1474,10 @@ RegexOptions.IgnoreCase
                     decimal prevPrice = 0;
                     DateTime tradeDate = DateTime.MinValue;
                     decimal openPrice = 0;
+                    decimal marketCapital = 0;
+                    decimal volume = 0;
+                    decimal PE = 0;
+                    decimal eps = 0;
                     decimal lowPrice = 0;
                     decimal highPrice = 0;
                     decimal week52Low = 0;
@@ -1577,6 +1583,33 @@ RegexOptions.IgnoreCase
                                         break;
                                     case "Open":
                                         openPrice = DataTypeHelper.ToDecimal(secondCell);
+                                        break;
+                                    case "Mkt cap":
+                                        bool isBilion = false;
+                                        bool isTrillion = false;
+                                        bool isCrore = false;
+                                        if (secondCell.Contains("B") == true)
+                                        {
+                                            isBilion = true;
+                                        }
+                                        else if (secondCell.Contains("T") == true)
+                                        {
+                                            isTrillion = true;
+                                        }
+                                        else if (secondCell.Contains("C") == true)
+                                        {
+
+                                        }
+                                        marketCapital = DataTypeHelper.ToDecimal(secondCell);
+                                        break;
+                                    case "P/E":
+                                        PE = DataTypeHelper.ToDecimal(secondCell);
+                                        break;
+                                    case "Vol.":
+                                        volume = DataTypeHelper.ToDecimal(secondCell);
+                                        break;
+                                    case "EPS":
+                                        eps = DataTypeHelper.ToDecimal(secondCell);
                                         break;
                                 }
                             }
@@ -2398,4 +2431,16 @@ RegexOptions.IgnoreCase
         public string cp { get; set; }
         public string cp_fix { get; set; }
     }
+
+    public class RowCollections
+    {
+        public RowCollections()
+        {
+            this.cells = new List<string>();
+        }
+        public int index { get; set; }
+        public string name { get; set; }
+        public List<string> cells { get; set; }
+    }
+
 }
