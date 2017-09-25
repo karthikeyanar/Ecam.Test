@@ -1012,7 +1012,7 @@ namespace Ecam.Framework.Repository
             if (string.IsNullOrEmpty(criteria.ltp_to_percentage) == false)
             {
                 where.AppendFormat(" and ifnull(ltp_percentage,0)<={0}", criteria.ltp_to_percentage).Append(Environment.NewLine);
-            } 
+            }
 
             if ((criteria.from_profit ?? 0) != 0)
             {
@@ -1031,7 +1031,9 @@ namespace Ecam.Framework.Repository
 
             //orderBy = " order by (negative/(negative+positive) * 100) asc,(positive/(negative+positive) * 100) desc,(((total_last_price - total_first_price)/total_first_price) * 100) desc,monthly_avg desc,weekly_avg desc " + Environment.NewLine;
 
-            orderBy = " order by negative asc,(((last_price - first_price)/first_price) * 100) desc,(((total_last_price - total_first_price)/total_first_price) * 100) desc,monthly_avg desc,weekly_avg desc " + Environment.NewLine;
+            //orderBy = " order by negative asc,(((last_price - first_price)/first_price) * 100) desc,(((total_last_price - total_first_price)/total_first_price) * 100) desc,monthly_avg desc,weekly_avg desc " + Environment.NewLine;
+
+            orderBy = " order by (negative/(negative+positive) * 100) asc,(((last_price - first_price)/first_price) * 100) desc,(((total_last_price - total_first_price)/total_first_price) * 100) desc,monthly_avg desc,weekly_avg desc " + Environment.NewLine;
 
             sql = string.Format("select " + Environment.NewLine +
             "(((last_price - first_price)/first_price) * 100) as profit" + Environment.NewLine +
