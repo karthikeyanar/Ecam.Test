@@ -1475,13 +1475,20 @@ RegexOptions.IgnoreCase
                     DateTime tradeDate = DateTime.MinValue;
                     decimal openPrice = 0;
                     decimal marketCapital = 0;
+                    string marketCapitalValue = "";
                     decimal volume = 0;
-                    decimal PE = 0;
+                    decimal pe = 0;
                     decimal eps = 0;
                     decimal lowPrice = 0;
                     decimal highPrice = 0;
                     decimal week52Low = 0;
                     decimal week52High = 0;
+
+                    bool isBilion = false;
+                    bool isTrillion = false;
+                    bool isCrore = false;
+                    bool isMillion = false;
+                    decimal crore = 10000000;
                     if (collections.Count > 0)
                     {
                         currentPrice = DataTypeHelper.ToDecimal(TradeHelper.RemoveHTMLTag(collections[0].Groups[2].Value));
@@ -1540,9 +1547,9 @@ RegexOptions.IgnoreCase
    | RegexOptions.Compiled
    );
                     collections = regex.Matches(html);
-                    if (collections.Count > 0)
+                    foreach(Match tblMatch in collections)
                     {
-                        string tableContent = collections[0].Groups[2].Value;
+                        string tableContent = tblMatch.Value;// collections[0].Groups[2].Value;
 
                         regex = new Regex(
     @"<tr(.*?)>(.*?)</tr>",
@@ -1585,9 +1592,11 @@ RegexOptions.IgnoreCase
                                         openPrice = DataTypeHelper.ToDecimal(secondCell);
                                         break;
                                     case "Mkt cap":
-                                        bool isBilion = false;
-                                        bool isTrillion = false;
-                                        bool isCrore = false;
+                                        marketCapitalValue = secondCell;
+                                        isBilion = false;
+                                        isTrillion = false;
+                                        isCrore = false;
+                                        isMillion = false;
                                         if (secondCell.Contains("B") == true)
                                         {
                                             isBilion = true;
@@ -1598,15 +1607,67 @@ RegexOptions.IgnoreCase
                                         }
                                         else if (secondCell.Contains("C") == true)
                                         {
-
+                                            isCrore = true;
                                         }
+                                        else if (secondCell.Contains("M") == true)
+                                        {
+                                            isMillion = true;
+                                        }
+                                        secondCell = secondCell.Replace("B", "").Replace("T", "").Replace("C", "").Replace("M", "");
                                         marketCapital = DataTypeHelper.ToDecimal(secondCell);
+                                        if (isBilion == true)
+                                        {
+                                            marketCapital = marketCapital * (100 * crore);
+                                        }
+                                        else if (isTrillion == true)
+                                        {
+                                            marketCapital = marketCapital * (100000 * crore);
+                                        }
+                                        else if (isCrore == true)
+                                        {
+                                            marketCapital = marketCapital * crore;
+                                        }
+                                        marketCapital = marketCapital / crore;
                                         break;
                                     case "P/E":
-                                        PE = DataTypeHelper.ToDecimal(secondCell);
+                                        pe = DataTypeHelper.ToDecimal(secondCell);
                                         break;
                                     case "Vol.":
+                                        isBilion = false;
+                                        isTrillion = false;
+                                        isCrore = false;
+                                        isMillion = false;
+                                        if (secondCell.Contains("B") == true)
+                                        {
+                                            isBilion = true;
+                                        }
+                                        else if (secondCell.Contains("T") == true)
+                                        {
+                                            isTrillion = true;
+                                        }
+                                        else if (secondCell.Contains("C") == true)
+                                        {
+                                            isCrore = true;
+                                        }
+                                        else if (secondCell.Contains("M") == true)
+                                        {
+                                            isMillion = true;
+                                        }
+                                        secondCell = secondCell.Replace("B", "").Replace("T", "").Replace("C", "").Replace("M", "");
                                         volume = DataTypeHelper.ToDecimal(secondCell);
+                                        if (isBilion == true)
+                                        {
+                                            volume = volume * (100 * crore);
+                                        }
+                                        else if (isTrillion == true)
+                                        {
+                                            volume = volume * (100000 * crore);
+                                        }
+                                        else if (isCrore == true)
+                                        {
+                                            volume = volume * crore;
+                                        }
+                                        volume = volume / crore;
                                         break;
                                     case "EPS":
                                         eps = DataTypeHelper.ToDecimal(secondCell);
@@ -1664,7 +1725,15 @@ RegexOptions.IgnoreCase
                             prev_price = prevPrice,
                             trade_date = tradeDate,
                         });
-                        string sql = string.Format(" update tra_company set week_52_low={0},week_52_high={1} where symbol='{2}'", week52Low, week52High, symbol);
+                        string sql = string.Format(" update tra_company set week_52_low={0},week_52_high={1},mcstr='{2}',mc={3},pe={4},volume={5},eps={6} where symbol='{7}'"
+                            , week52Low
+                            , week52High
+                            , marketCapitalValue
+                            , marketCapital
+                            , pe
+                            , volume
+                            , eps
+                            , symbol);
                         MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
                         if (week52High <= 0 || week52Low <= 0)
                         {
@@ -1716,7 +1785,7 @@ RegexOptions.IgnoreCase
                 catch (Exception ex)
                 {
                     string s = ex.Message;
-                    //Helper.Log("GoogleException symbol 3=" + symbol, "GoogleException_" + rnd.Next(1000, 10000));
+                    Helper.Log("GoogleException symbol 3=" + symbol + ",EX=" + ex.Message, "GoogleException_" + rnd.Next(1000, 10000));
                 }
                 //  }
             }
