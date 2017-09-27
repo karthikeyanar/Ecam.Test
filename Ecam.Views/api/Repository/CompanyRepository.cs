@@ -1033,7 +1033,7 @@ namespace Ecam.Framework.Repository
 
             //orderBy = " order by negative asc,(((last_price - first_price)/first_price) * 100) desc,(((total_last_price - total_first_price)/total_first_price) * 100) desc,monthly_avg desc,weekly_avg desc " + Environment.NewLine;
 
-            orderBy = " order by (negative/(negative+positive) * 100) asc,(((last_price - first_price)/first_price) * 100) desc,(((total_last_price - total_first_price)/total_first_price) * 100) desc,monthly_avg desc,weekly_avg desc " + Environment.NewLine;
+            orderBy = " order by (negative/(negative+positive) * 100) asc,monthly_avg desc,weekly_avg desc " + Environment.NewLine;
 
             sql = string.Format("select " + Environment.NewLine +
             "(((last_price - first_price)/first_price) * 100) as profit" + Environment.NewLine +

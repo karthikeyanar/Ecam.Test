@@ -67,6 +67,7 @@ namespace Ecam.Views.Controllers
                         if (company != null)
                         {
                             company.ltp_price = contract.ltp_price;
+                            company.is_current_stock = true;
                             context.Entry(company).State = System.Data.Entity.EntityState.Modified;
                             context.SaveChanges();
                         }
