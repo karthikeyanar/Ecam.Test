@@ -27,8 +27,16 @@ namespace Ecam.Contracts
         public Nullable<bool> is_nifty_200 { get; set; }
         public Nullable<decimal> rsi { get; set; }
         public Nullable<decimal> prev_rsi { get; set; }
-        public Nullable<decimal> rsi_diff { get; set; }
+        public Nullable<int> mf_cnt { get; set; }
+        public Nullable<decimal> mf_qty { get; set; }
+        public Nullable<decimal> monthly_avg { get; set; }
+        public Nullable<decimal> weekly_avg { get; set; }
         public Nullable<bool> is_current_stock { get; set; }
+        public string mcstr { get; set; }
+        public Nullable<decimal> mc { get; set; }
+        public Nullable<decimal> pe { get; set; }
+        public Nullable<decimal> volume { get; set; }
+        public Nullable<decimal> eps { get; set; }
         
         public string category_name { get; set; }
         public Nullable<decimal> ltp_percentage { get; set; }
@@ -39,8 +47,6 @@ namespace Ecam.Contracts
         public Nullable<decimal> week_52_percentage { get; set; }
         public Nullable<decimal> week_52_positive_percentage { get; set; }
         public List<string> category_list { get; set; }
-        public Nullable<int> mf_cnt { get; set; }
-        public Nullable<decimal> mf_qty { get; set; }
         public Nullable<int> positive_count { get; set; }
         public Nullable<int> negative_count { get; set; }
         public Nullable<int> success_count { get; set; }
@@ -48,8 +54,6 @@ namespace Ecam.Contracts
         public Nullable<decimal> first_price { get; set; }
         public Nullable<decimal> last_price { get; set; }
         public Nullable<decimal> profit { get; set; }
-        public Nullable<decimal> monthly_avg { get; set; }
-        public Nullable<decimal> weekly_avg { get; set; }
         public Nullable<int> negative { get; set; }
         public Nullable<int> positive { get; set; }
         public Nullable<int> negative_percentage { get; set; }

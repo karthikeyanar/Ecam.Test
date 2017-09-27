@@ -396,6 +396,28 @@ namespace Ecam.Framework.Repository
 
             orderBy = string.Format("order by {0} {1}", paging.SortName, paging.SortOrder);
 
+            string dateFilter = string.Empty;
+            DateTime? minDate = Convert.ToDateTime("01/01/1900");
+            if (criteria.start_date.HasValue && criteria.end_date.HasValue)
+            {
+                dateFilter = string.Format(" and m.trade_date>='{0}' and m.trade_date<='{1}' ", criteria.start_date.Value.ToString("yyyy-MM-dd"), criteria.end_date.Value.ToString("yyyy-MM-dd"));
+            }
+
+            if (criteria.total_start_date.HasValue == false)
+                criteria.total_start_date = DateTime.Now.Date.AddDays(-(365 * 3));
+            if (criteria.total_end_date.HasValue == false)
+                criteria.total_end_date = DateTime.Now.Date;
+
+            string totalDateFilter = string.Empty;
+            totalDateFilter = string.Format(" and m.trade_date>='{0}' and m.trade_date<='{1}' "
+                , criteria.total_start_date.Value.ToString("yyyy-MM-dd")
+                , criteria.total_end_date.Value.ToString("yyyy-MM-dd")) + Environment.NewLine;
+
+            string totalDateAVGFilter = string.Empty;
+            totalDateAVGFilter = string.Format(" and m.avg_date>='{0}' and m.avg_date<='{1}' "
+                , DataTypeHelper.GetFirstDayOfMonth(criteria.total_start_date.Value).ToString("yyyy-MM-dd")
+                , DataTypeHelper.GetLastDayOfMonth(criteria.total_end_date.Value).ToString("yyyy-MM-dd")) + Environment.NewLine;
+
             selectFields = "ct.company_id" + Environment.NewLine +
                            ",ct.company_name" + Environment.NewLine +
                            ",ct.symbol" + Environment.NewLine +
@@ -416,6 +438,21 @@ namespace Ecam.Framework.Repository
                            ",ct.prev_rsi" + Environment.NewLine +
                            ",ct.monthly_avg" + Environment.NewLine +
                            ",ct.weekly_avg" + Environment.NewLine +
+                           ",ct.mc" + Environment.NewLine +
+                           ",ct.pe" + Environment.NewLine +
+                           ",ct.volume" + Environment.NewLine +
+                           ",ct.eps" + Environment.NewLine +
+                            ",(select high_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " and m.high_price > 0 order by m.high_price desc limit 0,1) as total_high_price" + Environment.NewLine +
+                            ",(select low_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " and m.low_price > 0 order by m.low_price asc limit 0,1) as total_low_price" + Environment.NewLine +
+                            ",(select high_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " and m.high_price > 0 order by m.high_price desc limit 0,1) as profit_high_price" + Environment.NewLine +
+                            ",(select low_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " and m.low_price > 0 order by m.low_price asc limit 0,1) as profit_low_price" + Environment.NewLine +
+                            ",(select open_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " order by m.trade_date asc limit 0,1) as total_first_price" + Environment.NewLine +
+                            ",(select ltp_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " order by m.trade_date desc limit 0,1) as total_last_price" + Environment.NewLine +
+                            ",(select open_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date asc limit 0,1) as first_price" + Environment.NewLine +
+                            ",(select ltp_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date desc limit 0,1) as last_price" + Environment.NewLine +
+                            ",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + " and ifnull(m.percentage, 0) < 0) as negative" + Environment.NewLine +
+                            ",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + "  and ifnull(m.percentage, 0) > 0) as positive" + Environment.NewLine +
+                            ",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + " ) as total" + Environment.NewLine +
                            "";
 
             if (string.IsNullOrEmpty(criteria.mf_ids) == false)
@@ -430,14 +467,7 @@ namespace Ecam.Framework.Repository
                    ",(select sum(ifnull(mpf.stock_value, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_qty" + Environment.NewLine +
                    "";
             }
-
-            string dateFilter = string.Empty;
-            DateTime? minDate = Convert.ToDateTime("01/01/1900");
-            if (criteria.start_date.HasValue && criteria.end_date.HasValue)
-            {
-                dateFilter = string.Format(" and m.trade_date>='{0}' and m.trade_date<='{1}' ", criteria.start_date.Value.ToString("yyyy-MM-dd"), criteria.end_date.Value.ToString("yyyy-MM-dd"));
-            }
-
+            
             selectFields += "" +
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.prev_price, 0)) / ifnull(ct.prev_price, 0)) * 100) as prev_percentage" + Environment.NewLine +
                            ",(ifnull(ct.open_price,0) - ifnull(ct.prev_price,0)) as diff" + Environment.NewLine +
@@ -451,10 +481,6 @@ namespace Ecam.Framework.Repository
                            ",(((ifnull(ct.week_52_high, 0) - ifnull(ct.ltp_price, 0)) / ifnull(ct.ltp_price, 0)) * 100) as week_52_positive_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.week_52_low, 0)) / ifnull(ct.week_52_low, 0)) * 100) as week_52_low_percentage" + Environment.NewLine +
                            ",ct.company_id as id" + Environment.NewLine +
-                           ",(select high_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.high_price desc limit 0,1) as profit_high_price" +
-                           ",(select low_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.low_price asc limit 0,1) as profit_low_price" +
-                           ",(select open_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date asc limit 0,1) as first_price" +
-                           ",(select ltp_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date desc limit 0,1) as last_price" +
                            "";
 
             sql = string.Format(sqlFormat, selectFields, joinTables, where, "", "", "");
@@ -511,6 +537,9 @@ namespace Ecam.Framework.Repository
 
             sql = string.Format("select " +
             "(((last_price - first_price)/first_price) * 100) as profit" + Environment.NewLine +
+            ",(((total_last_price - total_first_price)/total_first_price) * 100) as total_profit" + Environment.NewLine +
+            ",(negative/(negative+positive) * 100) as negative_percentage" + Environment.NewLine +
+            ",(positive/(negative+positive) * 100) as positive_percentage" + Environment.NewLine +
             ",(((profit_high_price - ltp_price)/ltp_price) * 100) as profit_high_percentage" + Environment.NewLine +
             ",(((profit_low_price - ltp_price)/ltp_price) * 100) as profit_low_percentage" + Environment.NewLine +
             ",tbl.*" + Environment.NewLine +
