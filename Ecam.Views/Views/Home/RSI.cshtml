@@ -68,7 +68,7 @@
             <div class="clearfix"></div>
             <div class="m-l-15">
                 <div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="from_prev_rsi" class="form-control input-sm" placeholder="From Prev RSI" style="width:100px" />
+                    <input type="text" name="from_prev_rsi" class="form-control input-sm" value="70" placeholder="From Prev RSI" style="width:100px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <input type="text" name="to_prev_rsi" class="form-control input-sm" placeholder="To Prev RSI" style="width:100px" />
@@ -88,7 +88,7 @@
                     </div>
                 </div>
                 <div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="from_rsi" class="form-control input-sm" value="70" placeholder="From RSI" style="width:100px" />
+                    <input type="text" name="from_rsi" class="form-control input-sm" placeholder="From RSI" style="width:100px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <input type="text" name="to_rsi" class="form-control input-sm" placeholder="To RSI" style="width:100px" />
@@ -160,7 +160,7 @@
                 </div>
             </div>
             <input type="hidden" name="page_index" value="1" />
-            <input type="hidden" name="sort_name" value="rsi" />
+            <input type="hidden" name="sort_name" value="prev_rsi" />
             <input type="hidden" name="sort_order" value="desc" />
         </div>
         <table id="CompanyTable" class="table table-striped table-bordered table-hover table-condensed table-gray">
@@ -178,8 +178,17 @@
                     <th>
                         Category
                     </th>
+                    <th sortname="yesterday_date" class="text-right text-nowrap">
+                        Yesterday Date
+                    </th>
+                    <th sortname="yesterday_percentage" class="text-right text-nowrap">
+                        Yesterday %
+                    </th>
                     <th sortname="trade_date" class="text-right text-nowrap">
                         Date
+                    </th>
+                    <th sortname="prev_percentage" class="text-right text-nowrap">
+                        C%
                     </th>
                     <th sortname="open_price" class="text-right text-nowrap">
                         Open
@@ -196,8 +205,8 @@
                     <th sortname="close_price" class="text-right text-nowrap">
                         Close
                     </th>
-                    <th sortname="prev_percentage" class="text-right text-nowrap">
-                        C%
+                    <th sortname="prev_rsi" class="text-right text-nowrap">
+                        Prev.RSI
                     </th>
                     <th sortname="rsi" class="text-right text-nowrap">
                         RSI
@@ -225,7 +234,16 @@
                         </div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatDate(yesterday_date())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(yesterday_percentage())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatDate(trade_date())"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(prev_percentage())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(open_price())"></div>
@@ -243,7 +261,7 @@
                         <div data-bind="text:formatNumber(close_price())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(prev_percentage())"></div>
+                        <div data-bind="text:formatNumber(prev_rsi())"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(rsi())"></div>

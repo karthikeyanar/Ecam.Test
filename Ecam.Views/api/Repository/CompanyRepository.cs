@@ -709,12 +709,12 @@ namespace Ecam.Framework.Repository
 
             if (criteria.is_book_mark.HasValue)
             {
-                where.AppendFormat(" and ifnull(m.is_book_mark,0)={0}", ((criteria.is_book_mark ?? false) == true ? "1" : "0"));
+                where.AppendFormat(" and ifnull(c.is_book_mark,0)={0}", ((criteria.is_book_mark ?? false) == true ? "1" : "0"));
             }
 
             if (criteria.is_current_stock.HasValue)
             {
-                where.AppendFormat(" and ifnull(m.is_current_stock,0)={0}", ((criteria.is_current_stock ?? false) == true ? "1" : "0"));
+                where.AppendFormat(" and ifnull(c.is_current_stock,0)={0}", ((criteria.is_current_stock ?? false) == true ? "1" : "0"));
             }
 
             if (criteria.from_price.HasValue)
@@ -750,17 +750,17 @@ namespace Ecam.Framework.Repository
 
             if (criteria.is_nifty_50.HasValue)
             {
-                where.AppendFormat(" and ifnull(m.is_nifty_50,0)={0}", ((criteria.is_nifty_50 ?? false) == true ? "1" : "0"));
+                where.AppendFormat(" and ifnull(c.is_nifty_50,0)={0}", ((criteria.is_nifty_50 ?? false) == true ? "1" : "0"));
             }
 
             if (criteria.is_nifty_100.HasValue)
             {
-                where.AppendFormat(" and ifnull(m.is_nifty_100,0)={0}", ((criteria.is_nifty_100 ?? false) == true ? "1" : "0"));
+                where.AppendFormat(" and ifnull(c.is_nifty_100,0)={0}", ((criteria.is_nifty_100 ?? false) == true ? "1" : "0"));
             }
 
             if (criteria.is_nifty_200.HasValue)
             {
-                where.AppendFormat(" and ifnull(m.is_nifty_200,0)={0}", ((criteria.is_nifty_200 ?? false) == true ? "1" : "0"));
+                where.AppendFormat(" and ifnull(c.is_nifty_200,0)={0}", ((criteria.is_nifty_200 ?? false) == true ? "1" : "0"));
             }
 
             if (criteria.trade_date.HasValue)
@@ -799,12 +799,16 @@ namespace Ecam.Framework.Repository
             selectFields = "c.company_id" + Environment.NewLine +
                            ",c.company_name" + Environment.NewLine +
                            ",m.*" + Environment.NewLine +
+                           ",(select m2.trade_date from tra_market m2 where m2.symbol = m.symbol and m2.trade_date < m.trade_date " +
+                           " order by m2.trade_date desc limit 0,1) as yesterday_date " +
+                           ",(select(((m2.close_price - m2.open_price) / m2.open_price) * 100) from tra_market m2 where m2.symbol = m.symbol and m2.trade_date < m.trade_date " + 
+                           " order by m2.trade_date desc limit 0,1) as yesterday_percentage " +
                            ",(((m.close_price-m.open_price)/m.open_price) * 100) as prev_percentage" +
                            "";
 
             sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, orderBy, pageLimit);
 
-            //Helper.Log(sql);
+            Helper.Log(sql);
             List<TRA_COMPANY> rows = new List<TRA_COMPANY>();
             List<tra_company_category> companyCategories;
             using (EcamContext context = new EcamContext())
