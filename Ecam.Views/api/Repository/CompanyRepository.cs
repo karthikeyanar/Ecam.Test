@@ -14,6 +14,7 @@ namespace Ecam.Framework.Repository
     public interface ICompanyRepository
     {
         PaginatedListResult<TRA_COMPANY> Get(TRA_COMPANY_SEARCH criteria, Paging paging);
+        PaginatedListResult<TRA_COMPANY> GetMarketList(TRA_COMPANY_SEARCH criteria, Paging paging);
         PaginatedListResult<TRA_MARKET_INTRA_DAY> GetIntraDay(TRA_COMPANY_SEARCH criteria, Paging paging);
         PaginatedListResult<TRA_MARKET_AVG> GetAvg(TRA_COMPANY_SEARCH criteria, Paging paging);
         PaginatedListResult<TRA_MARKET_RSI> GetRSI(TRA_COMPANY_SEARCH criteria, Paging paging);
@@ -467,7 +468,7 @@ namespace Ecam.Framework.Repository
                    ",(select sum(ifnull(mpf.stock_value, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_qty" + Environment.NewLine +
                    "";
             }
-            
+
             selectFields += "" +
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.prev_price, 0)) / ifnull(ct.prev_price, 0)) * 100) as prev_percentage" + Environment.NewLine +
                            ",(ifnull(ct.open_price,0) - ifnull(ct.prev_price,0)) as diff" + Environment.NewLine +
@@ -525,6 +526,11 @@ namespace Ecam.Framework.Repository
                 where.AppendFormat(" and ifnull((((last_price - first_price)/first_price) * 100),0)<={0}", criteria.to_profit);
             }
 
+            if ((criteria.max_negative_count ?? 0) > 0)
+            {
+                where.AppendFormat(" and ifnull(negative,0)<={0}", criteria.max_negative_count).Append(Environment.NewLine);
+            }
+
             string tempsql = string.Format("select " +
        "tbl.*" + Environment.NewLine +
        " from(" + Environment.NewLine +
@@ -546,6 +552,257 @@ namespace Ecam.Framework.Repository
             " from(" + Environment.NewLine +
             sql + Environment.NewLine +
             ") as tbl {0} {1} {2} {3} ", where, "", orderBy, pageLimit);
+
+            //Helper.Log(sql);
+            List<TRA_COMPANY> rows = new List<TRA_COMPANY>();
+            List<tra_company_category> companyCategories;
+            using (EcamContext context = new EcamContext())
+            {
+                rows = context.Database.SqlQuery<TRA_COMPANY>(sql).ToList();
+                List<string> symbols = (from q in rows select q.symbol).ToList();
+                companyCategories = (from q in context.tra_company_category
+                                     where symbols.Contains(q.symbol) == true
+                                     select q).ToList();
+            }
+
+            foreach (var row in rows)
+            {
+                row.category_list = (from q in companyCategories
+                                     where q.symbol == row.symbol
+                                     select q.category_name).ToList();
+                string categoryName = "";
+                foreach (var cat in row.category_list)
+                {
+                    categoryName += cat + ",";
+                }
+                if (string.IsNullOrEmpty(categoryName) == false)
+                {
+                    categoryName = categoryName.Substring(0, categoryName.Length - 1);
+                }
+                row.category_name = categoryName;
+            }
+            return new PaginatedListResult<TRA_COMPANY> { total = paging.Total, rows = rows };
+        }
+
+        public PaginatedListResult<TRA_COMPANY> GetMarketList(TRA_COMPANY_SEARCH criteria, Paging paging)
+        {
+            StringBuilder where = new StringBuilder();
+            string selectFields = "";
+            string pageLimit = "";
+            string orderBy = "";
+            string groupByName = string.Empty;
+            string joinTables = string.Empty;
+            string sqlFormat = "select {0} from tra_market m {1} where {2} {3} {4} {5}";
+            string sql = string.Empty;
+            string role = Authentication.CurrentRole;
+
+            if ((criteria.id ?? 0) > 0)
+            {
+                where.AppendFormat(" c.company_id={0}", criteria.id);
+            }
+            else
+            {
+                where.AppendFormat(" c.company_id>0 ");
+
+                if (string.IsNullOrEmpty(criteria.company_name) == false)
+                {
+                    where.AppendFormat(" and c.company_name like '%{0}%", criteria.company_name);
+                }
+            }
+
+            if (string.IsNullOrEmpty(criteria.symbols) == false)
+            {
+                where.AppendFormat(" and m.symbol in({0})", Helper.ConvertStringSQLFormat(criteria.symbols));
+            }
+
+            if (string.IsNullOrEmpty(criteria.categories) == false)
+            {
+                string categorySymbols = "-1";
+                using (EcamContext context = new EcamContext())
+                {
+                    List<string> categoryList = Helper.ConvertStringList(criteria.categories);
+                    List<tra_company_category> categories = null;
+                    List<string> categorySymbolList = null;
+                    categories = (from q in context.tra_company_category
+                                  where categoryList.Contains(q.category_name) == true
+                                  select q).ToList();
+                    if ((criteria.is_all_category ?? false) == true)
+                    {
+                        categorySymbolList = new List<string>();
+                        foreach (var row in categories)
+                        {
+                            var tempList = (from q in categories where q.symbol == row.symbol select q).ToList();
+                            int selCnt = 0;
+                            foreach (var tempRow in tempList)
+                            {
+                                foreach (string str in categoryList)
+                                {
+                                    if (string.IsNullOrEmpty(str) == false)
+                                    {
+                                        if (tempRow.category_name == str)
+                                        {
+                                            selCnt += 1;
+                                        }
+                                    }
+                                }
+                            }
+                            if (selCnt == categoryList.Count)
+                            {
+                                categorySymbolList.Add(row.symbol);
+                            }
+                        }
+                        categorySymbolList = categorySymbolList.Distinct().ToList();
+                    }
+                    else
+                    {
+                        categorySymbolList = (from q in categories select q.symbol).Distinct().ToList();
+                    }
+                    if (categorySymbolList.Count > 0)
+                    {
+                        categorySymbols = "";
+                    }
+                    foreach (var str in categorySymbolList)
+                    {
+                        categorySymbols += str + ",";
+                    }
+                    if (string.IsNullOrEmpty(categorySymbols) == false)
+                    {
+                        categorySymbols = categorySymbols.Substring(0, categorySymbols.Length - 1);
+                    }
+                }
+                if (string.IsNullOrEmpty(categorySymbols) == false)
+                {
+                    where.AppendFormat(" and m.symbol in({0})", Helper.ConvertStringSQLFormat(categorySymbols));
+                }
+            }
+
+            if (string.IsNullOrEmpty(criteria.mf_ids) == false)
+            {
+                string symbols = "";
+                using (EcamContext context = new EcamContext())
+                {
+                    List<int> ids = Helper.ConvertIntIds(criteria.mf_ids);
+                    if (ids.Count > 0)
+                    {
+                        var list = (from q in context.tra_mutual_fund_pf
+                                    where ids.Contains(q.fund_id) == true
+                                    select q.symbol).Distinct().ToList();
+                        foreach (var str in list)
+                        {
+                            symbols += str + ",";
+                        }
+                        if (string.IsNullOrEmpty(symbols) == false)
+                        {
+                            symbols = symbols.Substring(0, symbols.Length - 1);
+                        }
+                    }
+                }
+                if (string.IsNullOrEmpty(symbols) == false)
+                {
+                    where.AppendFormat(" and m.symbol in({0})", Helper.ConvertStringSQLFormat(symbols));
+                }
+                else
+                {
+                    where.Append(" and m.symbol='-1'");
+                }
+            }
+
+            if (criteria.is_book_mark.HasValue)
+            {
+                where.AppendFormat(" and ifnull(m.is_book_mark,0)={0}", ((criteria.is_book_mark ?? false) == true ? "1" : "0"));
+            }
+
+            if (criteria.is_current_stock.HasValue)
+            {
+                where.AppendFormat(" and ifnull(m.is_current_stock,0)={0}", ((criteria.is_current_stock ?? false) == true ? "1" : "0"));
+            }
+
+            if (criteria.from_price.HasValue)
+            {
+                where.AppendFormat(" and ifnull(m.close_price,0)>={0}", criteria.from_price);
+            }
+
+            if (criteria.to_price.HasValue)
+            {
+                where.AppendFormat(" and ifnull(m.close_price,0)<={0}", criteria.to_price);
+            }
+
+
+            if (criteria.from_rsi.HasValue)
+            {
+                where.AppendFormat(" and ifnull(m.rsi,0)>={0}", criteria.from_rsi);
+            }
+
+            if (criteria.to_rsi.HasValue)
+            {
+                where.AppendFormat(" and ifnull(m.rsi,0)<={0}", criteria.to_rsi);
+            }
+
+            if (criteria.from_prev_rsi.HasValue)
+            {
+                where.AppendFormat(" and ifnull(m.prev_rsi,0)>={0}", criteria.from_prev_rsi);
+            }
+
+            if (criteria.to_prev_rsi.HasValue)
+            {
+                where.AppendFormat(" and ifnull(m.prev_rsi,0)<={0}", criteria.to_prev_rsi);
+            }
+
+            if (criteria.is_nifty_50.HasValue)
+            {
+                where.AppendFormat(" and ifnull(m.is_nifty_50,0)={0}", ((criteria.is_nifty_50 ?? false) == true ? "1" : "0"));
+            }
+
+            if (criteria.is_nifty_100.HasValue)
+            {
+                where.AppendFormat(" and ifnull(m.is_nifty_100,0)={0}", ((criteria.is_nifty_100 ?? false) == true ? "1" : "0"));
+            }
+
+            if (criteria.is_nifty_200.HasValue)
+            {
+                where.AppendFormat(" and ifnull(m.is_nifty_200,0)={0}", ((criteria.is_nifty_200 ?? false) == true ? "1" : "0"));
+            }
+
+            if (criteria.trade_date.HasValue)
+            {
+                where.AppendFormat(" and m.trade_date='{0}' ", criteria.trade_date.Value.ToString("yyyy-MM-dd"));
+            }
+
+            DateTime? minDate = Convert.ToDateTime("01/01/1900");
+            if (criteria.start_date.HasValue && criteria.end_date.HasValue)
+            {
+                where.AppendFormat(" and m.trade_date>='{0}' and m.trade_date<='{1}' ", criteria.start_date.Value.ToString("yyyy-MM-dd"), criteria.end_date.Value.ToString("yyyy-MM-dd"));
+            }
+
+            joinTables += " join tra_company c on c.symbol = m.symbol ";
+
+            selectFields = "count(*) as cnt";
+
+            sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, "", "");
+
+            paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString, sql));
+
+            if (string.IsNullOrEmpty(paging.SortOrder))
+            {
+                paging.SortOrder = "asc";
+            }
+
+            if (paging.PageSize > 0)
+            {
+                int from = (paging.PageIndex > 1) ? ((paging.PageIndex - 1) * paging.PageSize) : 0;
+                int to = paging.PageSize;
+                pageLimit = string.Format("limit {0},{1}", from, to);
+            }
+
+            orderBy = string.Format("order by {0} {1}", paging.SortName, paging.SortOrder);
+
+            selectFields = "c.company_id" + Environment.NewLine +
+                           ",c.company_name" + Environment.NewLine +
+                           ",m.*" + Environment.NewLine +
+                           ",(((m.close_price-m.open_price)/m.open_price) * 100) as prev_percentage" +
+                           "";
+
+            sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, orderBy, pageLimit);
 
             //Helper.Log(sql);
             List<TRA_COMPANY> rows = new List<TRA_COMPANY>();

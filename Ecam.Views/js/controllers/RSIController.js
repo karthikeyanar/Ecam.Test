@@ -1,8 +1,8 @@
 ﻿"use strict";
-define("IntradayController", ["knockout", "komapping", "helper", "service"], function (ko, komapping, helper, service) {
+define("RSIController", ["knockout", "komapping", "helper", "service"], function (ko, komapping, helper, service) {
     return function () {
         var self = this;
-        this.template = "/Home/Intraday";
+        this.template = "/Home/RSI";
 
         this.rows = ko.observableArray([]);
 
@@ -67,7 +67,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             if (is_mf == true) {
                 arr[arr.length] = { "name": "is_mf", "value": is_mf };
             }
-            var url = apiUrl("/Company/List");
+            var url = apiUrl("/Company/MarketList");
             $.ajax({
                 "url": url,
                 "cache": false,
@@ -85,17 +85,17 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
                 var highCurrentValue = 0;
                 var lowCurrentValue = 0;
-               
+
                 var totalRows = 0;
                 if (json.rows != null) {
                     $.each(json.rows, function (i, row) {
                         totalRows += 1;
-                        totalInvestment += cFloat(row.first_price);
-                        totalCurrentValue += cFloat(row.last_price);
+                        totalInvestment += cFloat(row.open_price);
+                        totalCurrentValue += cFloat(row.close_price);
 
-                        highCurrentValue += cFloat(row.profit_high_price);
-                        lowCurrentValue += cFloat(row.profit_low_price);
-                        //console.log('symbol=', row.symbol, 'first_price=', row.first_price, 'last_price=', row.last_price);
+                        highCurrentValue += cFloat(row.high_price);
+                        lowCurrentValue += cFloat(row.low_price);
+                        //console.log('symbol=', row.symbol, 'open_price=', row.open_price, 'close_price=', row.close_price);
                         row.quantity = 0;
                         row.investment_amount = 0;
                         row.target_price = 0;
@@ -278,53 +278,16 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                }
             });
 
-
-            var arrlastsixmonths = helper.getLastSixMonths();
-            var start = moment(_TODAYDATE).subtract('days', 30);// moment(arrlastsixmonths[0]);
-            var end = moment(_TODAYDATE);//moment(arrlastsixmonths[1]);
-            self.start_date(start.format('MM/DD/YYYY'));
-            self.end_date(end.format('MM/DD/YYYY'));
-
-            var $pageContent = $(".page-content");
-            //console.log('$pageContent=',$pageContent[0]);
-            var $reportRange = $('#reportrange', $pageContent);
-            //console.log('reportrange=',$reportRange[0]);
-            helper.handleDateRangePicker($reportRange, {
-                'opens': 'left',
-                'start': start,
-                'end': end,
-                'changeDate': function (start, end) {
-                    var daysDiff = helper.getTimeDiff(start.format('MM/DD/YYYY'), end.format('MM/DD/YYYY')).days;
-                    self.start_date(start.format('MM/DD/YYYY'));
-                    self.end_date(end.format('MM/DD/YYYY'));
-                    helper.changeDateRangeLabel($('span', $reportRange), start, end, self.start_date(), self.end_date());
-                    self.loadGrid();
-                }
+            var $txt = $(":input[name='trade_date']", $frmCompanySearch);
+            $txt.val(formatDate(new Date()));
+            $txt.datepicker({
+                "format": "dd/M/yyyy",
+                "autoclose": true,
+                "todayHighlight": true
             });
-            helper.changeDateRangeLabel($('span', $reportRange), start, end, self.start_date(), self.end_date());
-
-            var start = moment(_TODAYDATE).subtract('days', 365);
-            var end = moment(_TODAYDATE);
-            self.total_start_date(start.format('MM/DD/YYYY'));
-            self.total_end_date(end.format('MM/DD/YYYY'));
-
-            var $pageContent = $(".page-content");
-            //console.log('$pageContent=',$pageContent[0]);
-            var $totalReportRange = $('#total_reportrange', $pageContent);
-            //console.log('reportrange=',$totalReportRange[0]);
-            helper.handleDateRangePicker($totalReportRange, {
-                'opens': 'left',
-                'start': start,
-                'end': end,
-                'changeDate': function (start, end) {
-                    var daysDiff = helper.getTimeDiff(start.format('MM/DD/YYYY'), end.format('MM/DD/YYYY')).days;
-                    self.total_start_date(start.format('MM/DD/YYYY'));
-                    self.total_end_date(end.format('MM/DD/YYYY'));
-                    helper.changeDateRangeLabel($('span', $totalReportRange), start, end, self.total_start_date(), self.total_end_date());
-                    self.loadGrid();
-                }
+            $txt.off('changeDate').on('changeDate', function (e, e1) {
+                self.loadGrid();
             });
-            helper.changeDateRangeLabel($('span', $totalReportRange), start, end, self.total_start_date(), self.total_end_date());
         }
 
         this.openItem = function (row) {

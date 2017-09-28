@@ -58,6 +58,11 @@ namespace Ecam.Views.Controllers
             return View();
         }
 
+        public ActionResult RSI()
+        {
+            return View();
+        }
+
         public ActionResult MonthlyAVG()
         {
             return View();

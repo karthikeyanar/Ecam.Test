@@ -67,6 +67,7 @@ namespace Ecam.Contracts
 
         public Nullable<decimal> profit_high_percentage { get; set; }
         public Nullable<decimal> profit_low_percentage { get; set; }
+        public Nullable<DateTime> trade_date { get; set; }
     }
 
     public class TRA_COMPANY_SEARCH : TRA_COMPANY

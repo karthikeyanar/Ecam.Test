@@ -76,6 +76,9 @@ define("MonthlyAVGController", ["knockout", "komapping", "helper", "service"], f
             }).done(function (json) {
                 self.rows.removeAll();
                 self.avg_profit(0);
+                self.high_avg_profit(0);
+                self.low_avg_profit(0);
+
                 var totalInvestment = 0;
                 var totalCurrentValue = 0;
 

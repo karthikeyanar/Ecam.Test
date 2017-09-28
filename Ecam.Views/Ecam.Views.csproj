@@ -15,7 +15,7 @@
     <AssemblyName>Ecam.Views</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
-    <UseIISExpress>false</UseIISExpress>
+    <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
@@ -555,6 +555,7 @@
     <Content Include="js\bootstrap\bootstrap.min.js" />
     <Content Include="js\bootstrap\npm.js" />
     <Content Include="js\controllers\HoldingController.js" />
+    <Content Include="js\controllers\RSIController.js" />
     <Content Include="js\controllers\MonthlyAVGController.js" />
     <Content Include="js\controllers\OrderController.js" />
     <Content Include="js\controllers\CategoryController.js" />
@@ -1198,6 +1199,7 @@
     <Content Include="Views\Home\Experts.cshtml" />
     <Content Include="Views\Home\AddExperts.cshtml" />
     <Content Include="Views\Home\AddExpertsRecommend.cshtml" />
+    <Content Include="Views\Home\RSI.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

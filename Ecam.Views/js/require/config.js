@@ -227,6 +227,20 @@ $(function () {
             unload: function () { }
         });
 
+        createFinchRoute("/rsi", {
+            setup: function (url) {
+                handleBlockUI();
+            },
+            load: function () {
+                require(['RSIController'], function (ViewModel) {
+                    document.title = "RSI - Ecams";
+                    var m = new ViewModel();
+                    app.viewModel(m);
+                });
+            },
+            unload: function () { }
+        });
+
         createFinchRoute("/monthlyavg", {
             setup: function (url) {
                 handleBlockUI();
