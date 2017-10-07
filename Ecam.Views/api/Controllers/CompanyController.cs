@@ -75,8 +75,9 @@ namespace Ecam.Views.Controllers
             foreach (var g in groups)
             {
                 g.companies = (from q in g.companies
+                               where q.profit > 0
                                orderby q.profit descending
-                               select q).ToList();
+                               select q).Take(10).ToList();
                 g.total_investment = (from q in g.companies select q.first_price).Sum();
                 g.total_current = (from q in g.companies select q.last_price).Sum();
                 g.total_high = (from q in g.companies select q.high_price).Sum();
