@@ -5,6 +5,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
         this.template = "/Home/Intraday";
 
         this.rows = ko.observableArray([]);
+        this.categories = ko.observableArray([]);
 
         this.start_date = ko.observable("");
         this.end_date = ko.observable("");
@@ -19,8 +20,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             self.loadGrid();
         }
 
-        this.loadGrid = function (callback) {
-            handleBlockUI();
+        this.getArr = function () {
             var $Company = $("#Company");
             var arr = $("#frmCompanySearch").serializeArray();
             arr.push({ "name": "PageSize", "value": $(":input[name='rows']", $Company).val() });
@@ -67,6 +67,13 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             if (is_mf == true) {
                 arr[arr.length] = { "name": "is_mf", "value": is_mf };
             }
+            return arr;
+        }
+
+        this.loadCompanies = function (callback) {
+            handleBlockUI();
+            var $Company = $("#Company");
+            var arr = self.getArr();
             var url = apiUrl("/Company/List");
             $.ajax({
                 "url": url,
@@ -85,7 +92,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
                 var highCurrentValue = 0;
                 var lowCurrentValue = 0;
-               
+
                 var totalRows = 0;
                 if (json.rows != null) {
                     $.each(json.rows, function (i, row) {
@@ -148,6 +155,36 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             });
         }
 
+        this.loadGrid = function (callback) {
+            var $active = $(".nav-tabs > li.active > a");
+            if ($active.html() == 'Categories') {
+                self.loadCategories();
+            } else {
+                self.loadCompanies(callback);
+            }
+        }
+
+        this.loadCategories = function () {
+            var arr = self.getArr();
+            handleBlockUI({ "message": "Loading categories..." });
+            var url = apiUrl("/Company/CategoryGroups");
+            $.ajax({
+                "url": url,
+                "cache": false,
+                "type": "GET",
+                "data": arr
+            }).done(function (json) {
+                self.categories.removeAll();
+                if (json != null) {
+                    $.each(json, function (i, row) {
+                        var m = komapping.fromJS(row);
+                        self.categories.push(m);
+                    });
+                }
+            }).always(function () {
+                unblockUI();
+            });
+        }
 
         this.calculateJSON = function () {
             var $frmSearch = $("#frmCompanySearch");
@@ -694,6 +731,33 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $("body").on("keyup", "#stoploss_percentage", function (event) {
                 self.calculateJSON();
             });
+            $("body").on("click", "#CategoryTable > tbody > tr > td.cls-symbol", function (event) {
+                var $this = $(this);
+                var dataFor = ko.dataFor($this[0]);
+                var $tr = $this.parents("tr:first");
+                var $tbl = $this.parents("table:first");
+                var $tbody = $("tbody", $tbl);
+                var childTRId = "tr_child_" + $tr.attr('index');
+                var $childTR = $("#" + childTRId, $tbody);
+                console.log('childTRId=', childTRId, '$childTR=', $childTR[0]);
+                var $treeExpand = $(".tree-expand", this);
+                if ($treeExpand.hasClass("ex-plus")) {
+                    $treeExpand.removeClass("ex-minus").removeClass("ex-plus");
+                    if (!$childTR[0]) {
+                    } else {
+                        if ($childTR.hasClass('hide')) {
+                            $childTR.removeClass("hide");
+                            $treeExpand.addClass("ex-minus");
+                        } else {
+                            $childTR.addClass("hide");
+                            $treeExpand.addClass("ex-plus");
+                        }
+                    }
+                } else {
+                    $childTR.addClass("hide");
+                    $treeExpand.removeClass("ex-minus").addClass("ex-plus");
+                }
+            });
             $("body").on("click", "#CompanyTable > tbody > tr > td.cls-symbol", function (event) {
                 var $this = $(this);
                 var dataFor = ko.dataFor($this[0]);
@@ -847,6 +911,12 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 callback();
 
             self.applyPlugins();
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                //console.log('e.target=', e.target);
+                self.loadGrid();
+                //e.target // newly activated tab
+                //e.relatedTarget // previous active tab
+            });
             pushGCEvent(function (e, ui) {
                 self.loadGrid();
             });

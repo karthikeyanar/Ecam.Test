@@ -46,6 +46,49 @@ namespace Ecam.Views.Controllers
         }
 
         [HttpGet]
+        [ActionName("CategoryGroups")]
+        public List<TRA_CATEGORY_GROUP> CategoryGroups([FromUri] TRA_COMPANY_SEARCH criteria, [FromUri] Paging paging)
+        {
+            paging.PageSize = 5000;
+            paging.PageIndex = 1;
+            List<TRA_COMPANY> rows = _CompanyRepository.Get(criteria, paging).rows.ToList();
+            List<TRA_CATEGORY_GROUP> groups = new List<TRA_CATEGORY_GROUP>();
+            foreach (var row in rows)
+            {
+                TRA_CATEGORY_GROUP g = null;
+                foreach (var cat in row.category_list)
+                {
+                    g = (from q in groups
+                         where q.category_name == cat
+                         select q).FirstOrDefault();
+                    if (g == null)
+                    {
+                        g = new TRA_CATEGORY_GROUP { category_name = cat, companies = new List<TRA_COMPANY>() };
+                        groups.Add(g);
+                    }
+                    if (g != null)
+                    {
+                        g.companies.Add(row);
+                    }
+                }
+            }
+            foreach (var g in groups)
+            {
+                g.companies = (from q in g.companies
+                               orderby q.profit descending
+                               select q).ToList();
+                g.total_investment = (from q in g.companies select q.first_price).Sum();
+                g.total_current = (from q in g.companies select q.last_price).Sum();
+                g.total_high = (from q in g.companies select q.high_price).Sum();
+                g.total_low = (from q in g.companies select q.low_price).Sum();
+            }
+            groups = (from q in groups
+                      orderby q.total_profit descending
+                      select q).ToList();
+            return groups;
+        }
+
+        [HttpGet]
         [ActionName("MarketList")]
         public PaginatedListResult<TRA_COMPANY> MarketList([FromUri] TRA_COMPANY_SEARCH criteria, [FromUri] Paging paging)
         {

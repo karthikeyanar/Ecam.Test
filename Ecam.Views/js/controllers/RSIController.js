@@ -148,7 +148,6 @@ define("RSIController", ["knockout", "komapping", "helper", "service"], function
             });
         }
 
-
         this.calculateJSON = function () {
             var $frmSearch = $("#frmCompanySearch");
             var availableAmount = cFloat($("#available_amount", $frmSearch).val());

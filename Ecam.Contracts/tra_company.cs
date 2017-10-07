@@ -104,5 +104,31 @@ namespace Ecam.Contracts
         public DateTime? total_start_date { get; set; }
         public DateTime? total_end_date { get; set; }
     }
+
+    public class TRA_CATEGORY_GROUP
+    {
+        public string category_name { get; set; }
+        public decimal? total_investment { get; set; }
+        public decimal? total_current { get; set; }
+        public decimal? total_high { get; set; }
+        public decimal? total_low { get; set; }
+
+        public decimal total_profit {
+            get {
+                return DataTypeHelper.SafeDivision(((total_current ?? 0) - (total_investment ?? 0)), (total_investment ?? 0)) * 100;
+            }
+        }
+        public decimal total_high_profit {
+            get {
+                return DataTypeHelper.SafeDivision(((total_high ?? 0) - (total_investment ?? 0)), (total_investment ?? 0)) * 100;
+            }
+        }
+        public decimal total_low_profit {
+            get {
+                return DataTypeHelper.SafeDivision(((total_low ?? 0) - (total_investment ?? 0)), (total_investment ?? 0)) * 100;
+            }
+        }
+        public List<TRA_COMPANY> companies { get; set; }
+    }
 } 
 

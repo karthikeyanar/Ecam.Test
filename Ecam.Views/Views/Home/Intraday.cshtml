@@ -94,13 +94,13 @@
                     <input type="text" name="to_rsi" class="form-control input-sm" placeholder="To RSI" style="width:100px" />
                 </div>
                 @*<div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="from_profit" class="form-control input-sm" placeholder="From Profit" style="width:100px" />
-                </div>
+                        <input type="text" name="from_profit" class="form-control input-sm" placeholder="From Profit" style="width:100px" />
+                    </div>
+                    <div class="form-group m-r-10 m-t-10">
+                        <input type="text" name="to_profit" class="form-control input-sm" placeholder="To Profit" style="width:100px" />
+                    </div>*@
                 <div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="to_profit" class="form-control input-sm" placeholder="To Profit" style="width:100px" />
-                </div>*@
-                <div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="max_negative_count" class="form-control input-sm" value="" placeholder="Max Negative Count" style="width:150px" />
+                    <input type="text" name="max_negative_count" class="form-control input-sm" value="4" placeholder="Max Negative Count" style="width:150px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <button id="reportrange" type="button" class="btn btn-sm btn-default">
@@ -153,238 +153,415 @@
 </div>
 <div class="row" id="Company">
     <div class="col-md-12">
-        <div class="row m-b-5">
-            <div class="col-md-12">
-                <div class="pull-right">
-                    <button id="add" class="btn btn-sm btn-primary btn-add">Add</button>
-                </div>
-                <div class="pull-right m-r-15">
-                    <button id="export" class="btn btn-sm btn-success btn-export">Export</button>
-                </div>
-                <div class="pull-right m-r-15">
-                    <span>AVG.Profit&nbsp;:&nbsp;</span><span style="font-weight:bold;" data-bind="text:formatPercentage(avg_profit())"></span>
-                </div>
-                <div class="pull-right m-r-15">
-                    <span>High AVG.Profit&nbsp;:&nbsp;</span><span style="font-weight:bold;" data-bind="text:formatPercentage(high_avg_profit())"></span>
-                </div>
-                <div class="pull-right m-r-15">
-                    <span>Low AVG.Profit&nbsp;:&nbsp;</span><span style="font-weight:bold;" data-bind="text:formatPercentage(low_avg_profit())"></span>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="pull-left m-r-15">
-                    <span class="pull-left p-t-5 p-r-10">Rows</span>
-                    <select id="rows" name="rows" class="pull-left form-control input-sm input-60">
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="50" selected>50</option>
-                        <option value="200">200</option>
-                        <option value="210">210</option>
-                        <option value="500">500</option>
-                    </select>
-                </div>
-                <div class="pull-left">
-                    <span id="paging_status" class="pull-left m-t-5"></span>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="pull-right">
-                    <ul class="manual-pagination no-margin"></ul>
-                </div>
-            </div>
-            <input type="hidden" name="page_index" value="1" />
-            <input type="hidden" name="sort_name" value="prev_percentage" />
-            <input type="hidden" name="sort_order" value="asc" />
-        </div>
-        <table id="CompanyTable" class="table table-striped table-bordered table-hover table-condensed table-gray">
-            <thead>
-                <tr>
-                    <th style="width: 10px">
-                        &nbsp;
-                    </th>
-                    <th style="width: 10px" sortname="is_book_mark">
-                        Mark
-                    </th>
-                    <th style="width: 10px" sortname="is_current_stock">
-                        CS
-                    </th>
-                    <th sortname="company_name">
-                        Company
-                    </th>
-                    <th sortname="symbol">
-                        Symbol
-                    </th>
-                    <th>
-                        Category
-                    </th>
-                    @*<th sortname="prev_rsi" class="text-right text-nowrap">
-                            Prev.RSI
-                        </th>*@
-                    <th sortname="rsi" class="text-right text-nowrap">
-                        RSI
-                    </th>
-                    <th sortname="prev_percentage" class="text-right text-nowrap">
-                        C%
-                    </th>
-                    <th sortname="ltp_price" class="text-right text-nowrap">
-                        LTP
-                    </th>
-                    @*<th sortname="mf_cnt" class="text-right">
-                        MFCNT
-                    </th>
-                    <th sortname="mf_qty" class="text-right">
-                        MFQTY
-                    </th>*@ 
-                    <th sortname="profit_high_percentage" class="text-right">
-                        Profit High %
-                    </th> 
-                    <th sortname="profit_low_percentage" class="text-right">
-                        Profit Low %
-                    </th>
-                    <th sortname="profit" class="text-right">
-                        Profit
-                    </th>
-                    <th class="text-right" sortname="total_profit">
-                        Total Profit
-                    </th>
-                    @*<th sortname="monthly_avg" class="text-right">
-                        M.AVG
-                    </th>
-                    <th sortname="weekly_avg" class="text-right">
-                        W.AVG
-                    </th>*@
-                    <th class="text-right" sortname="negative_percentage">
-                        Ne-
-                    </th>
-                    <th class="text-right" sortname="positive_percentage">
-                        Po+
-                    </th>
-                    <th sortname="mc" class="text-right">
-                        MC
-                    </th>
-                    @*<th sortname="week_52_low" class="text-right">
-                        W52 Low
-                    </th>
-                    <th sortname="week_52_high" class="text-right">
-                        W52 High
-                    </th>*@
-                    @*<th sortname="week_52_positive_percentage" class="text-right">
-                        W52 High %
-                    </th>*@
-                    <th style="width: 20px">
-                    </th>
-                    <th style="width: 10px">
-                    </th>
-                </tr>
-            </thead>
-            <tbody data-bind="foreach:rows">
-                <tr>
-                    <td class="cls-symbol">
-                        <div style="width:5px;">
-                            <a href="javascript:;" data-bind="attr:{'cid':id()}" class="tree-expand ex-plus pull-left">
-                                <span>&nbsp;</span>
-                            </a>
+        <div>
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#companies" aria-controls="home" role="tab" data-toggle="tab">Companies</a></li>
+                <li role="presentation"><a href="#categories" aria-controls="profile" role="tab" data-toggle="tab">Categories</a></li>
+            </ul>
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="companies">
+                    <div class="row m-b-5">
+                        <div class="col-md-12">
+                            <div class="pull-right">
+                                <button id="add" class="btn btn-sm btn-primary btn-add">Add</button>
+                            </div>
+                            <div class="pull-right m-r-15">
+                                <button id="export" class="btn btn-sm btn-success btn-export">Export</button>
+                            </div>
+                            <div class="pull-right m-r-15">
+                                <span>AVG.Profit&nbsp;:&nbsp;</span><span style="font-weight:bold;" data-bind="text:formatPercentage(avg_profit())"></span>
+                            </div>
+                            <div class="pull-right m-r-15">
+                                <span>High AVG.Profit&nbsp;:&nbsp;</span><span style="font-weight:bold;" data-bind="text:formatPercentage(high_avg_profit())"></span>
+                            </div>
+                            <div class="pull-right m-r-15">
+                                <span>Low AVG.Profit&nbsp;:&nbsp;</span><span style="font-weight:bold;" data-bind="text:formatPercentage(low_avg_profit())"></span>
+                            </div>
                         </div>
-                    </td>
-                    <td style="text-align:center;">
-                        <a href="javascript:;" class="is-book-mark">
-                            <i data-bind="css:{'fa-bookmark fg-primary': cBool(is_book_mark())==true,'fa-bookmark-o': cBool(is_book_mark())==false}" class="fa fa-bookmark"></i>
-                        </a>
-                    </td>
-                    <td style="text-align:center;">
-                        <a href="javascript:;" class="is-current-stock">
-                            <i data-bind="css:{'fa-user fg-primary': cBool(is_current_stock())==true,'fa-user-o': cBool(is_current_stock())==false}" class="fa fa-user"></i>
-                        </a>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:company_name">
-                        <div style="width:150px;overflow:hidden;" data-bind="text:company_name">
-                        </div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:symbol"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit">
-                        <div style="width:250px;overflow:hidden;" data-bind="text:category_name">
-                        </div> 
-                    </td>
-                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                            <div data-bind="text:formatNumber(prev_rsi())"></div>
-                        </td>*@
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(rsi())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(prev_percentage())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(ltp_price())"></div>
-                    </td>
-                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(mf_cnt())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(mf_qty())"></div>
-                    </td>*@
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(profit_high_percentage())"></div>
-                        <div data-bind="text:formatNumber(profit_high_price())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(profit_low_percentage())"></div>
-                        <div data-bind="text:formatNumber(profit_low_price())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(profit())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(total_profit())"></div>
-                    </td>
-                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(monthly_avg())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(weekly_avg())"></div>
-                    </td>*@
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(negative_percentage())"></div>
-                        <div style="font-size:11px;" data-bind="text:formatInteger(negative())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(positive_percentage())"></div>
-                        <div style="font-size:11px;" data-bind="text:formatInteger(positive())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(mc())"></div>
-                    </td>
-                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(week_52_low())"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatNumber(week_52_high())"></div>
-                    </td>*@
-                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(week_52_positive_percentage())"></div>
-                    </td>*@
-                    <td style="text-align:center;white-space:nowrap;">
-                        <div style="width:80px;">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="pull-left m-r-15">
+                                <span class="pull-left p-t-5 p-r-10">Rows</span>
+                                <select id="rows" name="rows" class="pull-left form-control input-sm input-60">
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50" selected>50</option>
+                                    <option value="200">200</option>
+                                    <option value="210">210</option>
+                                    <option value="500">500</option>
+                                </select>
+                            </div>
                             <div class="pull-left">
-                                <a data-bind="attr:{'href': 'javascript:;'}" class="open-chart">C</a>
+                                <span id="paging_status" class="pull-left m-t-5"></span>
                             </div>
-                            <div class="pull-left m-l-15">
-                                <a data-bind="attr:{'href': 'https://www.google.com/search?q=NSE:'+symbol().replace('&','%26')}" target="_blank">G</a>
-                            </div>
-                            <div class="pull-left m-l-15">
-                                <a data-bind="attr:{'href': 'https://www.google.com/finance?q=NSE:'+symbol().replace('&','%26')}" target="_blank">GF</a>
-                            </div><div class="clearfix"></div>
                         </div>
-                        <div class="clearfix"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="text-center">
-                        <a href="javascript:;" class="cursor-pointer fg-black btn-delete" data-placement="top"><i class="fa fa-times"></i></a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                        <div class="col-md-6">
+                            <div class="pull-right">
+                                <ul class="manual-pagination no-margin"></ul>
+                            </div>
+                        </div>
+                        <input type="hidden" name="page_index" value="1" />
+                        <input type="hidden" name="sort_name" value="prev_percentage" />
+                        <input type="hidden" name="sort_order" value="desc" />
+                    </div>
+                    <table id="CompanyTable" class="table table-striped table-bordered table-hover table-condensed table-gray">
+                        <thead>
+                            <tr>
+                                <th style="width: 10px">
+                                    &nbsp;
+                                </th>
+                                <th style="width: 10px" sortname="is_book_mark">
+                                    Mark
+                                </th>
+                                <th style="width: 10px" sortname="is_current_stock">
+                                    CS
+                                </th>
+                                <th sortname="company_name">
+                                    Company
+                                </th>
+                                <th sortname="symbol">
+                                    Symbol
+                                </th>
+                                <th>
+                                    Category
+                                </th>
+                                @*<th sortname="prev_rsi" class="text-right text-nowrap">
+                                        Prev.RSI
+                                    </th>*@
+                                <th sortname="rsi" class="text-right text-nowrap">
+                                    RSI
+                                </th>
+                                <th sortname="prev_percentage" class="text-right text-nowrap">
+                                    C%
+                                </th>
+                                <th sortname="ltp_price" class="text-right text-nowrap">
+                                    LTP
+                                </th>
+                                @*<th sortname="mf_cnt" class="text-right">
+                                        MFCNT
+                                    </th>
+                                    <th sortname="mf_qty" class="text-right">
+                                        MFQTY
+                                    </th>*@
+                                <th sortname="profit_high_percentage" class="text-right">
+                                    Profit High %
+                                </th>
+                                <th sortname="profit_low_percentage" class="text-right">
+                                    Profit Low %
+                                </th>
+                                <th sortname="profit" class="text-right">
+                                    Profit
+                                </th>
+                                <th class="text-right" sortname="total_profit">
+                                    Total Profit
+                                </th>
+                                @*<th sortname="monthly_avg" class="text-right">
+                                        M.AVG
+                                    </th>
+                                    <th sortname="weekly_avg" class="text-right">
+                                        W.AVG
+                                    </th>*@
+                                <th class="text-right" sortname="negative_percentage">
+                                    Ne-
+                                </th>
+                                <th class="text-right" sortname="positive_percentage">
+                                    Po+
+                                </th>
+                                <th sortname="mc" class="text-right">
+                                    MC
+                                </th>
+                                @*<th sortname="week_52_low" class="text-right">
+                                        W52 Low
+                                    </th>
+                                    <th sortname="week_52_high" class="text-right">
+                                        W52 High
+                                    </th>*@
+                                @*<th sortname="week_52_positive_percentage" class="text-right">
+                                        W52 High %
+                                    </th>*@
+                                <th style="width: 20px">
+                                </th>
+                                <th style="width: 10px">
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach:rows">
+                            <tr>
+                                <td class="cls-symbol">
+                                    <div style="width:5px;">
+                                        <a href="javascript:;" data-bind="attr:{'cid':id()}" class="tree-expand ex-plus pull-left">
+                                            <span>&nbsp;</span>
+                                        </a>
+                                    </div>
+                                </td>
+                                <td style="text-align:center;">
+                                    <a href="javascript:;" class="is-book-mark">
+                                        <i data-bind="css:{'fa-bookmark fg-primary': cBool(is_book_mark())==true,'fa-bookmark-o': cBool(is_book_mark())==false}" class="fa fa-bookmark"></i>
+                                    </a>
+                                </td>
+                                <td style="text-align:center;">
+                                    <a href="javascript:;" class="is-current-stock">
+                                        <i data-bind="css:{'fa-user fg-primary': cBool(is_current_stock())==true,'fa-user-o': cBool(is_current_stock())==false}" class="fa fa-user"></i>
+                                    </a>
+                                </td>
+                                <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:company_name">
+                                    <div style="width:150px;overflow:hidden;" data-bind="text:company_name">
+                                    </div>
+                                </td>
+                                <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:symbol"></td>
+                                <td style="vertical-align:top;" class="cursor-pointer btn-edit">
+                                    <div style="width:250px;overflow:hidden;" data-bind="text:category_name">
+                                    </div>
+                                </td>
+                                @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                        <div data-bind="text:formatNumber(prev_rsi())"></div>
+                                    </td>*@
+                                <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                    <div data-bind="text:formatNumber(rsi())"></div>
+                                </td>
+                                <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                    <div data-bind="text:formatPercentage(prev_percentage())"></div>
+                                </td>
+                                <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                    <div data-bind="text:formatNumber(ltp_price())"></div>
+                                </td>
+                                @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                        <div data-bind="text:formatNumber(mf_cnt())"></div>
+                                    </td>
+                                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                        <div data-bind="text:formatNumber(mf_qty())"></div>
+                                    </td>*@
+                                <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                    <div data-bind="text:formatPercentage(profit_high_percentage())"></div>
+                                    <div data-bind="text:formatNumber(profit_high_price())"></div>
+                                </td>
+                                <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                    <div data-bind="text:formatPercentage(profit_low_percentage())"></div>
+                                    <div data-bind="text:formatNumber(profit_low_price())"></div>
+                                </td>
+                                <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                    <div data-bind="text:formatPercentage(profit())"></div>
+                                </td>
+                                <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                    <div data-bind="text:formatPercentage(total_profit())"></div>
+                                </td>
+                                @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                        <div data-bind="text:formatPercentage(monthly_avg())"></div>
+                                    </td>
+                                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                        <div data-bind="text:formatPercentage(weekly_avg())"></div>
+                                    </td>*@
+                                <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                    <div data-bind="text:formatPercentage(negative_percentage())"></div>
+                                    <div style="font-size:11px;" data-bind="text:formatInteger(negative())"></div>
+                                </td>
+                                <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                    <div data-bind="text:formatPercentage(positive_percentage())"></div>
+                                    <div style="font-size:11px;" data-bind="text:formatInteger(positive())"></div>
+                                </td>
+                                <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                    <div data-bind="text:formatNumber(mc())"></div>
+                                </td>
+                                @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                        <div data-bind="text:formatNumber(week_52_low())"></div>
+                                    </td>
+                                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                        <div data-bind="text:formatNumber(week_52_high())"></div>
+                                    </td>*@
+                                @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                        <div data-bind="text:formatPercentage(week_52_positive_percentage())"></div>
+                                    </td>*@
+                                <td style="text-align:center;white-space:nowrap;">
+                                    <div style="width:80px;">
+                                        <div class="pull-left">
+                                            <a data-bind="attr:{'href': 'javascript:;'}" class="open-chart">C</a>
+                                        </div>
+                                        <div class="pull-left m-l-15">
+                                            <a data-bind="attr:{'href': 'https://www.google.com/search?q=NSE:'+symbol().replace('&','%26')}" target="_blank">G</a>
+                                        </div>
+                                        <div class="pull-left m-l-15">
+                                            <a data-bind="attr:{'href': 'https://www.google.com/finance?q=NSE:'+symbol().replace('&','%26')}" target="_blank">GF</a>
+                                        </div><div class="clearfix"></div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </td>
+                                <td style="vertical-align:top;" class="text-center">
+                                    <a href="javascript:;" class="cursor-pointer fg-black btn-delete" data-placement="top"><i class="fa fa-times"></i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="categories">
+                    <table id="CategoryTable" class="table table-striped table-bordered table-hover table-condensed table-gray">
+                        <thead>
+                            <tr>
+                                <th style="width: 15px">
+                                    &nbsp;
+                                </th>
+                                <th sortname="category_name">
+                                    Category
+                                </th>
+                                <th>
+                                    Count
+                                </th>
+                                <th sortname="total_profit" class="text-right text-nowrap">
+                                    Profit %
+                                </th>
+                                <th sortname="total_high_profit" class="text-right">
+                                    High %
+                                </th>
+                                <th sortname="total_low_profit" class="text-right">
+                                    Low %
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach:categories">
+                            <tr data-bind="attr:{'index':$index()}">
+                                <td class="cls-symbol">
+                                    <div style="width:15px;">
+                                        <a href="javascript:;" class="tree-expand ex-plus pull-left">
+                                            <span>&nbsp;</span>
+                                        </a>
+                                    </div>
+                                </td>
+                                <td style="vertical-align:top;" class="cursor-pointer" data-bind="text:category_name">
+                                    <div style="width:150px;overflow:hidden;" data-bind="text:category_name">
+                                    </div>
+                                </td>
+                                <td style="vertical-align:top;" class="cursor-pointer">
+                                    <div data-bind="text:formatNumber(companies().length)"></div>
+                                </td>
+                                <td style="vertical-align:top;" class="cursor-pointer text-right">
+                                    <div data-bind="text:formatPercentage(total_profit())"></div>
+                                </td>
+                                <td style="vertical-align:top;" class="cursor-pointer text-right">
+                                    <div data-bind="text:formatPercentage(total_high_profit())"></div>
+                                </td>
+                                <td style="vertical-align:top;" class="cursor-pointer text-right">
+                                    <div data-bind="text:formatPercentage(total_low_profit())"></div>
+                                </td>
+                            </tr>
+                            <tr class="hide" data-bind="attr:{'id':'tr_child_'+$index()}">
+                                <td colspan="6">
+                                    <table id="CategoryCompanyTable" class="table table-striped table-bordered table-hover table-condensed table-gray">
+                                        <thead>
+                                            <tr>
+                                                <th sortname="company_name">
+                                                    Company
+                                                </th>
+                                                <th sortname="symbol">
+                                                    Symbol
+                                                </th>
+                                                <th>
+                                                    Category
+                                                </th>
+                                                <th sortname="rsi" class="text-right text-nowrap">
+                                                    RSI
+                                                </th>
+                                                <th sortname="prev_percentage" class="text-right text-nowrap">
+                                                    C%
+                                                </th>
+                                                <th sortname="ltp_price" class="text-right text-nowrap">
+                                                    LTP
+                                                </th>
+                                                <th sortname="profit_high_percentage" class="text-right">
+                                                    Profit High %
+                                                </th>
+                                                <th sortname="profit_low_percentage" class="text-right">
+                                                    Profit Low %
+                                                </th>
+                                                <th sortname="profit" class="text-right">
+                                                    Profit
+                                                </th>
+                                                <th class="text-right" sortname="total_profit">
+                                                    Total Profit
+                                                </th>
+                                                <th class="text-right" sortname="negative_percentage">
+                                                    Ne-
+                                                </th>
+                                                <th class="text-right" sortname="positive_percentage">
+                                                    Po+
+                                                </th>
+                                                <th sortname="mc" class="text-right">
+                                                    MC
+                                                </th>
+                                                <th style="width: 20px">
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody data-bind="foreach:companies">
+                                            <tr>
+                                                <td style="vertical-align:top;" class="cursor-pointer" data-bind="text:company_name">
+                                                    <div style="width:150px;overflow:hidden;" data-bind="text:company_name">
+                                                    </div>
+                                                </td>
+                                                <td style="vertical-align:top;" class="cursor-pointer" data-bind="text:symbol"></td>
+                                                <td style="vertical-align:top;" class="cursor-pointer">
+                                                    <div style="width:250px;overflow:hidden;" data-bind="text:category_name">
+                                                    </div>
+                                                </td>
+                                                <td style="vertical-align:top;" class="cursor-pointer text-right">
+                                                    <div data-bind="text:formatNumber(rsi())"></div>
+                                                </td>
+                                                <td style="vertical-align:top;" class="cursor-pointer text-right">
+                                                    <div data-bind="text:formatPercentage(prev_percentage())"></div>
+                                                </td>
+                                                <td style="vertical-align:top;" class="cursor-pointer text-right">
+                                                    <div data-bind="text:formatNumber(ltp_price())"></div>
+                                                </td>
+                                                <td style="vertical-align:top;" class="cursor-pointer text-right">
+                                                    <div data-bind="text:formatPercentage(profit_high_percentage())"></div>
+                                                    <div data-bind="text:formatNumber(profit_high_price())"></div>
+                                                </td>
+                                                <td style="vertical-align:top;" class="cursor-pointer text-right">
+                                                    <div data-bind="text:formatPercentage(profit_low_percentage())"></div>
+                                                    <div data-bind="text:formatNumber(profit_low_price())"></div>
+                                                </td>
+                                                <td style="vertical-align:top;" class="cursor-pointer text-right">
+                                                    <div data-bind="text:formatPercentage(profit())"></div>
+                                                </td>
+                                                <td style="vertical-align:top;" class="cursor-pointer text-right">
+                                                    <div data-bind="text:formatPercentage(total_profit())"></div>
+                                                </td>
+                                                <td style="vertical-align:top;" class="cursor-pointer text-right">
+                                                    <div data-bind="text:formatPercentage(negative_percentage())"></div>
+                                                    <div style="font-size:11px;" data-bind="text:formatInteger(negative())"></div>
+                                                </td>
+                                                <td style="vertical-align:top;" class="cursor-pointer text-right">
+                                                    <div data-bind="text:formatPercentage(positive_percentage())"></div>
+                                                    <div style="font-size:11px;" data-bind="text:formatInteger(positive())"></div>
+                                                </td>
+                                                <td style="vertical-align:top;" class="cursor-pointer text-right">
+                                                    <div data-bind="text:formatNumber(mc())"></div>
+                                                </td>
+                                                <td style="text-align:center;white-space:nowrap;">
+                                                    <div style="width:80px;">
+                                                        <div class="pull-left">
+                                                            <a data-bind="attr:{'href': 'javascript:;'}" class="open-chart">C</a>
+                                                        </div>
+                                                        <div class="pull-left m-l-15">
+                                                            <a data-bind="attr:{'href': 'https://www.google.com/search?q=NSE:'+symbol().replace('&','%26')}" target="_blank">G</a>
+                                                        </div>
+                                                        <div class="pull-left m-l-15">
+                                                            <a data-bind="attr:{'href': 'https://www.google.com/finance?q=NSE:'+symbol().replace('&','%26')}" target="_blank">GF</a>
+                                                        </div><div class="clearfix"></div>
+                                                    </div>
+                                                    <div class="clearfix"></div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <div class="modal-container">

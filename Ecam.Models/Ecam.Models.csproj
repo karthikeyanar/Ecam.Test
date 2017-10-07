@@ -125,6 +125,7 @@
     <Compile Include="Models\tra_mutual_fund.cs" />
     <Compile Include="Models\tra_mutual_fund_pf.cs" />
     <Compile Include="Partial\BaseEntity.cs" />
+    <Compile Include="Partial\tra_category.cs" />
     <Compile Include="Partial\tra_holding.cs" />
     <Compile Include="Partial\tra_company.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
