@@ -737,9 +737,9 @@ RegexOptions.IgnoreCase
 
                 if ((now >= morningStart && now <= eveningStart))
                 {
-                    query = (from q in query
-                             join h in context.tra_holding on q.symbol equals h.symbol
-                             select q);
+                    //query = (from q in query
+                    //         join h in context.tra_holding on q.symbol equals h.symbol
+                    //         select q);
                     //string IS_NIFTY_50 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_50"];
                     //string IS_NIFTY_100 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_100"];
                     //string IS_NIFTY_200 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_200"];
