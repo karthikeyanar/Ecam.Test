@@ -1110,12 +1110,12 @@ namespace Ecam.Models
                     var monthLastTrade = (from q in context.tra_market where q.symbol == market.symbol && q.trade_date <= monthEndDate orderby q.trade_date descending select q).FirstOrDefault();
                     if (monthFirstTrade != null && monthLastTrade != null)
                     {
-                        if (monthLastTrade.trade_date.Day >= 15)
-                        {
-                            decimal openPrice = (monthFirstTrade.open_price ?? 0);
-                            decimal lastPrice = (monthLastTrade.close_price ?? 0);
-                            CreateAVGRecord(market.symbol, "M", openPrice, lastPrice, monthStartDate);
-                        }
+                        //if (monthLastTrade.trade_date.Day >= 15)
+                        //{
+                        decimal openPrice = (monthFirstTrade.open_price ?? 0);
+                        decimal lastPrice = (monthLastTrade.close_price ?? 0);
+                        CreateAVGRecord(market.symbol, "M", openPrice, lastPrice, monthStartDate);
+                        //}
                     }
 
                     var weekFirstTrade = (from q in context.tra_market where q.symbol == market.symbol && q.trade_date >= weekFirstDate orderby q.trade_date ascending select q).FirstOrDefault();
@@ -1148,12 +1148,12 @@ namespace Ecam.Models
                 var monthLastTrade = (from q in markets where q.trade_date <= monthEndDate orderby q.trade_date descending select q).FirstOrDefault();
                 if (monthFirstTrade != null && monthLastTrade != null)
                 {
-                    if (monthLastTrade.trade_date.Day >= 15)
-                    {
-                        decimal openPrice = (monthFirstTrade.open_price ?? 0);
-                        decimal lastPrice = (monthLastTrade.close_price ?? 0);
-                        CreateAVGRecord(symbol, "M", openPrice, lastPrice, monthStartDate);
-                    }
+                    //if (monthLastTrade.trade_date.Day >= 15)
+                    //{
+                    decimal openPrice = (monthFirstTrade.open_price ?? 0);
+                    decimal lastPrice = (monthLastTrade.close_price ?? 0);
+                    CreateAVGRecord(symbol, "M", openPrice, lastPrice, monthStartDate);
+                    //}
                 }
 
                 var weekFirstTrade = (from q in markets where q.trade_date >= weekFirstDate orderby q.trade_date ascending select q).FirstOrDefault();
@@ -1547,7 +1547,7 @@ RegexOptions.IgnoreCase
    | RegexOptions.Compiled
    );
                     collections = regex.Matches(html);
-                    foreach(Match tblMatch in collections)
+                    foreach (Match tblMatch in collections)
                     {
                         string tableContent = tblMatch.Value;// collections[0].Groups[2].Value;
 
