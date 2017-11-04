@@ -1,0 +1,9 @@
+drop table tra_category;
+drop table tra_company;
+drop table tra_company_category;
+drop table tra_holding;
+drop table tra_market;
+drop table tra_market_avg;
+drop table tra_market_intra_day;
+drop table tra_mutual_fund;
+drop table tra_mutual_fund_pf;

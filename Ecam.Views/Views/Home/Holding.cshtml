@@ -5,6 +5,9 @@
             <div class="form-group" style="margin-left:10px; margin-right:10px;float:left;">
                 <h1 class="page-title" style="margin-top:-4px;">Holdings</h1>
             </div>
+            <div class="form-group m-r-10 m-t-10">
+                <input type="text" name="target_percentage" class="form-control input-sm" value="0.72" placeholder="Target" style="width:100px" />
+            </div>
             <div class="form-group m-r-10 m-t-10 pull-right">
                 <button type="button" id="btn" class="btn btn-success btn-sm" data-bind="click:refresh">Refresh</button>
             </div>
@@ -71,24 +74,36 @@
                     <th sortname="quantity">
                         Quantity
                     </th>
-                    <th sortname="avg_price">
-                        Avg.Price
-                    </th>
-                    <th sortname="investment">
-                        Investment
-                    </th>
                     <th sortname="ltp_price">
                         LTP
                     </th>
+                    <th sortname="avg_price">
+                        Buy.Price
+                    </th>
+                    <th sortname="target_price">
+                        Target Price
+                    </th>
+                    <th>
+                        Target Profit
+                    </th>
+                    <th>
+                        Target
+                    </th>
+                    @*<th sortname="investment">
+                        Investment
+                    </th>*@
                     <th sortname="current_market_value">
                         CMV
                     </th>
-                    <th sortname="change_value">
-                        Change
+                    @*<th sortname="change_percentage">
+                        %
+                    </th>*@
+                    @*<th>
+                        Profit
                     </th>
-                    <th sortname="change_percentage">
-                        C%
-                    </th>
+                    <th>
+                        Final
+                    </th>*@
                     <th style="width: 50px">
                     </th>
                 </tr>
@@ -99,12 +114,16 @@
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:symbol"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatDate(trade_date)"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:quantity"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(avg_price)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(investment)"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(ltp_price)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(avg_price)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(target_price)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(target_profit)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(target_total)"></td>
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(investment)"></td>*@
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(current_market_value)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(change_value)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatPercentage(change_percentage)"></td>
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatPercentage(change_percentage)"></td>*@
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(profit)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(final_total)"></td>*@
                     <td style="vertical-align:top;" class="text-center">
                         <a href="javascript:;" class="cursor-pointer fg-black btn-delete" data-placement="top"><i class="fa fa-times"></i></a>
                     </td>

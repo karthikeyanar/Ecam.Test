@@ -1,0 +1,65 @@
+select concat('\'',symbol,'\',') from (select (((last_price - first_price)/first_price) * 100) as profit
+,(((total_last_price - total_first_price)/total_first_price) * 100) as total_profit
+,(negative/(negative+positive) * 100) as negative_percentage
+,(positive/(negative+positive) * 100) as positive_percentage
+,(((profit_high_price - ltp_price)/ltp_price) * 100) as profit_high_percentage
+,(((profit_low_price - ltp_price)/ltp_price) * 100) as profit_low_percentage
+,tbl.*
+ from(
+select ct.company_id
+,ct.company_name
+,ct.symbol
+,ct.open_price
+,ct.high_price
+,ct.low_price
+,ct.ltp_price
+,ct.close_price
+,ct.prev_price
+,ct.week_52_high
+,ct.week_52_low
+,ct.is_book_mark
+,ct.is_current_stock
+,ct.is_nifty_50
+,ct.is_nifty_100
+,ct.is_nifty_200
+,ct.rsi
+,ct.prev_rsi
+,ct.monthly_avg
+,ct.weekly_avg
+,ct.mc
+,ct.pe
+,ct.volume
+,ct.eps
+,(select high_price from tra_market m where m.symbol = ct.symbol  and m.trade_date>='2016-10-31' and m.trade_date<='2017-10-31' 
+ and m.high_price > 0 order by m.high_price desc limit 0,1) as total_high_price
+,(select low_price from tra_market m where m.symbol = ct.symbol  and m.trade_date>='2016-10-31' and m.trade_date<='2017-10-31' 
+ and m.low_price > 0 order by m.low_price asc limit 0,1) as total_low_price
+,(select high_price from tra_market m where m.symbol = ct.symbol  and m.trade_date>='2016-10-31' and m.trade_date<='2017-10-31'  and m.high_price > 0 order by m.high_price desc limit 0,1) as profit_high_price
+,(select low_price from tra_market m where m.symbol = ct.symbol  and m.trade_date>='2016-10-31' and m.trade_date<='2017-10-31'  and m.low_price > 0 order by m.low_price asc limit 0,1) as profit_low_price
+,(select open_price from tra_market m where m.symbol = ct.symbol  and m.trade_date>='2016-10-31' and m.trade_date<='2017-10-31' 
+ order by m.trade_date asc limit 0,1) as total_first_price
+,(select ltp_price from tra_market m where m.symbol = ct.symbol  and m.trade_date>='2016-10-31' and m.trade_date<='2017-10-31' 
+ order by m.trade_date desc limit 0,1) as total_last_price
+,(select open_price from tra_market m where m.symbol = ct.symbol  and m.trade_date>='2016-10-31' and m.trade_date<='2017-10-31'  order by m.trade_date asc limit 0,1) as first_price
+,(select ltp_price from tra_market m where m.symbol = ct.symbol  and m.trade_date>='2016-10-31' and m.trade_date<='2017-10-31'  order by m.trade_date desc limit 0,1) as last_price
+,(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M'  and m.avg_date>='2016-10-01' and m.avg_date<='2017-10-31' 
+ and ifnull(m.percentage, 0) < 0) as negative
+,(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M'  and m.avg_date>='2016-10-01' and m.avg_date<='2017-10-31' 
+  and ifnull(m.percentage, 0) > 0) as positive
+,(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M'  and m.avg_date>='2016-10-01' and m.avg_date<='2017-10-31' 
+ ) as total
+,(select count(mpf.fund_id) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_cnt
+,(select sum(ifnull(mpf.stock_value, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_qty
+,(((ifnull(ct.ltp_price, 0) - ifnull(ct.prev_price, 0)) / ifnull(ct.prev_price, 0)) * 100) as prev_percentage
+,(ifnull(ct.open_price,0) - ifnull(ct.prev_price,0)) as diff
+,(ifnull(ct.rsi,0) - ifnull(ct.prev_rsi,0)) as rsi_diff
+,(((ifnull(ct.ltp_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as ltp_percentage
+,(((ifnull(ct.high_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as high_percentage
+,(((ifnull(ct.low_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as low_percentage
+,(((ifnull(ct.ltp_price, 0) - ifnull(ct.week_52_high, 0)) / ifnull(ct.week_52_high, 0)) * 100) as week_52_percentage
+,(((ifnull(ct.week_52_high, 0) - ifnull(ct.ltp_price, 0)) / ifnull(ct.ltp_price, 0)) * 100) as week_52_positive_percentage
+,(((ifnull(ct.ltp_price, 0) - ifnull(ct.week_52_low, 0)) / ifnull(ct.week_52_low, 0)) * 100) as week_52_low_percentage
+,ct.company_id as id
+ from tra_company ct  where  ct.company_id>0    
+) as tbl  where company_id > 0  order by profit desc 
+) as tbl2 limit 0,50
