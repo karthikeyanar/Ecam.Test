@@ -9,11 +9,11 @@ select c.company_name,c.symbol
 ,(select count(*) from tra_market m where m.symbol = c.symbol) as total
 ,(select count(*) from tra_market m where m.symbol = c.symbol and (((ifnull(m.ltp_price, 0) - ifnull(m.prev_price, 0)) / ifnull(m.prev_price, 0)) * 100) <=0) as ltp_count
 ,(select count(*) from tra_market m where m.symbol = c.symbol 
-and (((ifnull(m.low_price, 0) - ifnull(m.prev_price, 0)) / ifnull(m.prev_price, 0)) * 100)<=-0.7
-and (((ifnull(m.high_price, 0) - ifnull(m.prev_price, 0)) / ifnull(m.prev_price, 0)) * 100)<0.7
+and (((ifnull(m.low_price, 0) - ifnull(m.prev_price, 0)) / ifnull(m.prev_price, 0)) * 100)<=-0.72
+and (((ifnull(m.high_price, 0) - ifnull(m.prev_price, 0)) / ifnull(m.prev_price, 0)) * 100)<0.72
 ) as low_count
-,(select count(*) from tra_market m where m.symbol = c.symbol and (((ifnull(m.open_price, 0) - ifnull(m.prev_price, 0)) / ifnull(m.prev_price, 0)) * 100) >=0.7) as open_count
-,(select count(*) from tra_market m where m.symbol = c.symbol and (((ifnull(m.high_price, 0) - ifnull(m.prev_price, 0)) / ifnull(m.prev_price, 0)) * 100)>=0.7) as high_count
+,(select count(*) from tra_market m where m.symbol = c.symbol and (((ifnull(m.open_price, 0) - ifnull(m.prev_price, 0)) / ifnull(m.prev_price, 0)) * 100) >=0.72) as open_count
+,(select count(*) from tra_market m where m.symbol = c.symbol and (((ifnull(m.high_price, 0) - ifnull(m.prev_price, 0)) / ifnull(m.prev_price, 0)) * 100)>=0.72) as high_count
 from tra_company c 
 where c.symbol in(
 'AVANTIFEED',
@@ -117,5 +117,5 @@ where c.symbol in(
 'REDINGTON',
 'IBULHSGFIN'
 )
-) as tbl order by diff desc
+) as tbl order by high_percentage desc
 limit 0,500

@@ -38,7 +38,7 @@ namespace Ecam.Contracts
         }
         public decimal? final_total {
             get {
-                return (this.quantity * (this.ltp_price ?? 0)) + this.profit;
+                return (this.investment ?? 0) + this.profit;
             }
         }
 
@@ -53,7 +53,7 @@ namespace Ecam.Contracts
         }
         public decimal? target_total {
             get {
-                return (this.quantity * (this.target_price ?? 0)) + this.profit;
+                return (this.investment ?? 0) + this.profit;
             }
         }
 
@@ -69,7 +69,8 @@ namespace Ecam.Contracts
             decimal gst = (decimal)(txn * (decimal)18) / 100;
             decimal stamb = (decimal)(turnover * (decimal)0.006) / 100;
             decimal sebi = (decimal)(((decimal)15 * turnover) / 10000000);
-            result = ((sell - buy) - (stt + txn + gst + stamb + sebi));
+            decimal dpcharges = (decimal)15.93;
+            result = ((sell - buy) - (stt + txn + gst + stamb + sebi + dpcharges));
             return result;
         }
     }

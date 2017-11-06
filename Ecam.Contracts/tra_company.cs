@@ -103,6 +103,9 @@ namespace Ecam.Contracts
 
         public DateTime? total_start_date { get; set; }
         public DateTime? total_end_date { get; set; }
+
+        public decimal? total_from_profit { get; set; }
+        public decimal? total_to_profit { get; set; }
     }
 
     public class TRA_CATEGORY_GROUP

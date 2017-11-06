@@ -326,10 +326,10 @@ namespace Ecam.Framework.Repository
                 where.AppendFormat(" and ifnull(ct.is_book_mark,0)={0}", ((criteria.is_book_mark ?? false) == true ? "1" : "0"));
             }
 
-            if (criteria.is_current_stock.HasValue)
-            {
-                where.AppendFormat(" and ifnull(ct.is_current_stock,0)={0}", ((criteria.is_current_stock ?? false) == true ? "1" : "0"));
-            }
+            //if (criteria.is_current_stock.HasValue)
+            //{
+            //    where.AppendFormat(" and ifnull(ct.is_current_stock,0)={0}", ((criteria.is_current_stock ?? false) == true ? "1" : "0"));
+            //}
 
             if (criteria.from_price.HasValue)
             {
@@ -375,6 +375,11 @@ namespace Ecam.Framework.Repository
             if (criteria.is_nifty_200.HasValue)
             {
                 where.AppendFormat(" and ifnull(ct.is_nifty_200,0)={0}", ((criteria.is_nifty_200 ?? false) == true ? "1" : "0"));
+            }
+
+            if((criteria.is_current_stock ?? false) == true)
+            {
+                joinTables += " join tra_holding h on h.symbol = ct.symbol ";
             }
 
             selectFields = "count(*) as cnt";
@@ -524,6 +529,16 @@ namespace Ecam.Framework.Repository
             if ((criteria.to_profit ?? 0) != 0)
             {
                 where.AppendFormat(" and ifnull((((last_price - first_price)/first_price) * 100),0)<={0}", criteria.to_profit);
+            }
+
+            if ((criteria.total_from_profit ?? 0) != 0)
+            {
+                where.AppendFormat(" and ifnull((((total_last_price - total_first_price)/total_first_price) * 100),0)>={0}", criteria.total_from_profit);
+            }
+
+            if ((criteria.total_to_profit ?? 0) != 0)
+            {
+                where.AppendFormat(" and ifnull((((total_last_price - total_first_price)/total_first_price) * 100),0)<={0}", criteria.total_to_profit);
             }
 
             if ((criteria.max_negative_count ?? 0) > 0)

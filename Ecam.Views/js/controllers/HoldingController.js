@@ -37,7 +37,7 @@ define("HoldingController", ["knockout", "komapping", "helper", "service"], func
                 var profitPercentage = 0;
                 $.each(json.rows, function (i, row) {
                     totalInvestment += cFloat(row.investment);
-                    totalMarketValue += cFloat(row.current_market_value);
+                    totalMarketValue += cFloat(row.final_total);
                 });
                 profitPercentage = ((cFloat(totalMarketValue) - cFloat(totalInvestment)) / cFloat(totalInvestment)) * 100;
                 self.total_investment(totalInvestment);

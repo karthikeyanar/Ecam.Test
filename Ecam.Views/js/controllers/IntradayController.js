@@ -48,15 +48,15 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 arr[arr.length] = { "name": "is_nifty_200", "value": isNifty200 };
             }
 
-            var is_sell_to_buy = $("#frmCompanySearch #is_sell_to_buy")[0].checked;
-            if (is_sell_to_buy == true) {
-                arr[arr.length] = { "name": "is_sell_to_buy", "value": is_sell_to_buy };
-            }
+            //var is_sell_to_buy = $("#frmCompanySearch #is_sell_to_buy")[0].checked;
+            //if (is_sell_to_buy == true) {
+            //    arr[arr.length] = { "name": "is_sell_to_buy", "value": is_sell_to_buy };
+            //}
 
-            var is_buy_to_sell = $("#frmCompanySearch #is_buy_to_sell")[0].checked;
-            if (is_buy_to_sell == true) {
-                arr[arr.length] = { "name": "is_buy_to_sell", "value": is_buy_to_sell };
-            }
+            //var is_buy_to_sell = $("#frmCompanySearch #is_buy_to_sell")[0].checked;
+            //if (is_buy_to_sell == true) {
+            //    arr[arr.length] = { "name": "is_buy_to_sell", "value": is_buy_to_sell };
+            //}
 
             var is_all_category = $("#frmCompanySearch #is_all_category")[0].checked;
             if (is_all_category == true) {
