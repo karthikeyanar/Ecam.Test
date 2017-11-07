@@ -20,42 +20,42 @@ namespace Ecam.Contracts
         public decimal? ltp_price { get; set; }
         public decimal? target_price {
             get {
-                return ((this.target_percentage ?? 0) > 0 ? (((this.avg_price ?? 0) * (this.target_percentage ?? 0)) / 100) + (this.avg_price ?? 0) : 0);
+                return ((this.target_percentage ?? 0) > 0 ? (((this.ltp_price ?? 0) * (this.target_percentage ?? 0)) / 100) + (this.ltp_price ?? 0) : 0);
             }
         }
 
         public decimal? investment { get; set; }
         public decimal? current_market_value { get; set; }
 
-        public decimal profit {
-            get {
-                decimal result = 0;
-                decimal buy = (this.quantity * (this.avg_price ?? 0));
-                decimal sell = (this.quantity * (this.ltp_price ?? 0));
-                result = this.CalcTotal(buy, sell, (buy + sell));
-                return result;
-            }
-        }
-        public decimal? final_total {
-            get {
-                return (this.investment ?? 0) + this.profit;
-            }
-        }
+        //public decimal profit {
+        //    get {
+        //        decimal result = 0;
+        //        decimal buy = (this.quantity * (this.avg_price ?? 0));
+        //        decimal sell = (this.quantity * (this.ltp_price ?? 0));
+        //        result = this.CalcTotal(buy, sell, (buy + sell));
+        //        return result;
+        //    }
+        //}
+        //public decimal? final_total {
+        //    get {
+        //        return (this.investment ?? 0) + this.profit;
+        //    }
+        //}
 
-        public decimal target_profit {
-            get {
-                decimal result = 0;
-                decimal buy = (this.quantity * (this.avg_price ?? 0));
-                decimal sell = (this.quantity * (this.target_price ?? 0));
-                result = this.CalcTotal(buy, sell, (buy + sell));
-                return result;
-            }
-        }
-        public decimal? target_total {
-            get {
-                return (this.investment ?? 0) + this.profit;
-            }
-        }
+        //public decimal target_profit {
+        //    get {
+        //        decimal result = 0;
+        //        decimal buy = (this.quantity * (this.avg_price ?? 0));
+        //        decimal sell = (this.quantity * (this.target_price ?? 0));
+        //        result = this.CalcTotal(buy, sell, (buy + sell));
+        //        return result;
+        //    }
+        //}
+        //public decimal? target_total {
+        //    get {
+        //        return (this.investment ?? 0) + this.profit;
+        //    }
+        //}
 
         public decimal? change_value { get; set; }
         public decimal? change_percentage { get; set; }

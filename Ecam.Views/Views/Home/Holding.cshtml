@@ -28,6 +28,9 @@
                     <span>Profit&nbsp;:&nbsp;</span><span style="font-weight:bold;" data-bind="text:formatNumber(profit())"></span>
                 </div>
                 <div class="pull-right m-r-15">
+                    <span>Final&nbsp;:&nbsp;</span><span style="font-weight:bold;" data-bind="text:formatNumber(final_total())"></span>
+                </div>
+                <div class="pull-right m-r-15">
                     <span>CMV&nbsp;:&nbsp;</span><span style="font-weight:bold;" data-bind="text:formatNumber(total_market_value())"></span>
                 </div>
                 <div class="pull-right m-r-15">
@@ -92,18 +95,21 @@
                     <th sortname="investment">
                         Investment
                     </th>
+                    <th>
+                        Investment %
+                    </th>
                     <th sortname="current_market_value">
                         CMV
                     </th>
                     <th sortname="change_percentage">
                         %
                     </th>
-                    <th>
+                    @*<th>
                         Profit
                     </th>
                     <th>
                         Final
-                    </th>
+                    </th>*@
                     <th style="width: 50px">
                     </th>
                 </tr>
@@ -120,10 +126,11 @@
                     @*<td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(target_profit)"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(target_total)"></td>*@
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(investment)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatPercentage(investment_percentage)"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(current_market_value)"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatPercentage(change_percentage)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(profit)"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(final_total)"></td>
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(profit)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(final_total)"></td>*@
                     <td style="vertical-align:top;" class="text-center">
                         <a href="javascript:;" class="cursor-pointer fg-black btn-delete" data-placement="top"><i class="fa fa-times"></i></a>
                     </td>

@@ -14,6 +14,7 @@ define("HoldingController", ["knockout", "komapping", "helper", "service"], func
         this.profit_percentage = ko.observable();
         this.total_investment = ko.observable();
         this.total_market_value = ko.observable();
+        this.final_total = ko.observable();
 
         this.loadGrid = function (callback) {
             handleBlockUI();
@@ -31,18 +32,40 @@ define("HoldingController", ["knockout", "komapping", "helper", "service"], func
                 "data": arr
             }).done(function (json) {
                 self.rows.removeAll();
-                self.rows(json.rows);
+
                 var totalInvestment = 0;
                 var totalMarketValue = 0;
+                var totalFinalValue = 0;
                 var profitPercentage = 0;
+
                 $.each(json.rows, function (i, row) {
                     totalInvestment += cFloat(row.investment);
-                    totalMarketValue += cFloat(row.final_total);
+                    totalMarketValue += cFloat(row.current_market_value);
                 });
-                profitPercentage = ((cFloat(totalMarketValue) - cFloat(totalInvestment)) / cFloat(totalInvestment)) * 100;
+
+                $.each(json.rows, function (i, row) {
+                    row.investment_percentage = (cFloat(row.investment) / cFloat(totalInvestment)) * 100;
+                });
+
+                self.rows(json.rows);
+
+                var stt = (totalMarketValue * 0.1) / 100;
+                var txn = (totalMarketValue * 0.00325) / 100;
+                var gst = (txn * 18) / 100;
+                var stamb = (totalMarketValue * 0.006) / 100;
+                var sebi = ((15 * totalMarketValue) / 10000000);
+                var dpcharges = (self.rows.length * 15.93);
+
+                totalFinalValue = (totalMarketValue - (stt + txn + gst + stamb + sebi + dpcharges));
+
+                //console.log('totalMarketValue=', totalMarketValue, 'stt=', stt, 'txn=', txn, 'gst=', gst, 'stamb=', stamb, 'sebi=', sebi, 'dpcharges=', dpcharges, 'totalFinalValue=', totalFinalValue);
+
+                profitPercentage = ((cFloat(totalFinalValue) - cFloat(totalInvestment)) / cFloat(totalInvestment)) * 100;
+
                 self.total_investment(totalInvestment);
                 self.total_market_value(totalMarketValue);
-                self.profit(cFloat(totalMarketValue) - cFloat(totalInvestment));
+                self.final_total(totalFinalValue);
+                self.profit(cFloat(totalFinalValue) - cFloat(totalInvestment));
                 self.profit_percentage(profitPercentage);
                 $(".manual-pagination", $Holding).each(function () {
                     var element = this;
