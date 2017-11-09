@@ -675,6 +675,18 @@
                     Date
                 </th>
                 <th class="text-right">
+                    Open
+                </th>
+                <th class="text-right">
+                    Low
+                </th>
+                <th class="text-right">
+                    High
+                </th>
+                @*<th class="text-right">
+                    LTP
+                </th>*@
+                <th class="text-right">
                     Close
                 </th>
                 <th class="text-right">
@@ -699,6 +711,10 @@
             <tr>
                 <td>${row.symbol}</td>
                 <td>${formatDate(row.trade_date)}</td>
+                <td class="text-right">${formatNumber(row.open_price)}</td>
+                <td class="text-right">${formatNumber(row.low_price)}</td>
+                <td class="text-right">${formatNumber(row.high_price)}</td>
+                @*<td class="text-right">${formatNumber(row.ltp_price)}</td>*@
                 <td class="text-right">${formatNumber(row.close_price)}</td>
                 <td class="text-right">${formatPercentage(row.prev_percentage)}</td>
                 <td class="text-right">${formatNumber(row.rsi)}</td>

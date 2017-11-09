@@ -33,6 +33,10 @@ namespace Ecam.Contracts
     {
         public string symbol { get; set; }
         public System.DateTime trade_date { get; set; }
+        public decimal? open_price { get; set; }
+        public decimal? low_price { get; set; }
+        public decimal? high_price { get; set; }
+        public decimal? ltp_price { get; set; }
         public decimal? close_price { get; set; }
         public decimal? rsi { get; set; }
         public decimal? prev_rsi { get; set; }

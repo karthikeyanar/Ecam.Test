@@ -973,6 +973,10 @@ namespace Ecam.Framework.Repository
 
             selectFields = "m.symbol" + Environment.NewLine +
                             ",m.trade_date" + Environment.NewLine +
+                            ",m.open_price" + Environment.NewLine +
+                            ",m.low_price" + Environment.NewLine +
+                            ",m.high_price" + Environment.NewLine +
+                            ",m.ltp_price" + Environment.NewLine +
                             ",m.close_price" + Environment.NewLine +
                             ",m.rsi" + Environment.NewLine +
                             ",m.prev_rsi" + Environment.NewLine +
@@ -985,7 +989,7 @@ namespace Ecam.Framework.Repository
 
             sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, orderBy, pageLimit);
 
-            Helper.Log(sql);
+            //Helper.Log(sql);
             List<TRA_MARKET_RSI> rows = new List<TRA_MARKET_RSI>();
             using (EcamContext context = new EcamContext())
             {
