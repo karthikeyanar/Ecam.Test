@@ -1098,7 +1098,12 @@ namespace Ecam.Models
         {
             using (EcamContext context = new EcamContext())
             {
-                tra_market market = (from q in context.tra_market where q.symbol == symbol && q.trade_date == date orderby q.trade_date select q).FirstOrDefault();
+                IQueryable<tra_market> markets = context.tra_market.Where(q => q.symbol == symbol);
+                if (date.Year > 1900)
+                {
+                    markets = markets.Where(q => q.trade_date == date);
+                }
+                tra_market market = (from q in markets orderby q.trade_date descending select q).FirstOrDefault();
                 if (market != null)
                 {
                     DateTime monthStartDate = DataTypeHelper.GetFirstDayOfMonth(market.trade_date);
