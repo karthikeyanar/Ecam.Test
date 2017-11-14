@@ -317,8 +317,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
 
             var arrlastsixmonths = helper.getLastSixMonths();
-            var start = moment(_TODAYDATE).subtract('days', 30);// moment(arrlastsixmonths[0]);
-            var end = moment(_TODAYDATE);//moment(arrlastsixmonths[1]);
+            var start = moment(_TODAYDATE).startOf('month');//moment(_TODAYDATE).subtract('days', 30);// moment(arrlastsixmonths[0]);
+            var end = moment(_TODAYDATE).endOf('month'); //moment(_TODAYDATE);//moment(arrlastsixmonths[1]);
             self.start_date(start.format('MM/DD/YYYY'));
             self.end_date(end.format('MM/DD/YYYY'));
 
@@ -340,7 +340,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             });
             helper.changeDateRangeLabel($('span', $reportRange), start, end, self.start_date(), self.end_date());
 
-            var start = moment(_TODAYDATE).subtract('days', 365);
+            var start = moment(_TODAYDATE).subtract('days', 182);
             var end = moment(_TODAYDATE);
             self.total_start_date(start.format('MM/DD/YYYY'));
             self.total_end_date(end.format('MM/DD/YYYY'));
@@ -739,7 +739,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 var $tbody = $("tbody", $tbl);
                 var childTRId = "tr_child_" + $tr.attr('index');
                 var $childTR = $("#" + childTRId, $tbody);
-                console.log('childTRId=', childTRId, '$childTR=', $childTR[0]);
+                //console.log('childTRId=', childTRId, '$childTR=', $childTR[0]);
                 var $treeExpand = $(".tree-expand", this);
                 if ($treeExpand.hasClass("ex-plus")) {
                     $treeExpand.removeClass("ex-minus").removeClass("ex-plus");

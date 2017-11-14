@@ -100,7 +100,7 @@
                     <input type="text" name="to_profit" class="form-control input-sm" placeholder="To Profit" style="width:100px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="max_negative_count" class="form-control input-sm" value="" placeholder="Max Negative Count" style="width:150px" />
+                    <input type="text" name="max_negative_count" class="form-control input-sm" value="1" placeholder="Max Negative Count" style="width:150px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <button id="reportrange" type="button" class="btn btn-sm btn-default">
@@ -194,7 +194,8 @@
                                 <select id="rows" name="rows" class="pull-left form-control input-sm input-60">
                                     <option value="10">10</option>
                                     <option value="20">20</option>
-                                    <option value="50" selected>50</option>
+                                    <option value="50">50</option>
+                                    <option value="100" selected>100</option>
                                     <option value="200">200</option>
                                     <option value="210">210</option>
                                     <option value="500">500</option>
@@ -210,7 +211,7 @@
                             </div>
                         </div>
                         <input type="hidden" name="page_index" value="1" />
-                        <input type="hidden" name="sort_name" value="prev_percentage" />
+                        <input type="hidden" name="sort_name" value="total_profit" />
                         <input type="hidden" name="sort_order" value="desc" />
                     </div>
                     <table id="CompanyTable" class="table table-striped table-bordered table-hover table-condensed table-gray">
