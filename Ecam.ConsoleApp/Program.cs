@@ -33,6 +33,54 @@ namespace Ecam.ConsoleApp
             DownloadStart();
         }
 
+        private static void UpdatePrevPrice()
+        {
+
+            GoogleHistoryDownloadData history = new GoogleHistoryDownloadData();
+            List<tra_company> companies;
+            using (EcamContext context = new EcamContext())
+            {
+                companies = (from q in context.tra_company
+                             orderby q.symbol ascending
+                             select q).ToList();
+            }
+            foreach (var company in companies)
+            {
+                List<TempClass> tempList;
+                DateTime today = DateTime.Now.Date;
+                DateTime monthStartDate = DataTypeHelper.GetFirstDayOfMonth(today);
+                DateTime monthEndDate = DataTypeHelper.GetLastDayOfMonth(today);
+                using (EcamContext context = new EcamContext())
+                {
+                    tempList = (from q in context.tra_market
+                                where q.symbol == company.symbol
+                                && q.trade_date >= monthStartDate
+                                && q.trade_date <= monthEndDate
+                                orderby q.symbol ascending
+                                select new TempClass
+                                {
+                                    symbol = company.symbol,
+                                    trade_date = q.trade_date,
+                                    close_price = q.close_price,
+                                    high_price = q.high_price,
+                                    low_price = q.low_price,
+                                    open_price = q.open_price,
+                                    ltp_price = q.ltp_price,
+                                    //prev_price = DataTypeHelper.ToDecimal(prev),
+                                }).ToList();
+                }
+                tempList = (from q in tempList orderby q.trade_date ascending select q).ToList();
+                int rowIndex = 0;
+                foreach (var temprow in tempList)
+                {
+                    rowIndex += 1;
+                    TradeHelper.ImportPrice(temprow);
+                    Console.WriteLine("Symbol=" + temprow.symbol + ",Date=" + temprow.trade_date.ToString("dd/MM/yyyy") + " Completed");
+                }
+                //GoogleHistoryDownloadData.CalculateRSI(company.symbol);
+            }
+        }
+
         private static void DownloadStart()
         {
             //Helper.Log("DownloadStart=" + DateTime.Now.ToString(), "DOWNLOAD");
@@ -233,7 +281,7 @@ RegexOptions.IgnoreCase
                     rows.Add(row);
                 }
             }
-            
+
         }
 
         private static decimal GetDecimalValue(string html)

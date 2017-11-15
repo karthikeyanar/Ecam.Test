@@ -505,6 +505,7 @@ namespace Ecam.Models
                     }
                 }
             }
+            tempList = (from q in tempList orderby q.trade_date ascending select q).ToList();
             int rowIndex = 0;
             foreach (var temprow in tempList)
             {
