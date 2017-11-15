@@ -448,6 +448,123 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             });
         }
 
+
+        this.start_index = -1;
+        this.openLog = function () {
+            $('#temp-modal-container').remove();
+            var $cnt = $("<div id='temp-modal-container'></div>");
+            $('body').append($cnt);
+            var data = {
+                "name": "Log"
+                , "title": "Log"
+                , "is_modal_full": false
+                , "position": "top"
+            };
+            $("#modal-log-template").tmpl(data).appendTo($cnt);
+            var $modal = $("#modal-log-" + data.name, $cnt);
+            $modal.modal('show');
+            self.createLogs($modal);
+        }
+
+        this.createLogs = function ($modal) {
+            self.start_index = cInt(self.start_index) + 1;
+            var startDate = moment(_TODAYDATE).subtract('month', self.start_index).startOf('month').format('MM/DD/YYYY');
+            var endDate = moment(_TODAYDATE).subtract('month', self.start_index).endOf('month').format('MM/DD/YYYY');
+            var totalStartDate = moment(_TODAYDATE).subtract('month', self.start_index + 1).endOf('month').subtract('month', 6).add('days', 1).format('MM/DD/YYYY');
+            var totalEndDate = moment(_TODAYDATE).subtract('month', self.start_index + 1).endOf('month').format('MM/DD/YYYY');
+            var arr = [];
+            arr.push({ 'name': 'PageIndex', 'value': 1 });
+            arr.push({ 'name': 'PageSize', 'value': 10 });
+            arr.push({ 'name': 'SortName', 'value': 'total_profit' });
+            arr.push({ 'name': 'SortOrder', 'value': 'desc' });
+            arr.push({ 'name': 'start_date', 'value': startDate });
+            arr.push({ 'name': 'end_date', 'value': endDate });
+            arr.push({ 'name': 'total_start_date', 'value': totalStartDate });
+            arr.push({ 'name': 'total_end_date', 'value': totalEndDate });
+            arr.push({ 'name': 'total_from_profit', 'value': 10 });
+            //arr.push({ 'name': 'max_negative_count', 'value': 1 });
+            arr.push({ 'name': 'categories', 'value': 'CEMENT & CEMENT PRODUCTS,ENERGY,CHEMICALS,CONSTRUCTION,CONSUMER GOODS,METALS,NIFTY FMGC,RETAIL,TEXTILES' });
+
+            handleBlockUI({ "message": 'Loading...' }); // + 'startDate='+  formatDate(startDate) +  'endDate=', formatDate(endDate)+  'totalStartDate='+  formatDate(totalStartDate)+  'totalEndDate='+  formatDate(totalEndDate) + ' ...' });
+            console.log('startIndex=', self.start_index, 'startDate=', formatDate(startDate), 'endDate=', formatDate(endDate), 'totalStartDate=', formatDate(totalStartDate), 'totalEndDate=', formatDate(totalEndDate));
+
+            var url = apiUrl("/Company/List");
+            $.ajax({
+                "url": url,
+                "cache": false,
+                "type": "GET",
+                "data": arr
+            }).done(function (json) {
+
+                var totalInvestment = 0;
+                var totalCurrentValue = 0;
+
+                var highCurrentValue = 0;
+                var lowCurrentValue = 0;
+
+                var totalRows = 0;
+                if (json.rows != null) {
+                    $.each(json.rows, function (i, row) {
+                        totalRows += 1;
+                        totalInvestment += cFloat(row.first_price);
+                        totalCurrentValue += cFloat(row.last_price);
+
+                        highCurrentValue += cFloat(row.profit_high_price);
+                        lowCurrentValue += cFloat(row.profit_low_price);
+                    });
+                }
+                console.log('totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue);
+                var totalProfitAVG = 0;
+
+                var data = {
+                    'total_from_date': formatDate(totalStartDate),
+                    'total_to_date': formatDate(totalEndDate),
+                    'from_date': formatDate(startDate),
+                    'to_date': formatDate(endDate),
+                    'low_avg_profit': 0,
+                    'high_avg_profit': 0,
+                    'avg_profit': 0
+                };
+
+                totalProfitAVG = cFloat(cFloat(totalCurrentValue - totalInvestment) / totalInvestment) * 100;
+                //self.avg_profit(totalProfitAVG);
+                data.avg_profit = totalProfitAVG;
+
+                totalProfitAVG = cFloat(cFloat(highCurrentValue - totalInvestment) / totalInvestment) * 100;
+                //self.high_avg_profit(totalProfitAVG);
+                data.high_avg_profit = totalProfitAVG;
+
+                totalProfitAVG = cFloat(cFloat(lowCurrentValue - totalInvestment) / totalInvestment) * 100;
+                //self.low_avg_profit(totalProfitAVG);
+                data.low_avg_profit = totalProfitAVG;
+
+                var $tbl = $(".table", $modal);
+                var $tbody = $("tbody", $tbl);
+                $("#detail-log-template").tmpl(data).appendTo($tbody);
+                unblockUI();
+
+                var total = 0;
+                var $spnTotalPercentage = $("#spnTotalPercentage", $tbody);
+                $("tr", $tbody).each(function () {
+                    var $tr = $(this);
+                    var $avg_profit = $(":input[name='avg_profit']", $tr);
+                    total += cFloat($avg_profit.val());
+                });
+
+                var length = $("tr", $tbody).length;
+
+                $("#spnTotalPercentage", $tbl).html(formatPercentage(total));
+                $("#spnAvgTotalPercentage", $tbl).html(formatPercentage((total / length)));
+
+                if (self.start_index <= 21) {
+                    self.createLogs($modal);
+                }
+
+            }).always(function () {
+
+            });
+        }
+
         this.loadTradeDetailChart = function ($childTD) {
             $childTD.addClass("loading");
             $childTD.empty();

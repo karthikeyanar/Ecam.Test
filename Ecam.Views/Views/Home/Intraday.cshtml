@@ -68,25 +68,25 @@
             <div class="clearfix"></div>
             <div class="m-l-15">
                 @*<div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="from_prev_rsi" class="form-control input-sm" placeholder="From Prev RSI" style="width:100px" />
-                </div>
-                <div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="to_prev_rsi" class="form-control input-sm" placeholder="To Prev RSI" style="width:100px" />
-                </div>*@
+                        <input type="text" name="from_prev_rsi" class="form-control input-sm" placeholder="From Prev RSI" style="width:100px" />
+                    </div>
+                    <div class="form-group m-r-10 m-t-10">
+                        <input type="text" name="to_prev_rsi" class="form-control input-sm" placeholder="To Prev RSI" style="width:100px" />
+                    </div>*@
                 @*<div class="form-group m-r-10 m-t-10">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="is_sell_to_buy" /> Sell To Buy
-                        </label>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="is_sell_to_buy" /> Sell To Buy
+                            </label>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group m-r-10 m-t-10">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="is_buy_to_sell" /> Buy To Sell
-                        </label>
-                    </div>
-                </div>*@
+                    <div class="form-group m-r-10 m-t-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="is_buy_to_sell" /> Buy To Sell
+                            </label>
+                        </div>
+                    </div>*@
                 <div class="form-group m-r-10 m-t-10">
                     <input type="text" name="from_rsi" class="form-control input-sm" placeholder="From RSI" style="width:100px" />
                 </div>
@@ -100,7 +100,7 @@
                     <input type="text" name="to_profit" class="form-control input-sm" placeholder="To Profit" style="width:100px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="max_negative_count" class="form-control input-sm" value="1" placeholder="Max Negative Count" style="width:150px" />
+                    <input type="text" name="max_negative_count" class="form-control input-sm" value="" placeholder="Max Negative Count" style="width:150px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <button id="reportrange" type="button" class="btn btn-sm btn-default">
@@ -148,6 +148,9 @@
                     </div>*@
                 <div class="form-group m-r-10 m-t-10">
                     <button type="button" id="btn" class="btn btn-success btn-sm" data-bind="click:refresh">Refresh</button>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <button type="button" id="btn" class="btn btn-primary btn-sm" data-bind="click:openLog">Log</button>
                 </div>
             </div>
             <input type="hidden" name="start_date" data-bind="value:start_date" />
@@ -653,6 +656,49 @@
         </div>
     </div>
 </script>
+<script type="text/html" id="modal-log-template">
+    <div id="modal-log-${name}" class="modal {{if is_modal_full==true}}container{{/if}} {{if position=='top'}}modal-top{{/if}}" tabindex="-1" data-focus-on="input:first" data-width="1024" style="display: none;">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">${title}</h4>
+        </div>
+        <div class="modal-body">
+            <div class="edit-cnt p-10">
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-striped table-bordered table-hover table-condensed table-gray">
+                            <thead>
+                                <tr>
+                                    <th>Total Start Date</th>
+                                    <th>Total End Date</th>
+                                    <th>From Date</th>
+                                    <th>To Date</th>
+                                    <th class="text-right">Low AVG.Profit</th>
+                                    <th class="text-right">High AVG.Profit</th>
+                                    <th class="text-right">AVG.Profit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td>Avg.Total</td>
+                                    <td colspan="3" class="text-right">
+                                        <span id="spnAvgTotalPercentage"></span>
+                                    </td>
+                                    <td>Total</td>
+                                    <td colspan="2" class="text-right">
+                                        <span id="spnTotalPercentage"></span>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
 <script type="text/html" id="detail-template">
     <div class="box-cnt">
         <div class="rsi-box pull-left m-r-15" style="width:45%;">
@@ -664,6 +710,17 @@
 </script>
 <script type="text/html" id="detail-rsi-chart-template">
     <div id="curve_chart" style="width: 100%; height: 500px"></div>
+</script>
+<script type="text/html" id="detail-log-template">
+    <tr>
+        <td>${formatDate(total_from_date)}</td>
+        <td>${formatDate(total_to_date)}</td>
+        <td>${formatDate(from_date)}</td>
+        <td>${formatDate(to_date)}</td>
+        <td class="text-right">${formatPercentage(low_avg_profit)}</td>
+        <td class="text-right">${formatPercentage(high_avg_profit)}</td>
+        <td class="text-right">${formatPercentage(avg_profit)}<input type="hidden" name="avg_profit" value="${avg_profit}" /> </td>
+    </tr>
 </script>
 <script type="text/html" id="detail-rsi-template">
     <table cellpadding="0" cellspacing="0" class="table table-condensed no-margin-bottom">
@@ -685,8 +742,8 @@
                     High
                 </th>
                 @*<th class="text-right">
-                    LTP
-                </th>*@
+                        LTP
+                    </th>*@
                 <th class="text-right">
                     Close
                 </th>
