@@ -70,6 +70,8 @@ namespace Ecam.Contracts
         public Nullable<DateTime> trade_date { get; set; }
         public Nullable<DateTime> yesterday_date { get; set; }
         public Nullable<decimal> yesterday_percentage { get; set; }
+        public Nullable<decimal> total_rsi { get; set; }
+        public Nullable<decimal> profit_rsi { get; set; }
     }
 
     public class TRA_COMPANY_SEARCH : TRA_COMPANY
@@ -106,6 +108,7 @@ namespace Ecam.Contracts
 
         public decimal? total_from_profit { get; set; }
         public decimal? total_to_profit { get; set; }
+        public string ignore_symbols { get; set; }
     }
 
     public class TRA_CATEGORY_GROUP

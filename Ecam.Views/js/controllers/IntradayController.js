@@ -292,6 +292,14 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                }
             });
 
+            var arr = [];
+            var categories = 'CEMENT & CEMENT PRODUCTS,ENERGY,CHEMICALS,CONSTRUCTION,CONSUMER GOODS,METALS,NIFTY FMGC,RETAIL,TEXTILES';
+            var caregoryList = categories.split(',');
+            $.each(caregoryList, function (i, cat) {
+                arr.push({ "id": cat, "text": cat });
+            });
+            $categories.select2Refresh("data", arr);
+
             select2Setup($mf_ids[0], {
                 multiple: true
                , width: 300
@@ -340,8 +348,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             });
             helper.changeDateRangeLabel($('span', $reportRange), start, end, self.start_date(), self.end_date());
 
-            var start = moment(_TODAYDATE).subtract('days', 182);
-            var end = moment(_TODAYDATE);
+            var start = moment(_TODAYDATE).subtract('month', 1).endOf('month').subtract('month', 6).add('days', 7).startOf('month');
+            var end = moment(_TODAYDATE).subtract('month', 1).endOf('month');
             self.total_start_date(start.format('MM/DD/YYYY'));
             self.total_end_date(end.format('MM/DD/YYYY'));
 
@@ -459,10 +467,12 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 , "title": "Log"
                 , "is_modal_full": false
                 , "position": "top"
+                , "width": $(window).width() - 100
             };
             $("#modal-log-template").tmpl(data).appendTo($cnt);
             var $modal = $("#modal-log-" + data.name, $cnt);
             $modal.modal('show');
+            self.start_index = -1;
             self.createLogs($modal);
         }
 
@@ -470,7 +480,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             self.start_index = cInt(self.start_index) + 1;
             var startDate = moment(_TODAYDATE).subtract('month', self.start_index).startOf('month').format('MM/DD/YYYY');
             var endDate = moment(_TODAYDATE).subtract('month', self.start_index).endOf('month').format('MM/DD/YYYY');
-            var totalStartDate = moment(_TODAYDATE).subtract('month', self.start_index + 1).endOf('month').subtract('month', 6).add('days', 1).format('MM/DD/YYYY');
+            var totalStartDate = moment(_TODAYDATE).subtract('month', self.start_index + 1).endOf('month').subtract('month', 6).add('days', 7).startOf('month').format('MM/DD/YYYY');
             var totalEndDate = moment(_TODAYDATE).subtract('month', self.start_index + 1).endOf('month').format('MM/DD/YYYY');
             var arr = [];
             arr.push({ 'name': 'PageIndex', 'value': 1 });
@@ -481,7 +491,9 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             arr.push({ 'name': 'end_date', 'value': endDate });
             arr.push({ 'name': 'total_start_date', 'value': totalStartDate });
             arr.push({ 'name': 'total_end_date', 'value': totalEndDate });
-            arr.push({ 'name': 'total_from_profit', 'value': 10 });
+            arr.push({ 'name': 'ignore_symbols', 'value': $(":input[name='ignore_symbols']").val() });
+            //arr.push({ 'name': 'total_from_profit', 'value': 1 });
+            //arr.push({ 'name': 'is_nifty_50', 'value': true });
             //arr.push({ 'name': 'max_negative_count', 'value': 1 });
             arr.push({ 'name': 'categories', 'value': 'CEMENT & CEMENT PRODUCTS,ENERGY,CHEMICALS,CONSTRUCTION,CONSUMER GOODS,METALS,NIFTY FMGC,RETAIL,TEXTILES' });
 
@@ -503,6 +515,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 var lowCurrentValue = 0;
 
                 var totalRows = 0;
+                var symbols = '';
                 if (json.rows != null) {
                     $.each(json.rows, function (i, row) {
                         totalRows += 1;
@@ -511,6 +524,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
                         highCurrentValue += cFloat(row.profit_high_price);
                         lowCurrentValue += cFloat(row.profit_low_price);
+                        symbols += row.symbol + ',';
                     });
                 }
                 console.log('totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue);
@@ -523,8 +537,12 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     'to_date': formatDate(endDate),
                     'low_avg_profit': 0,
                     'high_avg_profit': 0,
-                    'avg_profit': 0
+                    'avg_profit': 0,
+                    'total_equity': 0,
+                    'symbols': symbols
                 };
+
+                data.total_equity = json.rows.length;
 
                 totalProfitAVG = cFloat(cFloat(totalCurrentValue - totalInvestment) / totalInvestment) * 100;
                 //self.avg_profit(totalProfitAVG);
@@ -538,26 +556,61 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 //self.low_avg_profit(totalProfitAVG);
                 data.low_avg_profit = totalProfitAVG;
 
-                var $tbl = $(".table", $modal);
+                var $tbl = $("#tblLog", $modal);
                 var $tbody = $("tbody", $tbl);
-                $("#detail-log-template").tmpl(data).appendTo($tbody);
                 unblockUI();
+                if (self.start_index <= 31
+                    && formatDate(startDate).indexOf('2016') < 0
+                    ) {
+                    $("#detail-log-template").tmpl(data).appendTo($tbody);
 
-                var total = 0;
-                var $spnTotalPercentage = $("#spnTotalPercentage", $tbody);
-                $("tr", $tbody).each(function () {
-                    var $tr = $(this);
-                    var $avg_profit = $(":input[name='avg_profit']", $tr);
-                    total += cFloat($avg_profit.val());
-                });
+                    var total = 0;
+                    var $spnTotalPercentage = $("#spnTotalPercentage", $tbody);
+                    $("tr", $tbody).each(function () {
+                        var $tr = $(this);
+                        var $avg_profit = $(":input[name='avg_profit']", $tr);
+                        total += cFloat($avg_profit.val());
+                    });
 
-                var length = $("tr", $tbody).length;
+                    var length = $("tr", $tbody).length;
 
-                $("#spnTotalPercentage", $tbl).html(formatPercentage(total));
-                $("#spnAvgTotalPercentage", $tbl).html(formatPercentage((total / length)));
+                    $("#spnTotalPercentage", $tbl).html(formatPercentage(total));
+                    $("#spnAvgTotalPercentage", $tbl).html(formatPercentage((total / length)));
 
-                if (self.start_index <= 21) {
+                    console.log('formatDate(startDate)=', formatDate(startDate), 'indexOf=', formatDate(startDate).indexOf('2016'));
+
                     self.createLogs($modal);
+
+                } else {
+                    var $tblLogCount = $("#tblLogCount", $modal);
+                    var data = [];
+                    $("tr", $tbody).each(function () {
+                        var $tr = $(this);
+                        var symbols = cString($(":input[name='symbols']", $tr).val());
+                        if (symbols != '') {
+                            var arr = symbols.split(',');
+                            $.each(arr, function (i, sym) {
+                                if (cString(sym) != '') {
+                                    var temp = null;
+                                    $.each(data, function (j, d) {
+                                        if (d.symbol == sym) {
+                                            temp = d;
+                                        }
+                                    });
+                                    if (temp == null) {
+                                        temp = { "symbol": sym, "count": 0 };
+                                        data.push(temp);
+                                    }
+                                    temp.count += 1;
+                                }
+                            });
+                        }
+                    });
+                    data = data.sort(getDescOrder("count"));
+                    //console.log('data=', data);
+                    $.each(data, function (i, row) {
+                        $("tbody", $tblLogCount).append("<tr><td>" + row.symbol + "</td><td class='text-right'>" + row.count + "</td></tr>");
+                    });
                 }
 
             }).always(function () {

@@ -377,7 +377,12 @@ namespace Ecam.Framework.Repository
                 where.AppendFormat(" and ifnull(ct.is_nifty_200,0)={0}", ((criteria.is_nifty_200 ?? false) == true ? "1" : "0"));
             }
 
-            if((criteria.is_current_stock ?? false) == true)
+            if (string.IsNullOrEmpty(criteria.ignore_symbols) == false)
+            {
+                where.AppendFormat(" and ifnull(ct.symbol,0) not in({0})", Helper.ConvertStringSQLFormat(criteria.ignore_symbols));
+            }
+
+            if ((criteria.is_current_stock ?? false) == true)
             {
                 joinTables += " join tra_holding h on h.symbol = ct.symbol ";
             }
@@ -452,6 +457,8 @@ namespace Ecam.Framework.Repository
                             ",(select low_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " and m.low_price > 0 order by m.low_price asc limit 0,1) as total_low_price" + Environment.NewLine +
                             ",(select high_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " and m.high_price > 0 order by m.high_price desc limit 0,1) as profit_high_price" + Environment.NewLine +
                             ",(select low_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " and m.low_price > 0 order by m.low_price asc limit 0,1) as profit_low_price" + Environment.NewLine +
+                            ",(select ifnull(rsi,0) from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date desc limit 0,1) as profit_rsi" + Environment.NewLine +
+                            ",(select ifnull(rsi,0) from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " order by m.trade_date desc limit 0,1) as total_rsi" + Environment.NewLine +
                             ",(select open_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " order by m.trade_date asc limit 0,1) as total_first_price" + Environment.NewLine +
                             ",(select ltp_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " order by m.trade_date desc limit 0,1) as total_last_price" + Environment.NewLine +
                             ",(select open_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date asc limit 0,1) as first_price" + Environment.NewLine +
@@ -816,7 +823,7 @@ namespace Ecam.Framework.Repository
                            ",m.*" + Environment.NewLine +
                            ",(select m2.trade_date from tra_market m2 where m2.symbol = m.symbol and m2.trade_date < m.trade_date " +
                            " order by m2.trade_date desc limit 0,1) as yesterday_date " +
-                           ",(select(((m2.close_price - m2.open_price) / m2.open_price) * 100) from tra_market m2 where m2.symbol = m.symbol and m2.trade_date < m.trade_date " + 
+                           ",(select(((m2.close_price - m2.open_price) / m2.open_price) * 100) from tra_market m2 where m2.symbol = m.symbol and m2.trade_date < m.trade_date " +
                            " order by m2.trade_date desc limit 0,1) as yesterday_percentage " +
                            ",(((m.close_price-m.open_price)/m.open_price) * 100) as prev_percentage" +
                            "";
