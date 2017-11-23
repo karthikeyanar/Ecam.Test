@@ -482,86 +482,90 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             var endDate = moment(_TODAYDATE).subtract('month', self.start_index).endOf('month').format('MM/DD/YYYY');
             var totalStartDate = moment(_TODAYDATE).subtract('month', self.start_index + 1).endOf('month').subtract('month', 6).add('days', 7).startOf('month').format('MM/DD/YYYY');
             var totalEndDate = moment(_TODAYDATE).subtract('month', self.start_index + 1).endOf('month').format('MM/DD/YYYY');
-            var arr = [];
-            arr.push({ 'name': 'PageIndex', 'value': 1 });
-            arr.push({ 'name': 'PageSize', 'value': 10 });
-            arr.push({ 'name': 'SortName', 'value': 'total_profit' });
-            arr.push({ 'name': 'SortOrder', 'value': 'desc' });
-            arr.push({ 'name': 'start_date', 'value': startDate });
-            arr.push({ 'name': 'end_date', 'value': endDate });
-            arr.push({ 'name': 'total_start_date', 'value': totalStartDate });
-            arr.push({ 'name': 'total_end_date', 'value': totalEndDate });
-            arr.push({ 'name': 'ignore_symbols', 'value': $(":input[name='ignore_symbols']").val() });
-            //arr.push({ 'name': 'total_from_profit', 'value': 1 });
-            //arr.push({ 'name': 'is_nifty_50', 'value': true });
-            //arr.push({ 'name': 'max_negative_count', 'value': 1 });
-            arr.push({ 'name': 'categories', 'value': 'CEMENT & CEMENT PRODUCTS,ENERGY,CHEMICALS,CONSTRUCTION,CONSUMER GOODS,METALS,NIFTY FMGC,RETAIL,TEXTILES' });
 
-            handleBlockUI({ "message": 'Loading...' }); // + 'startDate='+  formatDate(startDate) +  'endDate=', formatDate(endDate)+  'totalStartDate='+  formatDate(totalStartDate)+  'totalEndDate='+  formatDate(totalEndDate) + ' ...' });
-            console.log('startIndex=', self.start_index, 'startDate=', formatDate(startDate), 'endDate=', formatDate(endDate), 'totalStartDate=', formatDate(totalStartDate), 'totalEndDate=', formatDate(totalEndDate));
+            if (self.start_index <= 50 && formatDate(startDate).indexOf('2017') >= 0) {
 
-            var url = apiUrl("/Company/List");
-            $.ajax({
-                "url": url,
-                "cache": false,
-                "type": "GET",
-                "data": arr
-            }).done(function (json) {
+                var arr = [];
+                arr.push({ 'name': 'PageIndex', 'value': 1 });
+                arr.push({ 'name': 'PageSize', 'value': 10 });
+                arr.push({ 'name': 'SortName', 'value': 'total_profit' });
+                arr.push({ 'name': 'SortOrder', 'value': 'desc' });
+                arr.push({ 'name': 'start_date', 'value': startDate });
+                arr.push({ 'name': 'end_date', 'value': endDate });
+                arr.push({ 'name': 'total_start_date', 'value': totalStartDate });
+                arr.push({ 'name': 'total_end_date', 'value': totalEndDate });
+                arr.push({ 'name': 'ignore_symbols', 'value': $(":input[name='ignore_symbols']").val() });
+                //arr.push({ 'name': 'total_from_profit', 'value': 1 });
+                //arr.push({ 'name': 'is_nifty_200', 'value': true });
+                //arr.push({ 'name': 'max_negative_count', 'value': 1 });
+                arr.push({ 'name': 'categories', 'value': 'CEMENT & CEMENT PRODUCTS,ENERGY,CHEMICALS,CONSTRUCTION,CONSUMER GOODS,METALS,NIFTY FMGC' });
 
-                var totalInvestment = 0;
-                var totalCurrentValue = 0;
+                handleBlockUI({ "message": 'Loading... - ' + formatDate(startDate) }); // + 'startDate='+  formatDate(startDate) +  'endDate=', formatDate(endDate)+  'totalStartDate='+  formatDate(totalStartDate)+  'totalEndDate='+  formatDate(totalEndDate) + ' ...' });
+                console.log('startIndex=', self.start_index, 'startDate=', formatDate(startDate), 'endDate=', formatDate(endDate), 'totalStartDate=', formatDate(totalStartDate), 'totalEndDate=', formatDate(totalEndDate));
 
-                var highCurrentValue = 0;
-                var lowCurrentValue = 0;
+                var url = apiUrl("/Company/List");
+                $.ajax({
+                    "url": url,
+                    "cache": false,
+                    "type": "GET",
+                    "data": arr
+                }).done(function (json) {
 
-                var totalRows = 0;
-                var symbols = '';
-                if (json.rows != null) {
-                    $.each(json.rows, function (i, row) {
-                        totalRows += 1;
-                        totalInvestment += cFloat(row.first_price);
-                        totalCurrentValue += cFloat(row.last_price);
+                    var totalInvestment = 0;
+                    var totalCurrentValue = 0;
 
-                        highCurrentValue += cFloat(row.profit_high_price);
-                        lowCurrentValue += cFloat(row.profit_low_price);
-                        symbols += row.symbol + ',';
-                    });
-                }
-                console.log('totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue);
-                var totalProfitAVG = 0;
+                    var highCurrentValue = 0;
+                    var lowCurrentValue = 0;
 
-                var data = {
-                    'total_from_date': formatDate(totalStartDate),
-                    'total_to_date': formatDate(totalEndDate),
-                    'from_date': formatDate(startDate),
-                    'to_date': formatDate(endDate),
-                    'low_avg_profit': 0,
-                    'high_avg_profit': 0,
-                    'avg_profit': 0,
-                    'total_equity': 0,
-                    'symbols': symbols
-                };
+                    var totalRows = 0;
+                    var symbols = '';
+                    if (json.rows != null) {
+                        $.each(json.rows, function (i, row) {
+                            totalRows += 1;
+                            totalInvestment += cFloat(row.first_price);
+                            totalCurrentValue += cFloat(row.last_price);
 
-                data.total_equity = json.rows.length;
+                            highCurrentValue += cFloat(row.profit_high_price);
+                            lowCurrentValue += cFloat(row.profit_low_price);
+                            symbols += row.symbol + ',';
+                        });
+                    }
+                    console.log('totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue);
+                    var totalProfitAVG = 0;
 
-                totalProfitAVG = cFloat(cFloat(totalCurrentValue - totalInvestment) / totalInvestment) * 100;
-                //self.avg_profit(totalProfitAVG);
-                data.avg_profit = totalProfitAVG;
+                    var data = {
+                        'total_from_date': formatDate(totalStartDate),
+                        'total_to_date': formatDate(totalEndDate),
+                        'from_date': formatDate(startDate),
+                        'to_date': formatDate(endDate),
+                        'low_avg_profit': 0,
+                        'high_avg_profit': 0,
+                        'avg_profit': 0,
+                        'total_equity': 0,
+                        'symbols': symbols
+                    };
 
-                totalProfitAVG = cFloat(cFloat(highCurrentValue - totalInvestment) / totalInvestment) * 100;
-                //self.high_avg_profit(totalProfitAVG);
-                data.high_avg_profit = totalProfitAVG;
+                    data.total_equity = json.rows.length;
 
-                totalProfitAVG = cFloat(cFloat(lowCurrentValue - totalInvestment) / totalInvestment) * 100;
-                //self.low_avg_profit(totalProfitAVG);
-                data.low_avg_profit = totalProfitAVG;
+                    totalProfitAVG = cFloat(cFloat(totalCurrentValue - totalInvestment) / totalInvestment) * 100;
+                    //self.avg_profit(totalProfitAVG);
+                    data.avg_profit = totalProfitAVG;
 
-                var $tbl = $("#tblLog", $modal);
-                var $tbody = $("tbody", $tbl);
-                unblockUI();
-                if (self.start_index <= 31
-                    && formatDate(startDate).indexOf('2016') < 0
-                    ) {
+                    totalProfitAVG = cFloat(cFloat(highCurrentValue - totalInvestment) / totalInvestment) * 100;
+                    //self.high_avg_profit(totalProfitAVG);
+                    data.high_avg_profit = totalProfitAVG;
+
+                    totalProfitAVG = cFloat(cFloat(lowCurrentValue - totalInvestment) / totalInvestment) * 100;
+                    //self.low_avg_profit(totalProfitAVG);
+                    data.low_avg_profit = totalProfitAVG;
+
+                    var $tbl = $("#tblLog", $modal);
+                    var $tbody = $("tbody", $tbl);
+                    unblockUI();
+                    //if (self.start_index <= 50
+                    //&& formatDate(startDate).indexOf('2016') < 0
+                    //   ) {
+
                     $("#detail-log-template").tmpl(data).appendTo($tbody);
 
                     var total = 0;
@@ -578,11 +582,14 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     $("#spnAvgTotalPercentage", $tbl).html(formatPercentage((total / length)));
 
                     console.log('formatDate(startDate)=', formatDate(startDate), 'indexOf=', formatDate(startDate).indexOf('2016'));
-
                     self.createLogs($modal);
 
-                } else {
+                    // } else {
+
+                    // }
+
                     var $tblLogCount = $("#tblLogCount", $modal);
+                    $("tbody", $tblLogCount).empty();
                     var data = [];
                     $("tr", $tbody).each(function () {
                         var $tr = $(this);
@@ -611,11 +618,13 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     $.each(data, function (i, row) {
                         $("tbody", $tblLogCount).append("<tr><td>" + row.symbol + "</td><td class='text-right'>" + row.count + "</td></tr>");
                     });
-                }
 
-            }).always(function () {
+                }).always(function () {
 
-            });
+                });
+            } else {
+                self.createLogs($modal);
+            }
         }
 
         this.loadTradeDetailChart = function ($childTD) {
