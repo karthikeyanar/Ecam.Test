@@ -1,0 +1,133 @@
+﻿@{ Layout = null; }
+<div class="page-header">
+    <div class="col-md-12 no-padding m-b-10 border-white header p-b-10">
+        <form id="frmSplitSearch" class="form-inline form-validate" role="form" onsubmit="return false">
+            <div class="form-group" style="margin-left:10px; margin-right:10px;float:left;">
+                <h1 class="page-title" style="margin-top:-4px;">Splits</h1>
+            </div>
+            <div class="form-group m-r-10 m-t-10 pull-right">
+                <button type="button" id="btn" class="btn btn-success btn-sm" data-bind="click:refresh">Refresh</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="row" id="Split">
+    <div class="col-md-12">
+        <div class="row m-b-5">
+            <div class="col-md-12">
+                <div class="pull-left">
+                    <button id="add" class="btn btn-sm btn-primary btn-add">Add</button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="pull-left m-r-15">
+                    <span class="pull-left p-t-5 p-r-10">Rows</span>
+                    <select id="rows" name="rows" class="pull-left form-control input-sm input-60">
+                        <option value="10">10</option>
+                        <option value="50">50</option>
+                        <option value="200" selected>200</option>
+                        <option value="500">500</option>
+                    </select>
+                </div>
+                <div class="pull-left">
+                    <span id="paging_status" class="pull-left m-t-5"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="pull-right">
+                    <ul class="manual-pagination no-margin"></ul>
+                </div>
+            </div>
+            <input type="hidden" name="page_index" value="1" />
+            <input type="hidden" name="sort_name" value="split_date" />
+            <input type="hidden" name="sort_order" value="desc" />
+        </div>
+        <table id="SplitTable" class="table table-striped table-bordered table-hover table-condensed table-gray">
+            <thead>
+                <tr>
+                    <th sortname="company_name">
+                        Company
+                    </th>
+                    <th sortname="symbol">
+                        Symbol
+                    </th>
+                    <th sortname="split_date">
+                        Date
+                    </th>
+                    <th sortname="split_factor">
+                        Factor
+                    </th>
+                    <th style="width: 50px">
+                    </th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach:rows">
+                <tr>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:company_name"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:symbol"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatDate(split_date)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(split_factor)"></td>
+                    <td style="vertical-align:top;" class="text-center">
+                        <a href="javascript:;" class="cursor-pointer fg-black btn-delete" data-placement="top"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal-container">
+</div>
+<!-- /ko -->
+<script type="text/html" id="modal-template">
+    <div id="modal-${name}" class="modal {{if is_modal_full==true}}container{{/if}} {{if position=='top'}}modal-top{{/if}}" tabindex="-1" data-focus-on="input:first" data-width="800" style="display: none;">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">${title}</h4>
+        </div>
+        <div class="modal-body">
+            <div class="edit-cnt p-10">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form method="post" class="form-horizontal form-validate" role="form" onsubmit="return false" data-bind="formValidate:{}">
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">
+                                    Symbol
+                                </label>
+                                <div class="col-md-7">
+                                    <input type="text" class="form-control input-sm" name="symbol" data-bind="value:symbol" placeholder="Symbol" data-rule-required="true" data-msg-required="Required" data-placement="bottom" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">
+                                    Date
+                                </label>
+                                <div class="col-md-7">
+                                    <input type="text" class="form-control input-sm" name="split_date" placeholder="Date" data-bind="value:formatDate(split_date)" data-rule-required="true" data-msg-required="Required" data-provide="datepicker"
+                                           data-date-format="dd/M/yyyy"
+                                           data-date-autoclose="true" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">
+                                    Factor
+                                </label>
+                                <div class="col-md-7">
+                                    <input type="text" class="form-control input-sm" name="split_factor" data-bind="value:split_factor" placeholder="Quantity" data-rule-required="true" data-msg-required="Required" data-placement="bottom" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-offset-4 col-md-8">
+                                    <input type="hidden" name="id" data-bind="value:id" />
+                                    <button type="submit" id="save" class="btn btn-sm btn-primary" data-loading-text="Save">Save</button>
+                                    <button type="button" class="btn btn-sm btn-danger m-l-15" data-dismiss="modal">Cancel</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>

@@ -30,7 +30,73 @@ namespace Ecam.ConsoleApp
             IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
             MC = System.Configuration.ConfigurationManager.AppSettings["MC"];
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
-            DownloadStart();
+
+            AddSplit();
+
+            //DownloadStart();
+        }
+
+        private static void AddSplit()
+        {
+            string sql = "select " + Environment.NewLine +
+                            " m.symbol" + Environment.NewLine +
+                            " ,DATE_FORMAT(m.trade_date,'%d/%b/%Y') as trade_date" + Environment.NewLine +
+                            " ,(((ifnull(m.prev_price,0)/ifnull(m.open_price,0)))) as prev_diff" + Environment.NewLine +
+                            " ,(((ifnull(m.open_price,0)-ifnull(m.prev_price,0))/ifnull(m.prev_price,0)) *100) as prev_percentage" + Environment.NewLine +
+                            " ,m.symbol" + Environment.NewLine +
+                            " ,m.trade_date as trade_date2" + Environment.NewLine +
+                            //" ,m.open_price" + Environment.NewLine +
+                            //" ,m.prev_price" + Environment.NewLine +
+                            //" ,m.* " + Environment.NewLine +
+                            " from tra_market m" + Environment.NewLine +
+                            " where (((ifnull(m.ltp_price,0) - ifnull(m.prev_price,0)) / ifnull(m.prev_price,0))*100) != 0" + Environment.NewLine +
+                            " and(((ifnull(m.ltp_price,0) - ifnull(m.prev_price,0)) / ifnull(m.prev_price,0))*100) <= -48" + Environment.NewLine +
+                            " order by prev_percentage asc limit 0,100";
+            using (MySqlDataReader dr = MySqlHelper.ExecuteReader(Ecam.Framework.Helper.ConnectionString, sql))
+            {
+                while (dr.Read())
+                {
+                    string symbol = dr["symbol"].ToString();
+                    DateTime tradeDate = DataTypeHelper.ToDateTime(dr["trade_date"]);
+                    decimal factor = DataTypeHelper.ToDecimal(dr["prev_diff"].ToString());
+                    tra_split split = null;
+
+                    using (EcamContext context = new EcamContext())
+                    {
+                        split = (from q in context.tra_split
+                                 where q.symbol == symbol
+                                 && q.split_date == tradeDate
+                                 select q).FirstOrDefault();
+                        if (split == null)
+                        {
+                            split = new tra_split();
+                        }
+                        else
+                        {
+                            split._prev_split = (from q in context.tra_split
+                                                 where
+                                                 q.id == split.id
+                                                 select q).FirstOrDefault();
+                        }
+                        split.symbol = symbol;
+                        split.split_date = tradeDate;
+                        split.split_factor = factor;
+                        if (split.id > 0)
+                        {
+                            context.Entry(split).State = System.Data.Entity.EntityState.Modified;
+                        }
+                        else
+                        {
+                            context.tra_split.Add(split);
+                        }
+                        context.SaveChanges();
+                    }
+                    if (split != null)
+                    {
+                        split.UpdatePrice();
+                    }
+                }
+            }
         }
 
         private static void UpdatePrevPrice()

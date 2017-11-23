@@ -88,5 +88,9 @@ namespace Ecam.Views.Controllers
             return View();
         }
 
+        public ActionResult Split()
+        {
+            return View();
+        }
     }
 }

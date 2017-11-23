@@ -290,6 +290,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="api\Controllers\BaseApiController.cs" />
+    <Compile Include="api\Controllers\SplitController.cs" />
     <Compile Include="api\Controllers\HoldingController.cs" />
     <Compile Include="api\Controllers\MFController.cs" />
     <Compile Include="api\Controllers\CategoryController.cs" />
@@ -308,6 +309,7 @@
     <Compile Include="api\Models\AirlineInvitationModel.cs" />
     <Compile Include="api\Models\IdentityModels.cs" />
     <Compile Include="api\Models\ImportExcelTableModel.cs" />
+    <Compile Include="api\Repository\SplitRepository.cs" />
     <Compile Include="api\Repository\HoldingRepository.cs" />
     <Compile Include="api\Repository\MarketRepository.cs" />
     <Compile Include="api\Repository\CompanyRepository.cs" />
@@ -554,6 +556,7 @@
     <Content Include="js\bootstrap\bootstrap.js" />
     <Content Include="js\bootstrap\bootstrap.min.js" />
     <Content Include="js\bootstrap\npm.js" />
+    <Content Include="js\controllers\SplitController.js" />
     <Content Include="js\controllers\HoldingController.js" />
     <Content Include="js\controllers\RSIController.js" />
     <Content Include="js\controllers\MonthlyAVGController.js" />
@@ -1200,6 +1203,7 @@
     <Content Include="Views\Home\AddExperts.cshtml" />
     <Content Include="Views\Home\AddExpertsRecommend.cshtml" />
     <Content Include="Views\Home\RSI.cshtml" />
+    <Content Include="Views\Home\Split.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

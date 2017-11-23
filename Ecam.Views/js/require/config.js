@@ -297,6 +297,20 @@ $(function () {
             unload: function () { }
         });
 
+        createFinchRoute("/split", {
+            setup: function (url) {
+                handleBlockUI();
+            },
+            load: function () {
+                require(['SplitController'], function (ViewModel) {
+                    document.title = "Split - Ecams";
+                    var m = new ViewModel();
+                    app.viewModel(m);
+                });
+            },
+            unload: function () { }
+        });
+
         createFinchRoute("/market", {
             setup: function (url) {
                 handleBlockUI();

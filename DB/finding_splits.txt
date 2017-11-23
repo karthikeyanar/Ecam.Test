@@ -1,0 +1,13 @@
+select 
+m.symbol
+,DATE_FORMAT(m.trade_date, '%d/%b/%Y') as trade_date
+,(((ifnull(m.prev_price, 0) / ifnull(m.open_price, 0)))) as prev_diff
+,(((ifnull(m.open_price, 0) - ifnull(m.prev_price, 0)) / ifnull(m.prev_price, 0)) * 100) as prev_percentage
+,m.symbol
+,m.trade_date as trade_date2
+,m.open_price
+,m.prev_price
+,m.*
+from tra_market m 
+where (((ifnull(m.ltp_price, 0) - ifnull(m.prev_price, 0)) / ifnull(m.prev_price, 0)) * 100) != 0
+order by prev_percentage asc   limit 0,10
