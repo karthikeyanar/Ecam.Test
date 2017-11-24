@@ -13,7 +13,7 @@ namespace Ecam.Models {
 				        public Nullable<decimal> prev_price { get; set; }
 				        public Nullable<decimal> week_52_high { get; set; }
 				        public Nullable<decimal> week_52_low { get; set; }
-				        public Nullable<bool> is_book_mark { get; set; }
+				        public Nullable<bool> is_archive { get; set; }
 				        public Nullable<bool> is_nifty_50 { get; set; }
 				        public Nullable<bool> is_nifty_100 { get; set; }
 				        public Nullable<bool> is_nifty_200 { get; set; }

@@ -321,10 +321,10 @@ namespace Ecam.Framework.Repository
                 }
             }
 
-            if (criteria.is_book_mark.HasValue)
-            {
-                where.AppendFormat(" and ifnull(ct.is_book_mark,0)={0}", ((criteria.is_book_mark ?? false) == true ? "1" : "0"));
-            }
+            //if (criteria.is_archive.HasValue)
+            //{
+                where.AppendFormat(" and ifnull(ct.is_archive,0)={0}", ((criteria.is_archive ?? false) == true ? "1" : "0"));
+            //}
 
             //if (criteria.is_current_stock.HasValue)
             //{
@@ -440,7 +440,7 @@ namespace Ecam.Framework.Repository
                            ",ct.prev_price" + Environment.NewLine +
                            ",ct.week_52_high" + Environment.NewLine +
                            ",ct.week_52_low" + Environment.NewLine +
-                           ",ct.is_book_mark" + Environment.NewLine +
+                           ",ct.is_archive" + Environment.NewLine +
                            ",ct.is_current_stock" + Environment.NewLine +
                            ",ct.is_nifty_50" + Environment.NewLine +
                            ",ct.is_nifty_100" + Environment.NewLine +
@@ -729,10 +729,10 @@ namespace Ecam.Framework.Repository
                 }
             }
 
-            if (criteria.is_book_mark.HasValue)
-            {
-                where.AppendFormat(" and ifnull(c.is_book_mark,0)={0}", ((criteria.is_book_mark ?? false) == true ? "1" : "0"));
-            }
+            //if (criteria.is_archive.HasValue)
+            //{
+                where.AppendFormat(" and ifnull(c.is_archive,0)={0}", ((criteria.is_archive ?? false) == true ? "1" : "0"));
+            //}
 
             if (criteria.is_current_stock.HasValue)
             {
@@ -1180,10 +1180,10 @@ namespace Ecam.Framework.Repository
                 }
             }
 
-            if (criteria.is_book_mark.HasValue)
-            {
-                where.AppendFormat(" and ifnull(c.is_book_mark,0)={0}", ((criteria.is_book_mark ?? false) == true ? "1" : "0")).Append(Environment.NewLine);
-            }
+            //if (criteria.is_archive.HasValue)
+            //{
+            where.AppendFormat(" and ifnull(c.is_archive,0)={0}", ((criteria.is_archive ?? false) == true ? "1" : "0")).Append(Environment.NewLine);
+            //}
 
             if (criteria.is_current_stock.HasValue)
             {

@@ -878,12 +878,6 @@ RegexOptions.IgnoreCase
             _INDEX = -1;
 
             string sql = "";
-            // Reset book mark
-            //string sql = "update tra_company set is_book_mark=0;";
-            //MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-
-            //sql = "update tra_company set is_book_mark=1 where ifnull(prev_rsi,0)>=70 or ifnull(prev_rsi,0)<=30;";
-            //MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
 
             // Delete yesterday tra_market_intraday
             sql = "delete from tra_market_intra_day where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(curdate(), '%Y-%m-%d')";

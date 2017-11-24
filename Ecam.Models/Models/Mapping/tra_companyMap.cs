@@ -84,7 +84,7 @@ namespace Ecam.Models {
             this.Property(t => t.prev_price).HasColumnName("prev_price");
             this.Property(t => t.week_52_high).HasColumnName("week_52_high");
             this.Property(t => t.week_52_low).HasColumnName("week_52_low");
-            this.Property(t => t.is_book_mark).HasColumnName("is_book_mark");
+            this.Property(t => t.is_archive).HasColumnName("is_archive");
             this.Property(t => t.is_nifty_50).HasColumnName("is_nifty_50");
             this.Property(t => t.is_nifty_100).HasColumnName("is_nifty_100");
             this.Property(t => t.is_nifty_200).HasColumnName("is_nifty_200");

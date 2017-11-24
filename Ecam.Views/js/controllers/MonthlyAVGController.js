@@ -27,9 +27,9 @@ define("MonthlyAVGController", ["knockout", "komapping", "helper", "service"], f
             arr.push({ "name": "PageIndex", "value": $(":input[name='page_index']", $Company).val() });
             arr.push({ "name": "SortName", "value": $(":input[name='sort_name']", $Company).val() });
             arr.push({ "name": "SortOrder", "value": $(":input[name='sort_order']", $Company).val() });
-            var isbookmark = $("#frmCompanySearch #is_book_mark")[0].checked;
-            if (isbookmark == true) {
-                arr[arr.length] = { "name": "is_book_mark", "value": isbookmark };
+            var isarchive = $("#frmCompanySearch #is_archive")[0].checked;
+            if (isarchive == true) {
+                arr[arr.length] = { "name": "is_archive", "value": isarchive };
             }
             var is_current_stock = $("#frmCompanySearch #is_current_stock")[0].checked;
             if (is_current_stock == true) {
@@ -185,9 +185,9 @@ define("MonthlyAVGController", ["knockout", "komapping", "helper", "service"], f
             arr.push({ "name": "PageIndex", "value": 0 });
             arr.push({ "name": "SortName", "value": $(":input[name='sort_name']", $Company).val() });
             arr.push({ "name": "SortOrder", "value": $(":input[name='sort_order']", $Company).val() });
-            var isbookmark = $("#frmCompanySearch #is_book_mark")[0].checked;
-            if (isbookmark == true) {
-                arr[arr.length] = { "name": "is_book_mark", "value": isbookmark };
+            var isarchive = $("#frmCompanySearch #is_archive")[0].checked;
+            if (isarchive == true) {
+                arr[arr.length] = { "name": "is_archive", "value": isarchive };
             }
             var is_current_stock = $("#frmCompanySearch #is_current_stock")[0].checked;
             if (is_current_stock == true) {
@@ -551,7 +551,7 @@ define("MonthlyAVGController", ["knockout", "komapping", "helper", "service"], f
 
         this.onElements = function () {
             self.offElements();
-            $("body").on("click", "#frmCompanySearch #is_book_mark", function (event) {
+            $("body").on("click", "#frmCompanySearch #is_archive", function (event) {
                 self.loadGrid();
             });
             $("body").on("click", "#frmCompanySearch #is_current_stock", function (event) {
@@ -643,13 +643,13 @@ define("MonthlyAVGController", ["knockout", "komapping", "helper", "service"], f
                 var $this = $(this);
                 var $i = $("i", $this);
                 var dataFor = ko.dataFor(this);
-                var url = apiUrl('/Company/UpdateBookMark');
+                var url = apiUrl('/Company/UpdateArchive');
                 var arr = [];
-                var isBookMark = $i.hasClass('fa-bookmark');
+                var isArchive = $i.hasClass('fa-bookmark');
                 arr.push({ "name": "symbol", "value": dataFor.symbol() });
-                arr.push({ "name": "is_book_mark", "value": !isBookMark });
+                arr.push({ "name": "is_archive", "value": !isArchive });
                 $i.removeClass('fa-bookmark').removeClass('fa-bookmark-o').removeClass('fg-primary');
-                if (isBookMark == true) {
+                if (isArchive == true) {
                     $i.addClass('fa-bookmark-o');
                 } else {
                     $i.addClass('fa-bookmark fg-primary');
@@ -805,7 +805,7 @@ define("MonthlyAVGController", ["knockout", "komapping", "helper", "service"], f
         }
 
         this.offElements = function () {
-            $("body").off("click", "#frmCompanySearch #is_book_mark");
+            $("body").off("click", "#frmCompanySearch #is_archive");
             $("body").off("click", "#frmCompanySearch #is_current_stock");
             $("body").off("click", "#frmCompanySearch #is_nifty_50");
             $("body").off("click", "#frmCompanySearch #is_nifty_100");

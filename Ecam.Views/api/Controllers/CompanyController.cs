@@ -131,7 +131,7 @@ namespace Ecam.Views.Controllers
             PaginatedListResult<TRA_COMPANY> obj = _CompanyRepository.Get(criteria, paging);
             List<TRA_COMPANY> rows = obj.rows.ToList();
             List<Ecam.Framework.CSVColumn> columnFormats = new List<Ecam.Framework.CSVColumn>();
-            columnFormats.Add(new CSVColumn { DisplayName = "Mark", PropertyName = "is_book_mark" });
+            columnFormats.Add(new CSVColumn { DisplayName = "Archive", PropertyName = "is_archive" });
             columnFormats.Add(new CSVColumn { DisplayName = "Company", PropertyName = "company_name" });
             columnFormats.Add(new CSVColumn { DisplayName = "Symbol", PropertyName = "symbol" });
             columnFormats.Add(new CSVColumn { DisplayName = "Category", PropertyName = "category_name" });
@@ -152,12 +152,12 @@ namespace Ecam.Views.Controllers
         }
 
         [HttpPost]
-        [ActionName("UpdateBookMark")]
-        public IHttpActionResult UpdateBookMark()
+        [ActionName("UpdateArchive")]
+        public IHttpActionResult UpdateArchive()
         {
             string symbol = HttpContext.Current.Request["symbol"];
-            string is_book_mark = HttpContext.Current.Request["is_book_mark"];
-            this.UpdateBookMark(symbol, (is_book_mark == "true"));
+            string is_archive = HttpContext.Current.Request["is_archive"];
+            this.UpdateArchive(symbol, (is_archive == "true"));
             return Ok();
         }
 
@@ -169,7 +169,7 @@ namespace Ecam.Views.Controllers
             return Ok();
         }
 
-        private void UpdateBookMark(string symbol, bool is_book_mark)
+        private void UpdateArchive(string symbol, bool is_archive)
         {
             using (EcamContext context = new EcamContext())
             {
@@ -178,34 +178,34 @@ namespace Ecam.Views.Controllers
                                        select q).FirstOrDefault();
                 if (company != null)
                 {
-                    company.is_book_mark = is_book_mark;
+                    company.is_archive = is_archive;
                     context.Entry(company).State = System.Data.Entity.EntityState.Modified;
                     context.SaveChanges();
-                    string categoryName = "2_FAVOURITES";
-                    tra_company_category category = (from q in context.tra_company_category
-                                                     where q.category_name == categoryName
-                                                     && q.symbol == company.symbol
-                                                     select q).FirstOrDefault();
-                    if ((company.is_book_mark ?? false) == false)
-                    {
-                        if (category != null)
-                        {
-                            context.tra_company_category.Remove(category);
-                            context.SaveChanges();
-                        }
-                    }
-                    else
-                    {
-                        if (category == null)
-                        {
-                            context.tra_company_category.Add(new tra_company_category
-                            {
-                                category_name = categoryName,
-                                symbol = symbol
-                            });
-                            context.SaveChanges();
-                        }
-                    }
+                    //string categoryName = "2_FAVOURITES";
+                    //tra_company_category category = (from q in context.tra_company_category
+                    //                                 where q.category_name == categoryName
+                    //                                 && q.symbol == company.symbol
+                    //                                 select q).FirstOrDefault();
+                    //if ((company.is_archive ?? false) == false)
+                    //{
+                    //    if (category != null)
+                    //    {
+                    //        context.tra_company_category.Remove(category);
+                    //        context.SaveChanges();
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    if (category == null)
+                    //    {
+                    //        context.tra_company_category.Add(new tra_company_category
+                    //        {
+                    //            category_name = categoryName,
+                    //            symbol = symbol
+                    //        });
+                    //        context.SaveChanges();
+                    //    }
+                    //}
                 }
             }
         }
