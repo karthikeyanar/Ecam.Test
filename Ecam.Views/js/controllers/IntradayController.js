@@ -537,6 +537,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $modal.modal('show');
         }
 
+        this.year_count = 0;
         this.start_index = -1;
         this.temp_investments = [];
         this.temp_total_amount = 0;
@@ -556,6 +557,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $modal.modal('show');
             self.temp_investments = [];
             self.start_index = -1;
+            self.year_count = 0;
             self.createLogs($modal, cFloat($(":input[name='total_amount']").val()));
         }
 
@@ -577,7 +579,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         if (row.name == "PageIndex") {
                             row.value = 1;
                         } else if (row.name == "PageSize") {
-                            row.value = 10;
+                            //row.value = 10;
                         } else if (row.name == "SortName") {
                             row.value = "total_profit";
                         } else if (row.name == "SortOrder") {
@@ -729,8 +731,10 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     totalAmount = cFloat(totalCMV) + cFloat(balance) + monthlyInvestment;
                     self.createLogs($modal, totalAmount);
 
-
-                    var totalFinalAmount = cFloat($(":input[name='total_amount']").val()) + (monthlyInvestment * cInt($("tr", $tbody).length));
+                    //cFloat($(":input[name='total_amount']").val())
+                    console.log('cell=', $("tr:eq(0) > td:eq(0)", $tbody)[0]);
+                    console.log('amount=', cFloat($("tr:eq(0) > td:eq(0)", $tbody).html()))
+                    var totalFinalAmount = cFloat($("tr:eq(0) > td:eq(0)", $tbody).html()) + (monthlyInvestment * cInt($("tr", $tbody).length));
                     $("#spnFinalTotalAmount", $modal).html(formatNumber(totalFinalAmount));
                     $("#spnFinalTotalCMV", $modal).html(formatNumber(totalAmount));
                     var p = ((cFloat(totalAmount) - cFloat(totalFinalAmount)) / cFloat(totalFinalAmount)) * 100;
@@ -789,6 +793,23 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         self.openInvestmentsModal(arr);
                     });
                 });
+                console.log('self.year_count=', self.year_count);
+                self.year_count += 1;
+                var finalEndDate = moment(_TODAYDATE).add('year', self.year_count).format('DD/MMM/YYYY');
+                $("#spnFinalEndDate", $modal).html(finalEndDate);
+                var $tblYearCount = $("#tblYearCount", $modal);
+                $("tbody", $tblYearCount).append("<tr><td>" + finalEndDate + "</td><td class='text-right'>" + $("#spnFinalTotalCMV", $modal).html() + "</td></tr>");
+                if (self.year_count <= 10) {
+                    var $tbl = $("#tblLog", $modal);
+                    var $tbody = $("tbody", $tbl);
+                    $tbody.empty();
+                    var $tblLogCount = $("#tblLogCount", $modal);
+                    $("tbody", $tblLogCount).empty();
+                    self.temp_investments = [];
+                    self.start_index = -1;
+                    console.log('start totalAmount=', totalAmount);
+                    self.createLogs($modal, totalAmount);
+                }
             }
         }
 
