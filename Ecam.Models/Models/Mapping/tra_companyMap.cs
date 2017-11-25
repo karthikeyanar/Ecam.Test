@@ -94,7 +94,7 @@ namespace Ecam.Models {
             this.Property(t => t.mf_qty).HasColumnName("mf_qty");
             this.Property(t => t.monthly_avg).HasColumnName("monthly_avg");
             this.Property(t => t.weekly_avg).HasColumnName("weekly_avg");
-            this.Property(t => t.is_current_stock).HasColumnName("is_current_stock");
+            this.Property(t => t.is_book_mark).HasColumnName("is_book_mark");
             this.Property(t => t.mcstr).HasColumnName("mcstr");
             this.Property(t => t.mc).HasColumnName("mc");
             this.Property(t => t.pe).HasColumnName("pe");

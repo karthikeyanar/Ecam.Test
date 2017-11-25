@@ -15,6 +15,11 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
         this.avg_profit = ko.observable();
         this.high_avg_profit = ko.observable();
         this.low_avg_profit = ko.observable();
+        this.positive_count = ko.observable();
+        this.negative_count = ko.observable();
+        this.positive_percentage = ko.observable();
+        this.negative_percentage = ko.observable();
+
         this._investments = null;
 
         this.refresh = function () {
@@ -32,9 +37,9 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             if (isarchive == true) {
                 arr[arr.length] = { "name": "is_archive", "value": isarchive };
             }
-            var is_current_stock = $("#frmCompanySearch #is_current_stock")[0].checked;
-            if (is_current_stock == true) {
-                arr[arr.length] = { "name": "is_current_stock", "value": is_current_stock };
+            var is_book_mark = $("#frmCompanySearch #is_book_mark")[0].checked;
+            if (is_book_mark == true) {
+                arr[arr.length] = { "name": "is_book_mark", "value": is_book_mark };
             }
             var isNifty50 = $("#frmCompanySearch #is_nifty_50")[0].checked;
             if (isNifty50 == true) {
@@ -89,9 +94,15 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 self.avg_profit(0);
                 self.high_avg_profit(0);
                 self.low_avg_profit(0);
+                self.positive_count(0);
+                self.negative_count(0);
+                self.positive_percentage(0);
+                self.negative_percentage(0);
 
                 var totalInvestment = 0;
                 var totalCurrentValue = 0;
+                var positiveCount = 0;
+                var negativeCount = 0;
 
                 var highCurrentValue = 0;
                 var lowCurrentValue = 0;
@@ -152,6 +163,12 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
                     highCurrentValue += cFloat(row.high_cmv);
                     lowCurrentValue += cFloat(row.low_cmv);
+
+                    if (cFloat(row.profit) > 0) {
+                        positiveCount += 1;
+                    } else {
+                        negativeCount += 1;
+                    }
                 });
 
                 self._investments = investments;
@@ -168,6 +185,16 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
                 totalProfitAVG = cFloat(cFloat(lowCurrentValue - totalInvestment) / totalInvestment) * 100;
                 self.low_avg_profit(totalProfitAVG);
+
+                self.positive_count(positiveCount);
+                self.negative_count(negativeCount);
+
+                var t = positiveCount + negativeCount;
+                var p = 0;
+                p = (positiveCount / t) * 100;
+                self.positive_percentage(p);
+                p = (negativeCount / t) * 100;
+                self.negative_percentage(p);
 
                 self.calculateJSON();
                 $(".manual-pagination", $Company).each(function () {
@@ -265,9 +292,9 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             if (isarchive == true) {
                 arr[arr.length] = { "name": "is_archive", "value": isarchive };
             }
-            var is_current_stock = $("#frmCompanySearch #is_current_stock")[0].checked;
-            if (is_current_stock == true) {
-                arr[arr.length] = { "name": "is_current_stock", "value": is_current_stock };
+            var is_book_mark = $("#frmCompanySearch #is_book_mark")[0].checked;
+            if (is_book_mark == true) {
+                arr[arr.length] = { "name": "is_book_mark", "value": is_book_mark };
             }
             arr[arr.length] = { "name": "is_export_excel", "value": true };
             var url = apiUrl("/Company/Export?t=1");
@@ -504,11 +531,18 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $('body').append($cnt);
             var totalAmount = cFloat($(":input[name='total_amount']").val());
             var totalInvestment = 0, totalCMV = 0, totalHighCMV = 0, totalLowCMV = 0, balance = 0, profit = 0, highProfit = 0, lowProfit = 0;
+            var positiveCount = 0;
+            var negativeCount = 0;
             $.each(investments, function (i, row) {
                 totalInvestment += cFloat(row.investment);
                 totalCMV += cFloat(row.cmv);
                 totalHighCMV += cFloat(row.high_cmv);
                 totalLowCMV += cFloat(row.low_cmv);
+                if (cFloat(row.profit) > 0) {
+                    positiveCount += 1;
+                } else {
+                    negativeCount += 1;
+                }
             });
             balance = cFloat(totalAmount - totalInvestment);
             profit = cFloat(cFloat(totalCMV - totalInvestment) / totalInvestment) * 100;
@@ -530,6 +564,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 , "Profit": profit
                 , "HighProfit": highProfit
                 , "LowProfit": lowProfit
+                , "PositiveCount": positiveCount
+                , "NegativeCount": negativeCount
             };
             console.log(data);
             $("#modal-investment-template").tmpl(data).appendTo($cnt);
@@ -537,6 +573,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $modal.modal('show');
         }
 
+        this.start_year_wise = false;
         this.year_count = 0;
         this.start_index = -1;
         this.temp_investments = [];
@@ -626,6 +663,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
                     var totalInvestment = 0;
                     var totalCurrentValue = 0;
+                    var positiveCount = 0;
+                    var negativeCount = 0;
 
                     var highCurrentValue = 0;
                     var lowCurrentValue = 0;
@@ -668,6 +707,12 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
                         highCurrentValue += cFloat(row.high_cmv);
                         lowCurrentValue += cFloat(row.low_cmv);
+
+                        if (cFloat(row.profit) > 0) {
+                            positiveCount += 1;
+                        } else {
+                            negativeCount += 1;
+                        }
                     });
 
                     console.log('totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue);
@@ -686,7 +731,11 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         'total_amount': totalAmount,
                         'investment': totalInvestment,
                         'cmv': totalCurrentValue,
-                        'investments': investments
+                        'investments': investments,
+                        'positive_count': positiveCount,
+                        'negative_count': negativeCount,
+                        'positive_percentage': (positiveCount / (positiveCount + negativeCount)) * 100,
+                        'negative_percentage': (negativeCount / (positiveCount + negativeCount)) * 100
                     };
 
                     data.total_equity = json.rows.length;
@@ -799,7 +848,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 $("#spnFinalEndDate", $modal).html(finalEndDate);
                 var $tblYearCount = $("#tblYearCount", $modal);
                 $("tbody", $tblYearCount).append("<tr><td>" + finalEndDate + "</td><td class='text-right'>" + $("#spnFinalTotalCMV", $modal).html() + "</td></tr>");
-                if (self.year_count <= 10) {
+                if (self.year_count <= 10 && self.start_year_wise == true) {
                     var $tbl = $("#tblLog", $modal);
                     var $tbody = $("tbody", $tbl);
                     $tbody.empty();
@@ -956,7 +1005,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $("body").on("click", "#frmCompanySearch #is_archive", function (event) {
                 self.loadGrid();
             });
-            $("body").on("click", "#frmCompanySearch #is_current_stock", function (event) {
+            $("body").on("click", "#frmCompanySearch #is_book_mark", function (event) {
                 self.loadGrid();
             });
             $("body").on("click", "#frmCompanySearch #is_nifty_50", function (event) {
@@ -1013,6 +1062,10 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $("body").on("click", "#Company .btn-add", function (event) {
                 self.openItem(null)
             });
+            $("body").on("click", "#btnYear", function (event) {
+                self.start_year_wise = true;
+                self.openLog();
+            });
             $("body").on("click", "#Company .btn-export", function (event) {
                 self.exportGrid()
             });
@@ -1068,13 +1121,13 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 var $this = $(this);
                 var $i = $("i", $this);
                 var dataFor = ko.dataFor(this);
-                var url = apiUrl('/Company/UpdateCurrentStock');
+                var url = apiUrl('/Company/UpdateBookMark');
                 var arr = [];
-                var is_current_stock = $i.hasClass('fa-user');
+                var is_book_mark = $i.hasClass('fa-user');
                 arr.push({ "name": "symbol", "value": dataFor.symbol() });
-                arr.push({ "name": "is_current_stock", "value": !is_current_stock });
+                arr.push({ "name": "is_book_mark", "value": !is_book_mark });
                 $i.removeClass('fa-user').removeClass('fa-user-o').removeClass('fg-primary');
-                if (is_current_stock == true) {
+                if (is_book_mark == true) {
                     $i.addClass('fa-user-o');
                 } else {
                     $i.addClass('fa-user fg-primary');
@@ -1235,7 +1288,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
         this.offElements = function () {
             $("body").off("click", "#frmCompanySearch #is_archive");
-            $("body").off("click", "#frmCompanySearch #is_current_stock");
+            $("body").off("click", "#frmCompanySearch #is_book_mark");
             $("body").off("click", "#frmCompanySearch #is_nifty_50");
             $("body").off("click", "#frmCompanySearch #is_nifty_100");
             $("body").off("click", "#frmCompanySearch #is_nifty_200");
@@ -1253,6 +1306,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $("body").off("click", "#frmCompanySearch #is_buy_to_sell");
             $("body").off("click", "#frmCompanySearch #is_all_category");
             $("body").off("click", "#frmCompanySearch #is_mf");
+            $("body").off("click", "#btnYear");
             $("body").off("click", "#Company .btn-add");
             $("body").off("click", "#Company .btn-edit");
             $("body").off("click", "#Company .btn-delete");

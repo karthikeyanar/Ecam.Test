@@ -34,16 +34,6 @@ namespace Ecam.Models
         public override void OnDeleted()
         {
             base.OnDeleted();
-            using (EcamContext context = new EcamContext())
-            {
-                tra_company company = (from q in context.tra_company where q.symbol == this.symbol select q).FirstOrDefault();
-                if (company != null)
-                {
-                    company.is_current_stock = false;
-                    context.Entry(company).State = System.Data.Entity.EntityState.Modified;
-                    context.SaveChanges();
-                }
-            }
         }
 
         public override void OnSaved()

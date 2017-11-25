@@ -31,7 +31,7 @@ namespace Ecam.Contracts
         public Nullable<decimal> mf_qty { get; set; }
         public Nullable<decimal> monthly_avg { get; set; }
         public Nullable<decimal> weekly_avg { get; set; }
-        public Nullable<bool> is_current_stock { get; set; }
+        public Nullable<bool> is_book_mark { get; set; }
         public string mcstr { get; set; }
         public Nullable<decimal> mc { get; set; }
         public Nullable<decimal> pe { get; set; }
@@ -109,6 +109,7 @@ namespace Ecam.Contracts
         public decimal? total_from_profit { get; set; }
         public decimal? total_to_profit { get; set; }
         public string ignore_symbols { get; set; }
+        public bool? is_current_stock { get; set; }
     }
 
     public class TRA_CATEGORY_GROUP

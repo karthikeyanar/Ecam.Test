@@ -323,13 +323,13 @@ namespace Ecam.Framework.Repository
 
             //if (criteria.is_archive.HasValue)
             //{
-                where.AppendFormat(" and ifnull(ct.is_archive,0)={0}", ((criteria.is_archive ?? false) == true ? "1" : "0"));
+            where.AppendFormat(" and ifnull(ct.is_archive,0)={0}", ((criteria.is_archive ?? false) == true ? "1" : "0"));
             //}
 
-            //if (criteria.is_current_stock.HasValue)
-            //{
-            //    where.AppendFormat(" and ifnull(ct.is_current_stock,0)={0}", ((criteria.is_current_stock ?? false) == true ? "1" : "0"));
-            //}
+            if (criteria.is_book_mark.HasValue)
+            {
+                where.AppendFormat(" and ifnull(ct.is_book_mark,0)={0}", ((criteria.is_book_mark ?? false) == true ? "1" : "0"));
+            }
 
             if (criteria.from_price.HasValue)
             {
@@ -441,7 +441,7 @@ namespace Ecam.Framework.Repository
                            ",ct.week_52_high" + Environment.NewLine +
                            ",ct.week_52_low" + Environment.NewLine +
                            ",ct.is_archive" + Environment.NewLine +
-                           ",ct.is_current_stock" + Environment.NewLine +
+                           ",ct.is_book_mark" + Environment.NewLine +
                            ",ct.is_nifty_50" + Environment.NewLine +
                            ",ct.is_nifty_100" + Environment.NewLine +
                            ",ct.is_nifty_200" + Environment.NewLine +
@@ -548,7 +548,7 @@ namespace Ecam.Framework.Repository
                 where.AppendFormat(" and ifnull((((total_last_price - total_first_price)/total_first_price) * 100),0)<={0}", criteria.total_to_profit);
             }
 
-            if ((criteria.max_negative_count ?? 0) > 0)
+            if ((criteria.max_negative_count ?? -1) >= 0)
             {
                 where.AppendFormat(" and ifnull(negative,0)<={0}", criteria.max_negative_count).Append(Environment.NewLine);
             }
@@ -731,12 +731,12 @@ namespace Ecam.Framework.Repository
 
             //if (criteria.is_archive.HasValue)
             //{
-                where.AppendFormat(" and ifnull(c.is_archive,0)={0}", ((criteria.is_archive ?? false) == true ? "1" : "0"));
+            where.AppendFormat(" and ifnull(c.is_archive,0)={0}", ((criteria.is_archive ?? false) == true ? "1" : "0"));
             //}
 
-            if (criteria.is_current_stock.HasValue)
+            if (criteria.is_book_mark.HasValue)
             {
-                where.AppendFormat(" and ifnull(c.is_current_stock,0)={0}", ((criteria.is_current_stock ?? false) == true ? "1" : "0"));
+                where.AppendFormat(" and ifnull(c.is_book_mark,0)={0}", ((criteria.is_book_mark ?? false) == true ? "1" : "0"));
             }
 
             if (criteria.from_price.HasValue)
@@ -1185,9 +1185,9 @@ namespace Ecam.Framework.Repository
             where.AppendFormat(" and ifnull(c.is_archive,0)={0}", ((criteria.is_archive ?? false) == true ? "1" : "0")).Append(Environment.NewLine);
             //}
 
-            if (criteria.is_current_stock.HasValue)
+            if (criteria.is_book_mark.HasValue)
             {
-                where.AppendFormat(" and ifnull(c.is_current_stock,0)={0}", ((criteria.is_current_stock ?? false) == true ? "1" : "0")).Append(Environment.NewLine);
+                where.AppendFormat(" and ifnull(c.is_book_mark,0)={0}", ((criteria.is_book_mark ?? false) == true ? "1" : "0")).Append(Environment.NewLine);
             }
 
             if (criteria.from_price.HasValue)

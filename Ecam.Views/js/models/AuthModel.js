@@ -125,7 +125,7 @@ define(["knockout"], function (ko) {
                 , {
                     "name": "AWBs", "url": "javascript:;", "icon": "", "is_active": false, "modules": ["is_awb_mgt"], "roles": ['CA', 'CM', 'LA', 'LM', 'AA', 'AM'], submenus:
                     [
-                        { "name": "Current Stock / Request", "url": "#/aa-awbs", "icon": "", "is_active": false, "modules": [], "is_default_display": false, "roles": ['AA', 'AM'], submenus: [] },
+                        { "name": "Book Mark / Request", "url": "#/aa-awbs", "icon": "", "is_active": false, "modules": [], "is_default_display": false, "roles": ['AA', 'AM'], submenus: [] },
                         { "name": "AWB Stock Report", "url": "#/aa-agent-stock-report", "icon": "", "is_active": false, "modules": [], "is_default_display": false, "roles": ['AA', 'AM'], submenus: [] },
                         { "name": "Create AWBs", "url": "#/cm-awblot", "icon": "", "is_active": false, "modules": [], "is_default_display": true, "roles": ['CA', 'CM'], submenus: [] },
                         { "name": "Company AWB Request", "url": "#/lm-company-awbrequest", "icon": "", "is_active": false, "modules": [], "is_default_display": false, "roles": ['LA', 'LM'], submenus: [] },

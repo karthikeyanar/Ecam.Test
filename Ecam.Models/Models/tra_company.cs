@@ -23,7 +23,7 @@ namespace Ecam.Models {
 				        public Nullable<decimal> mf_qty { get; set; }
 				        public Nullable<decimal> monthly_avg { get; set; }
 				        public Nullable<decimal> weekly_avg { get; set; }
-				        public Nullable<bool> is_current_stock { get; set; }
+				        public Nullable<bool> is_book_mark { get; set; }
 				        public string mcstr { get; set; }
 				        public Nullable<decimal> mc { get; set; }
 				        public Nullable<decimal> pe { get; set; }
