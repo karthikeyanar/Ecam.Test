@@ -30,10 +30,7 @@ namespace Ecam.ConsoleApp
             IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
             MC = System.Configuration.ConfigurationManager.AppSettings["MC"];
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
-
-            AddSplit();
-
-            //DownloadStart();
+            DownloadStart();
         }
 
         private static void AddSplit()

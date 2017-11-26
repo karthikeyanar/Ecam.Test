@@ -1941,15 +1941,16 @@ RegexOptions.IgnoreCase
                 string GOOGLE_HISTORY_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_HISTORY_DATA"];
                 WebClient client = new WebClient();
                 int numberOfRows = DataTypeHelper.ToInt32(System.Configuration.ConfigurationManager.AppSettings["NUMBER_OF_ROWS"]);
-                url = string.Format("https://www.google.com/finance/historical?q=NSE:{0}&num=" + numberOfRows
+                url = string.Format("https://finance.google.com/finance/historical?q=NSE:{0}&num=" + numberOfRows
                                                                     , symbol.Replace("&", "%26")
                                                                     );
                 string fileName = GOOGLE_HISTORY_DATA + "\\" + symbol + ".html";
                 if (File.Exists(fileName) == false)
                 {
-                    html = client.DownloadString(url);
                     try
                     {
+
+                        html = client.DownloadString(url);
                         File.WriteAllText(fileName, html);
                     }
                     catch { }
