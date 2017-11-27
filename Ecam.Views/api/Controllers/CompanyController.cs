@@ -46,6 +46,13 @@ namespace Ecam.Views.Controllers
         }
 
         [HttpGet]
+        [ActionName("BatchList")]
+        public List<BatchLog> BatchList([FromUri] TRA_COMPANY_SEARCH criteria, [FromUri] Paging paging)
+        {
+            return _CompanyRepository.GetBatchLog(criteria, paging);
+        }
+
+        [HttpGet]
         [ActionName("CategoryGroups")]
         public List<TRA_CATEGORY_GROUP> CategoryGroups([FromUri] TRA_COMPANY_SEARCH criteria, [FromUri] Paging paging)
         {

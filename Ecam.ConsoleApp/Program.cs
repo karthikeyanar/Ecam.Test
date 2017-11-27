@@ -31,7 +31,8 @@ namespace Ecam.ConsoleApp
             MC = System.Configuration.ConfigurationManager.AppSettings["MC"];
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
 
-            AddSplit();
+            Ecam.Models.Common.GetBatchLog();
+            //AddSplit();
 
             //DownloadStart();
         }

@@ -521,6 +521,35 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             });
         }
 
+        this.openBatchLog = function () {
+            $('#temp-batch-modal-container').remove();
+            var $cnt = $("<div id='temp-batch-modal-container'></div>");
+            $('body').append($cnt);
+            handleBlockUI();
+            var arr = self.last_params;
+            var url = apiUrl("/Company/BatchList");
+            $.ajax({
+                "url": url,
+                "cache": false,
+                "type": "GET",
+                "data": arr
+            }).done(function (json) {
+                var data = {
+                    "name": "Investment"
+                   , "title": "Investment"
+                   , "is_modal_full": false
+                   , "position": "top"
+                   , "width": $(window).width() - 100
+                    , "rows": json
+                };
+                $("#modal-batch-template").tmpl(data).appendTo($cnt);
+                var $modal = $("#modal-batch-" + data.name, $cnt);
+                $modal.modal('show');
+            }).always(function () {
+                unblockUI();
+            });
+        }
+
         this.openInvestments = function () {
             self.openInvestmentsModal(self._investments);
         }
@@ -579,6 +608,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
         this.temp_investments = [];
         this.temp_total_amount = 0;
         this.openLog = function () {
+            var $modal = $(".modal");
+            $modal.modal('hide');
             $('#temp-modal-container').remove();
             var $cnt = $("<div id='temp-modal-container'></div>");
             $('body').append($cnt);
@@ -590,7 +621,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 , "width": $(window).width() - 100
             };
             $("#modal-log-template").tmpl(data).appendTo($cnt);
-            var $modal = $("#modal-log-" + data.name, $cnt);
+            $modal = $("#modal-log-" + data.name, $cnt);
             $modal.modal('show');
             self.temp_investments = [];
             self.start_index = -1;
@@ -825,7 +856,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     });
 
                 }).always(function () {
-
+                    unblockUI();
                 });
             } else if (self.start_index <= totalCount) {
                 self.createLogs($modal, totalAmount);

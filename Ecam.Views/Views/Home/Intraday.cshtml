@@ -162,6 +162,9 @@
                     <button type="button" id="btn" class="btn btn-primary btn-sm" data-bind="click:openLog">Log</button>
                 </div>
                 <div class="form-group m-r-10 m-t-10">
+                    <button type="button" id="btn" class="btn btn-danger btn-sm" data-bind="click:openBatchLog">Batch Log</button>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
                     <button type="button" id="btn" class="btn btn-info btn-sm" data-bind="click:openInvestments">Investments</button>
                 </div>
             </div>
@@ -881,6 +884,53 @@
                                     <td class="text-right"></td>
                                 </tr>
                             </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="modal-batch-template">
+    <div id="modal-batch-${name}" class="modal {{if is_modal_full==true}}container{{/if}} {{if position=='top'}}modal-top{{/if}}" tabindex="-1" data-focus-on="input:first" data-width="${width}" style="display: none;">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">${title}</h4>
+        </div>
+        <div class="modal-body">
+            <div class="edit-cnt p-10">
+                <div class="clearfix">&nbsp;</div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table id="tblBatch" class="table table-striped table-bordered table-hover table-condensed table-gray">
+                            <thead>
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th class="text-right">W1</th>
+                                    <th class="text-right">W2</th>
+                                    <th class="text-right">W3</th>
+                                    <th class="text-right">W4</th>
+                                    <th class="text-right">W5</th>
+                                    <th class="text-right">First Price</th>
+                                    <th class="text-right">Last Price</th>
+                                    <th class="text-right">Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{each(j,row) rows}}
+                                <tr>
+                                    <td>${row.symbol}</td>
+                                    <td class="text-right">${formatPercentage(row.w1)}</td>
+                                    <td class="text-right">${formatPercentage(row.w2_total_percentage)}</td>
+                                    <td class="text-right">${formatPercentage(row.w3_total_percentage)}</td>
+                                    <td class="text-right">${formatPercentage(row.w4_total_percentage)}</td>
+                                    <td class="text-right">${formatPercentage(row.w5_total_percentage)}</td>
+                                    <td class="text-right">${formatNumber(row.first_price)}</td>
+                                    <td class="text-right">${formatNumber(row.last_price)}</td>
+                                    <td class="text-right">${formatPercentage(row.percentage)}</td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
                         </table>
                     </div>
                 </div>

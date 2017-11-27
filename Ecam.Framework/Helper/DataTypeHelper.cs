@@ -887,6 +887,47 @@ namespace Ecam.Framework
             return (awb_no.Length >= 11 ? awb_no.Substring(0, 3) : "");
         }
 
+        public static List<Weeks> GetMonthWeeks(DateTime date)
+        {
+            DateTime monthStartDate = DataTypeHelper.GetFirstDayOfMonth(date);
+            DateTime monthLastDate = DataTypeHelper.GetLastDayOfMonth(date);
+            TimeSpan ts = monthLastDate - monthStartDate;
+            List<Weeks> weeks = new List<Weeks>();
+            int i;
+            for (i = 0; i < ts.TotalDays; i++)
+            {
+                Weeks w = new Weeks
+                {
+                    first_date = DataTypeHelper.GetFirstDayOfWeek(monthStartDate.AddDays(i)),
+                    last_date = DataTypeHelper.GetLastDayOfWeek(monthStartDate.AddDays(i))
+                };
+                TimeSpan ws = w.first_date - monthStartDate;
+                if (ws.Days <= 0)
+                {
+                    w.first_date = monthStartDate;
+                }
+                ws = monthLastDate - w.last_date;
+                if (ws.Days <= 0)
+                {
+                    w.last_date = monthLastDate;
+                }
+                if ((from q in weeks
+                     where q.first_date == w.first_date
+                     && q.last_date == w.last_date
+                     select q).Count() <= 0)
+                {
+                    w.week_number = weeks.Count + 1;
+                    weeks.Add(w);
+                }
+            }
+            return weeks;
+        }
+
+        public static int GetWeekNumberOfMonth(DateTime date)
+        {
+            return DataTypeHelper.GetMonthWeeks(date).Count();
+        }
+
         /// <summary>
         /// Returns the first day of the week that the specified
         /// date is in using the current culture. 
@@ -949,4 +990,12 @@ namespace Ecam.Framework
             return value;
         }
     }
+
+    public class Weeks
+    {
+        public int week_number { get; set; }
+        public DateTime first_date { get; set; }
+        public DateTime last_date { get; set; }
+    }
+
 }
