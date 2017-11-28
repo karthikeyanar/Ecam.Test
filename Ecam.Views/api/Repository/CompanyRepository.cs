@@ -15,6 +15,7 @@ namespace Ecam.Framework.Repository
     {
         PaginatedListResult<TRA_COMPANY> Get(TRA_COMPANY_SEARCH criteria, Paging paging);
         List<BatchLog> GetBatchLog(TRA_COMPANY_SEARCH criteria, Paging paging);
+        List<DailySummary> GetDailySummary(TRA_COMPANY_SEARCH criteria, Paging paging);
         PaginatedListResult<TRA_COMPANY> GetMarketList(TRA_COMPANY_SEARCH criteria, Paging paging);
         PaginatedListResult<TRA_MARKET_INTRA_DAY> GetIntraDay(TRA_COMPANY_SEARCH criteria, Paging paging);
         PaginatedListResult<TRA_MARKET_AVG> GetAvg(TRA_COMPANY_SEARCH criteria, Paging paging);
@@ -206,6 +207,11 @@ namespace Ecam.Framework.Repository
         public List<BatchLog> GetBatchLog(TRA_COMPANY_SEARCH criteria, Paging paging)
         {
             return Common.GetBatchLog(criteria, paging);
+        }
+
+        public List<DailySummary> GetDailySummary(TRA_COMPANY_SEARCH criteria, Paging paging)
+        {
+            return Common.GetDailySummary(criteria, paging);
         }
 
         public PaginatedListResult<TRA_COMPANY> GetMarketList(TRA_COMPANY_SEARCH criteria, Paging paging)

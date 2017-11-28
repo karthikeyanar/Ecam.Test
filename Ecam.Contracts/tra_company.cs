@@ -110,6 +110,7 @@ namespace Ecam.Contracts
         public decimal? total_to_profit { get; set; }
         public string ignore_symbols { get; set; }
         public bool? is_current_stock { get; set; }
+        public decimal? total_amount { get; set; }
     }
 
     public class TRA_CATEGORY_GROUP

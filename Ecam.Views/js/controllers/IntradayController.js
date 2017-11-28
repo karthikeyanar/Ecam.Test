@@ -550,6 +550,35 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             });
         }
 
+        this.openDailyLog = function () {
+            $('#temp-daily-modal-container').remove();
+            var $cnt = $("<div id='temp-daily-modal-container'></div>");
+            $('body').append($cnt);
+            handleBlockUI();
+            var arr = self.last_params;
+            var url = apiUrl("/Company/DailyList");
+            $.ajax({
+                "url": url,
+                "cache": false,
+                "type": "GET",
+                "data": arr
+            }).done(function (json) {
+                var data = {
+                    "name": "Investment"
+                   , "title": "Investment"
+                   , "is_modal_full": false
+                   , "position": "top"
+                   , "width": $(window).width() - 100
+                    , "rows": json
+                };
+                $("#modal-daily-template").tmpl(data).appendTo($cnt);
+                var $modal = $("#modal-daily-" + data.name, $cnt);
+                $modal.modal('show');
+            }).always(function () {
+                unblockUI();
+            });
+        }
+
         this.openInvestments = function () {
             self.openInvestmentsModal(self._investments);
         }

@@ -539,13 +539,205 @@ namespace Ecam.Models
                     }
                 }
             }
+            foreach (var log in logs)
+            {
+                if (log.w1_first_price <= 0 && log.w1_last_price <= 0)
+                {
+                    log.w1_first_price = log.w2_first_price;
+                    log.w1_last_price = log.w2_last_price;
+                    log.w1 = DataTypeHelper.SafeDivision((log.w1_last_price - log.w1_first_price), log.w1_first_price) * 100;
+                }
+            }
             logs = (from q in logs
                     orderby q.percentage descending
                     select q).ToList();
             return logs;
         }
+
+        public static List<DailySummary> GetDailySummary(TRA_COMPANY_SEARCH criteria, Paging paging)
+        {
+            DateTime minDate = Convert.ToDateTime("01/01/1900");
+            List<DailySummary> logs = new List<DailySummary>();
+            List<TRA_COMPANY> list = Common.Get(criteria, paging).rows.ToList();
+
+            List<string> symbols = (from q in list
+                                    select q.symbol).Distinct().ToList();
+            List<tra_market> markets;
+            using (EcamContext context = new EcamContext())
+            {
+                markets = (from q in context.tra_market
+                           where symbols.Contains(q.symbol) == true
+                           && q.trade_date >= criteria.start_date
+                           && q.trade_date <= criteria.end_date
+                           select q).ToList();
+            }
+
+            DateTime monthStartDate = DataTypeHelper.GetFirstDayOfMonth(criteria.end_date ?? minDate);
+            DateTime monthLastDate = DataTypeHelper.GetLastDayOfMonth(criteria.end_date ?? minDate);
+            TimeSpan ts = monthLastDate - monthStartDate;
+            List<Weeks> weeks = new List<Weeks>();
+            int i;
+            for (i = 0; i < ts.TotalDays; i++)
+            {
+                DateTime dt = monthStartDate.AddDays(i);
+               
+                    DailySummary log = (from q in logs
+                                        where q.date == dt
+                                        select q).FirstOrDefault();
+                    if (log == null)
+                    {
+                        log = new DailySummary
+                        {
+                            date = dt,
+                        };
+                        logs.Add(log);
+                    }
+                    if (log != null)
+                    {
+                        foreach (string symbol in symbols)
+                        {
+                            DailyLog daily = (from q in log.logs
+                                              where q.symbol == symbol
+                                              && q.date == dt
+                                              select q).FirstOrDefault();
+                            if (daily == null)
+                            {
+                                daily = new DailyLog
+                                {
+                                    symbol = symbol,
+                                    buy_price = 0,
+                                    close_price = 0,
+                                    date = dt,
+                                    high_price = 0,
+                                    total_amount = (criteria.total_amount ?? 0),
+                                    total_equity = symbols.Count(),
+                                    low_price = 0
+                                };
+                                log.logs.Add(daily);
+                            }
+                            daily.date = dt;
+                            daily.buy_price = (from q in markets
+                                               where q.symbol == symbol
+                                               && q.trade_date >= monthStartDate
+                                               orderby q.trade_date ascending
+                                               select (q.open_price ?? 0)).FirstOrDefault();
+                            var market = (from q in markets
+                                          where q.symbol == symbol
+                                          && q.trade_date == dt
+                                          select q).FirstOrDefault();
+                            if (market == null)
+                            {
+                                market = (from q in markets
+                                          where q.symbol == symbol
+                                          && q.trade_date <= dt
+                                          orderby q.trade_date descending 
+                                          select q).FirstOrDefault();
+                            }
+                            if (market != null)
+                            {
+                                daily.close_price = (market.close_price ?? 0);
+                                daily.high_price = (market.high_price ?? 0);
+                                daily.low_price = (market.low_price ?? 0);
+                            }
+                        }
+                    }
+                
+            }
+            logs = (from q in logs
+                    orderby q.date ascending
+                    select q).ToList();
+            return logs;
+        }
     }
 
+    public class DailySummary
+    {
+        public DailySummary()
+        {
+            this.logs = new List<DailyLog>();
+        }
+        public List<DailyLog> logs { get; set; }
+        public DateTime date { get; set; }
+        public decimal investment {
+            get {
+                return (from q in this.logs select q.buy_amount).Sum();
+            }
+        }
+        public decimal cmv {
+            get {
+                return (from q in this.logs select q.cmv).Sum();
+            }
+        }
+        public decimal cmv_high {
+            get {
+                return (from q in this.logs select q.cmv_high).Sum();
+            }
+        }
+        public decimal cmv_low {
+            get {
+                return (from q in this.logs select q.cmv_low).Sum();
+            }
+        }
+        public decimal percentage {
+            get {
+                return DataTypeHelper.SafeDivision((this.cmv - this.investment), this.investment) * 100;
+            }
+        }
+        public decimal percentage_high {
+            get {
+                return DataTypeHelper.SafeDivision((this.cmv_high - this.investment), this.investment) * 100;
+            }
+        }
+        public decimal percentage_low {
+            get {
+                return DataTypeHelper.SafeDivision((this.cmv_low - this.investment), this.investment) * 100;
+            }
+        }
+    }
+
+    public class DailyLog
+    {
+        public DateTime date { get; set; }
+        public string symbol { get; set; }
+        public decimal total_amount { get; set; }
+        public decimal total_equity { get; set; }
+        public decimal investment {
+            get {
+                return DataTypeHelper.SafeDivision(this.total_amount, this.total_equity);
+            }
+        }
+        public decimal buy_price { get; set; }
+        public int quantity {
+            get {
+                return (int)DataTypeHelper.SafeDivision(this.investment, this.buy_price);
+            }
+        }
+        public decimal buy_amount {
+            get {
+                return this.quantity * this.buy_price;
+            }
+        }
+
+        public decimal high_price { get; set; }
+        public decimal low_price { get; set; }
+        public decimal close_price { get; set; }
+
+        public decimal cmv {
+            get {
+                return this.quantity * this.close_price;
+            }
+        }
+        public decimal cmv_high {
+            get {
+                return this.quantity * this.high_price;
+            }
+        }
+        public decimal cmv_low {
+            get {
+                return this.quantity * this.low_price;
+            }
+        }
+    }
 
     public class BatchLog
     {

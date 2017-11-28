@@ -53,6 +53,13 @@ namespace Ecam.Views.Controllers
         }
 
         [HttpGet]
+        [ActionName("DailyList")]
+        public List<DailySummary> DailyList([FromUri] TRA_COMPANY_SEARCH criteria, [FromUri] Paging paging)
+        {
+            return _CompanyRepository.GetDailySummary(criteria, paging);
+        }
+
+        [HttpGet]
         [ActionName("CategoryGroups")]
         public List<TRA_CATEGORY_GROUP> CategoryGroups([FromUri] TRA_COMPANY_SEARCH criteria, [FromUri] Paging paging)
         {
