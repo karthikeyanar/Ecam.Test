@@ -1011,11 +1011,20 @@
         <td class="text-right">${formatNumber(total_equity)}</td>
         <td class="text-right">${positive_count+' (' + formatPercentage(positive_percentage) + ')'}</td>
         <td class="text-right">${negative_count+' (' + formatPercentage(negative_percentage) + ')'}</td>
-        <td>
-            <span><i class="fa fa-search cursor-pointer">&nbsp;</i></span>
+        <td style="width:100px;white-space:nowrap;">
+            <div class="pull-left">
+                <span><i class="fa fa-search cursor-pointer">&nbsp;</i></span>
+            </div>
+            <div class="pull-left m-l-15">
+                <span id="lnkDaily" style="color:blue;cursor:pointer;">Daily</span>
+            </div><div class="clearfix"></div>
         </td>
         <td>
             ${symbols}
+            <input type="hidden" id="FromDate" value="${from_date}" />
+            <input type="hidden" id="ToDate" value="${to_date}" />
+            <input type="hidden" id="TotalFromDate" value="${total_from_date}" />
+            <input type="hidden" id="TotalToDate" value="${total_to_date}" />
             <input type="hidden" name="symbols" value="${symbols}" />
         </td>
     </tr>

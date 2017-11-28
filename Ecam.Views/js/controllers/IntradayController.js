@@ -551,11 +551,14 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
         }
 
         this.openDailyLog = function () {
+            self.openDailyLogModal(self.last_params);
+        }
+
+        this.openDailyLogModal = function (arr) {
             $('#temp-daily-modal-container').remove();
             var $cnt = $("<div id='temp-daily-modal-container'></div>");
             $('body').append($cnt);
             handleBlockUI();
-            var arr = self.last_params;
             var url = apiUrl("/Company/DailyList");
             $.ajax({
                 "url": url,
@@ -900,6 +903,19 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         var index = $("tr", $tbody).index($tr);
                         var arr = self.temp_investments[index];
                         self.openInvestmentsModal(arr);
+                    });
+                    var $lnkDaily = $("#lnkDaily", $tr);
+                    $lnkDaily.unbind('click').click(function () {
+                        var arr = self.last_params;
+                        $.each(arr, function (i, p) {
+                            switch (p.name) {
+                                case "start_date": p.value = $("#FromDate", $tr).val(); break;
+                                case "end_date": p.value = $("#ToDate", $tr).val(); break;
+                                case "total_start_date": p.value = $("#TotalFromDate", $tr).val(); break;
+                                case "total_end_date": p.value = $("#TotalToDate", $tr).val(); break;
+                            }
+                        });
+                        self.openDailyLogModal(arr);
                     });
                 });
                 console.log('self.year_count=', self.year_count);

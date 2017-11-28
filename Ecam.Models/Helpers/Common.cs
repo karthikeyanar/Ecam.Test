@@ -577,71 +577,73 @@ namespace Ecam.Models
             TimeSpan ts = monthLastDate - monthStartDate;
             List<Weeks> weeks = new List<Weeks>();
             int i;
-            for (i = 0; i < ts.TotalDays; i++)
+            for (i = 0; i < ts.TotalDays + 1; i++)
             {
                 DateTime dt = monthStartDate.AddDays(i);
-               
-                    DailySummary log = (from q in logs
-                                        where q.date == dt
-                                        select q).FirstOrDefault();
-                    if (log == null)
+
+                DailySummary log = (from q in logs
+                                    where q.date == dt
+                                    select q).FirstOrDefault();
+                if (log == null)
+                {
+                    log = new DailySummary
                     {
-                        log = new DailySummary
-                        {
-                            date = dt,
-                        };
-                        logs.Add(log);
-                    }
-                    if (log != null)
+                        date = dt,
+                    };
+                    logs.Add(log);
+                }
+                if (log != null)
+                {
+                    foreach (string symbol in symbols)
                     {
-                        foreach (string symbol in symbols)
+                        DailyLog daily = (from q in log.logs
+                                          where q.symbol == symbol
+                                          && q.date == dt
+                                          select q).FirstOrDefault();
+                        if (daily == null)
                         {
-                            DailyLog daily = (from q in log.logs
-                                              where q.symbol == symbol
-                                              && q.date == dt
-                                              select q).FirstOrDefault();
-                            if (daily == null)
+                            daily = new DailyLog
                             {
-                                daily = new DailyLog
-                                {
-                                    symbol = symbol,
-                                    buy_price = 0,
-                                    close_price = 0,
-                                    date = dt,
-                                    high_price = 0,
-                                    total_amount = (criteria.total_amount ?? 0),
-                                    total_equity = symbols.Count(),
-                                    low_price = 0
-                                };
-                                log.logs.Add(daily);
-                            }
-                            daily.date = dt;
-                            daily.buy_price = (from q in markets
-                                               where q.symbol == symbol
-                                               && q.trade_date >= monthStartDate
-                                               orderby q.trade_date ascending
-                                               select (q.open_price ?? 0)).FirstOrDefault();
-                            var market = (from q in markets
-                                          where q.symbol == symbol
-                                          && q.trade_date == dt
-                                          select q).FirstOrDefault();
-                            if (market == null)
-                            {
-                                market = (from q in markets
-                                          where q.symbol == symbol
-                                          && q.trade_date <= dt
-                                          orderby q.trade_date descending 
-                                          select q).FirstOrDefault();
-                            }
-                            if (market != null)
-                            {
-                                daily.close_price = (market.close_price ?? 0);
-                                daily.high_price = (market.high_price ?? 0);
-                                daily.low_price = (market.low_price ?? 0);
-                            }
+                                symbol = symbol,
+                                buy_price = 0,
+                                close_price = 0,
+                                ltp_price = 0,
+                                date = dt,
+                                high_price = 0,
+                                total_amount = (criteria.total_amount ?? 0),
+                                total_equity = symbols.Count(),
+                                low_price = 0
+                            };
+                            log.logs.Add(daily);
+                        }
+                        daily.date = dt;
+                        daily.buy_price = (from q in markets
+                                           where q.symbol == symbol
+                                           && q.trade_date >= monthStartDate
+                                           orderby q.trade_date ascending
+                                           select (q.open_price ?? 0)).FirstOrDefault();
+                        var market = (from q in markets
+                                      where q.symbol == symbol
+                                      && q.trade_date == dt
+                                      select q).FirstOrDefault();
+                        if (market == null)
+                        {
+                            market = (from q in markets
+                                      where q.symbol == symbol
+                                      && q.trade_date <= dt
+                                      orderby q.trade_date descending
+                                      select q).FirstOrDefault();
+                        }
+                        if (market != null)
+                        {
+                            daily.close_price = (market.close_price ?? 0);
+                            daily.ltp_price = (market.ltp_price ?? 0);
+                            daily.high_price = (market.high_price ?? 0);
+                            daily.low_price = (market.low_price ?? 0);
                         }
                     }
-                
+                }
+
             }
             logs = (from q in logs
                     orderby q.date ascending
@@ -721,10 +723,11 @@ namespace Ecam.Models
         public decimal high_price { get; set; }
         public decimal low_price { get; set; }
         public decimal close_price { get; set; }
+        public decimal ltp_price { get; set; }
 
         public decimal cmv {
             get {
-                return this.quantity * this.close_price;
+                return this.quantity * this.ltp_price;
             }
         }
         public decimal cmv_high {
