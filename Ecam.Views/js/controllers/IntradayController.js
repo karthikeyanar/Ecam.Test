@@ -587,6 +587,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
         }
 
         this.openInvestmentsModal = function (investments) {
+            investments = investments.sort(getDescOrder("profit"));
             $('#temp-investment-modal-container').remove();
             var $cnt = $("<div id='temp-investment-modal-container'></div>");
             $('body').append($cnt);
