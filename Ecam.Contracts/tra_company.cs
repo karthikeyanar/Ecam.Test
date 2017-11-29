@@ -58,6 +58,9 @@ namespace Ecam.Contracts
         public Nullable<int> positive { get; set; }
         public Nullable<int> negative_percentage { get; set; }
         public Nullable<int> positive_percentage { get; set; }
+
+        public Nullable<decimal> total_first_price { get; set; }
+        public Nullable<decimal> total_last_price { get; set; }
         public Nullable<decimal> total_profit { get; set; }
 
         public Nullable<decimal> total_high_price { get; set; }
@@ -72,6 +75,10 @@ namespace Ecam.Contracts
         public Nullable<decimal> yesterday_percentage { get; set; }
         public Nullable<decimal> total_rsi { get; set; }
         public Nullable<decimal> profit_rsi { get; set; }
+
+        //public Nullable<decimal> trigger_first_price { get; set; }
+        //public Nullable<decimal> trigger_last_price { get; set; }
+        //public Nullable<decimal> trigger_profit { get; set; }
     }
 
     public class TRA_COMPANY_SEARCH : TRA_COMPANY
@@ -106,11 +113,17 @@ namespace Ecam.Contracts
         public DateTime? total_start_date { get; set; }
         public DateTime? total_end_date { get; set; }
 
+        public DateTime? trigger_start_date { get; set; }
+        public DateTime? trigger_end_date { get; set; }
+
         public decimal? total_from_profit { get; set; }
         public decimal? total_to_profit { get; set; }
         public string ignore_symbols { get; set; }
         public bool? is_current_stock { get; set; }
         public decimal? total_amount { get; set; }
+
+        public decimal? trigger_from_profit { get; set; }
+        public decimal? trigger_to_profit { get; set; }
     }
 
     public class TRA_CATEGORY_GROUP

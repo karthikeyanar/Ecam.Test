@@ -258,6 +258,16 @@ namespace Ecam.Models
                 , DataTypeHelper.GetFirstDayOfMonth(criteria.total_start_date.Value).ToString("yyyy-MM-dd")
                 , DataTypeHelper.GetLastDayOfMonth(criteria.total_end_date.Value).ToString("yyyy-MM-dd")) + Environment.NewLine;
 
+            //if (criteria.trigger_start_date.HasValue == false)
+            //    criteria.trigger_start_date = criteria.total_start_date;
+            //if (criteria.trigger_end_date.HasValue == false)
+            //    criteria.trigger_end_date = criteria.total_end_date;
+
+            //string triggerDateFilter = string.Empty;
+            //triggerDateFilter = string.Format(" and m.trade_date>='{0}' and m.trade_date<='{1}' "
+            //    , criteria.trigger_start_date.Value.ToString("yyyy-MM-dd")
+            //    , criteria.trigger_end_date.Value.ToString("yyyy-MM-dd")) + Environment.NewLine;
+
             selectFields = "ct.company_id" + Environment.NewLine +
                            ",ct.company_name" + Environment.NewLine +
                            ",ct.symbol" + Environment.NewLine +
@@ -288,8 +298,13 @@ namespace Ecam.Models
                             ",(select low_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " and m.low_price > 0 order by m.low_price asc limit 0,1) as profit_low_price" + Environment.NewLine +
                             ",(select ifnull(rsi,0) from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date desc limit 0,1) as profit_rsi" + Environment.NewLine +
                             ",(select ifnull(rsi,0) from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " order by m.trade_date desc limit 0,1) as total_rsi" + Environment.NewLine +
+
                             ",(select open_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " order by m.trade_date asc limit 0,1) as total_first_price" + Environment.NewLine +
                             ",(select ltp_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " order by m.trade_date desc limit 0,1) as total_last_price" + Environment.NewLine +
+
+                            //",(select open_price from tra_market m where m.symbol = ct.symbol " + triggerDateFilter + " order by m.trade_date asc limit 0,1) as trigger_first_price" + Environment.NewLine +
+                            //",(select ltp_price from tra_market m where m.symbol = ct.symbol " + triggerDateFilter + " order by m.trade_date desc limit 0,1) as trigger_last_price" + Environment.NewLine +
+
                             ",(select open_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date asc limit 0,1) as first_price" + Environment.NewLine +
                             ",(select ltp_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date desc limit 0,1) as last_price" + Environment.NewLine +
                             ",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + " and ifnull(m.percentage, 0) < 0) as negative" + Environment.NewLine +
@@ -377,6 +392,16 @@ namespace Ecam.Models
                 where.AppendFormat(" and ifnull((((total_last_price - total_first_price)/total_first_price) * 100),0)<={0}", criteria.total_to_profit);
             }
 
+            //if ((criteria.trigger_from_profit ?? 0) != 0)
+            //{
+            //    where.AppendFormat(" and ifnull((((trigger_last_price - trigger_first_price)/trigger_first_price) * 100),0)>={0}", criteria.trigger_from_profit);
+            //}
+
+            //if ((criteria.trigger_to_profit ?? 0) != 0)
+            //{
+            //    where.AppendFormat(" and ifnull((((trigger_last_price - trigger_first_price)/trigger_first_price) * 100),0)<={0}", criteria.trigger_to_profit);
+            //}
+
             if ((criteria.max_negative_count ?? -1) >= 0)
             {
                 where.AppendFormat(" and ifnull(negative,0)<={0}", criteria.max_negative_count).Append(Environment.NewLine);
@@ -395,6 +420,7 @@ namespace Ecam.Models
             sql = string.Format("select " +
             "(((last_price - first_price)/first_price) * 100) as profit" + Environment.NewLine +
             ",(((total_last_price - total_first_price)/total_first_price) * 100) as total_profit" + Environment.NewLine +
+            //",(((trigger_last_price - trigger_first_price)/trigger_first_price) * 100) as trigger_profit" + Environment.NewLine +
             ",(negative/(negative+positive) * 100) as negative_percentage" + Environment.NewLine +
             ",(positive/(negative+positive) * 100) as positive_percentage" + Environment.NewLine +
             ",(((profit_high_price - ltp_price)/ltp_price) * 100) as profit_high_percentage" + Environment.NewLine +

@@ -57,13 +57,13 @@
                         </label>
                     </div>
                 </div>
-                <div class="form-group m-r-10 m-t-10">
+                @*<div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" id="is_mf" /> MF Stock
                         </label>
                     </div>
-                </div>
+                </div>*@
             </div>
             <div class="clearfix"></div>
             <div class="m-l-15">
@@ -88,19 +88,19 @@
                         </div>
                     </div>*@
                 <div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="from_rsi" class="form-control input-sm" placeholder="From RSI" style="width:100px" />
+                    <span>From RSI&nbsp;</span><input type="text" name="from_rsi" class="form-control input-sm" placeholder="From RSI" style="width:100px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="to_rsi" class="form-control input-sm" placeholder="To RSI" style="width:100px" />
+                    <span>To RSI&nbsp;</span><input type="text" name="to_rsi" class="form-control input-sm" placeholder="To RSI" style="width:100px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="from_profit" class="form-control input-sm" value="" placeholder="From Profit" style="width:100px" />
+                    <span>From Profit&nbsp;</span><input type="text" name="from_profit" class="form-control input-sm" value="" placeholder="From Profit" style="width:100px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="to_profit" class="form-control input-sm" placeholder="To Profit" style="width:100px" />
+                    <span>To Profit&nbsp;</span><input type="text" name="to_profit" class="form-control input-sm" placeholder="To Profit" style="width:100px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="max_negative_count" class="form-control input-sm" value="-1" placeholder="Max Negative Count" style="width:150px" />
+                    <span>Max Negative&nbsp;</span><input type="text" name="max_negative_count" class="form-control input-sm" value="-1" placeholder="Max Negative Count" style="width:150px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <button id="reportrange" type="button" class="btn btn-sm btn-default">
@@ -124,13 +124,28 @@
                         </span><b class="caret"></b>
                     </button>
                 </div>
+                @*<div class="form-group m-r-10 m-t-10 p-t-5">
+                    <label>Trigger Profit Dates:</label>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <button id="trigger_reportrange" type="button" class="btn btn-sm btn-default">
+                        <i class="fa fa-calendar cursor-pointer m-r-10"></i><span class="m-r-10">
+                        </span><b class="caret"></b>
+                    </button>
+                </div>*@
                 <div class="clearfix"></div>
                 <div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="total_from_profit" class="form-control input-sm" value="25" placeholder="From Total Profit" style="width:100px" />
+                    <span>From Total Profit&nbsp;</span><input type="text" name="total_from_profit" class="form-control input-sm" value="25" placeholder="From Total Profit" style="width:100px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="total_to_profit" class="form-control input-sm" placeholder="To Total Profit" style="width:100px" />
+                    <span>To Total Profit&nbsp;</span><input type="text" name="total_to_profit" class="form-control input-sm" placeholder="To Total Profit" style="width:100px" />
                 </div>
+                @*<div class="form-group m-r-10 m-t-10">
+                    <span>From Trigger Profit&nbsp;</span><input type="text" name="trigger_from_profit" class="form-control input-sm" value="0.1" placeholder="From Trigger Profit" style="width:100px" />
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <span>To Trigger Profit&nbsp;</span><input type="text" name="trigger_to_profit" class="form-control input-sm" placeholder="To Trigger Profit" style="width:100px" />
+                </div>*@
                 @*<div class="form-group m-r-10 m-t-10">
                         <input type="text" name="available_amount" id="available_amount" placeholder="Available Amount" class="form-control input-sm" style="width:100px;" />
                     </div>
@@ -147,14 +162,14 @@
                         <input type="text" name="ltp_to_percentage" id="ltp_to_percentage" placeholder="To %" class="form-control input-sm" style="width:100px;" />
                     </div>*@
                 <div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="total_amount" class="form-control input-sm" placeholder="Total Amount" value="136500" />
+                    <span>Total Investment&nbsp;</span><input type="text" name="total_amount" class="form-control input-sm" placeholder="Total Amount" value="136500" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="monthly_investment" class="form-control input-sm" placeholder="Monthly Investment" value="20000" />
+                    <span>Monthly Investment&nbsp;</span><input type="text" name="monthly_investment" class="form-control input-sm" placeholder="Monthly Investment" value="20000" />
                 </div>
-                <div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="ignore_symbols" class="form-control input-sm" placeholder="Ignore Symbols" value="" style="width:800px" />
-                </div>
+                @*<div class="form-group m-r-10 m-t-10">
+                    <span>Ignore Symbols&nbsp;</span><input type="text" name="ignore_symbols" class="form-control input-sm" placeholder="Ignore Symbols" value="" style="width:800px" />
+                </div>*@
                 <div class="form-group m-r-10 m-t-10">
                     <button type="button" id="btn" class="btn btn-success btn-sm" data-bind="click:refresh">Refresh</button>
                 </div>
@@ -175,6 +190,8 @@
             <input type="hidden" name="end_date" data-bind="value:end_date" />
             <input type="hidden" name="total_start_date" data-bind="value:total_start_date" />
             <input type="hidden" name="total_end_date" data-bind="value:total_end_date" />
+            @*<input type="hidden" name="trigger_start_date" data-bind="value:trigger_start_date" />
+            <input type="hidden" name="trigger_end_date" data-bind="value:trigger_end_date" />*@
         </form>
     </div>
 </div>
@@ -268,14 +285,14 @@
                                 @*<th sortname="prev_rsi" class="text-right text-nowrap">
                                         Prev.RSI
                                     </th>*@
-                                <th sortname="total_rsi" class="text-right text-nowrap">
-                                    Total RSI
+                                <th sortname="rsi" class="text-right text-nowrap">
+                                    RSI
                                 </th>
-                                <th sortname="profit_rsi" class="text-right text-nowrap">
+                                @*<th sortname="profit_rsi" class="text-right text-nowrap">
                                     Profit RSI
-                                </th>
+                                </th>*@
                                 <th sortname="prev_percentage" class="text-right text-nowrap">
-                                    C%
+                                    Last %
                                 </th>
                                 <th sortname="ltp_price" class="text-right text-nowrap">
                                     LTP
@@ -292,14 +309,20 @@
                                     <th sortname="mf_qty" class="text-right">
                                         MFQTY
                                     </th>*@
-                                <th sortname="profit_high_percentage" class="text-right">
+                                @*<th sortname="profit_high_percentage" class="text-right">
                                     Profit High %
                                 </th>
                                 <th sortname="profit_low_percentage" class="text-right">
                                     Profit Low %
-                                </th>
+                                </th>*@
                                 <th sortname="profit" class="text-right">
                                     Profit
+                                </th>
+                                <th sortname="total_first_price" class="text-right text-nowrap">
+                                    Total F.P
+                                </th>
+                                <th sortname="total_last_price" class="text-right text-nowrap">
+                                    Total L.P
                                 </th>
                                 <th class="text-right" sortname="total_profit">
                                     Total Profit
@@ -366,11 +389,11 @@
                                         <div data-bind="text:formatNumber(prev_rsi())"></div>
                                     </td>*@
                                 <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                                    <div data-bind="text:formatNumber(total_rsi())"></div>
+                                    <div data-bind="text:formatNumber(rsi())"></div>
                                 </td>
-                                <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                                     <div data-bind="text:formatNumber(profit_rsi())"></div>
-                                </td>
+                                </td>*@
                                 <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                                     <div data-bind="text:formatPercentage(prev_percentage())"></div>
                                 </td>
@@ -389,18 +412,24 @@
                                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                                         <div data-bind="text:formatNumber(mf_qty())"></div>
                                     </td>*@
-                                <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                                     <div data-bind="text:formatPercentage(profit_high_percentage())"></div>
                                     <div data-bind="text:formatNumber(profit_high_price())"></div>
                                 </td>
                                 <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                                     <div data-bind="text:formatPercentage(profit_low_percentage())"></div>
                                     <div data-bind="text:formatNumber(profit_low_price())"></div>
-                                </td>
+                                </td>*@
                                 <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                                     <div data-bind="text:formatPercentage(profit())"></div>
                                     @*<div data-bind="text:formatNumber(first_price())"></div>
                                         <div data-bind="text:formatNumber(last_price())"></div>*@
+                                </td>
+                                <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                    <div data-bind="text:formatNumber(total_first_price())"></div>
+                                </td>
+                                <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                    <div data-bind="text:formatNumber(total_last_price())"></div>
                                 </td>
                                 <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                                     <div data-bind="text:formatPercentage(total_profit())"></div>

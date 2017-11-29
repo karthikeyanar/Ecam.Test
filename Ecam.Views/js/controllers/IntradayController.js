@@ -12,6 +12,9 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
         this.total_start_date = ko.observable("");
         this.total_end_date = ko.observable("");
 
+        //this.trigger_start_date = ko.observable("");
+        //this.trigger_end_date = ko.observable("");
+
         this.avg_profit = ko.observable();
         this.high_avg_profit = ko.observable();
         this.low_avg_profit = ko.observable();
@@ -69,10 +72,10 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 arr[arr.length] = { "name": "is_all_category", "value": is_all_category };
             }
 
-            var is_mf = $("#frmCompanySearch #is_mf")[0].checked;
-            if (is_mf == true) {
-                arr[arr.length] = { "name": "is_mf", "value": is_mf };
-            }
+            //var is_mf = $("#frmCompanySearch #is_mf")[0].checked;
+            //if (is_mf == true) {
+            //    arr[arr.length] = { "name": "is_mf", "value": is_mf };
+            //}
             return arr;
         }
 
@@ -357,6 +360,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                }
             });
 
+            var $pageContent = $(".page-content");
             var arr = [];
             var categories = 'CEMENT & CEMENT PRODUCTS,ENERGY,CHEMICALS,CONSTRUCTION,CONSUMER GOODS,METALS,NIFTY FMGC,RETAIL,TEXTILES';
             var caregoryList = categories.split(',');
@@ -388,14 +392,12 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                }
             });
 
-
+            // Current month
             var arrlastsixmonths = helper.getLastSixMonths();
             var start = moment(_TODAYDATE).startOf('month');//moment(_TODAYDATE).subtract('days', 30);// moment(arrlastsixmonths[0]);
             var end = moment(_TODAYDATE).endOf('month'); //moment(_TODAYDATE);//moment(arrlastsixmonths[1]);
             self.start_date(start.format('MM/DD/YYYY'));
             self.end_date(end.format('MM/DD/YYYY'));
-
-            var $pageContent = $(".page-content");
             //console.log('$pageContent=',$pageContent[0]);
             var $reportRange = $('#reportrange', $pageContent);
             //console.log('reportrange=',$reportRange[0]);
@@ -413,12 +415,12 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             });
             helper.changeDateRangeLabel($('span', $reportRange), start, end, self.start_date(), self.end_date());
 
+
+            // Total start,end date
             var start = moment(_TODAYDATE).subtract('month', 1).endOf('month').subtract('month', 6).add('days', 7).startOf('month');
             var end = moment(_TODAYDATE).subtract('month', 1).endOf('month');
             self.total_start_date(start.format('MM/DD/YYYY'));
             self.total_end_date(end.format('MM/DD/YYYY'));
-
-            var $pageContent = $(".page-content");
             //console.log('$pageContent=',$pageContent[0]);
             var $totalReportRange = $('#total_reportrange', $pageContent);
             //console.log('reportrange=',$totalReportRange[0]);
@@ -435,6 +437,29 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 }
             });
             helper.changeDateRangeLabel($('span', $totalReportRange), start, end, self.total_start_date(), self.total_end_date());
+
+
+            //// Trigger start,end date
+            //var start = moment(_TODAYDATE).subtract('month', 1).endOf('month').subtract('month', 1).add('days', 7).startOf('month');
+            //var end = moment(_TODAYDATE).subtract('month', 1).endOf('month');
+            //self.trigger_start_date(start.format('MM/DD/YYYY'));
+            //self.trigger_end_date(end.format('MM/DD/YYYY'));
+            ////console.log('$pageContent=',$pageContent[0]);
+            //var $triggerReportRange = $('#trigger_reportrange', $pageContent);
+            ////console.log('reportrange=',$triggerReportRange[0]);
+            //helper.handleDateRangePicker($triggerReportRange, {
+            //    'opens': 'left',
+            //    'start': start,
+            //    'end': end,
+            //    'changeDate': function (start, end) {
+            //        var daysDiff = helper.getTimeDiff(start.format('MM/DD/YYYY'), end.format('MM/DD/YYYY')).days;
+            //        self.trigger_start_date(start.format('MM/DD/YYYY'));
+            //        self.trigger_end_date(end.format('MM/DD/YYYY'));
+            //        helper.changeDateRangeLabel($('span', $triggerReportRange), start, end, self.trigger_start_date(), self.trigger_end_date());
+            //        self.loadGrid();
+            //    }
+            //});
+            //helper.changeDateRangeLabel($('span', $triggerReportRange), start, end, self.trigger_start_date(), self.trigger_end_date());
         }
 
         this.openItem = function (row) {
@@ -671,6 +696,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             var endDate = moment(_TODAYDATE).subtract('month', index).endOf('month').format('MM/DD/YYYY');
             var totalStartDate = moment(_TODAYDATE).subtract('month', index + 1).endOf('month').subtract('month', 6).add('days', 7).startOf('month').format('MM/DD/YYYY');
             var totalEndDate = moment(_TODAYDATE).subtract('month', index + 1).endOf('month').format('MM/DD/YYYY');
+            //var triggerStartDate = moment(_TODAYDATE).subtract('month', index + 1).endOf('month').subtract('month', 1).add('days', 7).startOf('month').format('MM/DD/YYYY');
+            //var triggerEndDate = moment(_TODAYDATE).subtract('month', index + 1).endOf('month').format('MM/DD/YYYY');
 
             if (self.start_index <= totalCount && formatDate(startDate).indexOf('2017') >= 0) {
 
@@ -694,6 +721,11 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         } else if (row.name == "total_end_date") {
                             row.value = totalEndDate;
                         }
+                        //else if (row.name == "trigger_start_date") {
+                        //    row.value = triggerStartDate;
+                        //} else if (row.name == "trigger_end_date") {
+                        //    row.value = triggerEndDate;
+                        //}
                         arr.push(row);
                     });
                 }
@@ -712,7 +744,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 //arr.push({ 'name': 'categories', 'value': 'CEMENT & CEMENT PRODUCTS,ENERGY,CHEMICALS,CONSTRUCTION,CONSUMER GOODS,METALS,NIFTY FMGC' });
 
                 handleBlockUI({ "message": 'Loading... - ' + formatDate(startDate) }); // + 'startDate='+  formatDate(startDate) +  'endDate=', formatDate(endDate)+  'totalStartDate='+  formatDate(totalStartDate)+  'totalEndDate='+  formatDate(totalEndDate) + ' ...' });
-                console.log('index=', index, 'startDate=', formatDate(startDate), 'endDate=', formatDate(endDate), 'totalStartDate=', formatDate(totalStartDate), 'totalEndDate=', formatDate(totalEndDate));
+                //console.log('index=', index, 'startDate=', formatDate(startDate), 'endDate=', formatDate(endDate), 'totalStartDate=', formatDate(totalStartDate), 'totalEndDate=', formatDate(totalEndDate));
 
                 var url = apiUrl("/Company/List");
                 $.ajax({
