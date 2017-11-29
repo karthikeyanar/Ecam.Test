@@ -362,7 +362,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
             var $pageContent = $(".page-content");
             var arr = [];
-            var categories = 'CEMENT & CEMENT PRODUCTS,ENERGY,CHEMICALS,CONSTRUCTION,CONSUMER GOODS,METALS,NIFTY FMGC,RETAIL,TEXTILES';
+            var categories = 'CEMENT & CEMENT PRODUCTS,ENERGY,CHEMICALS,CONSTRUCTION,CONSUMER GOODS,METALS,NIFTY FMGC,RETAIL,TEXTILES,FERTILISERS & PESTICIDES,MEDIA & ENTERTAINMENT,NIFTY INFRA,PAPER';
             var caregoryList = categories.split(',');
             $.each(caregoryList, function (i, cat) {
                 arr.push({ "id": cat, "text": cat });
@@ -688,7 +688,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
         }
 
         this.createLogs = function ($modal, totalAmount) {
-            var totalCount = 30;
+            var totalCount = 50;
             self.start_index = cInt(self.start_index) + 1;
 
             var index = totalCount - self.start_index;

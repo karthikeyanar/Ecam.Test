@@ -1343,7 +1343,7 @@ RegexOptions.IgnoreCase
             DateTime eveningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 3:31PM");
             DateTime eveningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 11:59PM");
             DateTime now = DateTime.Now;
-            url = string.Format("https://www.google.com/finance?q=NSE:{0}"
+            url = string.Format("https://finance.google.com/finance?q=NSE:{0}"
                                                                    , symbol.Replace("&", "%26")
                                                                    );
             string fileName = GOOGLE_DATA + "\\" + symbol + ".html";
@@ -1364,64 +1364,64 @@ RegexOptions.IgnoreCase
             //    //    isJSONAPI = true;
             //    //}
             //}
-            if ((now >= eveningStart && now <= eveningEnd))
+            //if ((now >= eveningStart && now <= eveningEnd))
+            //{
+            if (File.Exists(fileName) == true)
             {
-                if (File.Exists(fileName) == true)
+                FileInfo fileInfo = new FileInfo(fileName);
+                if (fileInfo.CreationTime < eveningStart)
                 {
-                    FileInfo fileInfo = new FileInfo(fileName);
-                    if (fileInfo.CreationTime < eveningStart)
-                    {
-                        File.Delete(fileName);
-                    }
+                    File.Delete(fileName);
                 }
-                if (File.Exists(fileName) == false)
+            }
+            if (File.Exists(fileName) == false)
+            {
+                try
                 {
+                    html = client.DownloadString(url);
                     try
                     {
-                        html = client.DownloadString(url);
-                        try
-                        {
-                            File.WriteAllText(fileName, html);
-                        }
-                        catch { }
-                        Console.WriteLine("Download google data symbol evening=" + symbol);
+                        File.WriteAllText(fileName, html);
                     }
-                    catch
-                    {
-                        //Helper.Log("DownloadErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData_" + rnd.Next(1000, 10000));
-                    }
+                    catch { }
+                    Console.WriteLine("Download google data symbol evening=" + symbol);
                 }
-                else
+                catch
                 {
-                    html = File.ReadAllText(fileName);
+                    //Helper.Log("DownloadErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData_" + rnd.Next(1000, 10000));
                 }
             }
             else
             {
-                html = client.DownloadString(url);
-                Console.WriteLine("Download google data symbol morning=" + symbol);
-                if (File.Exists(fileName) == true)
-                {
-                    File.Delete(fileName);
-                }
-                //if (File.Exists(fileName) == false)
-                //{
-                //    try
-                //    {
-                //        html = client.DownloadString(url);
-                //        //File.WriteAllText(fileName, html);
-                //        Console.WriteLine("Download google data symbol morning=" + symbol);
-                //    }
-                //    catch
-                //    {
-                //        //Helper.Log("DownloadErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData_" + rnd.Next(1000, 10000));
-                //    }
-                //}
-                //else
-                //{
-                //    html = File.ReadAllText(fileName);
-                //}
+                html = File.ReadAllText(fileName);
             }
+            //}
+            //else
+            //{
+            //    html = client.DownloadString(url);
+            //    Console.WriteLine("Download google data symbol morning=" + symbol);
+            //    if (File.Exists(fileName) == true)
+            //    {
+            //        File.Delete(fileName);
+            //    }
+            //    //if (File.Exists(fileName) == false)
+            //    //{
+            //    //    try
+            //    //    {
+            //    //        html = client.DownloadString(url);
+            //    //        //File.WriteAllText(fileName, html);
+            //    //        Console.WriteLine("Download google data symbol morning=" + symbol);
+            //    //    }
+            //    //    catch
+            //    //    {
+            //    //        //Helper.Log("DownloadErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData_" + rnd.Next(1000, 10000));
+            //    //    }
+            //    //}
+            //    //else
+            //    //{
+            //    //    html = File.ReadAllText(fileName);
+            //    //}
+            //}
             //else if (isJSONAPI == true)
             //{
             //    try
