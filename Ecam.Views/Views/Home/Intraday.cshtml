@@ -39,6 +39,13 @@
                 <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
+                            <input type="checkbox" id="is_current_stock" /> Show Current Stock
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <div class="checkbox">
+                        <label>
                             <input type="checkbox" id="is_nifty_50" /> Nifty 50
                         </label>
                     </div>
@@ -368,12 +375,12 @@
                                     </div>
                                 </td>
                                 <td style="text-align:center;">
-                                    <a href="javascript:;" class="is-book-mark">
+                                    <a href="javascript:;" class="is-archive">
                                         <i data-bind="css:{'fa-bookmark fg-primary': cBool(is_archive())==true,'fa-bookmark-o': cBool(is_archive())==false}" class="fa fa-bookmark"></i>
                                     </a>
                                 </td>
                                 <td style="text-align:center;">
-                                    <a href="javascript:;" class="is-current-stock">
+                                    <a href="javascript:;" class="is-book-mark">
                                         <i data-bind="css:{'fa-user fg-primary': cBool(is_book_mark())==true,'fa-user-o': cBool(is_book_mark())==false}" class="fa fa-user"></i>
                                     </a>
                                 </td>

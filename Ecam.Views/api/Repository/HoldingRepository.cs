@@ -70,7 +70,6 @@ namespace Ecam.Framework.Repository
 
             orderBy = string.Format("order by {0} {1}", paging.SortName, paging.SortOrder);
             selectFields = "h.holding_id as id" + Environment.NewLine +
-                           "," + (criteria.target_percentage ?? 0).ToString() + " as target_percentage " + Environment.NewLine +
                            ",h.*" + Environment.NewLine +
                            ",(((ifnull(c.ltp_price, 0) - ifnull(h.avg_price, 0)) / ifnull(h.avg_price, 0)) * 100) as change_percentage" + Environment.NewLine +
                            ",(ifnull(h.quantity, 0) * ifnull(h.avg_price, 0)) as investment" + Environment.NewLine +
@@ -80,7 +79,7 @@ namespace Ecam.Framework.Repository
                            ",c.ltp_price" + Environment.NewLine +
                            "";
             sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, orderBy, pageLimit);
-            Helper.Log(sql);
+            //Helper.Log(sql);
             List<TRA_HOLDING> rows = new List<TRA_HOLDING>();
             using (EcamContext context = new EcamContext())
             {
