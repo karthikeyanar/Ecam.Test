@@ -458,6 +458,29 @@ namespace Ecam.Models
                 }
                 row.category_name = categoryName;
             }
+            foreach(var row in rows)
+            {
+                if((row.first_price ?? 0) <= 0)
+                {
+                    row.first_price = row.total_last_price;
+                }
+                if ((row.last_price ?? 0) <= 0)
+                {
+                    row.last_price = row.total_last_price;
+                }
+                if ((row.high_price ?? 0) <= 0)
+                {
+                    row.high_price = row.total_last_price;
+                }
+                if ((row.low_price ?? 0) <= 0)
+                {
+                    row.low_price = row.total_last_price;
+                }
+                if ((row.last_price ?? 0) <= 0)
+                {
+                    row.profit = DataTypeHelper.SafeDivision(((row.last_price ?? 0) - (row.first_price ?? 0)), (row.first_price ?? 0)) * 100;
+                }
+            }
             return new PaginatedListResult<TRA_COMPANY> { total = paging.Total, rows = rows };
         }
 

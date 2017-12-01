@@ -787,6 +787,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                             var profit = cFloat(((cmv - investment) / investment) * 100);
                             var highProfit = cFloat(((high_cmv - investment) / investment) * 100);
                             var lowProfit = cFloat(((low_cmv - investment) / investment) * 100);
+
                             investments.push({
                                 "symbol": row.symbol,
                                 "quantity": quantity,
@@ -819,7 +820,15 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         }
                     });
 
-                    console.log('totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue);
+                    //console.log('investments length=', investments.length);
+                    //if (investments.length <= 0) {
+                    //    totalInvestment = cFloat(totalAmount);
+                    //    totalCurrentValue = cFloat(totalAmount);
+                    //    highCurrentValue = cFloat(totalAmount);
+                    //    lowCurrentValue = cFloat(totalAmount);
+                    //}
+
+                    console.log('totalAmount=', totalAmount, 'totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue, 'highCurrentValue=', highCurrentValue, 'lowCurrentValue=', lowCurrentValue);
                     var totalProfitAVG = 0;
 
                     var data = {
@@ -875,6 +884,13 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         totalHighCMV += cFloat(row.high_cmv);
                         totalLowCMV += cFloat(row.low_cmv);
                     });
+                    //if (investments.length <= 0) {
+                    //    totalInvestment = cFloat(totalAmount);
+                    //    totalCMV = cFloat(totalAmount);
+                    //    totalHighCMV = cFloat(totalAmount);
+                    //    totalLowCMV = cFloat(totalAmount);
+                    //}
+
                     balance = cFloat(totalAmount - totalInvestment);
                     profit = cFloat(cFloat(totalCMV - totalInvestment) / totalInvestment) * 100;
                     highProfit = cFloat(cFloat(totalHighCMV - totalInvestment) / totalInvestment) * 100;
@@ -882,6 +898,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
                     var monthlyInvestment = cFloat($(":input[name='monthly_investment']").val());
                     totalAmount = cFloat(totalCMV) + cFloat(balance) + monthlyInvestment;
+                    console.log('follow next year totalCMV=', totalCMV, 'balance=', balance, 'monthlyInvestment=', monthlyInvestment);
                     self.createLogs($modal, totalAmount);
 
                     //cFloat($(":input[name='total_amount']").val())
