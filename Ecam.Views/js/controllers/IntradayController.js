@@ -1134,8 +1134,40 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             });
         }
 
+        this.goToNextSlap = function (index) {
+            var $pageContent = $(".page-content");
+
+            var start = moment(_TODAYDATE).subtract('month', index).startOf('month');
+            var end = moment(_TODAYDATE).subtract('month', index).endOf('month');
+            self.start_date(start.format('MM/DD/YYYY'));
+            self.end_date(end.format('MM/DD/YYYY'));
+            var $reportRange = $('#reportrange', $pageContent);
+            helper.changeDateRangeLabel($('span', $reportRange), start, end, self.start_date(), self.end_date());
+
+            start = moment(_TODAYDATE).subtract('month', index + 1).endOf('month').subtract('month', 6).add('days', 7).startOf('month');
+            end = moment(_TODAYDATE).subtract('month', index + 1).endOf('month');
+            self.total_start_date(start.format('MM/DD/YYYY'));
+            self.total_end_date(end.format('MM/DD/YYYY'));
+            var $totalReportRange = $('#total_reportrange', $pageContent);
+            helper.changeDateRangeLabel($('span', $totalReportRange), start, end, self.total_start_date(), self.total_end_date());
+
+            self.loadGrid();
+        }
+
         this.onElements = function () {
             self.offElements();
+            $("body").on("click", "#frmCompanySearch #btnNextSlap", function (event) {
+                var index = cInt($(this).attr('index'));
+                index -= 1;
+                $(this).attr("index", index);
+                self.goToNextSlap(index);
+            });
+            $("body").on("click", "#frmCompanySearch #btnPrevSlap", function (event) {
+                var index = cInt($(this).attr('index'));
+                index += 1;
+                $(this).attr("index", index);
+                self.goToNextSlap(index);
+            });
             $("body").on("click", "#frmCompanySearch #is_archive", function (event) {
                 self.loadGrid();
             });
@@ -1424,6 +1456,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
         }
 
         this.offElements = function () {
+            $("body").off("click", "#frmCompanySearch #btnNextSlap");
+            $("body").off("click", "#frmCompanySearch #btnPrevSlap");
             $("body").off("click", "#frmCompanySearch #is_archive");
             $("body").off("click", "#frmCompanySearch #is_book_mark");
             $("body").off("click", "#frmCompanySearch #is_current_stock");
