@@ -171,7 +171,9 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     highCurrentValue += cFloat(row.high_cmv);
                     lowCurrentValue += cFloat(row.low_cmv);
 
-                    if (cFloat(row.profit) > 0) {
+                    var p = ((cFloat(row.last_price) - cFloat(row.first_price)) / cFloat(row.last_price)) * 100;
+
+                    if (cFloat(p) > 0) {
                         positiveCount += 1;
                     } else {
                         negativeCount += 1;
@@ -369,13 +371,13 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             });
 
             var $pageContent = $(".page-content");
-            var arr = [];
-            var categories = 'CEMENT & CEMENT PRODUCTS,ENERGY,CHEMICALS,CONSTRUCTION,CONSUMER GOODS,METALS,NIFTY FMGC,RETAIL,TEXTILES,FERTILISERS & PESTICIDES,MEDIA & ENTERTAINMENT,NIFTY INFRA,PAPER';
-            var caregoryList = categories.split(',');
-            $.each(caregoryList, function (i, cat) {
-                arr.push({ "id": cat, "text": cat });
-            });
-            $categories.select2Refresh("data", arr);
+            //var arr = [];
+            //var categories = 'CEMENT & CEMENT PRODUCTS,ENERGY,CHEMICALS,CONSTRUCTION,CONSUMER GOODS,METALS,NIFTY FMGC,RETAIL,TEXTILES,FERTILISERS & PESTICIDES,MEDIA & ENTERTAINMENT,NIFTY INFRA,PAPER';
+            //var caregoryList = categories.split(',');
+            //$.each(caregoryList, function (i, cat) {
+            //    arr.push({ "id": cat, "text": cat });
+            //});
+            //$categories.select2Refresh("data", arr);
 
             select2Setup($mf_ids[0], {
                 multiple: true
@@ -820,15 +822,14 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         }
                     });
 
-                    //console.log('investments length=', investments.length);
-                    //if (investments.length <= 0) {
-                    //    totalInvestment = cFloat(totalAmount);
-                    //    totalCurrentValue = cFloat(totalAmount);
-                    //    highCurrentValue = cFloat(totalAmount);
-                    //    lowCurrentValue = cFloat(totalAmount);
-                    //}
+                    console.log('before totalAmount=', totalAmount, 'totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue, 'highCurrentValue=', highCurrentValue, 'lowCurrentValue=', lowCurrentValue);
 
-                    console.log('totalAmount=', totalAmount, 'totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue, 'highCurrentValue=', highCurrentValue, 'lowCurrentValue=', lowCurrentValue);
+                    totalCurrentValue = self.calcFinalMarketValue(totalCurrentValue, investments.length, false);
+                    highCurrentValue = self.calcFinalMarketValue(highCurrentValue, investments.length, false);
+                    lowCurrentValue = self.calcFinalMarketValue(lowCurrentValue, investments.length, false);
+
+                    console.log('after totalAmount=', totalAmount, 'totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue, 'highCurrentValue=', highCurrentValue, 'lowCurrentValue=', lowCurrentValue);
+
                     var totalProfitAVG = 0;
 
                     var data = {
@@ -876,29 +877,21 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
                     self.temp_investments.push(investments);
 
-                    //console.log('formatDate(startDate)=', formatDate(startDate), 'indexOf=', formatDate(startDate).indexOf('2016'));
-                    var totalInvestment = 0, totalCMV = 0, totalHighCMV = 0, totalLowCMV = 0, balance = 0, profit = 0, highProfit = 0, lowProfit = 0;
-                    $.each(investments, function (i, row) {
-                        totalInvestment += cFloat(row.investment);
-                        totalCMV += cFloat(row.cmv);
-                        totalHighCMV += cFloat(row.high_cmv);
-                        totalLowCMV += cFloat(row.low_cmv);
-                    });
-                    //if (investments.length <= 0) {
-                    //    totalInvestment = cFloat(totalAmount);
-                    //    totalCMV = cFloat(totalAmount);
-                    //    totalHighCMV = cFloat(totalAmount);
-                    //    totalLowCMV = cFloat(totalAmount);
-                    //}
+                    var balance = 0; var profit = 0; var highProfit = 0; var lowProfit = 0;
 
                     balance = cFloat(totalAmount - totalInvestment);
-                    profit = cFloat(cFloat(totalCMV - totalInvestment) / totalInvestment) * 100;
-                    highProfit = cFloat(cFloat(totalHighCMV - totalInvestment) / totalInvestment) * 100;
-                    lowProfit = cFloat(cFloat(totalLowCMV - totalInvestment) / totalInvestment) * 100;
+
+                    console.log('before balance=', balance);
+                    balance = cFloat(balance) - cFloat(self.getCharges(totalInvestment, investments.length, true));
+                    console.log('after balance=', balance);
+
+                    profit = cFloat(cFloat(totalCurrentValue - totalInvestment) / totalInvestment) * 100;
+                    highProfit = cFloat(cFloat(highCurrentValue - totalInvestment) / totalInvestment) * 100;
+                    lowProfit = cFloat(cFloat(lowCurrentValue - totalInvestment) / totalInvestment) * 100;
 
                     var monthlyInvestment = cFloat($(":input[name='monthly_investment']").val());
-                    totalAmount = cFloat(totalCMV) + cFloat(balance) + monthlyInvestment;
-                    console.log('follow next year totalCMV=', totalCMV, 'balance=', balance, 'monthlyInvestment=', monthlyInvestment);
+                    totalAmount = cFloat(totalCurrentValue) + cFloat(balance) + monthlyInvestment;
+                    console.log('follow next year totalCurrentValue=', totalCurrentValue, 'balance=', balance, 'monthlyInvestment=', monthlyInvestment);
                     self.createLogs($modal, totalAmount);
 
                     //cFloat($(":input[name='total_amount']").val())
@@ -945,8 +938,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         $("tbody", $tblLogCount).append("<tr><td>" + row.symbol + "</td><td class='text-right'>" + row.count + "</td></tr>");
                     });
 
-                }).always(function () {
                     unblockUI();
+                }).always(function () {
                 });
             } else if (self.start_index <= totalCount) {
                 self.createLogs($modal, totalAmount);
@@ -994,6 +987,25 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     self.createLogs($modal, totalAmount);
                 }
             }
+        }
+
+        this.calcFinalMarketValue = function (totalMarketValue, totalEquity, isInvestment) {
+            return (cFloat(totalMarketValue) - self.getCharges(totalMarketValue, totalEquity, isInvestment));
+        }
+
+        this.getCharges = function (totalMarketValue, totalEquity, isInvestment) {
+            totalMarketValue = cFloat(totalMarketValue);
+            totalEquity = cInt(totalEquity);
+            var stt = (totalMarketValue * 0.1) / 100;
+            var txn = (totalMarketValue * 0.00325) / 100;
+            var gst = (txn * 18) / 100;
+            var stamb = (totalMarketValue * 0.006) / 100;
+            var sebi = ((15 * totalMarketValue) / 10000000);
+            var dpcharges = (totalEquity * 15.93);
+            if (isInvestment == true) {
+                dpcharges = 0;
+            }
+            return (stt + txn + gst + stamb + sebi + dpcharges);
         }
 
         this.loadTradeDetailChart = function ($childTD) {
@@ -1134,6 +1146,20 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             });
         }
 
+        this.loadDefaultCategories = function () {
+            var $frmCompanySearch = $("#frmCompanySearch");
+            var $symbols = $(":input[name='symbols']", $frmCompanySearch);
+            var $categories = $(":input[name='categories']", $frmCompanySearch);
+            var $pageContent = $(".page-content");
+            var arr = [];
+            var categories = 'CEMENT & CEMENT PRODUCTS,ENERGY,CHEMICALS,CONSTRUCTION,CONSUMER GOODS,METALS,NIFTY FMGC,RETAIL,TEXTILES,FERTILISERS & PESTICIDES,MEDIA & ENTERTAINMENT,NIFTY INFRA,PAPER';
+            var caregoryList = categories.split(',');
+            $.each(caregoryList, function (i, cat) {
+                arr.push({ "id": cat, "text": cat });
+            });
+            $categories.select2Refresh("data", arr);
+        }
+
         this.goToNextSlap = function (index) {
             var $pageContent = $(".page-content");
 
@@ -1151,7 +1177,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             var $totalReportRange = $('#total_reportrange', $pageContent);
             helper.changeDateRangeLabel($('span', $totalReportRange), start, end, self.total_start_date(), self.total_end_date());
 
-            self.loadGrid();
+            //self.loadGrid();
         }
 
         this.onElements = function () {
