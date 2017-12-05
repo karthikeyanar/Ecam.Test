@@ -1168,6 +1168,18 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             self.start_date(start.format('MM/DD/YYYY'));
             self.end_date(end.format('MM/DD/YYYY'));
             var $reportRange = $('#reportrange', $pageContent);
+            helper.handleDateRangePicker($reportRange, {
+                'opens': 'left',
+                'start': start,
+                'end': end,
+                'changeDate': function (start, end) {
+                    var daysDiff = helper.getTimeDiff(start.format('MM/DD/YYYY'), end.format('MM/DD/YYYY')).days;
+                    self.start_date(start.format('MM/DD/YYYY'));
+                    self.end_date(end.format('MM/DD/YYYY'));
+                    helper.changeDateRangeLabel($('span', $reportRange), start, end, self.start_date(), self.end_date());
+                    self.loadGrid();
+                }
+            });
             helper.changeDateRangeLabel($('span', $reportRange), start, end, self.start_date(), self.end_date());
 
             start = moment(_TODAYDATE).subtract('month', index + 1).endOf('month').subtract('month', 6).add('days', 7).startOf('month');
@@ -1175,6 +1187,18 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             self.total_start_date(start.format('MM/DD/YYYY'));
             self.total_end_date(end.format('MM/DD/YYYY'));
             var $totalReportRange = $('#total_reportrange', $pageContent);
+            helper.handleDateRangePicker($totalReportRange, {
+                'opens': 'left',
+                'start': start,
+                'end': end,
+                'changeDate': function (start, end) {
+                    var daysDiff = helper.getTimeDiff(start.format('MM/DD/YYYY'), end.format('MM/DD/YYYY')).days;
+                    self.total_start_date(start.format('MM/DD/YYYY'));
+                    self.total_end_date(end.format('MM/DD/YYYY'));
+                    helper.changeDateRangeLabel($('span', $totalReportRange), start, end, self.total_start_date(), self.total_end_date());
+                    self.loadGrid();
+                }
+            });
             helper.changeDateRangeLabel($('span', $totalReportRange), start, end, self.total_start_date(), self.total_end_date());
 
             //self.loadGrid();
