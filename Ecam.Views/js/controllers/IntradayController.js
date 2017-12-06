@@ -691,16 +691,24 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $("#modal-log-template").tmpl(data).appendTo($cnt);
             $modal = $("#modal-log-" + data.name, $cnt);
             $modal.modal('show');
-            self.temp_investments = [];
-            self.start_index = -1;
-            self.year_count = 0;
-            self.createLogs($modal, cFloat($(":input[name='total_amount']").val()));
+            var $selYear = $("#selYear", $modal);
+            //$selYear.val(moment(_TODAYDATE).format('YYYY'));
+            //self.createLogs($modal, cFloat($(":input[name='total_amount']").val()));
+            $selYear.change(function () {
+                if (this.value != '') {
+                    self.temp_investments = [];
+                    self.start_index = -1;
+                    self.year_count = 0;
+                    self.createLogs($modal, cFloat($(":input[name='total_amount']").val()));
+                }
+            });
         }
 
         this.createLogs = function ($modal, totalAmount) {
+            totalAmount = cFloat(totalAmount);
             var totalCount = 50;
             self.start_index = cInt(self.start_index) + 1;
-
+            var $selYear = $("#selYear", $modal);
             var index = totalCount - self.start_index;
             var startDate = moment(_TODAYDATE).subtract('month', index).startOf('month').format('MM/DD/YYYY');
             var endDate = moment(_TODAYDATE).subtract('month', index).endOf('month').format('MM/DD/YYYY');
@@ -709,7 +717,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             //var triggerStartDate = moment(_TODAYDATE).subtract('month', index + 1).endOf('month').subtract('month', 1).add('days', 7).startOf('month').format('MM/DD/YYYY');
             //var triggerEndDate = moment(_TODAYDATE).subtract('month', index + 1).endOf('month').format('MM/DD/YYYY');
 
-            if (self.start_index <= totalCount && formatDate(startDate).indexOf('2017') >= 0) {
+            if (self.start_index <= totalCount && formatDate(startDate).indexOf($selYear.val()) >= 0) {
 
                 var arr = [];
                 if (self.last_params != null) {
@@ -767,6 +775,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     var totalEquity = json.rows.length;
                     var totalInvestmentPerEquity = cFloat(totalAmount / totalEquity);
 
+                    console.log('totalAmount=', totalAmount, 'totalEquity=', totalEquity, 'totalInvestmentPerEquity=', totalInvestmentPerEquity);
+
                     var totalInvestment = 0;
                     var totalCurrentValue = 0;
                     var positiveCount = 0;
@@ -780,6 +790,11 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     if (json.rows != null) {
                         $.each(json.rows, function (i, row) {
                             symbols += row.symbol + ',';
+
+                            if (cFloat(row.first_price) <= 0) { row.first_price = 1; }
+                            if (cFloat(row.last_price) <= 0) { row.last_price = 1; }
+                            if (cFloat(row.profit_high_price) <= 0) { row.profit_high_price = 1; }
+                            if (cFloat(row.profit_low_price) <= 0) { row.profit_low_price = 1; }
 
                             var quantity = cInt(totalInvestmentPerEquity / cFloat(row.first_price));
                             var investment = cFloat(quantity * cFloat(row.first_price));
@@ -808,6 +823,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         });
                     }
 
+
                     $.each(investments, function (i, row) {
                         totalInvestment += cFloat(row.investment);
                         totalCurrentValue += cFloat(row.cmv);
@@ -821,6 +837,14 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                             negativeCount += 1;
                         }
                     });
+
+                    if (investments.length <= 0) {
+                        totalInvestment = totalAmount;
+                        totalCurrentValue = totalAmount;
+                        highCurrentValue = totalAmount;
+                        lowCurrentValue = totalAmount;
+                    }
+
 
                     console.log('before totalAmount=', totalAmount, 'totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue, 'highCurrentValue=', highCurrentValue, 'lowCurrentValue=', lowCurrentValue);
 
@@ -892,6 +916,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     var monthlyInvestment = cFloat($(":input[name='monthly_investment']").val());
                     totalAmount = cFloat(totalCurrentValue) + cFloat(balance) + monthlyInvestment;
                     console.log('follow next year totalCurrentValue=', totalCurrentValue, 'balance=', balance, 'monthlyInvestment=', monthlyInvestment);
+                    $(":input[name='total_amount']").val(totalAmount);
                     self.createLogs($modal, totalAmount);
 
                     //cFloat($(":input[name='total_amount']").val())
@@ -942,9 +967,10 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 }).always(function () {
                 });
             } else if (self.start_index <= totalCount) {
+                $(":input[name='total_amount']").val(totalAmount);
                 self.createLogs($modal, totalAmount);
             }
-            if (self.start_index > totalCount) {
+            if (self.start_index > totalCount && self.start_year_wise == true) {
                 var $tbl = $("#tblLog", $modal);
                 var $tbody = $("tbody", $tbl);
                 $("tr", $tbody).each(function () {
@@ -984,6 +1010,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     self.temp_investments = [];
                     self.start_index = -1;
                     console.log('start totalAmount=', totalAmount);
+                    $(":input[name='total_amount']").val(totalAmount);
                     self.createLogs($modal, totalAmount);
                 }
             }
@@ -1162,6 +1189,11 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
         this.goToNextSlap = function (index) {
             var $pageContent = $(".page-content");
+            var $frmCompanySearch = $("#frmCompanySearch");
+            var $btnNextSlap = $("#btnNextSlap", $frmCompanySearch);
+            var $btnPrevSlap = $("#btnPrevSlap", $frmCompanySearch);
+            $btnNextSlap.attr("index", index);
+            $btnPrevSlap.attr("index", index);
 
             var start = moment(_TODAYDATE).subtract('month', index).startOf('month');
             var end = moment(_TODAYDATE).subtract('month', index).endOf('month');
@@ -1209,13 +1241,11 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $("body").on("click", "#frmCompanySearch #btnNextSlap", function (event) {
                 var index = cInt($(this).attr('index'));
                 index -= 1;
-                $(this).attr("index", index);
                 self.goToNextSlap(index);
             });
             $("body").on("click", "#frmCompanySearch #btnPrevSlap", function (event) {
                 var index = cInt($(this).attr('index'));
                 index += 1;
-                $(this).attr("index", index);
                 self.goToNextSlap(index);
             });
             $("body").on("click", "#frmCompanySearch #is_archive", function (event) {
