@@ -55,6 +55,11 @@ namespace Ecam.Models
                 {
                     context.tra_company_category.Remove(row);
                 }
+                List<tra_category_profit> profits = (from q in context.tra_category_profit where q.category_name == this.category_name select q).ToList();
+                foreach (tra_category_profit row in profits)
+                {
+                    context.tra_category_profit.Remove(row);
+                }
                 context.SaveChanges();
             }
         }

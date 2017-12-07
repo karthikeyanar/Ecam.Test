@@ -107,6 +107,7 @@
     <Compile Include="Helpers\EmailHelper.cs" />
     <Compile Include="Models\ecamtest_backupContext.cs" />
     <Compile Include="Models\Mapping\tra_categoryMap.cs" />
+    <Compile Include="Models\Mapping\tra_category_profitMap.cs" />
     <Compile Include="Models\Mapping\tra_companyMap.cs" />
     <Compile Include="Models\Mapping\tra_company_categoryMap.cs" />
     <Compile Include="Models\Mapping\tra_holdingMap.cs" />
@@ -117,6 +118,7 @@
     <Compile Include="Models\Mapping\tra_mutual_fund_pfMap.cs" />
     <Compile Include="Models\Mapping\tra_splitMap.cs" />
     <Compile Include="Models\tra_category.cs" />
+    <Compile Include="Models\tra_category_profit.cs" />
     <Compile Include="Models\tra_company.cs" />
     <Compile Include="Models\tra_company_category.cs" />
     <Compile Include="Models\tra_holding.cs" />

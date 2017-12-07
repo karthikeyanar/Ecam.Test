@@ -309,6 +309,7 @@
     <Compile Include="api\Models\AirlineInvitationModel.cs" />
     <Compile Include="api\Models\IdentityModels.cs" />
     <Compile Include="api\Models\ImportExcelTableModel.cs" />
+    <Compile Include="api\Repository\CategoryRepository.cs" />
     <Compile Include="api\Repository\SplitRepository.cs" />
     <Compile Include="api\Repository\HoldingRepository.cs" />
     <Compile Include="api\Repository\MarketRepository.cs" />

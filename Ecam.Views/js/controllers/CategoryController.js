@@ -18,7 +18,7 @@ define("CategoryController", ["knockout", "komapping", "helper", "service"], fun
             arr.push({ "name": "PageIndex", "value": $(":input[name='page_index']", $Category).val() });
             arr.push({ "name": "SortName", "value": $(":input[name='sort_name']", $Category).val() });
             arr.push({ "name": "SortOrder", "value": $(":input[name='sort_order']", $Category).val() });
-            var url = apiUrl("/Category/Search");
+            var url = apiUrl("/Category/List");
             $.ajax({
                 "url": url,
                 "cache": false,

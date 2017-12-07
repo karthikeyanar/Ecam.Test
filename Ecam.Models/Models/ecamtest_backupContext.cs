@@ -9,6 +9,7 @@ namespace Ecam.Models{
 		public EcamContext(): base("Name=EcamContext") {
 		}
         public DbSet<tra_category> tra_category { get; set; }
+        public DbSet<tra_category_profit> tra_category_profit { get; set; }
         public DbSet<tra_company> tra_company { get; set; }
         public DbSet<tra_company_category> tra_company_category { get; set; }
         public DbSet<tra_holding> tra_holding { get; set; }
@@ -23,6 +24,7 @@ namespace Ecam.Models{
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Configurations.Add(new tra_categoryMap());
+            modelBuilder.Configurations.Add(new tra_category_profitMap());
             modelBuilder.Configurations.Add(new tra_companyMap());
             modelBuilder.Configurations.Add(new tra_company_categoryMap());
             modelBuilder.Configurations.Add(new tra_holdingMap());
@@ -33,6 +35,20 @@ namespace Ecam.Models{
             modelBuilder.Configurations.Add(new tra_mutual_fund_pfMap());
             modelBuilder.Configurations.Add(new tra_splitMap());
 			modelBuilder.Configurations.Add(new aspnetuserrolesMap());
+
+			///* SQL Page Helper  */
+			//			List<tra_category> tra_category_List = context.tra_category.Take(1).ToList();
+			//			List<tra_category_profit> tra_category_profit_List = context.tra_category_profit.Take(1).ToList();
+			//			List<tra_company> tra_company_List = context.tra_company.Take(1).ToList();
+			//			List<tra_company_category> tra_company_category_List = context.tra_company_category.Take(1).ToList();
+			//			List<tra_holding> tra_holding_List = context.tra_holding.Take(1).ToList();
+			//			List<tra_market> tra_market_List = context.tra_market.Take(1).ToList();
+			//			List<tra_market_avg> tra_market_avg_List = context.tra_market_avg.Take(1).ToList();
+			//			List<tra_market_intra_day> tra_market_intra_day_List = context.tra_market_intra_day.Take(1).ToList();
+			//			List<tra_mutual_fund> tra_mutual_fund_List = context.tra_mutual_fund.Take(1).ToList();
+			//			List<tra_mutual_fund_pf> tra_mutual_fund_pf_List = context.tra_mutual_fund_pf.Take(1).ToList();
+			//			List<tra_split> tra_split_List = context.tra_split.Take(1).ToList();
+			//		/* End SQL Page Helper */
 
         }
     }

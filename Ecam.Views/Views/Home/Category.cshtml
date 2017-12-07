@@ -51,6 +51,15 @@
                     <th sortname="category_name">
                         Category
                     </th>
+                    <th sortname="profit_2016">
+                        2016
+                    </th>
+                    <th sortname="profit_2017">
+                        2017
+                    </th>
+                    <th sortname="profit_2018">
+                        2018
+                    </th>
                     <th style="width: 50px">
                     </th>
                 </tr>
@@ -58,6 +67,9 @@
             <tbody data-bind="foreach:rows">
                 <tr>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:category_name"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(profit_2016)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(profit_2017)"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:formatNumber(profit_2018)"></td>
                     <td style="vertical-align:top;" class="text-center">
                         <a href="javascript:;" class="cursor-pointer fg-black btn-delete" data-placement="top"><i class="fa fa-times"></i></a>
                     </td>

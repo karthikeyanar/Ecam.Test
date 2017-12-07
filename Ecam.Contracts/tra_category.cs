@@ -12,6 +12,13 @@ namespace Ecam.Contracts
     public class TRA_CATEGORY : BaseContract
     {
         public string category_name { get; set; }
+        public decimal? profit_2016 { get; set; }
+        public decimal? profit_2017 { get; set; }
+        public decimal? profit_2018 { get; set; }
+    }
+
+    public class TRA_CATEGORY_SEARCH : TRA_CATEGORY
+    {
     }
 }
 

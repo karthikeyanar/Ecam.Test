@@ -692,8 +692,11 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $modal = $("#modal-log-" + data.name, $cnt);
             $modal.modal('show');
             var $selYear = $("#selYear", $modal);
-            //$selYear.val(moment(_TODAYDATE).format('YYYY'));
-            //self.createLogs($modal, cFloat($(":input[name='total_amount']").val()));
+            $selYear.val(moment(_TODAYDATE).format('YYYY'));
+            self.temp_investments = [];
+            self.start_index = -1;
+            self.year_count = 0;
+            self.createLogs($modal, cFloat($(":input[name='total_amount']").val()));
             $selYear.change(function () {
                 if (this.value != '') {
                     self.temp_investments = [];
@@ -916,7 +919,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     var monthlyInvestment = cFloat($(":input[name='monthly_investment']").val());
                     totalAmount = cFloat(totalCurrentValue) + cFloat(balance) + monthlyInvestment;
                     console.log('follow next year totalCurrentValue=', totalCurrentValue, 'balance=', balance, 'monthlyInvestment=', monthlyInvestment);
-                    $(":input[name='total_amount']").val(totalAmount);
+                    //$(":input[name='total_amount']").val(totalAmount);
                     self.createLogs($modal, totalAmount);
 
                     //cFloat($(":input[name='total_amount']").val())
@@ -967,10 +970,10 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 }).always(function () {
                 });
             } else if (self.start_index <= totalCount) {
-                $(":input[name='total_amount']").val(totalAmount);
+                //$(":input[name='total_amount']").val(totalAmount);
                 self.createLogs($modal, totalAmount);
             }
-            if (self.start_index > totalCount && self.start_year_wise == true) {
+            if (self.start_index > totalCount) {
                 var $tbl = $("#tblLog", $modal);
                 var $tbody = $("tbody", $tbl);
                 $("tr", $tbody).each(function () {
@@ -1000,7 +1003,9 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 var finalEndDate = moment(_TODAYDATE).add('year', self.year_count).format('DD/MMM/YYYY');
                 $("#spnFinalEndDate", $modal).html(finalEndDate);
                 var $tblYearCount = $("#tblYearCount", $modal);
-                $("tbody", $tblYearCount).append("<tr><td>" + finalEndDate + "</td><td class='text-right'>" + $("#spnFinalTotalCMV", $modal).html() + "</td></tr>");
+                if (self.start_year_wise == true) {
+                    $("tbody", $tblYearCount).append("<tr><td>" + finalEndDate + "</td><td class='text-right'>" + $("#spnFinalTotalCMV", $modal).html() + "</td></tr>");
+                }
                 if (self.year_count <= 10 && self.start_year_wise == true) {
                     var $tbl = $("#tblLog", $modal);
                     var $tbody = $("tbody", $tbl);
@@ -1010,7 +1015,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     self.temp_investments = [];
                     self.start_index = -1;
                     console.log('start totalAmount=', totalAmount);
-                    $(":input[name='total_amount']").val(totalAmount);
+                    //$(":input[name='total_amount']").val(totalAmount);
                     self.createLogs($modal, totalAmount);
                 }
             }
@@ -1179,7 +1184,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             var $categories = $(":input[name='categories']", $frmCompanySearch);
             var $pageContent = $(".page-content");
             var arr = [];
-            var categories = 'CEMENT & CEMENT PRODUCTS,ENERGY,CHEMICALS,CONSTRUCTION,CONSUMER GOODS,METALS,NIFTY FMGC,RETAIL,TEXTILES,FERTILISERS & PESTICIDES,MEDIA & ENTERTAINMENT,NIFTY INFRA,PAPER';
+            var categories = 'CEMENT & CEMENT PRODUCTS,CHEMICALS,CONSTRUCTION,CONSUMER GOODS,NIFTY FMGC,RETAIL,TEXTILES,AUTOMOBILE,FINANCIAL SERVICES';
             var caregoryList = categories.split(',');
             $.each(caregoryList, function (i, cat) {
                 arr.push({ "id": cat, "text": cat });

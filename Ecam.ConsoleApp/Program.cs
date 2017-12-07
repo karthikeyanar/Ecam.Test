@@ -30,7 +30,8 @@ namespace Ecam.ConsoleApp
             IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
             MC = System.Configuration.ConfigurationManager.AppSettings["MC"];
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
-            DownloadStart();
+            Ecam.Models.Common.CreateCategoryProfit();
+            //DownloadStart();
         }
 
         private static void AddSplit()
@@ -181,7 +182,6 @@ namespace Ecam.ConsoleApp
                 //}
             }
         }
-
 
         private static string GetString(string html, string startWord, string endWord)
         {

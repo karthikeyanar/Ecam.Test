@@ -458,9 +458,9 @@ namespace Ecam.Models
                 }
                 row.category_name = categoryName;
             }
-            foreach(var row in rows)
+            foreach (var row in rows)
             {
-                if((row.first_price ?? 0) <= 0)
+                if ((row.first_price ?? 0) <= 0)
                 {
                     row.first_price = row.total_last_price;
                 }
@@ -699,6 +699,262 @@ namespace Ecam.Models
                     select q).ToList();
             return logs;
         }
+
+        public static void CreateCategoryProfit()
+        {
+            List<tra_category> categories;
+            using (EcamContext context = new EcamContext())
+            {
+                categories = (from q in context.tra_category
+                              orderby q.category_name ascending
+                              select q).ToList();
+            }
+            foreach (var category in categories)
+            {
+                Common.CreateCategoryProfit(category.category_name, 2016);
+                Common.CreateCategoryProfit(category.category_name, 2017);
+            }
+        }
+
+        public static void CreateCategoryProfit(string categoryName, int year)
+        {
+            DateTime yearStartDate = Convert.ToDateTime("01/01/" + year);
+            decimal initialAmount = 500000;
+            decimal totalAmount = initialAmount;
+            decimal monthlyInvestment = 20000;
+            int totalMonths = 12;
+            int i;
+            for (i = 1; i <= totalMonths; i++)
+            {
+                DateTime dt = Convert.ToDateTime(i + "/01/" + year);
+                DateTime startDate = DataTypeHelper.GetFirstDayOfMonth(dt);
+                DateTime endDate = DataTypeHelper.GetLastDayOfMonth(dt);
+                DateTime totalStartDate = startDate.AddMonths(-6);
+                DateTime totalEndDate = DataTypeHelper.GetLastDayOfMonth(totalStartDate.AddMonths(6).AddDays(-7));
+
+                //Console.WriteLine("StartDate=" + startDate.ToString("dd/MMM/yyyyy") + ",EndDate=" + endDate.ToString("dd/MMM/yyyyy"));
+                List<TRA_COMPANY> list = Common.Get(new TRA_COMPANY_SEARCH
+                {
+                    categories = categoryName,
+                    start_date = startDate,
+                    end_date = endDate,
+                    total_start_date = totalStartDate,
+                    total_end_date = totalEndDate,
+                    total_amount = totalAmount,
+                    monthly_investment = monthlyInvestment,
+                    max_negative_count = -1,
+                }, new Paging
+                {
+                    PageIndex = 1,
+                    PageSize = 10,
+                    SortName = "total_profit",
+                    SortOrder = "desc",
+                }).rows.ToList();
+
+                int totalEquity = list.Count();
+                decimal totalInvestmentPerEquity = (totalAmount / totalEquity);
+                decimal totalInvestment = 0;
+                decimal totalCurrentValue = 0;
+                decimal positiveCount = 0;
+                decimal negativeCount = 0;
+
+                decimal highCurrentValue = 0;
+                decimal lowCurrentValue = 0;
+                decimal balance = 0; decimal profit = 0; decimal highProfit = 0; decimal lowProfit = 0;
+
+                List<Investment> investments = new List<Investment>();
+                string symbols = "";
+
+                if (list != null)
+                {
+                    foreach (var row in list)
+                    {
+                        symbols += row.symbol + ",";
+
+                        if ((row.first_price ?? 0) <= 0) { row.first_price = 1; }
+                        if ((row.last_price ?? 0) <= 0) { row.last_price = 1; }
+                        if ((row.profit_high_price ?? 0) <= 0) { row.profit_high_price = 1; }
+                        if ((row.profit_low_price ?? 0) <= 0) { row.profit_low_price = 1; }
+
+                        int quantity = (int)(totalInvestmentPerEquity / row.first_price);
+                        decimal investment = (quantity * (row.first_price ?? 0));
+                        decimal cmv = quantity * (row.last_price ?? 0);
+                        decimal high_cmv = quantity * (row.profit_high_price ?? 0);
+                        decimal low_cmv = quantity * (row.profit_low_price ?? 0);
+                        profit = (((cmv - investment) / investment) * 100);
+                        highProfit = (((high_cmv - investment) / investment) * 100);
+                        lowProfit = (((low_cmv - investment) / investment) * 100);
+
+                        investments.Add(new Models.Investment
+                        {
+                            symbol = row.symbol,
+                            quantity = quantity,
+                            investment = investment,
+                            cmv = cmv,
+                            high_cmv = high_cmv,
+                            low_cmv = low_cmv,
+                            profit = profit,
+                            high_profit = highProfit,
+                            low_profit = lowProfit,
+                            first_price = (row.first_price ?? 0),
+                            last_price = (row.last_price ?? 0),
+                            profit_high_price = (row.profit_high_price ?? 0),
+                            profit_low_price = (row.profit_low_price ?? 0)
+                        });
+                    }
+
+
+                    foreach (var row in investments)
+                    {
+                        totalInvestment += (row.investment);
+                        totalCurrentValue += (row.cmv);
+
+                        highCurrentValue += (row.high_cmv);
+                        lowCurrentValue += (row.low_cmv);
+
+                        if (row.profit > 0)
+                        {
+                            positiveCount += 1;
+                        }
+                        else
+                        {
+                            negativeCount += 1;
+                        }
+                    }
+
+                    if (investments.Count <= 0)
+                    {
+                        totalInvestment = totalAmount;
+                        totalCurrentValue = totalAmount;
+                        highCurrentValue = totalAmount;
+                        lowCurrentValue = totalAmount;
+                    }
+
+
+                    totalCurrentValue = Common.CalcFinalMarketValue(totalCurrentValue, investments.Count, false);
+                    highCurrentValue = Common.CalcFinalMarketValue(highCurrentValue, investments.Count, false);
+                    lowCurrentValue = Common.CalcFinalMarketValue(lowCurrentValue, investments.Count, false);
+
+                    decimal totalProfitAVG = ((totalCurrentValue - totalInvestment) / totalInvestment) * 100;
+
+                    balance = 0; profit = 0; highProfit = 0; lowProfit = 0;
+
+                    balance = (totalAmount - totalInvestment);
+
+                    balance = balance - (Common.GetCharges(totalInvestment, investments.Count, true));
+
+                    profit = ((totalCurrentValue - totalInvestment) / totalInvestment) * 100;
+                    highProfit = ((highCurrentValue - totalInvestment) / totalInvestment) * 100;
+                    lowProfit = ((lowCurrentValue - totalInvestment) / totalInvestment) * 100;
+
+                    totalAmount = (totalCurrentValue) + (balance) + monthlyInvestment;
+
+                    decimal totalFinalAmount = initialAmount + (monthlyInvestment * i);
+
+                    decimal yearProfit = (((totalAmount) - (totalFinalAmount)) / (totalFinalAmount)) * 100;
+
+                    using (EcamContext context = new EcamContext())
+                    {
+                        tra_category_profit categoryProfit = (from q in context.tra_category_profit
+                                                              where q.category_name == categoryName
+                                                              && q.profit_date == startDate
+                                                              && q.profit_type == "M"
+                                                              select q).FirstOrDefault();
+                        bool isExist = false;
+                        if (categoryProfit == null)
+                        {
+                            categoryProfit = new tra_category_profit();
+                        }
+                        else
+                        {
+                            isExist = true;
+                        }
+                        categoryProfit.category_name = categoryName;
+                        categoryProfit.profit_date = startDate;
+                        categoryProfit.profit_type = "M";
+                        categoryProfit.profit = totalProfitAVG;
+                        if (isExist == true)
+                        {
+                            context.Entry(categoryProfit).State = System.Data.Entity.EntityState.Modified;
+                        }
+                        else
+                        {
+                            context.tra_category_profit.Add(categoryProfit);
+                        }
+                        context.SaveChanges();
+
+
+                        categoryProfit = (from q in context.tra_category_profit
+                                          where q.category_name == categoryName
+                                          && q.profit_date == yearStartDate
+                                          && q.profit_type == "Y"
+                                          select q).FirstOrDefault();
+                        isExist = false;
+                        if (categoryProfit == null)
+                        {
+                            categoryProfit = new tra_category_profit();
+                        }
+                        else
+                        {
+                            isExist = true;
+                        }
+                        categoryProfit.category_name = categoryName;
+                        categoryProfit.profit_date = yearStartDate;
+                        categoryProfit.profit_type = "Y";
+                        categoryProfit.profit = yearProfit;
+                        if (isExist == true)
+                        {
+                            context.Entry(categoryProfit).State = System.Data.Entity.EntityState.Modified;
+                        }
+                        else
+                        {
+                            context.tra_category_profit.Add(categoryProfit);
+                        }
+                        context.SaveChanges();
+                    }
+                }
+            }
+            Console.WriteLine("Completed category=" + categoryName + ",Year=" + year);
+        }
+
+        public static decimal CalcFinalMarketValue(decimal totalMarketValue, decimal totalEquity, bool isInvestment)
+        {
+            return ((totalMarketValue) - Common.GetCharges(totalMarketValue, totalEquity, isInvestment));
+        }
+
+        public static decimal GetCharges(decimal totalMarketValue, decimal totalEquity, bool isInvestment)
+        {
+            //totalMarketValue = cFloat(totalMarketValue);
+            //totalEquity = cInt(totalEquity);
+            decimal stt = (decimal)(totalMarketValue * (decimal)0.1) / 100;
+            decimal txn = (decimal)(totalMarketValue * (decimal)0.00325) / 100;
+            decimal gst = (txn * 18) / 100;
+            decimal stamb = (decimal)(totalMarketValue * (decimal)0.006) / 100;
+            decimal sebi = ((15 * totalMarketValue) / 10000000);
+            decimal dpcharges = (decimal)(totalEquity * (decimal)15.93);
+            if (isInvestment == true)
+            {
+                dpcharges = 0;
+            }
+            return (stt + txn + gst + stamb + sebi + dpcharges);
+        }
+    }
+
+    public class Investment
+    {
+        public string symbol { get; set; }
+        public int quantity { get; set; }
+        public decimal investment { get; set; }
+        public decimal cmv { get; set; }
+        public decimal high_cmv { get; set; }
+        public decimal low_cmv { get; set; }
+        public decimal profit { get; set; }
+        public decimal high_profit { get; set; }
+        public decimal low_profit { get; set; }
+        public decimal first_price { get; set; }
+        public decimal last_price { get; set; }
+        public decimal profit_high_price { get; set; }
+        public decimal profit_low_price { get; set; }
     }
 
     public class DailySummary
