@@ -23,6 +23,7 @@ namespace Ecam.ConsoleApp
         public static string IS_NIFTY_FLAG_CSV = "";
         public static string GOOGLE_DATA = "";
         public static string MC = "";
+        public static string MONEY_CONTROL = "";
         static void Main(string[] args)
         {
             IS_NIFTY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_FLAG_CSV"];
@@ -30,9 +31,223 @@ namespace Ecam.ConsoleApp
             IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
             MC = System.Configuration.ConfigurationManager.AppSettings["MC"];
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
-            Ecam.Models.Common.CreateCategoryProfit();
-            //DownloadStart();
+            MONEY_CONTROL = System.Configuration.ConfigurationManager.AppSettings["MONEY_CONTROL"];
+            DoMoneyControl();
         }
+
+        #region MoneyControl
+
+        private static void DoMoneyControl()
+        {
+            Regex regex = null;
+            string[] arr;
+            WebClient webClient = new WebClient();
+            List<string> urls = GetURLList();
+            if (urls.Count > 0)
+            {
+                string companyName = "";
+                string symbol = "";
+                string categoryName = "";
+
+                string firstURL = urls[0];
+                arr = firstURL.Split(("//").ToCharArray());
+                string name = arr[arr.Length - 1];
+                string dir = System.IO.Path.Combine(MONEY_CONTROL, "equities");
+                if (System.IO.Directory.Exists(dir) == false)
+                {
+                    System.IO.Directory.CreateDirectory(dir);
+                }
+                string fileName = dir + "\\" + name + ".html";
+                string rootHTML = string.Empty;
+                if (System.IO.File.Exists(fileName) == false)
+                {
+                    //rootHTML = webClient.DownloadString(firstURL);
+                    //System.IO.File.WriteAllText(fileName, rootHTML);
+                }
+                else
+                {
+                    rootHTML = System.IO.File.ReadAllText(fileName);
+                }
+
+                if (string.IsNullOrEmpty(rootHTML) == false)
+                {
+                    string html = string.Empty;
+
+                    regex = new Regex(
+   @"<h1(.*?)>(.*?)</h1>",
+   RegexOptions.IgnoreCase
+   | RegexOptions.Multiline
+   | RegexOptions.IgnorePatternWhitespace
+   | RegexOptions.Compiled
+   );
+
+                    MatchCollection collections = regex.Matches(rootHTML);
+                    if (collections.Count >= 1)
+                    {
+                        companyName = TradeHelper.RemoveHTMLTag(collections[0].Value).Trim();
+                    }
+
+                    string startWord = "<div class=\"FL gry10\">";
+                    string endWord = "<div id=\"mcpcp_addportfolio\"";
+                    int startIndex = rootHTML.IndexOf(startWord);
+                    int endIndex = rootHTML.IndexOf(endWord);
+                    int length = endIndex - startIndex + endWord.Length;
+                    if (startIndex > 0 && endIndex > 0)
+                    {
+                        html = rootHTML.Substring(startIndex, length);
+
+                        string value = TradeHelper.RemoveHTMLTag(html);
+                        arr = value.Split(("|").ToArray());
+                        foreach (string row in arr)
+                        {
+                            string[] cells = row.Split((":").ToCharArray());
+                            if (cells.Length >= 2)
+                            {
+                                if (string.IsNullOrEmpty(cells[0]) == false)
+                                {
+                                    cells[0] = cells[0].Trim();
+                                }
+                                if (string.IsNullOrEmpty(cells[1]) == false)
+                                {
+                                    cells[1] = cells[1].Trim();
+                                }
+                                if (cells[0] == "NSE")
+                                {
+                                    symbol = cells[1];
+                                }
+                                else if (cells[0] == "SECTOR")
+                                {
+                                    categoryName = cells[1];
+                                }
+                            }
+                        }
+                    }
+                    if (string.IsNullOrEmpty(companyName) == false
+                        && string.IsNullOrEmpty(symbol) == false
+                        && string.IsNullOrEmpty(categoryName) == false)
+                    {
+                        using (EcamContext context = new EcamContext())
+                        {
+                            tra_category category = (from q in context.tra_category
+                                                     where q.category_name == categoryName
+                                                     select q).FirstOrDefault();
+                            if (category == null)
+                            {
+                                context.tra_category.Add(new tra_category
+                                {
+                                    category_name = categoryName
+                                });
+                                context.SaveChanges();
+                            }
+                            tra_company company = (from q in context.tra_company
+                                                   where q.symbol == symbol
+                                                   select q).FirstOrDefault();
+                            if (company == null)
+                            {
+                                company = new tra_company
+                                {
+                                    symbol = symbol,
+                                    company_name = companyName,
+                                };
+                                context.tra_company.Add(company);
+                                context.SaveChanges();
+                            }
+                            else
+                            {
+                                company.money_control_url = firstURL;
+                                context.Entry(company).State = System.Data.Entity.EntityState.Modified;
+                                context.SaveChanges();
+                            }
+                            tra_company_category companyCategory = (from q in context.tra_company_category
+                                                                    where q.symbol == symbol
+                                                                    && q.category_name == categoryName
+                                                                    select q).FirstOrDefault();
+                            if (companyCategory == null)
+                            {
+                                context.tra_company_category.Add(new tra_company_category
+                                {
+                                    category_name = categoryName,
+                                    symbol = symbol
+                                });
+                                context.SaveChanges();
+                            }
+                        }
+                        Console.WriteLine("Company=" + companyName + ",Symbol=" + symbol + ",Category=" + categoryName);
+                    }
+                }
+            }
+        }
+
+        private static List<string> GetURLList()
+        {
+            List<string> urls = new List<string>();
+            Regex regex = null;
+            if (string.IsNullOrEmpty(MONEY_CONTROL) == false)
+            {
+                string[] files = System.IO.Directory.GetFiles(MONEY_CONTROL);
+                foreach (string fileName in files)
+                {
+                    string html = System.IO.File.ReadAllText(fileName);
+                    html = html.Replace("\n", "").Replace("\r", "").Replace("\r\n", "");
+                    regex = new Regex(
+                                            @"<tr(.*?)>(.*?)</tr>",
+                                            RegexOptions.IgnoreCase
+                                            | RegexOptions.Multiline
+                                            | RegexOptions.IgnorePatternWhitespace
+                                            | RegexOptions.Compiled
+                                            );
+                    MatchCollection trCollections = regex.Matches(html);
+                    int i, j;
+                    for (i = 0; i < trCollections.Count; i++)
+                    {
+                        Match trMatch = trCollections[i];
+                        string tr = trMatch.Value;
+                        regex = new Regex(
+                                        @"<td(.*?)>(.*?)</td>",
+                                        RegexOptions.IgnoreCase
+                                        | RegexOptions.Multiline
+                                        | RegexOptions.IgnorePatternWhitespace
+                                        | RegexOptions.Compiled
+                                        );
+                        MatchCollection tdCollections = regex.Matches(tr);
+                        RowCollections row = new RowCollections();
+                        for (j = 0; j < tdCollections.Count; j++)
+                        {
+                            string v = tdCollections[j].Groups[2].Value;
+                            if (string.IsNullOrEmpty(v) == false)
+                            {
+                                if (v.Contains("<a") == true)
+                                {
+                                    regex = new Regex(
+                                                @"(\S+)=[""']?((?:.(?![""']?\s+(?:\S+)=|[>""']))+.)[""']?",
+                                                RegexOptions.IgnoreCase
+                                                | RegexOptions.Multiline
+                                                | RegexOptions.IgnorePatternWhitespace
+                                                | RegexOptions.Compiled
+                                                );
+                                    MatchCollection attrCollections = regex.Matches(v);
+                                    if (attrCollections.Count > 0)
+                                    {
+                                        if (attrCollections[0].Groups.Count >= 3)
+                                        {
+                                            if (attrCollections[0].Groups[1].Value == "href")
+                                            {
+                                                string url = "http://www.moneycontrol.com" + attrCollections[0].Groups[2].Value;
+                                                urls.Add(url);
+                                                //Helper.Log(url + Environment.NewLine);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return urls;
+        }
+
+        #endregion
 
         private static void AddSplit()
         {

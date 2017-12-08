@@ -2,12 +2,15 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.ModelConfiguration;
 // namespace CodeFirstClassGenerate.Models.Mapping
-namespace Ecam.Models {
-    public partial class tra_companyMap : EntityTypeConfiguration<tra_company> {
-        public tra_companyMap() {
-		            // Primary Key
-		            this.HasKey(t => t.id);
-		
+namespace Ecam.Models
+{
+    public partial class tra_companyMap : EntityTypeConfiguration<tra_company>
+    {
+        public tra_companyMap()
+        {
+            // Primary Key
+            this.HasKey(t => t.id);
+
             // Properties
             this.Property(t => t.company_name)
                 .IsRequired()
@@ -18,61 +21,64 @@ namespace Ecam.Models {
                 .HasMaxLength(50);
 
             this.Property(t => t.open_price)
-                .HasPrecision(13,4);
+                .HasPrecision(13, 4);
 
             this.Property(t => t.high_price)
-                .HasPrecision(13,4);
+                .HasPrecision(13, 4);
 
             this.Property(t => t.low_price)
-                .HasPrecision(13,4);
+                .HasPrecision(13, 4);
 
             this.Property(t => t.ltp_price)
-                .HasPrecision(13,4);
+                .HasPrecision(13, 4);
 
             this.Property(t => t.close_price)
-                .HasPrecision(13,4);
+                .HasPrecision(13, 4);
 
             this.Property(t => t.prev_price)
-                .HasPrecision(13,4);
+                .HasPrecision(13, 4);
 
             this.Property(t => t.week_52_high)
-                .HasPrecision(13,4);
+                .HasPrecision(13, 4);
 
             this.Property(t => t.week_52_low)
-                .HasPrecision(13,4);
+                .HasPrecision(13, 4);
 
             this.Property(t => t.rsi)
-                .HasPrecision(13,4);
+                .HasPrecision(13, 4);
 
             this.Property(t => t.prev_rsi)
-                .HasPrecision(13,4);
+                .HasPrecision(13, 4);
 
             this.Property(t => t.mf_qty)
-                .HasPrecision(13,4);
+                .HasPrecision(13, 4);
 
             this.Property(t => t.monthly_avg)
-                .HasPrecision(13,4);
+                .HasPrecision(13, 4);
 
             this.Property(t => t.weekly_avg)
-                .HasPrecision(13,4);
+                .HasPrecision(13, 4);
 
             this.Property(t => t.mcstr)
                 .HasMaxLength(50);
 
             this.Property(t => t.mc)
-                .HasPrecision(13,4);
+                .HasPrecision(13, 4);
 
             this.Property(t => t.pe)
-                .HasPrecision(13,4);
+                .HasPrecision(13, 4);
 
             this.Property(t => t.volume)
-                .HasPrecision(13,4);
+                .HasPrecision(13, 4);
 
             this.Property(t => t.eps)
-                .HasPrecision(13,4);
+                .HasPrecision(13, 4);
+
+            this.Property(t => t.money_control_url)
+                .HasMaxLength(500);
 
             // Table & Column Mappings
-			this.ToTable("tra_company");
+            this.ToTable("tra_company");
             this.Property(t => t.id).HasColumnName("company_id");
             this.Property(t => t.company_name).HasColumnName("company_name");
             this.Property(t => t.symbol).HasColumnName("symbol");
@@ -100,10 +106,11 @@ namespace Ecam.Models {
             this.Property(t => t.pe).HasColumnName("pe");
             this.Property(t => t.volume).HasColumnName("volume");
             this.Property(t => t.eps).HasColumnName("eps");
-			       Ignore(t=>t.created_date);
-						       Ignore(t=>t.created_by);
-						       Ignore(t=>t.last_updated_date);
-						       Ignore(t=>t.last_updated_by);
-			        }
+            this.Property(t => t.money_control_url).HasColumnName("money_control_url");
+            Ignore(t => t.created_date);
+            Ignore(t => t.created_by);
+            Ignore(t => t.last_updated_date);
+            Ignore(t => t.last_updated_by);
+        }
     }
 }
