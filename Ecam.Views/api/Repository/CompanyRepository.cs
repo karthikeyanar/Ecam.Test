@@ -438,7 +438,7 @@ namespace Ecam.Framework.Repository
 
             sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, orderBy, pageLimit);
 
-            Helper.Log(sql);
+            //Helper.Log(sql);
             List<TRA_COMPANY> rows = new List<TRA_COMPANY>();
             List<tra_company_category> companyCategories;
             using (EcamContext context = new EcamContext())
@@ -979,7 +979,7 @@ namespace Ecam.Framework.Repository
 
             //     paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString, tempsql));
 
-            Helper.Log(sql);
+            //Helper.Log(sql);
             List<TRA_COMPANY> rows = new List<TRA_COMPANY>();
             List<tra_company_category> companyCategories;
             using (EcamContext context = new EcamContext())

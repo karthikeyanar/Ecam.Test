@@ -47,34 +47,34 @@ namespace Ecam.Contracts
         public Nullable<decimal> week_52_percentage { get; set; }
         public Nullable<decimal> week_52_positive_percentage { get; set; }
         public List<string> category_list { get; set; }
-        public Nullable<int> positive_count { get; set; }
-        public Nullable<int> negative_count { get; set; }
-        public Nullable<int> success_count { get; set; }
-        public Nullable<int> fail_count { get; set; }
+        //public Nullable<int> positive_count { get; set; }
+        //public Nullable<int> negative_count { get; set; }
+        //public Nullable<int> success_count { get; set; }
+        //public Nullable<int> fail_count { get; set; }
         public Nullable<decimal> first_price { get; set; }
         public Nullable<decimal> last_price { get; set; }
         public Nullable<decimal> profit { get; set; }
-        public Nullable<int> negative { get; set; }
-        public Nullable<int> positive { get; set; }
-        public Nullable<int> negative_percentage { get; set; }
-        public Nullable<int> positive_percentage { get; set; }
+        //public Nullable<int> negative { get; set; }
+        //public Nullable<int> positive { get; set; }
+        //public Nullable<int> negative_percentage { get; set; }
+        //public Nullable<int> positive_percentage { get; set; }
 
         public Nullable<decimal> total_first_price { get; set; }
         public Nullable<decimal> total_last_price { get; set; }
         public Nullable<decimal> total_profit { get; set; }
 
-        public Nullable<decimal> total_high_price { get; set; }
-        public Nullable<decimal> total_low_price { get; set; }
-        public Nullable<decimal> profit_high_price { get; set; }
-        public Nullable<decimal> profit_low_price { get; set; }
+        //public Nullable<decimal> total_high_price { get; set; }
+        //public Nullable<decimal> total_low_price { get; set; }
+        //public Nullable<decimal> profit_high_price { get; set; }
+        //public Nullable<decimal> profit_low_price { get; set; }
 
-        public Nullable<decimal> profit_high_percentage { get; set; }
-        public Nullable<decimal> profit_low_percentage { get; set; }
+        //public Nullable<decimal> profit_high_percentage { get; set; }
+        //public Nullable<decimal> profit_low_percentage { get; set; }
         public Nullable<DateTime> trade_date { get; set; }
         public Nullable<DateTime> yesterday_date { get; set; }
         public Nullable<decimal> yesterday_percentage { get; set; }
-        public Nullable<decimal> total_rsi { get; set; }
-        public Nullable<decimal> profit_rsi { get; set; }
+        //public Nullable<decimal> total_rsi { get; set; }
+        //public Nullable<decimal> profit_rsi { get; set; }
 
         //public Nullable<decimal> trigger_first_price { get; set; }
         //public Nullable<decimal> trigger_last_price { get; set; }

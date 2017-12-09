@@ -16,8 +16,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
         //this.trigger_end_date = ko.observable("");
 
         this.avg_profit = ko.observable();
-        this.high_avg_profit = ko.observable();
-        this.low_avg_profit = ko.observable();
+        //this.high_avg_profit = ko.observable();
+        //this.low_avg_profit = ko.observable();
         this.positive_count = ko.observable();
         this.negative_count = ko.observable();
         this.positive_percentage = ko.observable();
@@ -99,8 +99,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 self.rows.removeAll();
 
                 self.avg_profit(0);
-                self.high_avg_profit(0);
-                self.low_avg_profit(0);
+                //self.high_avg_profit(0);
+                //self.low_avg_profit(0);
                 self.positive_count(0);
                 self.negative_count(0);
                 self.positive_percentage(0);
@@ -138,25 +138,25 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         var quantity = cInt(totalInvestmentPerEquity / cFloat(row.first_price));
                         var investment = cFloat(quantity * cFloat(row.first_price));
                         var cmv = cFloat(quantity * cFloat(row.last_price));
-                        var high_cmv = cFloat(quantity * cFloat(row.profit_high_price));
-                        var low_cmv = cFloat(quantity * cFloat(row.profit_low_price));
+                        //var high_cmv = cFloat(quantity * cFloat(row.profit_high_price));
+                        //var low_cmv = cFloat(quantity * cFloat(row.profit_low_price));
                         var profit = cFloat(((cmv - investment) / investment) * 100);
-                        var highProfit = cFloat(((high_cmv - investment) / investment) * 100);
-                        var lowProfit = cFloat(((low_cmv - investment) / investment) * 100);
+                        //var highProfit = cFloat(((high_cmv - investment) / investment) * 100);
+                        //var lowProfit = cFloat(((low_cmv - investment) / investment) * 100);
                         investments.push({
                             "symbol": row.symbol,
                             "quantity": quantity,
                             "investment": investment,
                             "cmv": cmv,
-                            "high_cmv": high_cmv,
-                            "low_cmv": low_cmv,
+                            //"high_cmv": high_cmv,
+                            //"low_cmv": low_cmv,
                             "profit": profit,
-                            "high_profit": highProfit,
-                            "low_profit": lowProfit,
+                            //"high_profit": highProfit,
+                            //"low_profit": lowProfit,
                             "first_price": row.first_price,
-                            "last_price": row.last_price,
-                            "profit_high_price": row.profit_high_price,
-                            "profit_low_price": row.profit_low_price
+                            "last_price": row.last_price
+                            //"profit_high_price": row.profit_high_price,
+                            //"profit_low_price": row.profit_low_price
                         });
 
                         var m = komapping.fromJS(row);
@@ -190,10 +190,10 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 self.avg_profit(totalProfitAVG);
 
                 totalProfitAVG = cFloat(cFloat(highCurrentValue - totalInvestment) / totalInvestment) * 100;
-                self.high_avg_profit(totalProfitAVG);
+                //self.high_avg_profit(totalProfitAVG);
 
                 totalProfitAVG = cFloat(cFloat(lowCurrentValue - totalInvestment) / totalInvestment) * 100;
-                self.low_avg_profit(totalProfitAVG);
+                //self.low_avg_profit(totalProfitAVG);
 
                 self.positive_count(positiveCount);
                 self.negative_count(negativeCount);
@@ -627,7 +627,10 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             var $cnt = $("<div id='temp-investment-modal-container'></div>");
             $('body').append($cnt);
             var totalAmount = cFloat($(":input[name='total_amount']").val());
-            var totalInvestment = 0, totalCMV = 0, totalHighCMV = 0, totalLowCMV = 0, balance = 0, profit = 0, highProfit = 0, lowProfit = 0;
+            var totalInvestment = 0, totalCMV = 0;
+            //var totalHighCMV = 0, totalLowCMV = 0;
+            var balance = 0, profit = 0;
+            //var highProfit = 0, lowProfit = 0;
             var positiveCount = 0;
             var negativeCount = 0;
             $.each(investments, function (i, row) {
@@ -643,8 +646,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             });
             balance = cFloat(totalAmount - totalInvestment);
             profit = cFloat(cFloat(totalCMV - totalInvestment) / totalInvestment) * 100;
-            highProfit = cFloat(cFloat(totalHighCMV - totalInvestment) / totalInvestment) * 100;
-            lowProfit = cFloat(cFloat(totalLowCMV - totalInvestment) / totalInvestment) * 100;
+            //highProfit = cFloat(cFloat(totalHighCMV - totalInvestment) / totalInvestment) * 100;
+            //lowProfit = cFloat(cFloat(totalLowCMV - totalInvestment) / totalInvestment) * 100;
             var data = {
                 "name": "Investment"
                 , "title": "Investment"
@@ -655,12 +658,12 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 , "TotalAmount": totalAmount
                 , "TotalInvestment": totalInvestment
                 , "TotalCMV": totalCMV
-                , "TotalHighCMV": totalHighCMV
-                , "TotalLowCMV": totalLowCMV
+                //, "TotalHighCMV": totalHighCMV
+                //, "TotalLowCMV": totalLowCMV
                 , "Balance": balance
                 , "Profit": profit
-                , "HighProfit": highProfit
-                , "LowProfit": lowProfit
+                //, "HighProfit": highProfit
+                //, "LowProfit": lowProfit
                 , "PositiveCount": positiveCount
                 , "NegativeCount": negativeCount
             };
@@ -796,32 +799,32 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
                             if (cFloat(row.first_price) <= 0) { row.first_price = 1; }
                             if (cFloat(row.last_price) <= 0) { row.last_price = 1; }
-                            if (cFloat(row.profit_high_price) <= 0) { row.profit_high_price = 1; }
-                            if (cFloat(row.profit_low_price) <= 0) { row.profit_low_price = 1; }
+                            //if (cFloat(row.profit_high_price) <= 0) { row.profit_high_price = 1; }
+                            //if (cFloat(row.profit_low_price) <= 0) { row.profit_low_price = 1; }
 
                             var quantity = cInt(totalInvestmentPerEquity / cFloat(row.first_price));
                             var investment = cFloat(quantity * cFloat(row.first_price));
                             var cmv = cFloat(quantity * cFloat(row.last_price));
-                            var high_cmv = cFloat(quantity * cFloat(row.profit_high_price));
-                            var low_cmv = cFloat(quantity * cFloat(row.profit_low_price));
+                            //var high_cmv = cFloat(quantity * cFloat(row.profit_high_price));
+                            //var low_cmv = cFloat(quantity * cFloat(row.profit_low_price));
                             var profit = cFloat(((cmv - investment) / investment) * 100);
-                            var highProfit = cFloat(((high_cmv - investment) / investment) * 100);
-                            var lowProfit = cFloat(((low_cmv - investment) / investment) * 100);
+                            //var highProfit = cFloat(((high_cmv - investment) / investment) * 100);
+                            //var lowProfit = cFloat(((low_cmv - investment) / investment) * 100);
 
                             investments.push({
                                 "symbol": row.symbol,
                                 "quantity": quantity,
                                 "investment": investment,
                                 "cmv": cmv,
-                                "high_cmv": high_cmv,
-                                "low_cmv": low_cmv,
+                                //"high_cmv": high_cmv,
+                                //"low_cmv": low_cmv,
                                 "profit": profit,
-                                "high_profit": highProfit,
-                                "low_profit": lowProfit,
+                                //"high_profit": highProfit,
+                                //"low_profit": lowProfit,
                                 "first_price": row.first_price,
-                                "last_price": row.last_price,
-                                "profit_high_price": row.profit_high_price,
-                                "profit_low_price": row.profit_low_price
+                                "last_price": row.last_price
+                                //"profit_high_price": row.profit_high_price,
+                                //"profit_low_price": row.profit_low_price
                             });
                         });
                     }
