@@ -462,12 +462,13 @@ namespace Ecam.Models
                             , eps
                             , symbol);
                         MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-                        if (week52High <= 0 || week52Low <= 0)
-                        {
+                        //if (week52High <= 0 || week52Low <= 0)
+                        //{
                             //Helper.Log("GoogleException symbol 1=" + symbol, "GoogleException_" + rnd.Next(1000, 10000));
-                        }
+                        //}
                         Console.WriteLine("Completed symbol=" + symbol);
 
+                        /*
                         using (EcamContext context = new EcamContext())
                         {
                             var market = (from q in context.tra_market where q.symbol == symbol orderby q.trade_date descending select q).FirstOrDefault();
@@ -503,6 +504,7 @@ namespace Ecam.Models
                                 }
                             }
                         }
+                        */
                     }
                     else
                     {

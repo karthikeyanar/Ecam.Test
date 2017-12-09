@@ -97,12 +97,12 @@
                             </label>
                         </div>
                     </div>*@
-                <div class="form-group m-r-10 m-t-10">
+                @*<div class="form-group m-r-10 m-t-10">
                     <span>From RSI&nbsp;</span><input type="text" name="from_rsi" class="form-control input-sm" placeholder="From RSI" style="width:100px" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <span>To RSI&nbsp;</span><input type="text" name="to_rsi" class="form-control input-sm" placeholder="To RSI" style="width:100px" />
-                </div>
+                </div>*@
                 <div class="form-group m-r-10 m-t-10">
                     <span>From Profit&nbsp;</span><input type="text" name="from_profit" class="form-control input-sm" value="" placeholder="From Profit" style="width:100px" />
                 </div>
@@ -302,9 +302,9 @@
                                 @*<th sortname="prev_rsi" class="text-right text-nowrap">
                                         Prev.RSI
                                     </th>*@
-                                <th sortname="rsi" class="text-right text-nowrap">
+                                @*<th sortname="rsi" class="text-right text-nowrap">
                                     RSI
-                                </th>
+                                </th>*@
                                 @*<th sortname="profit_rsi" class="text-right text-nowrap">
                                     Profit RSI
                                 </th>*@
@@ -405,9 +405,9 @@
                                 @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                                         <div data-bind="text:formatNumber(prev_rsi())"></div>
                                     </td>*@
-                                <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                                     <div data-bind="text:formatNumber(rsi())"></div>
-                                </td>
+                                </td>*@
                                 @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                                     <div data-bind="text:formatNumber(profit_rsi())"></div>
                                 </td>*@
@@ -562,12 +562,12 @@
                                                 <th>
                                                     Category
                                                 </th>
-                                                <th sortname="total_rsi" class="text-right text-nowrap">
+                                                @*<th sortname="total_rsi" class="text-right text-nowrap">
                                                     Total RSI
                                                 </th>
                                                 <th sortname="profit_rsi" class="text-right text-nowrap">
                                                     Profit RSI
-                                                </th>
+                                                </th>*@
                                                 <th sortname="prev_percentage" class="text-right text-nowrap">
                                                     C%
                                                 </th>
@@ -610,12 +610,12 @@
                                                     <div style="width:250px;overflow:hidden;" data-bind="text:category_name">
                                                     </div>
                                                 </td>
-                                                <td style="vertical-align:top;" class="cursor-pointer text-right">
+                                                @*<td style="vertical-align:top;" class="cursor-pointer text-right">
                                                     <div data-bind="text:formatNumber(total_rsi())"></div>
                                                 </td>
                                                 <td style="vertical-align:top;" class="cursor-pointer text-right">
                                                     <div data-bind="text:formatNumber(profit_rsi())"></div>
-                                                </td>
+                                                </td>*@
                                                 <td style="vertical-align:top;" class="cursor-pointer text-right">
                                                     <div data-bind="text:formatPercentage(prev_percentage())"></div>
                                                 </td>
@@ -1116,9 +1116,9 @@
                 <th class="text-right">
                     %
                 </th>
-                <th class="text-right">
+                @*<th class="text-right">
                     RSI
-                </th>
+                </th>*@
                 @*<th class="text-right">
                         Prev.RSI
                     </th>*@
@@ -1141,7 +1141,7 @@
                 @*<td class="text-right">${formatNumber(row.ltp_price)}</td>*@
                 <td class="text-right">${formatNumber(row.close_price)}</td>
                 <td class="text-right">${formatPercentage(row.prev_percentage)}</td>
-                <td class="text-right">${formatNumber(row.rsi)}</td>
+                @*<td class="text-right">${formatNumber(row.rsi)}</td>*@
                 @*<td class="text-right">${formatNumber(row.prev_rsi)}</td>*@
                 <td class="text-right">${formatPercentage(row.open_percentage)}</td>
                 <td class="text-right">${formatPercentage(row.high_percentage)}</td>
@@ -1172,12 +1172,12 @@
                 <th class="text-right">
                     LTP%
                 </th>
-                <th class="text-right">
+                @*<th class="text-right">
                     RSI
                 </th>
                 <th class="text-right">
                     Prev.RSI
-                </th>
+                </th>*@
             </tr>
         </thead>
         <tbody>
@@ -1189,8 +1189,8 @@
                 <td class="text-right">${formatNumber(row.open_price)}</td>
                 <td class="text-right">${formatNumber(row.ltp_price)}</td>
                 <td class="text-right">${formatPercentage(row.ltp_percentage)}</td>
-                <td class="text-right">${formatNumber(row.rsi)}</td>
-                <td class="text-right">${formatNumber(row.prev_rsi)}</td>
+                @*<td class="text-right">${formatNumber(row.rsi)}</td>
+                <td class="text-right">${formatNumber(row.prev_rsi)}</td>*@
             </tr>
             {{/each}}
         </tbody>

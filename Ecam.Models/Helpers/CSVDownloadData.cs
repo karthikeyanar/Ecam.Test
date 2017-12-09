@@ -45,7 +45,7 @@ namespace Ecam.Models
             if (string.IsNullOrEmpty(_Symbol) == false)
             {
                 CSVDataDownload(_Symbol);
-                CalculateRSI(_Symbol);
+                //CalculateRSI(_Symbol);
             }
             Console.WriteLine("thread {0} result calculated...", threadIndex);
             string IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IMPORT_CSV"];
@@ -109,6 +109,7 @@ namespace Ecam.Models
             }
         }
 
+        /*
         public static void CalculateRSI(string symbol)
         {
             using (EcamContext context = new EcamContext())
@@ -307,6 +308,7 @@ namespace Ecam.Models
                 //}
             }
         }
+        */
 
         public string SYMBOL { get { return _Symbol; } }
         private string _Symbol;
