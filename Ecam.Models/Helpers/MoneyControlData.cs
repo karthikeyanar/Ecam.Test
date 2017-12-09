@@ -54,7 +54,7 @@ namespace Ecam.Models
             string MONEY_CONTROL = System.Configuration.ConfigurationManager.AppSettings["MONEY_CONTROL"];
             Regex regex = null;
             string[] arr;
-
+            WebClient webClient = new WebClient();
             string companyName = "";
             string symbol = "";
             string categoryName = "";
@@ -72,13 +72,12 @@ namespace Ecam.Models
             {
                 try
                 {
-                    rootHTML = string.Empty;
-                    //rootHTML = webClient.DownloadString(firstURL);
+                    rootHTML = webClient.DownloadString(url);
                     System.IO.File.WriteAllText(fileName, rootHTML);
                 }
                 catch (Exception ex)
                 {
-                    Helper.Log(url + Environment.NewLine, "MoneyControlDataDownload_Error");
+                    //Helper.Log(url + Environment.NewLine, "MoneyControlDataDownload_Error");
                     //Helper.Log(ex.Message, "MoneyControlDataDownload_Error");
                 }
             }
