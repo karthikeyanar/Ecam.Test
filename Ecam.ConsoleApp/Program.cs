@@ -143,7 +143,7 @@ namespace Ecam.ConsoleApp
                             " from tra_market m" + Environment.NewLine +
                             " where (((ifnull(m.ltp_price,0) - ifnull(m.prev_price,0)) / ifnull(m.prev_price,0))*100) != 0" + Environment.NewLine +
                             " and(((ifnull(m.ltp_price,0) - ifnull(m.prev_price,0)) / ifnull(m.prev_price,0))*100) <= -48" + Environment.NewLine +
-                            " order by prev_percentage asc limit 0,100";
+                            " order by trade_date asc,symbol asc limit 0,100";
             using (MySqlDataReader dr = MySqlHelper.ExecuteReader(Ecam.Framework.Helper.ConnectionString, sql))
             {
                 while (dr.Read())
