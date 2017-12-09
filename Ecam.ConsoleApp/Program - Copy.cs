@@ -24,6 +24,10 @@ namespace Ecam.ConsoleApp
         public static string GOOGLE_DATA = "";
         public static string MC = "";
         public static string MONEY_CONTROL = "";
+        private static int _INDEX = -1;
+        private static string[] _COMPANIES;
+        private static List<string> _URLS;
+
         static void Main(string[] args)
         {
             IS_NIFTY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_FLAG_CSV"];
@@ -40,6 +44,7 @@ namespace Ecam.ConsoleApp
 
         private static void DoMoneyControl()
         {
+<<<<<<< HEAD
             Regex regex = null;
             string[] arr;
             WebClient webClient = new WebClient();
@@ -178,6 +183,10 @@ namespace Ecam.ConsoleApp
                     }
                 }
             }
+=======
+            _URLS = GetURLList();
+            MoneyControlDownloadStart();
+>>>>>>> origin/master
         }
 
         private static List<string> GetURLList()
@@ -234,8 +243,18 @@ namespace Ecam.ConsoleApp
                                         {
                                             if (attrCollections[0].Groups[1].Value == "href")
                                             {
-                                                string url = "http://www.moneycontrol.com" + attrCollections[0].Groups[2].Value;
-                                                urls.Add(url);
+                                                if (string.IsNullOrEmpty(attrCollections[0].Groups[2].Value) == false)
+                                                {
+                                                    string url = attrCollections[0].Groups[2].Value;
+                                                    if (attrCollections[0].Groups[2].Value.Contains("moneycontrol.com") == false)
+                                                    {
+                                                        url = "http://www.moneycontrol.com" + attrCollections[0].Groups[2].Value;
+                                                    }
+                                                    if (urls.Contains(url) == false)
+                                                    {
+                                                        urls.Add(url);
+                                                    }
+                                                }
                                                 //Helper.Log(url + Environment.NewLine);
                                             }
                                         }
@@ -266,7 +285,7 @@ namespace Ecam.ConsoleApp
                             " from tra_market m" + Environment.NewLine +
                             " where (((ifnull(m.ltp_price,0) - ifnull(m.prev_price,0)) / ifnull(m.prev_price,0))*100) != 0" + Environment.NewLine +
                             " and(((ifnull(m.ltp_price,0) - ifnull(m.prev_price,0)) / ifnull(m.prev_price,0))*100) <= -48" + Environment.NewLine +
-                            " order by prev_percentage asc limit 0,100";
+                            " order by trade_date asc,symbol asc limit 0,100";
             using (MySqlDataReader dr = MySqlHelper.ExecuteReader(Ecam.Framework.Helper.ConnectionString, sql))
             {
                 while (dr.Read())
@@ -1047,8 +1066,7 @@ RegexOptions.IgnoreCase
         //    }
         //}
 
-        private static int _INDEX = -1;
-        private static string[] _COMPANIES;
+
         private static void GoogleData()
         {
             List<tra_company> companies;
@@ -1197,6 +1215,38 @@ RegexOptions.IgnoreCase
             _COMPANIES = (from q in companies select q.symbol).ToArray();
             _INDEX = -1;
             GoogleHistoryDownloadStart();
+        }
+
+        private static void MoneyControlDownloadStart()
+        {
+            int totalCount = _URLS.Count;
+            int queueCount = 64;
+            // One event is used for each Fibonacci object
+            ManualResetEvent[] doneEvents = new ManualResetEvent[queueCount];
+            MoneyControlData[] downArray = new MoneyControlData[queueCount];
+            //Random r = new Random();
+            // Configure and launch threads using ThreadPool:
+            Console.WriteLine("launching {0} tasks...", totalCount);
+            for (int i = 0; i < queueCount; i++)
+            {
+                _INDEX += 1;
+                string url = "";
+                if (_INDEX < _URLS.Count)
+                {
+                    url = _URLS[_INDEX];
+                }
+                doneEvents[i] = new ManualResetEvent(false);
+                MoneyControlData f = new MoneyControlData(url, doneEvents[i]);
+                downArray[i] = f;
+                ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback, i);
+            }
+            // Wait for all threads in pool to calculation...
+            WaitHandle.WaitAll(doneEvents);
+            if (_INDEX < _URLS.Count)
+            {
+                Console.WriteLine("All calculations are complete.");
+                MoneyControlDownloadStart();
+            }
         }
 
         private static void MutualFunds()

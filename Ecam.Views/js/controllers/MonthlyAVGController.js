@@ -12,8 +12,8 @@ define("MonthlyAVGController", ["knockout", "komapping", "helper", "service"], f
         this.total_end_date = ko.observable("");
 
         this.avg_profit = ko.observable();
-        this.high_avg_profit = ko.observable();
-        this.low_avg_profit = ko.observable();
+        //this.high_avg_profit = ko.observable();
+        //this.low_avg_profit = ko.observable();
 
         this.refresh = function () {
             self.loadGrid();
@@ -76,8 +76,8 @@ define("MonthlyAVGController", ["knockout", "komapping", "helper", "service"], f
             }).done(function (json) {
                 self.rows.removeAll();
                 self.avg_profit(0);
-                self.high_avg_profit(0);
-                self.low_avg_profit(0);
+                //self.high_avg_profit(0);
+                //self.low_avg_profit(0);
 
                 var totalInvestment = 0;
                 var totalCurrentValue = 0;
@@ -92,8 +92,8 @@ define("MonthlyAVGController", ["knockout", "komapping", "helper", "service"], f
                         totalInvestment += cFloat(row.first_price);
                         totalCurrentValue += cFloat(row.last_price);
 
-                        highCurrentValue += cFloat(row.profit_high_price);
-                        lowCurrentValue += cFloat(row.profit_low_price);
+                        //highCurrentValue += cFloat(row.profit_high_price);
+                        //lowCurrentValue += cFloat(row.profit_low_price);
 
                         //console.log('symbol=', row.symbol, 'first_price=', row.first_price, 'last_price=', row.last_price);
                         row.quantity = 0;
@@ -118,11 +118,11 @@ define("MonthlyAVGController", ["knockout", "komapping", "helper", "service"], f
                 totalProfitAVG = cFloat(cFloat(totalCurrentValue - totalInvestment) / totalInvestment) * 100;
                 self.avg_profit(totalProfitAVG);
 
-                totalProfitAVG = cFloat(cFloat(highCurrentValue - totalInvestment) / totalInvestment) * 100;
-                self.high_avg_profit(totalProfitAVG);
+                //totalProfitAVG = cFloat(cFloat(highCurrentValue - totalInvestment) / totalInvestment) * 100;
+                //self.high_avg_profit(totalProfitAVG);
 
-                totalProfitAVG = cFloat(cFloat(lowCurrentValue - totalInvestment) / totalInvestment) * 100;
-                self.low_avg_profit(totalProfitAVG);
+                //totalProfitAVG = cFloat(cFloat(lowCurrentValue - totalInvestment) / totalInvestment) * 100;
+                //self.low_avg_profit(totalProfitAVG);
 
                 self.calculateJSON();
                 $(".manual-pagination", $Company).each(function () {

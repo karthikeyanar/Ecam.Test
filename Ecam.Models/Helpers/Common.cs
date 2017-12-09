@@ -292,12 +292,12 @@ namespace Ecam.Models
                            ",ct.pe" + Environment.NewLine +
                            ",ct.volume" + Environment.NewLine +
                            ",ct.eps" + Environment.NewLine +
-                            ",(select high_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " and m.high_price > 0 order by m.high_price desc limit 0,1) as total_high_price" + Environment.NewLine +
-                            ",(select low_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " and m.low_price > 0 order by m.low_price asc limit 0,1) as total_low_price" + Environment.NewLine +
-                            ",(select high_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " and m.high_price > 0 order by m.high_price desc limit 0,1) as profit_high_price" + Environment.NewLine +
-                            ",(select low_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " and m.low_price > 0 order by m.low_price asc limit 0,1) as profit_low_price" + Environment.NewLine +
-                            ",(select ifnull(rsi,0) from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date desc limit 0,1) as profit_rsi" + Environment.NewLine +
-                            ",(select ifnull(rsi,0) from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " order by m.trade_date desc limit 0,1) as total_rsi" + Environment.NewLine +
+                            //",(select high_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " and m.high_price > 0 order by m.high_price desc limit 0,1) as total_high_price" + Environment.NewLine +
+                            //",(select low_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " and m.low_price > 0 order by m.low_price asc limit 0,1) as total_low_price" + Environment.NewLine +
+                            //",(select high_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " and m.high_price > 0 order by m.high_price desc limit 0,1) as profit_high_price" + Environment.NewLine +
+                            //",(select low_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " and m.low_price > 0 order by m.low_price asc limit 0,1) as profit_low_price" + Environment.NewLine +
+                            //",(select ifnull(rsi,0) from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date desc limit 0,1) as profit_rsi" + Environment.NewLine +
+                            //",(select ifnull(rsi,0) from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " order by m.trade_date desc limit 0,1) as total_rsi" + Environment.NewLine +
 
                             ",(select open_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " order by m.trade_date asc limit 0,1) as total_first_price" + Environment.NewLine +
                             ",(select ltp_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " order by m.trade_date desc limit 0,1) as total_last_price" + Environment.NewLine +
@@ -307,36 +307,36 @@ namespace Ecam.Models
 
                             ",(select open_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date asc limit 0,1) as first_price" + Environment.NewLine +
                             ",(select ltp_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date desc limit 0,1) as last_price" + Environment.NewLine +
-                            ",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + " and ifnull(m.percentage, 0) < 0) as negative" + Environment.NewLine +
-                            ",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + "  and ifnull(m.percentage, 0) > 0) as positive" + Environment.NewLine +
-                            ",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + " ) as total" + Environment.NewLine +
+                            //",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + " and ifnull(m.percentage, 0) < 0) as negative" + Environment.NewLine +
+                            //",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + "  and ifnull(m.percentage, 0) > 0) as positive" + Environment.NewLine +
+                            //",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + " ) as total" + Environment.NewLine +
                            "";
 
-            if (string.IsNullOrEmpty(criteria.mf_ids) == false)
-            {
-                selectFields += ",(select count(mpf.fund_id) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol and mpf.fund_id in(" + criteria.mf_ids + ")) as mf_cnt" + Environment.NewLine +
-                    ",(select sum(ifnull(mpf.stock_value, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol and mpf.fund_id in(" + criteria.mf_ids + ")) as mf_qty" + Environment.NewLine +
-                    "";
-            }
-            else
-            {
-                selectFields += ",(select count(mpf.fund_id) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_cnt" + Environment.NewLine +
-                   ",(select sum(ifnull(mpf.stock_value, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_qty" + Environment.NewLine +
-                   "";
-            }
+            //if (string.IsNullOrEmpty(criteria.mf_ids) == false)
+            //{
+            //    //selectFields += ",(select count(mpf.fund_id) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol and mpf.fund_id in(" + criteria.mf_ids + ")) as mf_cnt" + Environment.NewLine +
+            //    //    ",(select sum(ifnull(mpf.stock_value, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol and mpf.fund_id in(" + criteria.mf_ids + ")) as mf_qty" + Environment.NewLine +
+            //    //    "";
+            //}
+            //else
+            //{
+            //    //selectFields += ",(select count(mpf.fund_id) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_cnt" + Environment.NewLine +
+            //    //   ",(select sum(ifnull(mpf.stock_value, 0)) from tra_mutual_fund_pf mpf where mpf.symbol = ct.symbol) as mf_qty" + Environment.NewLine +
+            //    //   "";
+            //}
 
             selectFields += "" +
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.prev_price, 0)) / ifnull(ct.prev_price, 0)) * 100) as prev_percentage" + Environment.NewLine +
                            ",(ifnull(ct.open_price,0) - ifnull(ct.prev_price,0)) as diff" + Environment.NewLine +
-                           ",(ifnull(ct.rsi,0) - ifnull(ct.prev_rsi,0)) as rsi_diff" + Environment.NewLine +
+                           //",(ifnull(ct.rsi,0) - ifnull(ct.prev_rsi,0)) as rsi_diff" + Environment.NewLine +
 
                            ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as ltp_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.high_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as high_percentage" + Environment.NewLine +
                            ",(((ifnull(ct.low_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as low_percentage" + Environment.NewLine +
 
-                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.week_52_high, 0)) / ifnull(ct.week_52_high, 0)) * 100) as week_52_percentage" + Environment.NewLine +
-                           ",(((ifnull(ct.week_52_high, 0) - ifnull(ct.ltp_price, 0)) / ifnull(ct.ltp_price, 0)) * 100) as week_52_positive_percentage" + Environment.NewLine +
-                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.week_52_low, 0)) / ifnull(ct.week_52_low, 0)) * 100) as week_52_low_percentage" + Environment.NewLine +
+                           //",(((ifnull(ct.ltp_price, 0) - ifnull(ct.week_52_high, 0)) / ifnull(ct.week_52_high, 0)) * 100) as week_52_percentage" + Environment.NewLine +
+                           //",(((ifnull(ct.week_52_high, 0) - ifnull(ct.ltp_price, 0)) / ifnull(ct.ltp_price, 0)) * 100) as week_52_positive_percentage" + Environment.NewLine +
+                           //",(((ifnull(ct.ltp_price, 0) - ifnull(ct.week_52_low, 0)) / ifnull(ct.week_52_low, 0)) * 100) as week_52_low_percentage" + Environment.NewLine +
                            ",ct.company_id as id" + Environment.NewLine +
                            "";
 
@@ -402,10 +402,10 @@ namespace Ecam.Models
             //    where.AppendFormat(" and ifnull((((trigger_last_price - trigger_first_price)/trigger_first_price) * 100),0)<={0}", criteria.trigger_to_profit);
             //}
 
-            if ((criteria.max_negative_count ?? -1) >= 0)
-            {
-                where.AppendFormat(" and ifnull(negative,0)<={0}", criteria.max_negative_count).Append(Environment.NewLine);
-            }
+            //if ((criteria.max_negative_count ?? -1) >= 0)
+            //{
+            //    where.AppendFormat(" and ifnull(negative,0)<={0}", criteria.max_negative_count).Append(Environment.NewLine);
+            //}
 
             string tempsql = string.Format("select " +
        "tbl.*" + Environment.NewLine +
@@ -421,10 +421,10 @@ namespace Ecam.Models
             "(((last_price - first_price)/first_price) * 100) as profit" + Environment.NewLine +
             ",(((total_last_price - total_first_price)/total_first_price) * 100) as total_profit" + Environment.NewLine +
             //",(((trigger_last_price - trigger_first_price)/trigger_first_price) * 100) as trigger_profit" + Environment.NewLine +
-            ",(negative/(negative+positive) * 100) as negative_percentage" + Environment.NewLine +
-            ",(positive/(negative+positive) * 100) as positive_percentage" + Environment.NewLine +
-            ",(((profit_high_price - ltp_price)/ltp_price) * 100) as profit_high_percentage" + Environment.NewLine +
-            ",(((profit_low_price - ltp_price)/ltp_price) * 100) as profit_low_percentage" + Environment.NewLine +
+            //",(negative/(negative+positive) * 100) as negative_percentage" + Environment.NewLine +
+            //",(positive/(negative+positive) * 100) as positive_percentage" + Environment.NewLine +
+            //",(((profit_high_price - ltp_price)/ltp_price) * 100) as profit_high_percentage" + Environment.NewLine +
+            //",(((profit_low_price - ltp_price)/ltp_price) * 100) as profit_low_percentage" + Environment.NewLine +
             ",tbl.*" + Environment.NewLine +
             " from(" + Environment.NewLine +
             sql + Environment.NewLine +
@@ -773,17 +773,17 @@ namespace Ecam.Models
 
                         if ((row.first_price ?? 0) <= 0) { row.first_price = 1; }
                         if ((row.last_price ?? 0) <= 0) { row.last_price = 1; }
-                        if ((row.profit_high_price ?? 0) <= 0) { row.profit_high_price = 1; }
-                        if ((row.profit_low_price ?? 0) <= 0) { row.profit_low_price = 1; }
+                        //if ((row.profit_high_price ?? 0) <= 0) { row.profit_high_price = 1; }
+                        //if ((row.profit_low_price ?? 0) <= 0) { row.profit_low_price = 1; }
 
                         int quantity = (int)(totalInvestmentPerEquity / row.first_price);
                         decimal investment = (quantity * (row.first_price ?? 0));
                         decimal cmv = quantity * (row.last_price ?? 0);
-                        decimal high_cmv = quantity * (row.profit_high_price ?? 0);
-                        decimal low_cmv = quantity * (row.profit_low_price ?? 0);
+                        //decimal high_cmv = quantity * (row.profit_high_price ?? 0);
+                        //decimal low_cmv = quantity * (row.profit_low_price ?? 0);
                         profit = (((cmv - investment) / investment) * 100);
-                        highProfit = (((high_cmv - investment) / investment) * 100);
-                        lowProfit = (((low_cmv - investment) / investment) * 100);
+                        //highProfit = (((high_cmv - investment) / investment) * 100);
+                        //lowProfit = (((low_cmv - investment) / investment) * 100);
 
                         investments.Add(new Models.Investment
                         {
@@ -791,15 +791,15 @@ namespace Ecam.Models
                             quantity = quantity,
                             investment = investment,
                             cmv = cmv,
-                            high_cmv = high_cmv,
-                            low_cmv = low_cmv,
+                            //high_cmv = high_cmv,
+                            //low_cmv = low_cmv,
                             profit = profit,
-                            high_profit = highProfit,
-                            low_profit = lowProfit,
+                            //high_profit = highProfit,
+                            //low_profit = lowProfit,
                             first_price = (row.first_price ?? 0),
                             last_price = (row.last_price ?? 0),
-                            profit_high_price = (row.profit_high_price ?? 0),
-                            profit_low_price = (row.profit_low_price ?? 0)
+                            //profit_high_price = (row.profit_high_price ?? 0),
+                            //profit_low_price = (row.profit_low_price ?? 0)
                         });
                     }
 
@@ -809,8 +809,8 @@ namespace Ecam.Models
                         totalInvestment += (row.investment);
                         totalCurrentValue += (row.cmv);
 
-                        highCurrentValue += (row.high_cmv);
-                        lowCurrentValue += (row.low_cmv);
+                        //highCurrentValue += (row.high_cmv);
+                        //lowCurrentValue += (row.low_cmv);
 
                         if (row.profit > 0)
                         {
@@ -946,15 +946,15 @@ namespace Ecam.Models
         public int quantity { get; set; }
         public decimal investment { get; set; }
         public decimal cmv { get; set; }
-        public decimal high_cmv { get; set; }
-        public decimal low_cmv { get; set; }
+        //public decimal high_cmv { get; set; }
+        //public decimal low_cmv { get; set; }
         public decimal profit { get; set; }
-        public decimal high_profit { get; set; }
-        public decimal low_profit { get; set; }
+        //public decimal high_profit { get; set; }
+        //public decimal low_profit { get; set; }
         public decimal first_price { get; set; }
         public decimal last_price { get; set; }
-        public decimal profit_high_price { get; set; }
-        public decimal profit_low_price { get; set; }
+        //public decimal profit_high_price { get; set; }
+        //public decimal profit_low_price { get; set; }
     }
 
     public class DailySummary
