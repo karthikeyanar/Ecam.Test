@@ -33,6 +33,7 @@ namespace Ecam.ConsoleApp
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
             MONEY_CONTROL = System.Configuration.ConfigurationManager.AppSettings["MONEY_CONTROL"];
             DoMoneyControl();
+            //DownloadStart();
         }
 
         #region MoneyControl
@@ -43,14 +44,15 @@ namespace Ecam.ConsoleApp
             string[] arr;
             WebClient webClient = new WebClient();
             List<string> urls = GetURLList();
-            if (urls.Count > 0)
+            int index = 0;
+            foreach(string url in urls)
             {
+                index += 1;
                 string companyName = "";
                 string symbol = "";
                 string categoryName = "";
 
-                string firstURL = urls[0];
-                arr = firstURL.Split(("//").ToCharArray());
+                arr = url.Split(("//").ToCharArray());
                 string name = arr[arr.Length - 1];
                 string dir = System.IO.Path.Combine(MONEY_CONTROL, "equities");
                 if (System.IO.Directory.Exists(dir) == false)
@@ -61,8 +63,8 @@ namespace Ecam.ConsoleApp
                 string rootHTML = string.Empty;
                 if (System.IO.File.Exists(fileName) == false)
                 {
-                    //rootHTML = webClient.DownloadString(firstURL);
-                    //System.IO.File.WriteAllText(fileName, rootHTML);
+                    rootHTML = webClient.DownloadString(url);
+                    System.IO.File.WriteAllText(fileName, rootHTML);
                 }
                 else
                 {
@@ -154,7 +156,7 @@ namespace Ecam.ConsoleApp
                             }
                             else
                             {
-                                company.money_control_url = firstURL;
+                                company.money_control_url = url;
                                 context.Entry(company).State = System.Data.Entity.EntityState.Modified;
                                 context.SaveChanges();
                             }
@@ -172,7 +174,7 @@ namespace Ecam.ConsoleApp
                                 context.SaveChanges();
                             }
                         }
-                        Console.WriteLine("Company=" + companyName + ",Symbol=" + symbol + ",Category=" + categoryName);
+                        Console.WriteLine("Total="+ urls.Count + ",Index="+index+ ",Company=" + companyName + ",Symbol=" + symbol + ",Category=" + categoryName);
                     }
                 }
             }
