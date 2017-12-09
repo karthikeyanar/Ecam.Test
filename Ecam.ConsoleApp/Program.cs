@@ -24,6 +24,10 @@ namespace Ecam.ConsoleApp
         public static string GOOGLE_DATA = "";
         public static string MC = "";
         public static string MONEY_CONTROL = "";
+        private static int _INDEX = -1;
+        private static string[] _COMPANIES;
+        private static List<string> _URLS;
+
         static void Main(string[] args)
         {
             IS_NIFTY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_FLAG_CSV"];
@@ -39,143 +43,8 @@ namespace Ecam.ConsoleApp
 
         private static void DoMoneyControl()
         {
-            Regex regex = null;
-            string[] arr;
-            WebClient webClient = new WebClient();
-            List<string> urls = GetURLList();
-            if (urls.Count > 0)
-            {
-                string companyName = "";
-                string symbol = "";
-                string categoryName = "";
-
-                string firstURL = urls[0];
-                arr = firstURL.Split(("//").ToCharArray());
-                string name = arr[arr.Length - 1];
-                string dir = System.IO.Path.Combine(MONEY_CONTROL, "equities");
-                if (System.IO.Directory.Exists(dir) == false)
-                {
-                    System.IO.Directory.CreateDirectory(dir);
-                }
-                string fileName = dir + "\\" + name + ".html";
-                string rootHTML = string.Empty;
-                if (System.IO.File.Exists(fileName) == false)
-                {
-                    //rootHTML = webClient.DownloadString(firstURL);
-                    //System.IO.File.WriteAllText(fileName, rootHTML);
-                }
-                else
-                {
-                    rootHTML = System.IO.File.ReadAllText(fileName);
-                }
-
-                if (string.IsNullOrEmpty(rootHTML) == false)
-                {
-                    string html = string.Empty;
-
-                    regex = new Regex(
-   @"<h1(.*?)>(.*?)</h1>",
-   RegexOptions.IgnoreCase
-   | RegexOptions.Multiline
-   | RegexOptions.IgnorePatternWhitespace
-   | RegexOptions.Compiled
-   );
-
-                    MatchCollection collections = regex.Matches(rootHTML);
-                    if (collections.Count >= 1)
-                    {
-                        companyName = TradeHelper.RemoveHTMLTag(collections[0].Value).Trim();
-                    }
-
-                    string startWord = "<div class=\"FL gry10\">";
-                    string endWord = "<div id=\"mcpcp_addportfolio\"";
-                    int startIndex = rootHTML.IndexOf(startWord);
-                    int endIndex = rootHTML.IndexOf(endWord);
-                    int length = endIndex - startIndex + endWord.Length;
-                    if (startIndex > 0 && endIndex > 0)
-                    {
-                        html = rootHTML.Substring(startIndex, length);
-
-                        string value = TradeHelper.RemoveHTMLTag(html);
-                        arr = value.Split(("|").ToArray());
-                        foreach (string row in arr)
-                        {
-                            string[] cells = row.Split((":").ToCharArray());
-                            if (cells.Length >= 2)
-                            {
-                                if (string.IsNullOrEmpty(cells[0]) == false)
-                                {
-                                    cells[0] = cells[0].Trim();
-                                }
-                                if (string.IsNullOrEmpty(cells[1]) == false)
-                                {
-                                    cells[1] = cells[1].Trim();
-                                }
-                                if (cells[0] == "NSE")
-                                {
-                                    symbol = cells[1];
-                                }
-                                else if (cells[0] == "SECTOR")
-                                {
-                                    categoryName = cells[1];
-                                }
-                            }
-                        }
-                    }
-                    if (string.IsNullOrEmpty(companyName) == false
-                        && string.IsNullOrEmpty(symbol) == false
-                        && string.IsNullOrEmpty(categoryName) == false)
-                    {
-                        using (EcamContext context = new EcamContext())
-                        {
-                            tra_category category = (from q in context.tra_category
-                                                     where q.category_name == categoryName
-                                                     select q).FirstOrDefault();
-                            if (category == null)
-                            {
-                                context.tra_category.Add(new tra_category
-                                {
-                                    category_name = categoryName
-                                });
-                                context.SaveChanges();
-                            }
-                            tra_company company = (from q in context.tra_company
-                                                   where q.symbol == symbol
-                                                   select q).FirstOrDefault();
-                            if (company == null)
-                            {
-                                company = new tra_company
-                                {
-                                    symbol = symbol,
-                                    company_name = companyName,
-                                };
-                                context.tra_company.Add(company);
-                                context.SaveChanges();
-                            }
-                            else
-                            {
-                                company.money_control_url = firstURL;
-                                context.Entry(company).State = System.Data.Entity.EntityState.Modified;
-                                context.SaveChanges();
-                            }
-                            tra_company_category companyCategory = (from q in context.tra_company_category
-                                                                    where q.symbol == symbol
-                                                                    && q.category_name == categoryName
-                                                                    select q).FirstOrDefault();
-                            if (companyCategory == null)
-                            {
-                                context.tra_company_category.Add(new tra_company_category
-                                {
-                                    category_name = categoryName,
-                                    symbol = symbol
-                                });
-                                context.SaveChanges();
-                            }
-                        }
-                        Console.WriteLine("Company=" + companyName + ",Symbol=" + symbol + ",Category=" + categoryName);
-                    }
-                }
-            }
+            _URLS = GetURLList();
+            MoneyControlDownloadStart();
         }
 
         private static List<string> GetURLList()
@@ -232,8 +101,18 @@ namespace Ecam.ConsoleApp
                                         {
                                             if (attrCollections[0].Groups[1].Value == "href")
                                             {
-                                                string url = "http://www.moneycontrol.com" + attrCollections[0].Groups[2].Value;
-                                                urls.Add(url);
+                                                if (string.IsNullOrEmpty(attrCollections[0].Groups[2].Value) == false)
+                                                {
+                                                    string url = attrCollections[0].Groups[2].Value;
+                                                    if (attrCollections[0].Groups[2].Value.Contains("moneycontrol.com") == false)
+                                                    {
+                                                        url = "http://www.moneycontrol.com" + attrCollections[0].Groups[2].Value;
+                                                    }
+                                                    if (urls.Contains(url) == false)
+                                                    {
+                                                        urls.Add(url);
+                                                    }
+                                                }
                                                 //Helper.Log(url + Environment.NewLine);
                                             }
                                         }
@@ -1045,8 +924,7 @@ RegexOptions.IgnoreCase
         //    }
         //}
 
-        private static int _INDEX = -1;
-        private static string[] _COMPANIES;
+
         private static void GoogleData()
         {
             List<tra_company> companies;
@@ -1195,6 +1073,38 @@ RegexOptions.IgnoreCase
             _COMPANIES = (from q in companies select q.symbol).ToArray();
             _INDEX = -1;
             GoogleHistoryDownloadStart();
+        }
+
+        private static void MoneyControlDownloadStart()
+        {
+            int totalCount = _URLS.Count;
+            int queueCount = 64;
+            // One event is used for each Fibonacci object
+            ManualResetEvent[] doneEvents = new ManualResetEvent[queueCount];
+            MoneyControlData[] downArray = new MoneyControlData[queueCount];
+            //Random r = new Random();
+            // Configure and launch threads using ThreadPool:
+            Console.WriteLine("launching {0} tasks...", totalCount);
+            for (int i = 0; i < queueCount; i++)
+            {
+                _INDEX += 1;
+                string url = "";
+                if (_INDEX < _URLS.Count)
+                {
+                    url = _URLS[_INDEX];
+                }
+                doneEvents[i] = new ManualResetEvent(false);
+                MoneyControlData f = new MoneyControlData(url, doneEvents[i]);
+                downArray[i] = f;
+                ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback, i);
+            }
+            // Wait for all threads in pool to calculation...
+            WaitHandle.WaitAll(doneEvents);
+            if (_INDEX < _URLS.Count)
+            {
+                Console.WriteLine("All calculations are complete.");
+                MoneyControlDownloadStart();
+            }
         }
 
         private static void MutualFunds()

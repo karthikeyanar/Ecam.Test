@@ -101,6 +101,10 @@
     <Compile Include="Framework\ServiceFactory.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Helpers\MoneyControlData.cs" />
+    <Compile Include="Helpers\CSVDownloadData.cs" />
+    <Compile Include="Helpers\GoogleHistoryDownloadData.cs" />
+    <Compile Include="Helpers\GoogleDownloadData.cs" />
     <Compile Include="Helpers\TradeHelper.cs" />
     <Compile Include="Helpers\Common.cs" />
     <Compile Include="Helpers\DBHelper.cs" />
