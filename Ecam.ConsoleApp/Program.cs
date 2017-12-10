@@ -37,7 +37,6 @@ namespace Ecam.ConsoleApp
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
             MONEY_CONTROL = System.Configuration.ConfigurationManager.AppSettings["MONEY_CONTROL"];
             Ecam.Models.Common.CreateCategoryProfit();
-            //DoMoneyControl();
             //DownloadStart();
         }
 

@@ -21,14 +21,14 @@ namespace Ecam.Framework.Repository
         PaginatedListResult<TRA_MARKET_AVG> GetAvg(TRA_COMPANY_SEARCH criteria, Paging paging);
         PaginatedListResult<TRA_MARKET_RSI> GetRSI(TRA_COMPANY_SEARCH criteria, Paging paging);
         List<Select2List> GetCompanys(string name, int pageSize = 50, string categories = "");
-        List<Select2List> GetCategories(string name, int pageSize = 50);
+        List<Select2List> GetCategories(string name, int pageSize = 500);
         List<Select2List> GetMFFunds(string name, int pageSize = 50);
         PaginatedListResult<TRA_COMPANY> GetMonthlyAVG(TRA_COMPANY_SEARCH criteria, Paging paging);
     }
 
     public class CompanyRepository : ICompanyRepository
     {
-        public List<Select2List> GetCategories(string name, int pageSize = 50)
+        public List<Select2List> GetCategories(string name, int pageSize = 500)
         {
             StringBuilder where = new StringBuilder();
             string selectFields = "";
