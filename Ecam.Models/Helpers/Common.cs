@@ -758,9 +758,9 @@ namespace Ecam.Models
                 decimal positiveCount = 0;
                 decimal negativeCount = 0;
 
-                decimal highCurrentValue = 0;
-                decimal lowCurrentValue = 0;
-                decimal balance = 0; decimal profit = 0; decimal highProfit = 0; decimal lowProfit = 0;
+                //decimal highCurrentValue = 0;
+                //decimal lowCurrentValue = 0;
+                decimal balance = 0; decimal profit = 0; //decimal highProfit = 0; decimal lowProfit = 0;
 
                 List<Investment> investments = new List<Investment>();
                 string symbols = "";
@@ -826,26 +826,26 @@ namespace Ecam.Models
                     {
                         totalInvestment = totalAmount;
                         totalCurrentValue = totalAmount;
-                        highCurrentValue = totalAmount;
-                        lowCurrentValue = totalAmount;
+                        //highCurrentValue = totalAmount;
+                        //lowCurrentValue = totalAmount;
                     }
 
 
                     totalCurrentValue = Common.CalcFinalMarketValue(totalCurrentValue, investments.Count, false);
-                    highCurrentValue = Common.CalcFinalMarketValue(highCurrentValue, investments.Count, false);
-                    lowCurrentValue = Common.CalcFinalMarketValue(lowCurrentValue, investments.Count, false);
+                    //highCurrentValue = Common.CalcFinalMarketValue(highCurrentValue, investments.Count, false);
+                    //lowCurrentValue = Common.CalcFinalMarketValue(lowCurrentValue, investments.Count, false);
 
                     decimal totalProfitAVG = ((totalCurrentValue - totalInvestment) / totalInvestment) * 100;
 
-                    balance = 0; profit = 0; highProfit = 0; lowProfit = 0;
+                    balance = 0; profit = 0; //highProfit = 0; lowProfit = 0;
 
                     balance = (totalAmount - totalInvestment);
 
                     balance = balance - (Common.GetCharges(totalInvestment, investments.Count, true));
 
                     profit = ((totalCurrentValue - totalInvestment) / totalInvestment) * 100;
-                    highProfit = ((highCurrentValue - totalInvestment) / totalInvestment) * 100;
-                    lowProfit = ((lowCurrentValue - totalInvestment) / totalInvestment) * 100;
+                    //highProfit = ((highCurrentValue - totalInvestment) / totalInvestment) * 100;
+                    //lowProfit = ((lowCurrentValue - totalInvestment) / totalInvestment) * 100;
 
                     totalAmount = (totalCurrentValue) + (balance) + monthlyInvestment;
 

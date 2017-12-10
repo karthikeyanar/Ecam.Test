@@ -60,6 +60,9 @@ namespace Ecam.Models
                 string GOOGLE_HISTORY_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_HISTORY_DATA"];
                 WebClient client = new WebClient();
                 int numberOfRows = DataTypeHelper.ToInt32(System.Configuration.ConfigurationManager.AppSettings["NUMBER_OF_ROWS"]);
+                //url = string.Format("https://finance.google.com/finance/historical?q=NSE:{0}&sep=200&start=200&num=" + numberOfRows
+                //                                                    , symbol.Replace("&", "%26")
+                //                                                    );
                 url = string.Format("https://finance.google.com/finance/historical?q=NSE:{0}&num=" + numberOfRows
                                                                     , symbol.Replace("&", "%26")
                                                                     );

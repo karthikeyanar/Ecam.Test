@@ -28,11 +28,32 @@ namespace Ecam.Models
 
         public override void OnDeleting()
         {
+            if (this.id > 0)
+            {
+                using (EcamContext context = new EcamContext())
+                {
+                    this._prev_split = (from q in context.tra_split where q.id == this.id select q).FirstOrDefault();
+                }
+            }
             base.OnDeleting();
         }
 
         public override void OnDeleted()
         {
+            string sql = "";
+            if (this._prev_split != null)
+            {
+                sql = string.Format("update tra_market set " + Environment.NewLine +
+                      "open_price = ifnull(open_price,0)*{0}," + Environment.NewLine +
+                      "high_price = ifnull(high_price,0)*{0}," + Environment.NewLine +
+                      "low_price = ifnull(low_price,0)*{0}," + Environment.NewLine +
+                      "ltp_price = ifnull(ltp_price,0)*{0}," + Environment.NewLine +
+                      "close_price = ifnull(close_price,0)*{0}," + Environment.NewLine +
+                      "prev_price = ifnull(prev_price,0)*{0}" + Environment.NewLine +
+                      " where symbol='{1}' and trade_date<'{2}'" + Environment.NewLine +
+                      " ", this._prev_split.split_factor, this._prev_split.symbol, this._prev_split.split_date.ToString("yyyy-MM-dd"));
+                MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+            }
             base.OnDeleted();
         }
 
