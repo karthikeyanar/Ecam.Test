@@ -269,7 +269,7 @@ namespace Ecam.Views.Controllers
 
         [HttpGet]
         [ActionName("SelectCategories")]
-        public List<Select2List> GetSelectCategories([FromUri] string term, [FromUri] int pageSize = 50)
+        public List<Select2List> GetSelectCategories([FromUri] string term, [FromUri] int pageSize = 500)
         {
             return _CompanyRepository.GetCategories(term, pageSize);
         }

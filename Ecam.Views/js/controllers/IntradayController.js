@@ -640,8 +640,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $.each(investments, function (i, row) {
                 totalInvestment += cFloat(row.investment);
                 totalCMV += cFloat(row.cmv);
-                totalHighCMV += cFloat(row.high_cmv);
-                totalLowCMV += cFloat(row.low_cmv);
+                //totalHighCMV += cFloat(row.high_cmv);
+                //totalLowCMV += cFloat(row.low_cmv);
                 if (cFloat(row.profit) > 0) {
                     positiveCount += 1;
                 } else {
@@ -699,11 +699,11 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $modal = $("#modal-log-" + data.name, $cnt);
             $modal.modal('show');
             var $selYear = $("#selYear", $modal);
-            $selYear.val(moment(_TODAYDATE).format('YYYY'));
-            self.temp_investments = [];
-            self.start_index = -1;
-            self.year_count = 0;
-            self.createLogs($modal, cFloat($(":input[name='total_amount']").val()));
+            //$selYear.val(moment(_TODAYDATE).format('YYYY'));
+            //self.temp_investments = [];
+            //self.start_index = -1;
+            //self.year_count = 0;
+            //self.createLogs($modal, cFloat($(":input[name='total_amount']").val()));
             $selYear.change(function () {
                 if (this.value != '') {
                     self.temp_investments = [];
