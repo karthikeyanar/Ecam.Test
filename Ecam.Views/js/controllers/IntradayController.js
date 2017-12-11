@@ -1191,7 +1191,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             var $categories = $(":input[name='categories']", $frmCompanySearch);
             var $pageContent = $(".page-content");
             var arr = [];
-            var categories = 'CEMENT & CEMENT PRODUCTS,CHEMICALS,CONSTRUCTION,CONSUMER GOODS,NIFTY FMGC,RETAIL,TEXTILES,AUTOMOBILE,FINANCIAL SERVICES';
+            var categories = 'AQUACULTURE,ELECTRODES & GRAPHITE,DETERGENTS,STEEL - GP & GC SHEETS,FINANCE - GENERAL,PETROCHEMICALS,CHEMICALS,RETAIL,FINANCE - INVESTMENTS,TEXTILES - WOOLLEN & WORSTED,CONSTRUCTION & CONTRACTING - REAL ESTATE,OOD PROCESSING,CEMENT - PRODUCTS & BUILDING MATERIALS,CABLES - POWER & OTHERS,CONSTRUCTION & CONTRACTING - CIVIL,GLASS & GLASS PRODUCTS,CASTINGS & FORGINGS';
             var caregoryList = categories.split(',');
             $.each(caregoryList, function (i, cat) {
                 arr.push({ "id": cat, "text": cat });

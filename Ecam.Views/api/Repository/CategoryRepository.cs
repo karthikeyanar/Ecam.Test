@@ -70,7 +70,7 @@ namespace Ecam.Framework.Repository
                            ",(select ifnull(p.profit,0) from tra_category_profit p where p.category_name = c.category_name and p.profit_type = 'Y' and p.profit_date = '2018-01-01' limit 0,1) as profit_2018" + Environment.NewLine +
                            "";
             sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, orderBy, pageLimit);
-            //Helper.Log(sql);
+            Helper.Log(sql);
             List<TRA_CATEGORY> rows = new List<TRA_CATEGORY>();
             using (EcamContext context = new EcamContext())
             {
