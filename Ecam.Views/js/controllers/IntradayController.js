@@ -801,8 +801,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         $.each(json.rows, function (i, row) {
                             symbols += row.symbol + ',';
 
-                            if (cFloat(row.first_price) <= 0) { row.first_price = 1; }
-                            if (cFloat(row.last_price) <= 0) { row.last_price = 1; }
+                            if (cFloat(row.first_price) <= 0) { row.first_price = 0; }
+                            if (cFloat(row.last_price) <= 0) { row.last_price = 0; }
                             //if (cFloat(row.profit_high_price) <= 0) { row.profit_high_price = 1; }
                             //if (cFloat(row.profit_low_price) <= 0) { row.profit_low_price = 1; }
 

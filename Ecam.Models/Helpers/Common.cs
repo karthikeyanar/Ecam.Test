@@ -398,6 +398,8 @@ namespace Ecam.Models
                 where.AppendFormat(" and ifnull((((total_last_price - total_first_price)/total_first_price) * 100),0)<={0}", criteria.total_to_profit);
             }
 
+            where.Append(" and ifnull(total_first_price,0)>0 and ifnull(total_last_price,0)>0 and ifnull(first_price,0)>0 and ifnull(last_price,0)>0 ");
+
             //if ((criteria.trigger_from_profit ?? 0) != 0)
             //{
             //    where.AppendFormat(" and ifnull((((trigger_last_price - trigger_first_price)/trigger_first_price) * 100),0)>={0}", criteria.trigger_from_profit);
@@ -464,29 +466,29 @@ namespace Ecam.Models
                 }
                 row.category_name = categoryName;
             }
-            foreach (var row in rows)
-            {
-                if ((row.first_price ?? 0) <= 0)
-                {
-                    row.first_price = row.total_last_price;
-                }
-                if ((row.last_price ?? 0) <= 0)
-                {
-                    row.last_price = row.total_last_price;
-                }
-                if ((row.high_price ?? 0) <= 0)
-                {
-                    row.high_price = row.total_last_price;
-                }
-                if ((row.low_price ?? 0) <= 0)
-                {
-                    row.low_price = row.total_last_price;
-                }
-                if ((row.last_price ?? 0) <= 0)
-                {
-                    row.profit = DataTypeHelper.SafeDivision(((row.last_price ?? 0) - (row.first_price ?? 0)), (row.first_price ?? 0)) * 100;
-                }
-            }
+            //foreach (var row in rows)
+            //{
+            //    if ((row.first_price ?? 0) <= 0)
+            //    {
+            //        row.first_price = row.total_last_price;
+            //    }
+            //    if ((row.last_price ?? 0) <= 0)
+            //    {
+            //        row.last_price = row.total_last_price;
+            //    }
+            //    if ((row.high_price ?? 0) <= 0)
+            //    {
+            //        row.high_price = row.total_last_price;
+            //    }
+            //    if ((row.low_price ?? 0) <= 0)
+            //    {
+            //        row.low_price = row.total_last_price;
+            //    }
+            //    if ((row.last_price ?? 0) <= 0)
+            //    {
+            //        row.profit = DataTypeHelper.SafeDivision(((row.last_price ?? 0) - (row.first_price ?? 0)), (row.first_price ?? 0)) * 100;
+            //    }
+            //}
             return new PaginatedListResult<TRA_COMPANY> { total = paging.Total, rows = rows };
         }
 
@@ -712,14 +714,13 @@ namespace Ecam.Models
             using (EcamContext context = new EcamContext())
             {
                 categories = (from q in context.tra_category
-                              where q.category_name == "EDIBLE OILS & SOLVENT EXTRACTION"
                               orderby q.category_name ascending
                               select q).ToList();
             }
             foreach (var category in categories)
             {
                 Common.CreateCategoryProfit(category.category_name, 2016);
-                //Common.CreateCategoryProfit(category.category_name, 2017);
+                Common.CreateCategoryProfit(category.category_name, 2017);
             }
         }
 
@@ -778,17 +779,27 @@ namespace Ecam.Models
                     {
                         symbols += row.symbol + ",";
 
-                        if ((row.first_price ?? 0) <= 0) { row.first_price = 1; }
-                        if ((row.last_price ?? 0) <= 0) { row.last_price = 1; }
+                        if ((row.first_price ?? 0) <= 0) { row.first_price = 0; }
+                        if ((row.last_price ?? 0) <= 0) { row.last_price = 0; }
                         //if ((row.profit_high_price ?? 0) <= 0) { row.profit_high_price = 1; }
                         //if ((row.profit_low_price ?? 0) <= 0) { row.profit_low_price = 1; }
 
-                        int quantity = (int)(totalInvestmentPerEquity / row.first_price);
+                        int quantity = 0;
+                        try
+                        {
+                            quantity = (int)(totalInvestmentPerEquity / row.first_price);
+                        }
+                        catch { }
                         decimal investment = (quantity * (row.first_price ?? 0));
                         decimal cmv = quantity * (row.last_price ?? 0);
                         //decimal high_cmv = quantity * (row.profit_high_price ?? 0);
                         //decimal low_cmv = quantity * (row.profit_low_price ?? 0);
-                        profit = (((cmv - investment) / investment) * 100);
+                        profit = 0;
+                        try
+                        {
+                            profit = (((cmv - investment) / investment) * 100);
+                        }
+                        catch { }
                         //highProfit = (((high_cmv - investment) / investment) * 100);
                         //lowProfit = (((low_cmv - investment) / investment) * 100);
 
@@ -842,7 +853,12 @@ namespace Ecam.Models
                     //highCurrentValue = Common.CalcFinalMarketValue(highCurrentValue, investments.Count, false);
                     //lowCurrentValue = Common.CalcFinalMarketValue(lowCurrentValue, investments.Count, false);
 
-                    decimal totalProfitAVG = ((totalCurrentValue - totalInvestment) / totalInvestment) * 100;
+                    decimal totalProfitAVG = 0;
+                    try
+                    {
+                        totalProfitAVG = ((totalCurrentValue - totalInvestment) / totalInvestment) * 100;
+                    }
+                    catch { totalProfitAVG = 0; }
 
                     balance = 0; profit = 0; //highProfit = 0; lowProfit = 0;
 
@@ -850,7 +866,12 @@ namespace Ecam.Models
 
                     balance = balance - (Common.GetCharges(totalInvestment, investments.Count, true));
 
-                    profit = ((totalCurrentValue - totalInvestment) / totalInvestment) * 100;
+                    profit = 0;
+                    try
+                    {
+                        profit = ((totalCurrentValue - totalInvestment) / totalInvestment) * 100;
+                    }
+                    catch { profit = 0; }
                     //highProfit = ((highCurrentValue - totalInvestment) / totalInvestment) * 100;
                     //lowProfit = ((lowCurrentValue - totalInvestment) / totalInvestment) * 100;
 
@@ -858,12 +879,13 @@ namespace Ecam.Models
 
                     decimal totalFinalAmount = initialAmount + (monthlyInvestment * i);
 
-                    decimal yearProfit = (((totalAmount) - (totalFinalAmount)) / (totalFinalAmount)) * 100;
-
-                    if (i == 12)
+                    decimal yearProfit = 0;
+                    try
                     {
-                        string s = string.Empty;
+                        yearProfit = (((totalAmount) - (totalFinalAmount)) / (totalFinalAmount)) * 100;
                     }
+                    catch { yearProfit = 0; }
+
                     using (EcamContext context = new EcamContext())
                     {
                         tra_category_profit categoryProfit = (from q in context.tra_category_profit
