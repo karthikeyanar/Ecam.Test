@@ -206,6 +206,11 @@ namespace Ecam.Models
                 where.AppendFormat(" and ifnull(ct.is_nifty_200,0)={0}", ((criteria.is_nifty_200 ?? false) == true ? "1" : "0"));
             }
 
+            if (criteria.is_old.HasValue)
+            {
+                where.AppendFormat(" and ifnull(ct.is_old,0)={0}", ((criteria.is_old ?? false) == true ? "1" : "0"));
+            }
+
             if (string.IsNullOrEmpty(criteria.ignore_symbols) == false)
             {
                 where.AppendFormat(" and ifnull(ct.symbol,0) not in({0})", Helper.ConvertStringSQLFormat(criteria.ignore_symbols));
@@ -284,6 +289,7 @@ namespace Ecam.Models
                            ",ct.is_nifty_50" + Environment.NewLine +
                            ",ct.is_nifty_100" + Environment.NewLine +
                            ",ct.is_nifty_200" + Environment.NewLine +
+                           ",ct.is_old" + Environment.NewLine +
                            ",ct.rsi" + Environment.NewLine +
                            ",ct.prev_rsi" + Environment.NewLine +
                            ",ct.monthly_avg" + Environment.NewLine +
@@ -307,9 +313,9 @@ namespace Ecam.Models
 
                             ",(select open_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date asc limit 0,1) as first_price" + Environment.NewLine +
                             ",(select ltp_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date desc limit 0,1) as last_price" + Environment.NewLine +
-                            //",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + " and ifnull(m.percentage, 0) < 0) as negative" + Environment.NewLine +
-                            //",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + "  and ifnull(m.percentage, 0) > 0) as positive" + Environment.NewLine +
-                            //",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + " ) as total" + Environment.NewLine +
+                           //",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + " and ifnull(m.percentage, 0) < 0) as negative" + Environment.NewLine +
+                           //",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + "  and ifnull(m.percentage, 0) > 0) as positive" + Environment.NewLine +
+                           //",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + " ) as total" + Environment.NewLine +
                            "";
 
             //if (string.IsNullOrEmpty(criteria.mf_ids) == false)
@@ -706,13 +712,14 @@ namespace Ecam.Models
             using (EcamContext context = new EcamContext())
             {
                 categories = (from q in context.tra_category
+                              where q.category_name == "EDIBLE OILS & SOLVENT EXTRACTION"
                               orderby q.category_name ascending
                               select q).ToList();
             }
             foreach (var category in categories)
             {
                 Common.CreateCategoryProfit(category.category_name, 2016);
-                Common.CreateCategoryProfit(category.category_name, 2017);
+                //Common.CreateCategoryProfit(category.category_name, 2017);
             }
         }
 
@@ -726,7 +733,7 @@ namespace Ecam.Models
             int i;
             for (i = 1; i <= totalMonths; i++)
             {
-                DateTime dt = Convert.ToDateTime(i + "/01/" + year);
+                DateTime dt = Convert.ToDateTime("01" + "/" + DataTypeHelper.GetMonthName(i) + "/" + year);
                 DateTime startDate = DataTypeHelper.GetFirstDayOfMonth(dt);
                 DateTime endDate = DataTypeHelper.GetLastDayOfMonth(dt);
                 DateTime totalStartDate = startDate.AddMonths(-6);
@@ -853,6 +860,10 @@ namespace Ecam.Models
 
                     decimal yearProfit = (((totalAmount) - (totalFinalAmount)) / (totalFinalAmount)) * 100;
 
+                    if (i == 12)
+                    {
+                        string s = string.Empty;
+                    }
                     using (EcamContext context = new EcamContext())
                     {
                         tra_category_profit categoryProfit = (from q in context.tra_category_profit

@@ -699,6 +699,27 @@ namespace Ecam.Framework
             return dates;
         }
 
+        public static string GetMonthName(int month)
+        {
+            string result = string.Empty;
+            switch (month)
+            {
+                case 1: result = "Jan"; break;
+                case 2: result = "Feb"; break;
+                case 3: result = "Mar"; break;
+                case 4: result = "Apr"; break;
+                case 5: result = "May"; break;
+                case 6: result = "Jun"; break;
+                case 7: result = "Jul"; break;
+                case 8: result = "Aug"; break;
+                case 9: result = "Sep"; break;
+                case 10: result = "Oct"; break;
+                case 11: result = "Nov"; break;
+                case 12: result = "Dec"; break;
+            }
+            return result;
+        }
+
         public static List<DateTime> GetQuarterDates(DateTime startDate, DateTime endDate)
         {
             List<DateTime> dates = new List<DateTime>();

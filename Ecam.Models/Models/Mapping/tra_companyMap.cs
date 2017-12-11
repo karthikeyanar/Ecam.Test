@@ -107,6 +107,7 @@ namespace Ecam.Models
             this.Property(t => t.volume).HasColumnName("volume");
             this.Property(t => t.eps).HasColumnName("eps");
             this.Property(t => t.money_control_url).HasColumnName("money_control_url");
+            this.Property(t => t.is_old).HasColumnName("is_old");
             Ignore(t => t.created_date);
             Ignore(t => t.created_by);
             Ignore(t => t.last_updated_date);

@@ -37,6 +37,8 @@ namespace Ecam.Contracts
         public Nullable<decimal> pe { get; set; }
         public Nullable<decimal> volume { get; set; }
         public Nullable<decimal> eps { get; set; }
+        public string money_control_url { get; set; }
+        public Nullable<bool> is_old { get; set; }
         
         public string category_name { get; set; }
         public Nullable<decimal> ltp_percentage { get; set; }

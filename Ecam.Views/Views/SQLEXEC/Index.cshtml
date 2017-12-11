@@ -31,10 +31,10 @@
     </style>
     <script>
         function TableModel() {
-            var self=this;
-            this.columns=ko.observableArray([]);
-            this.rows=ko.observableArray([]);
-            this.error=ko.observable("");
+            var self = this;
+            this.columns = ko.observableArray([]);
+            this.rows = ko.observableArray([]);
+            this.error = ko.observable("");
         }
     </script>
 </head>
@@ -85,9 +85,9 @@
             return $.sessionStorage.get(key);
         }
         function getAuth() {
-            var key="auth";
-            var isRememberMe=getLS("rememberme");
-            if(isRememberMe==true) {
+            var key = "auth";
+            var isRememberMe = getLS("rememberme");
+            if (isRememberMe == true) {
                 return getLS(key);
             } else {
                 return getSS(key);
@@ -100,42 +100,42 @@
             //}
         }
         $.ajaxSetup({
-            beforeSend: function(xhr) {
+            beforeSend: function (xhr) {
                 addAuthHeader(xhr);
             },
-            error: function(jqXHR,exception) {
+            error: function (jqXHR, exception) {
                 $('#submit').button("reset");
                 $('#export').button("reset");
             }
         });
     </script>
     <script>
-        $(function() {
-            var tbl=new TableModel();
+        $(function () {
+            var tbl = new TableModel();
             ko.applyBindings(tbl);
-            var $btn=$('#submit');
-            $btn.on('click',function() {
-                var param=new Array();
-                param[param.length]={ "name": "key","value": "@HttpContext.Current.Request["key"]" };
-                param[param.length]={ "name": "sql","value": $("#sql").val() };
-                var url="/api/SQLEXPORT/Report";
+            var $btn = $('#submit');
+            $btn.on('click', function () {
+                var param = new Array();
+                param[param.length] = { "name": "key", "value": "@HttpContext.Current.Request["key"]" };
+                param[param.length] = { "name": "sql", "value": $("#sql").val() };
+                var url = "/api/SQLEXPORT/Report";
                 $btn.button('loading');
                 $.ajax({
                     "url": url,
                     "cache": false,
                     "type": "POST",
                     "data": param
-                }).done(function(json) {
-                    if(json.rows.length>500) {
-                        alert("Total Rows "+json.rows.length+" Please apply limit")
+                }).done(function (json) {
+                    if (json.rows.length > 1000) {
+                        alert("Total Rows " + json.rows.length + " Please apply limit")
                     } else {
                         $btn.button('reset');
                         tbl.columns.removeAll();
                         tbl.rows.removeAll();
-                        $.each(json.columns,function(i,col) {
+                        $.each(json.columns, function (i, col) {
                             tbl.columns.push(col);
                         });
-                        $.each(json.rows,function(i,row) {
+                        $.each(json.rows, function (i, row) {
                             tbl.rows.push(row);
                         });
                     }

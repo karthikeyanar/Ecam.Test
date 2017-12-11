@@ -1198,7 +1198,6 @@
     <Content Include="Views\Home\Intraday.cshtml" />
     <Content Include="Views\Home\Order.cshtml" />
     <Content Include="Views\Home\Holding.cshtml" />
-    <Content Include="Views\Home\s.cshtml" />
     <Content Include="Views\Home\ExpertsRecommend.cshtml" />
     <Content Include="Views\Home\Experts.cshtml" />
     <Content Include="Views\Home\AddExperts.cshtml" />

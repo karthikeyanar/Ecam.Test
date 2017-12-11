@@ -393,6 +393,11 @@ namespace Ecam.Framework.Repository
                 where.AppendFormat(" and ifnull(c.is_nifty_200,0)={0}", ((criteria.is_nifty_200 ?? false) == true ? "1" : "0"));
             }
 
+            if (criteria.is_old.HasValue)
+            {
+                where.AppendFormat(" and ifnull(c.is_old,0)={0}", ((criteria.is_old ?? false) == true ? "1" : "0"));
+            }
+
             if (criteria.trade_date.HasValue)
             {
                 where.AppendFormat(" and m.trade_date='{0}' ", criteria.trade_date.Value.ToString("yyyy-MM-dd"));
@@ -842,6 +847,11 @@ namespace Ecam.Framework.Repository
             if (criteria.is_nifty_200.HasValue)
             {
                 where.AppendFormat(" and ifnull(c.is_nifty_200,0)={0}", ((criteria.is_nifty_200 ?? false) == true ? "1" : "0")).Append(Environment.NewLine);
+            }
+
+            if (criteria.is_old.HasValue)
+            {
+                where.AppendFormat(" and ifnull(c.is_old,0)={0}", ((criteria.is_old ?? false) == true ? "1" : "0")).Append(Environment.NewLine);
             }
 
             groupByName = " group by c.symbol " + Environment.NewLine;
