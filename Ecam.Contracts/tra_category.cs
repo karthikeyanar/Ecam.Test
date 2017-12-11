@@ -12,6 +12,8 @@ namespace Ecam.Contracts
     public class TRA_CATEGORY : BaseContract
     {
         public string category_name { get; set; }
+        public Nullable<bool> is_archive { get; set; }
+        public Nullable<bool> is_book_mark { get; set; }
         public int? total_equity { get; set; }
         public decimal? profit_2016 { get; set; }
         public decimal? profit_2017 { get; set; }

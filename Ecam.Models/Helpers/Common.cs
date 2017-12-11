@@ -58,64 +58,81 @@ namespace Ecam.Models
                 where.AppendFormat(" and ct.symbol in({0})", Helper.ConvertStringSQLFormat(criteria.symbols));
             }
 
-            if (string.IsNullOrEmpty(criteria.categories) == false)
+            List<string> categoryList = null;
+            if ((criteria.is_book_mark_category ?? false) == true)
             {
-                string categorySymbols = "-1";
                 using (EcamContext context = new EcamContext())
                 {
-                    List<string> categoryList = Helper.ConvertStringList(criteria.categories);
-                    List<tra_company_category> categories = null;
-                    List<string> categorySymbolList = null;
-                    categories = (from q in context.tra_company_category
-                                  where categoryList.Contains(q.category_name) == true
-                                  select q).ToList();
-                    if ((criteria.is_all_category ?? false) == true)
+                    var categoryNameList = (from q in context.tra_category where (q.is_book_mark ?? false) == true select q.category_name).ToList();
+                    criteria.categories += Helper.ConvertStringIds(categoryNameList);
+                }
+            }
+
+            if (string.IsNullOrEmpty(criteria.categories) == false)
+            {
+                categoryList = Helper.ConvertStringList(criteria.categories);
+            }
+
+            if (categoryList != null)
+            {
+                if (categoryList.Count > 0)
+                {
+                    string categorySymbols = "-1";
+                    using (EcamContext context = new EcamContext())
                     {
-                        categorySymbolList = new List<string>();
-                        foreach (var row in categories)
+                        List<tra_company_category> categories = null;
+                        List<string> categorySymbolList = null;
+                        categories = (from q in context.tra_company_category
+                                      where categoryList.Contains(q.category_name) == true
+                                      select q).ToList();
+                        if ((criteria.is_all_category ?? false) == true)
                         {
-                            var tempList = (from q in categories where q.symbol == row.symbol select q).ToList();
-                            int selCnt = 0;
-                            foreach (var tempRow in tempList)
+                            categorySymbolList = new List<string>();
+                            foreach (var row in categories)
                             {
-                                foreach (string str in categoryList)
+                                var tempList = (from q in categories where q.symbol == row.symbol select q).ToList();
+                                int selCnt = 0;
+                                foreach (var tempRow in tempList)
                                 {
-                                    if (string.IsNullOrEmpty(str) == false)
+                                    foreach (string str in categoryList)
                                     {
-                                        if (tempRow.category_name == str)
+                                        if (string.IsNullOrEmpty(str) == false)
                                         {
-                                            selCnt += 1;
+                                            if (tempRow.category_name == str)
+                                            {
+                                                selCnt += 1;
+                                            }
                                         }
                                     }
                                 }
+                                if (selCnt == categoryList.Count)
+                                {
+                                    categorySymbolList.Add(row.symbol);
+                                }
                             }
-                            if (selCnt == categoryList.Count)
-                            {
-                                categorySymbolList.Add(row.symbol);
-                            }
+                            categorySymbolList = categorySymbolList.Distinct().ToList();
                         }
-                        categorySymbolList = categorySymbolList.Distinct().ToList();
-                    }
-                    else
-                    {
-                        categorySymbolList = (from q in categories select q.symbol).Distinct().ToList();
-                    }
-                    if (categorySymbolList.Count > 0)
-                    {
-                        categorySymbols = "";
-                    }
-                    foreach (var str in categorySymbolList)
-                    {
-                        categorySymbols += str + ",";
+                        else
+                        {
+                            categorySymbolList = (from q in categories select q.symbol).Distinct().ToList();
+                        }
+                        if (categorySymbolList.Count > 0)
+                        {
+                            categorySymbols = "";
+                        }
+                        foreach (var str in categorySymbolList)
+                        {
+                            categorySymbols += str + ",";
+                        }
+                        if (string.IsNullOrEmpty(categorySymbols) == false)
+                        {
+                            categorySymbols = categorySymbols.Substring(0, categorySymbols.Length - 1);
+                        }
                     }
                     if (string.IsNullOrEmpty(categorySymbols) == false)
                     {
-                        categorySymbols = categorySymbols.Substring(0, categorySymbols.Length - 1);
+                        where.AppendFormat(" and ct.symbol in({0})", Helper.ConvertStringSQLFormat(categorySymbols));
                     }
-                }
-                if (string.IsNullOrEmpty(categorySymbols) == false)
-                {
-                    where.AppendFormat(" and ct.symbol in({0})", Helper.ConvertStringSQLFormat(categorySymbols));
                 }
             }
 

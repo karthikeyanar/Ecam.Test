@@ -64,7 +64,10 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             if (isOld == true) {
                 arr[arr.length] = { "name": "is_old", "value": isOld };
             }
-
+            var is_book_mark_category = $("#frmCompanySearch #is_book_mark_category")[0].checked;
+            if (is_book_mark_category == true) {
+                arr[arr.length] = { "name": "is_book_mark_category", "value": is_book_mark_category };
+            }
             //var is_sell_to_buy = $("#frmCompanySearch #is_sell_to_buy")[0].checked;
             //if (is_sell_to_buy == true) {
             //    arr[arr.length] = { "name": "is_sell_to_buy", "value": is_sell_to_buy };
@@ -730,258 +733,256 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
             if (self.start_index <= totalCount && formatDate(startDate).indexOf($selYear.val()) >= 0) {
 
-                self.getTop10Categories(totalStartDate, totalEndDate, function (categories) {
-                    var arr = [];
-                    if (self.last_params != null) {
-                        $.each(self.last_params, function (i, row) {
-                            if (row.name == "PageIndex") {
-                                row.value = 1;
-                            } else if (row.name == "PageSize") {
-                                //row.value = 10;
-                            } else if (row.name == "SortName") {
-                                row.value = "total_profit";
-                            } else if (row.name == "SortOrder") {
-                                row.value = "desc";
-                            } else if (row.name == "start_date") {
-                                row.value = startDate
-                            } else if (row.name == "end_date") {
-                                row.value = endDate;
-                            } else if (row.name == "total_start_date") {
-                                row.value = totalStartDate;
-                            } else if (row.name == "total_end_date") {
-                                row.value = totalEndDate;
-                            }
-                            //else if (row.name == "trigger_start_date") {
-                            //    row.value = triggerStartDate;
-                            //} else if (row.name == "trigger_end_date") {
-                            //    row.value = triggerEndDate;
-                            //}
-                            arr.push(row);
+                var arr = [];
+                if (self.last_params != null) {
+                    $.each(self.last_params, function (i, row) {
+                        if (row.name == "PageIndex") {
+                            row.value = 1;
+                        } else if (row.name == "PageSize") {
+                            //row.value = 10;
+                        } else if (row.name == "SortName") {
+                            row.value = "total_profit";
+                        } else if (row.name == "SortOrder") {
+                            row.value = "desc";
+                        } else if (row.name == "start_date") {
+                            row.value = startDate
+                        } else if (row.name == "end_date") {
+                            row.value = endDate;
+                        } else if (row.name == "total_start_date") {
+                            row.value = totalStartDate;
+                        } else if (row.name == "total_end_date") {
+                            row.value = totalEndDate;
+                        }
+                        //else if (row.name == "trigger_start_date") {
+                        //    row.value = triggerStartDate;
+                        //} else if (row.name == "trigger_end_date") {
+                        //    row.value = triggerEndDate;
+                        //}
+                        arr.push(row);
+                    });
+                }
+                //arr.push({ 'name': 'PageIndex', 'value': 1 });
+                //arr.push({ 'name': 'PageSize', 'value': 10 });
+                //arr.push({ 'name': 'SortName', 'value': 'total_profit' });
+                //arr.push({ 'name': 'SortOrder', 'value': 'desc' });
+                //arr.push({ 'name': 'start_date', 'value': startDate });
+                //arr.push({ 'name': 'end_date', 'value': endDate });
+                //arr.push({ 'name': 'total_start_date', 'value': totalStartDate });
+                //arr.push({ 'name': 'total_end_date', 'value': totalEndDate });
+                //arr.push({ 'name': 'ignore_symbols', 'value': $(":input[name='ignore_symbols']").val() });
+                ////arr.push({ 'name': 'total_from_profit', 'value': 1 });
+                ////arr.push({ 'name': 'is_nifty_200', 'value': true });
+                ////arr.push({ 'name': 'max_negative_count', 'value': 1 });
+                //$.each(arr, function (i, row) {
+                //    if (row.name == "categories") {
+                //        row.value = categories;
+                //    }
+                //});
+
+                handleBlockUI({ "message": 'Loading... - ' + formatDate(startDate) }); // + 'startDate='+  formatDate(startDate) +  'endDate=', formatDate(endDate)+  'totalStartDate='+  formatDate(totalStartDate)+  'totalEndDate='+  formatDate(totalEndDate) + ' ...' });
+                //console.log('index=', index, 'startDate=', formatDate(startDate), 'endDate=', formatDate(endDate), 'totalStartDate=', formatDate(totalStartDate), 'totalEndDate=', formatDate(totalEndDate));
+
+                var url = apiUrl("/Company/List");
+                $.ajax({
+                    "url": url,
+                    "cache": false,
+                    "type": "GET",
+                    "data": arr
+                }).done(function (json) {
+
+                    var totalEquity = json.rows.length;
+                    var totalInvestmentPerEquity = cFloat(totalAmount / totalEquity);
+
+                    console.log('totalAmount=', totalAmount, 'totalEquity=', totalEquity, 'totalInvestmentPerEquity=', totalInvestmentPerEquity);
+
+                    var totalInvestment = 0;
+                    var totalCurrentValue = 0;
+                    var positiveCount = 0;
+                    var negativeCount = 0;
+
+                    var highCurrentValue = 0;
+                    var lowCurrentValue = 0;
+
+                    var investments = [];
+                    var symbols = '';
+                    if (json.rows != null) {
+                        $.each(json.rows, function (i, row) {
+                            symbols += row.symbol + ',';
+
+                            if (cFloat(row.first_price) <= 0) { row.first_price = 0; }
+                            if (cFloat(row.last_price) <= 0) { row.last_price = 0; }
+                            //if (cFloat(row.profit_high_price) <= 0) { row.profit_high_price = 1; }
+                            //if (cFloat(row.profit_low_price) <= 0) { row.profit_low_price = 1; }
+
+                            var quantity = cInt(totalInvestmentPerEquity / cFloat(row.first_price));
+                            var investment = cFloat(quantity * cFloat(row.first_price));
+                            var cmv = cFloat(quantity * cFloat(row.last_price));
+                            //var high_cmv = cFloat(quantity * cFloat(row.profit_high_price));
+                            //var low_cmv = cFloat(quantity * cFloat(row.profit_low_price));
+                            var profit = cFloat(((cmv - investment) / investment) * 100);
+                            //var highProfit = cFloat(((high_cmv - investment) / investment) * 100);
+                            //var lowProfit = cFloat(((low_cmv - investment) / investment) * 100);
+
+                            investments.push({
+                                "symbol": row.symbol,
+                                "quantity": quantity,
+                                "investment": investment,
+                                "cmv": cmv,
+                                //"high_cmv": high_cmv,
+                                //"low_cmv": low_cmv,
+                                "profit": profit,
+                                //"high_profit": highProfit,
+                                //"low_profit": lowProfit,
+                                "first_price": row.first_price,
+                                "last_price": row.last_price
+                                //"profit_high_price": row.profit_high_price,
+                                //"profit_low_price": row.profit_low_price
+                            });
                         });
                     }
-                    //arr.push({ 'name': 'PageIndex', 'value': 1 });
-                    //arr.push({ 'name': 'PageSize', 'value': 10 });
-                    //arr.push({ 'name': 'SortName', 'value': 'total_profit' });
-                    //arr.push({ 'name': 'SortOrder', 'value': 'desc' });
-                    //arr.push({ 'name': 'start_date', 'value': startDate });
-                    //arr.push({ 'name': 'end_date', 'value': endDate });
-                    //arr.push({ 'name': 'total_start_date', 'value': totalStartDate });
-                    //arr.push({ 'name': 'total_end_date', 'value': totalEndDate });
-                    //arr.push({ 'name': 'ignore_symbols', 'value': $(":input[name='ignore_symbols']").val() });
-                    ////arr.push({ 'name': 'total_from_profit', 'value': 1 });
-                    ////arr.push({ 'name': 'is_nifty_200', 'value': true });
-                    ////arr.push({ 'name': 'max_negative_count', 'value': 1 });
-                    //$.each(arr, function (i, row) {
-                    //    if (row.name == "categories") {
-                    //        row.value = categories;
-                    //    }
-                    //});
 
-                    handleBlockUI({ "message": 'Loading... - ' + formatDate(startDate) }); // + 'startDate='+  formatDate(startDate) +  'endDate=', formatDate(endDate)+  'totalStartDate='+  formatDate(totalStartDate)+  'totalEndDate='+  formatDate(totalEndDate) + ' ...' });
-                    //console.log('index=', index, 'startDate=', formatDate(startDate), 'endDate=', formatDate(endDate), 'totalStartDate=', formatDate(totalStartDate), 'totalEndDate=', formatDate(totalEndDate));
 
-                    var url = apiUrl("/Company/List");
-                    $.ajax({
-                        "url": url,
-                        "cache": false,
-                        "type": "GET",
-                        "data": arr
-                    }).done(function (json) {
+                    $.each(investments, function (i, row) {
+                        totalInvestment += cFloat(row.investment);
+                        totalCurrentValue += cFloat(row.cmv);
 
-                        var totalEquity = json.rows.length;
-                        var totalInvestmentPerEquity = cFloat(totalAmount / totalEquity);
+                        highCurrentValue += cFloat(row.high_cmv);
+                        lowCurrentValue += cFloat(row.low_cmv);
 
-                        console.log('totalAmount=', totalAmount, 'totalEquity=', totalEquity, 'totalInvestmentPerEquity=', totalInvestmentPerEquity);
+                        if (cFloat(row.profit) > 0) {
+                            positiveCount += 1;
+                        } else {
+                            negativeCount += 1;
+                        }
+                    });
 
-                        var totalInvestment = 0;
-                        var totalCurrentValue = 0;
-                        var positiveCount = 0;
-                        var negativeCount = 0;
+                    if (investments.length <= 0) {
+                        totalInvestment = totalAmount;
+                        totalCurrentValue = totalAmount;
+                        highCurrentValue = totalAmount;
+                        lowCurrentValue = totalAmount;
+                    }
 
-                        var highCurrentValue = 0;
-                        var lowCurrentValue = 0;
 
-                        var investments = [];
-                        var symbols = '';
-                        if (json.rows != null) {
-                            $.each(json.rows, function (i, row) {
-                                symbols += row.symbol + ',';
+                    console.log('before totalAmount=', totalAmount, 'totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue, 'highCurrentValue=', highCurrentValue, 'lowCurrentValue=', lowCurrentValue);
 
-                                if (cFloat(row.first_price) <= 0) { row.first_price = 0; }
-                                if (cFloat(row.last_price) <= 0) { row.last_price = 0; }
-                                //if (cFloat(row.profit_high_price) <= 0) { row.profit_high_price = 1; }
-                                //if (cFloat(row.profit_low_price) <= 0) { row.profit_low_price = 1; }
+                    totalCurrentValue = self.calcFinalMarketValue(totalCurrentValue, investments.length, false);
+                    highCurrentValue = self.calcFinalMarketValue(highCurrentValue, investments.length, false);
+                    lowCurrentValue = self.calcFinalMarketValue(lowCurrentValue, investments.length, false);
 
-                                var quantity = cInt(totalInvestmentPerEquity / cFloat(row.first_price));
-                                var investment = cFloat(quantity * cFloat(row.first_price));
-                                var cmv = cFloat(quantity * cFloat(row.last_price));
-                                //var high_cmv = cFloat(quantity * cFloat(row.profit_high_price));
-                                //var low_cmv = cFloat(quantity * cFloat(row.profit_low_price));
-                                var profit = cFloat(((cmv - investment) / investment) * 100);
-                                //var highProfit = cFloat(((high_cmv - investment) / investment) * 100);
-                                //var lowProfit = cFloat(((low_cmv - investment) / investment) * 100);
+                    console.log('after totalAmount=', totalAmount, 'totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue, 'highCurrentValue=', highCurrentValue, 'lowCurrentValue=', lowCurrentValue);
 
-                                investments.push({
-                                    "symbol": row.symbol,
-                                    "quantity": quantity,
-                                    "investment": investment,
-                                    "cmv": cmv,
-                                    //"high_cmv": high_cmv,
-                                    //"low_cmv": low_cmv,
-                                    "profit": profit,
-                                    //"high_profit": highProfit,
-                                    //"low_profit": lowProfit,
-                                    "first_price": row.first_price,
-                                    "last_price": row.last_price
-                                    //"profit_high_price": row.profit_high_price,
-                                    //"profit_low_price": row.profit_low_price
-                                });
+                    var totalProfitAVG = 0;
+
+                    var data = {
+                        'total_from_date': formatDate(totalStartDate),
+                        'total_to_date': formatDate(totalEndDate),
+                        'from_date': formatDate(startDate),
+                        'to_date': formatDate(endDate),
+                        'low_avg_profit': 0,
+                        'high_avg_profit': 0,
+                        'avg_profit': 0,
+                        'total_equity': 0,
+                        'symbols': symbols,
+                        'total_amount': totalAmount,
+                        'investment': totalInvestment,
+                        'cmv': totalCurrentValue,
+                        'investments': investments,
+                        'positive_count': positiveCount,
+                        'negative_count': negativeCount,
+                        'positive_percentage': (positiveCount / (positiveCount + negativeCount)) * 100,
+                        'negative_percentage': (negativeCount / (positiveCount + negativeCount)) * 100
+                    };
+
+                    data.total_equity = json.rows.length;
+
+                    totalProfitAVG = cFloat(cFloat(totalCurrentValue - totalInvestment) / totalInvestment) * 100;
+                    //self.avg_profit(totalProfitAVG);
+                    data.avg_profit = totalProfitAVG;
+
+                    totalProfitAVG = cFloat(cFloat(highCurrentValue - totalInvestment) / totalInvestment) * 100;
+                    //self.high_avg_profit(totalProfitAVG);
+                    data.high_avg_profit = totalProfitAVG;
+
+                    totalProfitAVG = cFloat(cFloat(lowCurrentValue - totalInvestment) / totalInvestment) * 100;
+                    //self.low_avg_profit(totalProfitAVG);
+                    data.low_avg_profit = totalProfitAVG;
+
+                    var $tbl = $("#tblLog", $modal);
+                    var $tbody = $("tbody", $tbl);
+                    unblockUI();
+                    //if (self.start_index <= 50
+                    //&& formatDate(startDate).indexOf('2016') < 0
+                    //   ) {
+
+                    $("#detail-log-template").tmpl(data).appendTo($tbody);
+
+                    self.temp_investments.push(investments);
+
+                    var balance = 0; var profit = 0; var highProfit = 0; var lowProfit = 0;
+
+                    balance = cFloat(totalAmount - totalInvestment);
+
+                    console.log('before balance=', balance);
+                    balance = cFloat(balance) - cFloat(self.getCharges(totalInvestment, investments.length, true));
+                    console.log('after balance=', balance);
+
+                    profit = cFloat(cFloat(totalCurrentValue - totalInvestment) / totalInvestment) * 100;
+                    highProfit = cFloat(cFloat(highCurrentValue - totalInvestment) / totalInvestment) * 100;
+                    lowProfit = cFloat(cFloat(lowCurrentValue - totalInvestment) / totalInvestment) * 100;
+
+                    var monthlyInvestment = cFloat($(":input[name='monthly_investment']").val());
+                    totalAmount = cFloat(totalCurrentValue) + cFloat(balance) + monthlyInvestment;
+                    console.log('follow next year totalCurrentValue=', totalCurrentValue, 'balance=', balance, 'monthlyInvestment=', monthlyInvestment);
+                    //$(":input[name='total_amount']").val(totalAmount);
+                    self.createLogs($modal, totalAmount);
+
+                    //cFloat($(":input[name='total_amount']").val())
+                    console.log('cell=', $("tr:eq(0) > td:eq(0)", $tbody)[0]);
+                    console.log('amount=', cFloat($("tr:eq(0) > td:eq(0)", $tbody).html()))
+                    var totalFinalAmount = cFloat($("tr:eq(0) > td:eq(0)", $tbody).html()) + (monthlyInvestment * cInt($("tr", $tbody).length));
+                    $("#spnFinalTotalAmount", $modal).html(formatNumber(totalFinalAmount));
+                    $("#spnFinalTotalCMV", $modal).html(formatNumber(totalAmount));
+                    var p = ((cFloat(totalAmount) - cFloat(totalFinalAmount)) / cFloat(totalFinalAmount)) * 100;
+                    $("#spnFinalTotalProfit", $modal).html(formatPercentage(p));
+
+                    // } else {
+
+                    // }
+
+                    var $tblLogCount = $("#tblLogCount", $modal);
+                    $("tbody", $tblLogCount).empty();
+                    var data = [];
+                    $("tr", $tbody).each(function () {
+                        var $tr = $(this);
+                        var symbols = cString($(":input[name='symbols']", $tr).val());
+                        if (symbols != '') {
+                            var arr = symbols.split(',');
+                            $.each(arr, function (i, sym) {
+                                if (cString(sym) != '') {
+                                    var temp = null;
+                                    $.each(data, function (j, d) {
+                                        if (d.symbol == sym) {
+                                            temp = d;
+                                        }
+                                    });
+                                    if (temp == null) {
+                                        temp = { "symbol": sym, "count": 0 };
+                                        data.push(temp);
+                                    }
+                                    temp.count += 1;
+                                }
                             });
                         }
-
-
-                        $.each(investments, function (i, row) {
-                            totalInvestment += cFloat(row.investment);
-                            totalCurrentValue += cFloat(row.cmv);
-
-                            highCurrentValue += cFloat(row.high_cmv);
-                            lowCurrentValue += cFloat(row.low_cmv);
-
-                            if (cFloat(row.profit) > 0) {
-                                positiveCount += 1;
-                            } else {
-                                negativeCount += 1;
-                            }
-                        });
-
-                        if (investments.length <= 0) {
-                            totalInvestment = totalAmount;
-                            totalCurrentValue = totalAmount;
-                            highCurrentValue = totalAmount;
-                            lowCurrentValue = totalAmount;
-                        }
-
-
-                        console.log('before totalAmount=', totalAmount, 'totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue, 'highCurrentValue=', highCurrentValue, 'lowCurrentValue=', lowCurrentValue);
-
-                        totalCurrentValue = self.calcFinalMarketValue(totalCurrentValue, investments.length, false);
-                        highCurrentValue = self.calcFinalMarketValue(highCurrentValue, investments.length, false);
-                        lowCurrentValue = self.calcFinalMarketValue(lowCurrentValue, investments.length, false);
-
-                        console.log('after totalAmount=', totalAmount, 'totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue, 'highCurrentValue=', highCurrentValue, 'lowCurrentValue=', lowCurrentValue);
-
-                        var totalProfitAVG = 0;
-
-                        var data = {
-                            'total_from_date': formatDate(totalStartDate),
-                            'total_to_date': formatDate(totalEndDate),
-                            'from_date': formatDate(startDate),
-                            'to_date': formatDate(endDate),
-                            'low_avg_profit': 0,
-                            'high_avg_profit': 0,
-                            'avg_profit': 0,
-                            'total_equity': 0,
-                            'symbols': symbols,
-                            'total_amount': totalAmount,
-                            'investment': totalInvestment,
-                            'cmv': totalCurrentValue,
-                            'investments': investments,
-                            'positive_count': positiveCount,
-                            'negative_count': negativeCount,
-                            'positive_percentage': (positiveCount / (positiveCount + negativeCount)) * 100,
-                            'negative_percentage': (negativeCount / (positiveCount + negativeCount)) * 100
-                        };
-
-                        data.total_equity = json.rows.length;
-
-                        totalProfitAVG = cFloat(cFloat(totalCurrentValue - totalInvestment) / totalInvestment) * 100;
-                        //self.avg_profit(totalProfitAVG);
-                        data.avg_profit = totalProfitAVG;
-
-                        totalProfitAVG = cFloat(cFloat(highCurrentValue - totalInvestment) / totalInvestment) * 100;
-                        //self.high_avg_profit(totalProfitAVG);
-                        data.high_avg_profit = totalProfitAVG;
-
-                        totalProfitAVG = cFloat(cFloat(lowCurrentValue - totalInvestment) / totalInvestment) * 100;
-                        //self.low_avg_profit(totalProfitAVG);
-                        data.low_avg_profit = totalProfitAVG;
-
-                        var $tbl = $("#tblLog", $modal);
-                        var $tbody = $("tbody", $tbl);
-                        unblockUI();
-                        //if (self.start_index <= 50
-                        //&& formatDate(startDate).indexOf('2016') < 0
-                        //   ) {
-
-                        $("#detail-log-template").tmpl(data).appendTo($tbody);
-
-                        self.temp_investments.push(investments);
-
-                        var balance = 0; var profit = 0; var highProfit = 0; var lowProfit = 0;
-
-                        balance = cFloat(totalAmount - totalInvestment);
-
-                        console.log('before balance=', balance);
-                        balance = cFloat(balance) - cFloat(self.getCharges(totalInvestment, investments.length, true));
-                        console.log('after balance=', balance);
-
-                        profit = cFloat(cFloat(totalCurrentValue - totalInvestment) / totalInvestment) * 100;
-                        highProfit = cFloat(cFloat(highCurrentValue - totalInvestment) / totalInvestment) * 100;
-                        lowProfit = cFloat(cFloat(lowCurrentValue - totalInvestment) / totalInvestment) * 100;
-
-                        var monthlyInvestment = cFloat($(":input[name='monthly_investment']").val());
-                        totalAmount = cFloat(totalCurrentValue) + cFloat(balance) + monthlyInvestment;
-                        console.log('follow next year totalCurrentValue=', totalCurrentValue, 'balance=', balance, 'monthlyInvestment=', monthlyInvestment);
-                        //$(":input[name='total_amount']").val(totalAmount);
-                        self.createLogs($modal, totalAmount);
-
-                        //cFloat($(":input[name='total_amount']").val())
-                        console.log('cell=', $("tr:eq(0) > td:eq(0)", $tbody)[0]);
-                        console.log('amount=', cFloat($("tr:eq(0) > td:eq(0)", $tbody).html()))
-                        var totalFinalAmount = cFloat($("tr:eq(0) > td:eq(0)", $tbody).html()) + (monthlyInvestment * cInt($("tr", $tbody).length));
-                        $("#spnFinalTotalAmount", $modal).html(formatNumber(totalFinalAmount));
-                        $("#spnFinalTotalCMV", $modal).html(formatNumber(totalAmount));
-                        var p = ((cFloat(totalAmount) - cFloat(totalFinalAmount)) / cFloat(totalFinalAmount)) * 100;
-                        $("#spnFinalTotalProfit", $modal).html(formatPercentage(p));
-
-                        // } else {
-
-                        // }
-
-                        var $tblLogCount = $("#tblLogCount", $modal);
-                        $("tbody", $tblLogCount).empty();
-                        var data = [];
-                        $("tr", $tbody).each(function () {
-                            var $tr = $(this);
-                            var symbols = cString($(":input[name='symbols']", $tr).val());
-                            if (symbols != '') {
-                                var arr = symbols.split(',');
-                                $.each(arr, function (i, sym) {
-                                    if (cString(sym) != '') {
-                                        var temp = null;
-                                        $.each(data, function (j, d) {
-                                            if (d.symbol == sym) {
-                                                temp = d;
-                                            }
-                                        });
-                                        if (temp == null) {
-                                            temp = { "symbol": sym, "count": 0 };
-                                            data.push(temp);
-                                        }
-                                        temp.count += 1;
-                                    }
-                                });
-                            }
-                        });
-                        data = data.sort(getDescOrder("count"));
-                        //console.log('data=', data);
-                        $.each(data, function (i, row) {
-                            $("tbody", $tblLogCount).append("<tr><td>" + row.symbol + "</td><td class='text-right'>" + row.count + "</td></tr>");
-                        });
-
-                        unblockUI();
-                    }).always(function () {
                     });
+                    data = data.sort(getDescOrder("count"));
+                    //console.log('data=', data);
+                    $.each(data, function (i, row) {
+                        $("tbody", $tblLogCount).append("<tr><td>" + row.symbol + "</td><td class='text-right'>" + row.count + "</td></tr>");
+                    });
+
+                    unblockUI();
+                }).always(function () {
                 });
             } else if (self.start_index <= totalCount) {
                 //$(":input[name='total_amount']").val(totalAmount);
@@ -1328,6 +1329,9 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $("body").on("click", "#frmCompanySearch #is_old", function (event) {
                 self.loadGrid();
             });
+            $("body").on("click", "#frmCompanySearch #is_book_mark_category", function (event) {
+                self.loadGrid();
+            });
             $("body").on("click", "#frmCompanySearch #is_all_time_low", function (event) {
                 self.loadGrid();
             });
@@ -1607,6 +1611,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             $("body").off("click", "#frmCompanySearch #is_nifty_100");
             $("body").off("click", "#frmCompanySearch #is_nifty_200");
             $("body").off("click", "#frmCompanySearch #is_old");
+            $("body").off("click", "#frmCompanySearch #is_book_mark_category");
             $("body").off("click", "#frmCompanySearch #is_all_time_low");
             $("body").off("click", "#frmCompanySearch #is_all_time_high");
             $("body").off("click", "#frmCompanySearch #is_all_time_low_15_days");

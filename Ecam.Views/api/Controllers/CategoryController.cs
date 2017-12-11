@@ -41,5 +41,56 @@ namespace Ecam.Views.Controllers
             return _CategoryRepository.GetMonthlyProfitCategories(startDate, endDate);
         }
 
+        [HttpPost]
+        [ActionName("UpdateArchive")]
+        public IHttpActionResult UpdateArchive()
+        {
+            string category_name = HttpContext.Current.Request["category_name"];
+            string is_archive = HttpContext.Current.Request["is_archive"];
+            this.UpdateArchive(category_name, (is_archive == "true"));
+            return Ok();
+        }
+
+        [HttpPost]
+        [ActionName("UpdateBookMark")]
+        public IHttpActionResult UpdateBookMark()
+        {
+            string category_name = HttpContext.Current.Request["category_name"];
+            string is_book_mark = HttpContext.Current.Request["is_book_mark"];
+            this.UpdateBookMark(category_name, (is_book_mark == "true"));
+            return Ok();
+        }
+
+        private void UpdateArchive(string category_name, bool is_archive)
+        {
+            using (EcamContext context = new EcamContext())
+            {
+                tra_category category = (from q in context.tra_category
+                                       where q.category_name == category_name
+                                       select q).FirstOrDefault();
+                if (category != null)
+                {
+                    category.is_archive = is_archive;
+                    context.Entry(category).State = System.Data.Entity.EntityState.Modified;
+                    context.SaveChanges(); 
+                }
+            }
+        }
+
+        private void UpdateBookMark(string category_name, bool is_book_mark)
+        {
+            using (EcamContext context = new EcamContext())
+            {
+                tra_category category = (from q in context.tra_category
+                                       where q.category_name == category_name
+                                       select q).FirstOrDefault();
+                if (category != null)
+                {
+                    category.is_book_mark = is_book_mark;
+                    context.Entry(category).State = System.Data.Entity.EntityState.Modified;
+                    context.SaveChanges();
+                }
+            }
+        }
     }
 }

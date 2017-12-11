@@ -99,6 +99,7 @@ namespace Ecam.Contracts
 
         public string mf_ids { get; set; }
 
+        public Nullable<bool> is_book_mark_category { get; set; }
         public Nullable<bool> is_sell_to_buy { get; set; }
         public Nullable<bool> is_buy_to_sell { get; set; }
 

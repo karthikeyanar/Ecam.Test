@@ -40,6 +40,16 @@ namespace Ecam.Framework.Repository
                 where.AppendFormat(" c.category_id>0 ");
             }
 
+            //if (criteria.is_archive.HasValue)
+            //{
+            where.AppendFormat(" and ifnull(c.is_archive,0)={0}", ((criteria.is_archive ?? false) == true ? "1" : "0"));
+            //}
+
+            if (criteria.is_book_mark.HasValue)
+            {
+                where.AppendFormat(" and ifnull(c.is_book_mark,0)={0}", ((criteria.is_book_mark ?? false) == true ? "1" : "0"));
+            }
+
             selectFields = "count(*) as cnt";
 
             sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, "", "");
@@ -87,7 +97,7 @@ namespace Ecam.Framework.Repository
                             " where profit_type = 'M' and profit_date >= '{0}' and profit_date <= '{1}'" +
                             " group by category_name " +
                             " ) as tbl order by profit desc " +
-                            " limit 0,10",startDate.ToString("yyyy-MM-dd"),endDate.ToString("yyyy-MM-dd"));
+                            " limit 0,10", startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
             List<string> rows = new List<string>();
             using (EcamContext context = new EcamContext())
             {

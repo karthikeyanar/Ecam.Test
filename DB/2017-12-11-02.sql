@@ -520,4 +520,5 @@ update tra_company set is_old = 1 where symbol in (
 'ZEELEARN',
 'ZENSARTECH',
 'ZYDUSWELL'
-)
+);
+update tra_category set is_book_mark = 1 where category_name in (select distinct category_name from tra_company_category cc join tra_company c on c.symbol = cc.symbol where ifnull(c.is_book_mark,0)=1);

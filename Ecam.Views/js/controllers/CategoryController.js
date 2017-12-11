@@ -18,6 +18,14 @@ define("CategoryController", ["knockout", "komapping", "helper", "service"], fun
             arr.push({ "name": "PageIndex", "value": $(":input[name='page_index']", $Category).val() });
             arr.push({ "name": "SortName", "value": $(":input[name='sort_name']", $Category).val() });
             arr.push({ "name": "SortOrder", "value": $(":input[name='sort_order']", $Category).val() });
+            var isarchive = $("#frmCategorySearch #is_archive")[0].checked;
+            if (isarchive == true) {
+                arr[arr.length] = { "name": "is_archive", "value": isarchive };
+            }
+            var is_book_mark = $("#frmCategorySearch #is_book_mark")[0].checked;
+            if (is_book_mark == true) {
+                arr[arr.length] = { "name": "is_book_mark", "value": is_book_mark };
+            }
             var url = apiUrl("/Category/List");
             $.ajax({
                 "url": url,
@@ -26,7 +34,9 @@ define("CategoryController", ["knockout", "komapping", "helper", "service"], fun
                 "data": arr
             }).done(function (json) {
                 self.rows.removeAll();
-                self.rows(json.rows);
+                $.each(json.rows, function (i, row) {
+                    self.rows.push(komapping.fromJS(row));
+                })
                 $(".manual-pagination", $Category).each(function () {
                     var element = this;
                     $(element).twbsPagination({
@@ -104,6 +114,58 @@ define("CategoryController", ["knockout", "komapping", "helper", "service"], fun
 
         this.onElements = function () {
             self.offElements();
+            $("body").on("click", "#frmCategorySearch #is_archive", function (event) {
+                self.loadGrid();
+            });
+            $("body").on("click", "#frmCategorySearch #is_book_mark", function (event) {
+                self.loadGrid();
+            });
+            $("body").on("click", ".is-archive", function (event) {
+                var $this = $(this);
+                var $i = $("i", $this);
+                var dataFor = ko.dataFor(this);
+                var url = apiUrl('/Category/UpdateArchive');
+                var arr = [];
+                var isArchive = $i.hasClass('fa-bookmark');
+                arr.push({ "name": "category_name", "value": dataFor.category_name() });
+                arr.push({ "name": "is_archive", "value": !isArchive });
+                $i.removeClass('fa-bookmark').removeClass('fa-bookmark-o').removeClass('fg-primary');
+                if (isArchive == true) {
+                    $i.addClass('fa-bookmark-o');
+                } else {
+                    $i.addClass('fa-bookmark fg-primary');
+                }
+                $.ajax({
+                    "url": url,
+                    "cache": false,
+                    "type": "POST",
+                    "data": arr
+                }).done(function (json) {
+                });
+            });
+            $("body").on("click", ".is-book-mark", function (event) {
+                var $this = $(this);
+                var $i = $("i", $this);
+                var dataFor = ko.dataFor(this);
+                var url = apiUrl('/Category/UpdateBookMark');
+                var arr = [];
+                var is_book_mark = $i.hasClass('fa-user');
+                arr.push({ "name": "category_name", "value": dataFor.category_name() });
+                arr.push({ "name": "is_book_mark", "value": !is_book_mark });
+                $i.removeClass('fa-user').removeClass('fa-user-o').removeClass('fg-primary');
+                if (is_book_mark == true) {
+                    $i.addClass('fa-user-o');
+                } else {
+                    $i.addClass('fa-user fg-primary');
+                }
+                $.ajax({
+                    "url": url,
+                    "cache": false,
+                    "type": "POST",
+                    "data": arr
+                }).done(function (json) {
+                });
+            });
             $("body").on("click", "#Category .btn-add", function (event) {
                 self.openItem(null)
             });
@@ -135,10 +197,14 @@ define("CategoryController", ["knockout", "komapping", "helper", "service"], fun
         }
 
         this.offElements = function () {
+            $("body").off("click", "#frmCategorySearch #is_archive");
+            $("body").off("click", "#frmCategorySearch #is_book_mark");
             $("body").off("click", "#Category .btn-add");
             $("body").off("click", "#Category .btn-edit");
             $("body").off("click", "#Category .btn-delete");
             $("body").off("change", "#Category #rows");
+            $("body").off("click", ".is-archive");
+            $("body").off("click", ".is-book-mark");
         }
 
         this.unInit = function () {
