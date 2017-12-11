@@ -14,6 +14,7 @@ namespace Ecam.Framework.Repository
     public interface ICategoryRepository
     {
         PaginatedListResult<TRA_CATEGORY> Get(TRA_CATEGORY_SEARCH criteria, Paging paging);
+        List<string> GetMonthlyProfitCategories(DateTime startDate, DateTime endDate);
     }
 
     public class CategoryRepository : ICategoryRepository
@@ -77,6 +78,22 @@ namespace Ecam.Framework.Repository
                 rows = context.Database.SqlQuery<TRA_CATEGORY>(sql).ToList();
             }
             return new PaginatedListResult<TRA_CATEGORY> { total = paging.Total, rows = rows };
+        }
+        public List<string> GetMonthlyProfitCategories(DateTime startDate, DateTime endDate)
+        {
+            StringBuilder where = new StringBuilder();
+            string sql = string.Format("select category_name from ( " +
+                            " select category_name,sum(profit) as profit from tra_category_profit " +
+                            " where profit_type = 'M' and profit_date >= '{0}' and profit_date <= '{1}'" +
+                            " group by category_name " +
+                            " ) as tbl order by profit desc " +
+                            " limit 0,10",startDate.ToString("yyyy-MM-dd"),endDate.ToString("yyyy-MM-dd"));
+            List<string> rows = new List<string>();
+            using (EcamContext context = new EcamContext())
+            {
+                rows = context.Database.SqlQuery<string>(sql).ToList();
+            }
+            return rows;
         }
     }
 }

@@ -33,5 +33,13 @@ namespace Ecam.Views.Controllers
         {
             return _CategoryRepository.Get(criteria, paging);
         }
+
+        [HttpGet]
+        [ActionName("GetMonthlyProfitCategories")]
+        public List<string> GetMonthlyProfitCategories([FromUri] DateTime startDate, [FromUri] DateTime endDate)
+        {
+            return _CategoryRepository.GetMonthlyProfitCategories(startDate, endDate);
+        }
+
     }
 }
