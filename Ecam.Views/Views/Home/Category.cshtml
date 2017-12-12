@@ -68,6 +68,9 @@
                     <th style="width: 10px" sortname="is_book_mark">
                         BM
                     </th>
+                    <th sortname="category_id">
+                        ID
+                    </th>
                     <th sortname="category_name">
                         Category
                     </th>
@@ -99,6 +102,7 @@
                             <i data-bind="css:{'fa-user fg-primary': cBool(is_book_mark())==true,'fa-user-o': cBool(is_book_mark())==false}" class="fa fa-user"></i>
                         </a>
                     </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:id"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:category_name"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatInteger(total_equity())"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right" data-bind="text:formatNumber(profit_2016())"></td>
