@@ -175,14 +175,6 @@ RegexOptions.IgnoreCase
                             context.Entry(company).State = System.Data.Entity.EntityState.Modified;
                             context.SaveChanges();
                         }
-                        var companyCategories = (from q in context.tra_company_category
-                                                 where q.symbol == symbol
-                                                 select q).ToList();
-                        foreach(var row in companyCategories)
-                        {
-                            context.tra_company_category.Remove(row);
-                        }
-                        context.SaveChanges();
                         tra_company_category companyCategory = (from q in context.tra_company_category
                                                                 where q.symbol == symbol
                                                                 && q.category_name == categoryName

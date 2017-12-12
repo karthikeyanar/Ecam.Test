@@ -736,6 +736,7 @@ namespace Ecam.Models
             }
             foreach (var category in categories)
             {
+                Common.CreateCategoryProfit(category.category_name, 2016);
                 Common.CreateCategoryProfit(category.category_name, DateTime.Now.Year);
             }
         }
@@ -776,7 +777,12 @@ namespace Ecam.Models
                 }).rows.ToList();
 
                 int totalEquity = list.Count();
-                decimal totalInvestmentPerEquity = (totalAmount / totalEquity);
+                decimal totalInvestmentPerEquity = 0;
+                try
+                {
+                    totalInvestmentPerEquity = (totalAmount / totalEquity);
+                }
+                catch { }
                 decimal totalInvestment = 0;
                 decimal totalCurrentValue = 0;
                 decimal positiveCount = 0;

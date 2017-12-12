@@ -1201,18 +1201,19 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             var $pageContent = $(".page-content");
             var startDate = formatDate(self.total_start_date());
             var endDate = formatDate(self.total_end_date());
-            self.getTop10Categories(startDate, endDate, function (categories) {
-                var caregoryList = categories.split(',');
-                console.log('caregoryList=', caregoryList);
-                var carr = [];
-                $.each(caregoryList, function (i, cat) {
-                    if (cString(cat) != '') {
-                        carr.push({ "id": cat, "text": cat });
-                    }
-                });
-                console.log('carr=', carr);
-                $categories.select2Refresh("data", carr);
+            var categories = 'CEMENT & CEMENT PRODUCTS,CHEMICALS,CONSTRUCTION,CONSUMER GOODS,FOOD PROCESSING,RETAIL,TEXTILES,AUTOMOBILE,FINANCIAL SERVICES';
+            //self.getTop10Categories(startDate, endDate, function (categories) {
+            var caregoryList = categories.split(',');
+            console.log('caregoryList=', caregoryList);
+            var carr = [];
+            $.each(caregoryList, function (i, cat) {
+                if (cString(cat) != '') {
+                    carr.push({ "id": cat, "text": cat });
+                }
             });
+            console.log('carr=', carr);
+            $categories.select2Refresh("data", carr);
+            //});
         }
 
         this.getTop10Categories = function (startDate, endDate, callback) {

@@ -21,6 +21,7 @@ namespace Ecam.ConsoleApp
         public static string IS_DOWNLOAD_HISTORY = "";
         public static string IS_IMPORT_CSV = "";
         public static string IS_NIFTY_FLAG_CSV = "";
+        public static string IS_CATEGORY_FLAG_CSV = "";
         public static string GOOGLE_DATA = "";
         public static string MC = "";
         public static string MONEY_CONTROL = "";
@@ -30,6 +31,7 @@ namespace Ecam.ConsoleApp
 
         static void Main(string[] args)
         {
+            IS_CATEGORY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_CATEGORY_FLAG_CSV"];
             IS_NIFTY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_FLAG_CSV"];
             IS_IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_IMPORT_CSV"];
             IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
@@ -259,6 +261,10 @@ namespace Ecam.ConsoleApp
             else if (IS_NIFTY_FLAG_CSV == "true")
             {
                 UpdateNiftyFlagCSV();
+            }
+            else if (IS_CATEGORY_FLAG_CSV == "true")
+            {
+                UpdateCategoryFlagCSV();
             }
             else
             {
@@ -1483,6 +1489,76 @@ RegexOptions.IgnoreCase
                                         context.Entry(company).State = System.Data.Entity.EntityState.Modified;
                                         context.SaveChanges();
                                         Console.WriteLine("Update flag=" + flag + ",symbol=" + company.symbol);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void UpdateCategoryFlagCSV()
+        {
+            string categoryFlagCSVDirectoryPath = System.Configuration.ConfigurationManager.AppSettings["CATEGORY_FLAG_CSV"];
+            List<string> symbols = new List<string>();
+            if (IS_CATEGORY_FLAG_CSV == "true")
+            {
+                string[] files = System.IO.Directory.GetFiles(categoryFlagCSVDirectoryPath);
+                foreach (string fullFileName in files)
+                {
+                    string flag = System.IO.Path.GetFileNameWithoutExtension(fullFileName);
+                    int i;
+                    using (TextReader reader = File.OpenText(fullFileName))
+                    {
+                        CsvReader csv = new CsvReader(reader);
+                        i = 0;
+                        while (csv.Read())
+                        {
+                            i += 1;
+                            string symbol = csv.GetField<string>("Symbol");
+                            string series = csv.GetField<string>("Series");
+                            string industry = csv.GetField<string>("Industry");
+                            if (string.IsNullOrEmpty(symbol) == false
+                                && string.IsNullOrEmpty(industry) == false
+                                && series == "EQ")
+                            {
+                                using (EcamContext context = new EcamContext())
+                                {
+                                    tra_category category = (from q in context.tra_category
+                                                             where q.category_name == industry
+                                                             select q).FirstOrDefault();
+                                    if (category == null)
+                                    {
+                                        context.tra_category.Add(new tra_category
+                                        {
+                                            category_name = industry
+                                        });
+                                        context.SaveChanges();
+                                    }
+                                    tra_company company = (from q in context.tra_company
+                                                           where q.symbol == symbol
+                                                           select q).FirstOrDefault();
+                                    if (company != null)
+                                    {
+                                        tra_company_category companyCategory = (from q in context.tra_company_category
+                                                                                where q.symbol == symbol
+                                                                                && q.category_name == industry
+                                                                                select q).FirstOrDefault();
+                                        if (companyCategory == null)
+                                        {
+                                            context.tra_company_category.Add(new tra_company_category
+                                            {
+                                                category_name = industry,
+                                                symbol = symbol
+                                            });
+                                            context.SaveChanges();
+                                        }
+                                        Console.WriteLine("Update category=" + industry + ",symbol=" + company.symbol);
+                                    }
+                                    else
+                                    {
+                                        Helper.Log("Company does not exist symbol=" + symbol, "UpdateCategoryFlagCSV");
                                     }
                                 }
                             }
