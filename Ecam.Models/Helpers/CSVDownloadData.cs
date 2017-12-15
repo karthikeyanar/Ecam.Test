@@ -22,59 +22,48 @@ using Ecam.Contracts.Enums;
 using Ecam.Framework.ExcelHelper;
 using CsvHelper;
 
-namespace Ecam.Models
-{
-    public class CSVDownloadData
-    {
-        public CSVDownloadData(string symbol, ManualResetEvent doneEvent)
-        {
+namespace Ecam.Models {
+    public class CSVDownloadData {
+        public CSVDownloadData(string symbol,ManualResetEvent doneEvent) {
             _OriginalSymbol = symbol;
             _Symbol = symbol;
             _doneEvent = doneEvent;
         }
 
-        public CSVDownloadData()
-        {
+        public CSVDownloadData() {
         }
 
         // Wrapper method for use with thread pool.
-        public void ThreadPoolCallback(Object threadContext)
-        {
+        public void ThreadPoolCallback(Object threadContext) {
             int threadIndex = (int)threadContext;
-            Console.WriteLine("thread {0} started...", threadIndex);
-            if (string.IsNullOrEmpty(_Symbol) == false)
-            {
+            Console.WriteLine("thread {0} started...",threadIndex);
+            if(string.IsNullOrEmpty(_Symbol) == false) {
                 CSVDataDownload(_Symbol);
                 //CalculateRSI(_Symbol);
             }
-            Console.WriteLine("thread {0} result calculated...", threadIndex);
+            Console.WriteLine("thread {0} result calculated...",threadIndex);
             string IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IMPORT_CSV"];
             string fileName = IMPORT_CSV + "\\" + _OriginalSymbol + ".csv";
-            if (File.Exists(fileName) == true)
-            {
+            if(File.Exists(fileName) == true) {
                 File.Delete(fileName);
             }
             _doneEvent.Set();
         }
 
-        private void CSVDataDownload(string tempSymbol)
-        {
-            if (string.IsNullOrEmpty(tempSymbol) == false)
-            {
+        private void CSVDataDownload(string tempSymbol) {
+            if(string.IsNullOrEmpty(tempSymbol) == false) {
                 string url = string.Empty;
                 string html = string.Empty;
                 string IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IMPORT_CSV"];
+                string IMPORT_BACKUP_CSV = IMPORT_CSV + "\\Backup";
                 string fileName = IMPORT_CSV + "\\" + tempSymbol + ".csv";
                 CsvReader csv = null;
                 int i = 0;
-                if (File.Exists(fileName) == true)
-                {
-                    using (TextReader reader = File.OpenText(fileName))
-                    {
+                if(File.Exists(fileName) == true) {
+                    using(TextReader reader = File.OpenText(fileName)) {
                         csv = new CsvReader(reader);
                         i = 0;
-                        while (csv.Read())
-                        {
+                        while(csv.Read()) {
                             i += 1;
                             string symbol = csv.GetField<string>("Symbol");
                             string series = csv.GetField<string>("Series");
@@ -86,12 +75,10 @@ namespace Ecam.Models
                             string lastTrade = csv.GetField<string>("Last Price");
                             string prev = csv.GetField<string>("Prev Close");
                             DateTime dt = DataTypeHelper.ToDateTime(date);
-                            if (string.IsNullOrEmpty(symbol) == false
-                                && series == "EQ")
-                            {
+                            if(string.IsNullOrEmpty(symbol) == false
+                                && series == "EQ") {
                                 _Symbol = symbol;
-                                TradeHelper.ImportPrice(new TempClass
-                                {
+                                TradeHelper.ImportPrice(new TempClass {
                                     symbol = symbol,
                                     trade_date = dt,
                                     close_price = DataTypeHelper.ToDecimal(close),
@@ -104,6 +91,14 @@ namespace Ecam.Models
                                 });
                             }
                         }
+                    }
+                } else {
+                    if(Directory.Exists(IMPORT_BACKUP_CSV) == false) {
+                        Directory.CreateDirectory(IMPORT_BACKUP_CSV);
+                    }
+                    string moveFileName = System.IO.Path.Combine(IMPORT_BACKUP_CSV,fileName);
+                    if(System.IO.File.Exists(moveFileName) == false) {
+                        System.IO.File.Move(fileName,moveFileName);
                     }
                 }
             }
