@@ -43,9 +43,17 @@ namespace Ecam.Models {
             }
             Console.WriteLine("thread {0} result calculated...",threadIndex);
             string IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IMPORT_CSV"];
+            string IMPORT_BACKUP_CSV = IMPORT_CSV + "\\Backup";
             string fileName = IMPORT_CSV + "\\" + _OriginalSymbol + ".csv";
-            if(File.Exists(fileName) == true) {
-                File.Delete(fileName);
+            //if(File.Exists(fileName) == true) {
+            //    File.Delete(fileName);
+            //}
+            if(Directory.Exists(IMPORT_BACKUP_CSV) == false) {
+                Directory.CreateDirectory(IMPORT_BACKUP_CSV);
+            }
+            string moveFileName = System.IO.Path.Combine(IMPORT_BACKUP_CSV,System.IO.Path.GetFileName(fileName));
+            if(System.IO.File.Exists(moveFileName) == false) {
+                System.IO.File.Move(fileName,moveFileName);
             }
             _doneEvent.Set();
         }
@@ -55,7 +63,6 @@ namespace Ecam.Models {
                 string url = string.Empty;
                 string html = string.Empty;
                 string IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IMPORT_CSV"];
-                string IMPORT_BACKUP_CSV = IMPORT_CSV + "\\Backup";
                 string fileName = IMPORT_CSV + "\\" + tempSymbol + ".csv";
                 CsvReader csv = null;
                 int i = 0;
@@ -92,15 +99,7 @@ namespace Ecam.Models {
                             }
                         }
                     }
-                } else {
-                    if(Directory.Exists(IMPORT_BACKUP_CSV) == false) {
-                        Directory.CreateDirectory(IMPORT_BACKUP_CSV);
-                    }
-                    string moveFileName = System.IO.Path.Combine(IMPORT_BACKUP_CSV,fileName);
-                    if(System.IO.File.Exists(moveFileName) == false) {
-                        System.IO.File.Move(fileName,moveFileName);
-                    }
-                }
+                }  
             }
         }
 
