@@ -38,7 +38,8 @@ namespace Ecam.ConsoleApp
             MC = System.Configuration.ConfigurationManager.AppSettings["MC"];
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
             MONEY_CONTROL = System.Configuration.ConfigurationManager.AppSettings["MONEY_CONTROL"];
-            //DownloadStart();
+            DownloadStart();
+            AddSplit();
             Ecam.Models.Common.CreateCategoryProfit();
         }
 

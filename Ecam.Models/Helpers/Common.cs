@@ -736,7 +736,6 @@ namespace Ecam.Models
             }
             foreach (var category in categories)
             {
-                Common.CreateCategoryProfit(category.category_name, 2016);
                 Common.CreateCategoryProfit(category.category_name, DateTime.Now.Year);
             }
         }
