@@ -868,13 +868,17 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         lowCurrentValue = totalAmount;
                     }
 
-                    //var pr = cFloat(cFloat(totalCurrentValue - totalInvestment) / totalInvestment) * 100;
-                    ////console.log('pr=', pr);
-                    //if (pr <= -5) {
-                    //    pr = 5;
-                    //    //console.log('pr fixed=5');
-                    //    totalCurrentValue = (totalInvestment - (cFloat(totalInvestment) * cFloat(pr) / 100));
-                    //}
+                    var maximumLoss = cFloat($("#maximum_loss", $modal).val());
+                    if (maximumLoss > 0) {
+                        maximumLoss = maximumLoss * -1;
+                        var pr = cFloat(cFloat(totalCurrentValue - totalInvestment) / totalInvestment) * 100;
+                        console.log('pr=', pr);
+                        if (pr <= maximumLoss) {
+                            pr = maximumLoss * -1;
+                            console.log('pr fixed=' + maximumLoss);
+                            totalCurrentValue = (totalInvestment - (cFloat(totalInvestment) * cFloat(pr) / 100));
+                        }
+                    }
 
                     //console.log('before totalAmount=', totalAmount, 'totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue, 'highCurrentValue=', highCurrentValue, 'lowCurrentValue=', lowCurrentValue);
 
