@@ -24,9 +24,12 @@ using CsvHelper;
 
 namespace Ecam.Models {
     public class CSVDownloadData {
-        public CSVDownloadData(string symbol,ManualResetEvent doneEvent) {
-            _OriginalSymbol = symbol;
-            _Symbol = symbol;
+        private List<string> _SYMBOLS_LIST = null;
+        private bool _IS_NOT_SUCCESS = false;
+        public CSVDownloadData(string file_name, List<string> symbols,ManualResetEvent doneEvent) {
+            _SYMBOLS_LIST = symbols;
+            _ORIGINAL_FILE_NAME = file_name;
+            _FILE_NAME = file_name;
             _doneEvent = doneEvent;
         }
 
@@ -37,33 +40,50 @@ namespace Ecam.Models {
         public void ThreadPoolCallback(Object threadContext) {
             int threadIndex = (int)threadContext;
             Console.WriteLine("thread {0} started...",threadIndex);
-            if(string.IsNullOrEmpty(_Symbol) == false) {
-                CSVDataDownload(_Symbol);
-                //CalculateRSI(_Symbol);
+            if(string.IsNullOrEmpty(_FILE_NAME) == false) {
+                CSVDataDownload(_FILE_NAME);
+                //CalculateRSI(_FILE_NAME);
             }
             Console.WriteLine("thread {0} result calculated...",threadIndex);
             string IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IMPORT_CSV"];
             string IMPORT_BACKUP_CSV = IMPORT_CSV + "\\Backup";
-            string fileName = IMPORT_CSV + "\\" + _OriginalSymbol + ".csv";
+            string fileName = IMPORT_CSV + "\\" + _ORIGINAL_FILE_NAME + ".csv";
             //if(File.Exists(fileName) == true) {
             //    File.Delete(fileName);
             //}
-            if(Directory.Exists(IMPORT_BACKUP_CSV) == false) {
-                Directory.CreateDirectory(IMPORT_BACKUP_CSV);
-            }
-            string moveFileName = System.IO.Path.Combine(IMPORT_BACKUP_CSV,System.IO.Path.GetFileName(fileName));
-            if(System.IO.File.Exists(moveFileName) == false) {
-                System.IO.File.Move(fileName,moveFileName);
+            if(this._IS_NOT_SUCCESS == false) {
+                if(string.IsNullOrEmpty(_ORIGINAL_FILE_NAME) == false) {
+                    if(Directory.Exists(IMPORT_BACKUP_CSV) == false) {
+                        Directory.CreateDirectory(IMPORT_BACKUP_CSV);
+                    }
+                    string movefile_name = System.IO.Path.Combine(IMPORT_BACKUP_CSV,System.IO.Path.GetFileName(fileName));
+                    if(System.IO.File.Exists(movefile_name) == false) {
+                        System.IO.File.Move(fileName,movefile_name);
+                    }
+                }
             }
             _doneEvent.Set();
         }
 
-        private void CSVDataDownload(string tempSymbol) {
-            if(string.IsNullOrEmpty(tempSymbol) == false) {
+        private void CSVDataDownload(string tempfilename) {
+            List<OldSymbol> oldSymbolList = new List<Models.OldSymbol> {
+                new OldSymbol { old_symbol = "PFRL", new_symbol = "ABFRL" },
+                new OldSymbol { old_symbol = "SKSMICRO", new_symbol = "BHARATFIN" },
+                new OldSymbol { old_symbol = "ADI", new_symbol = "FAIRCHEM" },
+                new OldSymbol { old_symbol = "FCEL", new_symbol = "FCONSUMER" },
+                new OldSymbol { old_symbol = "FRL", new_symbol = "FEL" },
+                new OldSymbol { old_symbol = "HCIL", new_symbol = "HSCL" },
+                new OldSymbol { old_symbol = "HITACHIHOM", new_symbol = "JCHAC" },
+                new OldSymbol { old_symbol = "MAX", new_symbol = "MFSL" },
+                new OldSymbol { old_symbol = "GULFCORP", new_symbol = "GOCLCORP" },
+                new OldSymbol { old_symbol = "IBSEC", new_symbol = "IBVENTURES" },
+                new OldSymbol { old_symbol = "VIKASGLOB", new_symbol = "VIKASECO" },
+            };
+            if(string.IsNullOrEmpty(tempfilename) == false) {
                 string url = string.Empty;
                 string html = string.Empty;
                 string IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IMPORT_CSV"];
-                string fileName = IMPORT_CSV + "\\" + tempSymbol + ".csv";
+                string fileName = IMPORT_CSV + "\\" + tempfilename + ".csv";
                 CsvReader csv = null;
                 int i = 0;
                 if(File.Exists(fileName) == true) {
@@ -84,18 +104,32 @@ namespace Ecam.Models {
                             DateTime dt = DataTypeHelper.ToDateTime(date);
                             if(string.IsNullOrEmpty(symbol) == false
                                 && series == "EQ") {
-                                _Symbol = symbol;
-                                TradeHelper.ImportPrice(new TempClass {
-                                    symbol = symbol,
-                                    trade_date = dt,
-                                    close_price = DataTypeHelper.ToDecimal(close),
-                                    high_price = DataTypeHelper.ToDecimal(high),
-                                    low_price = DataTypeHelper.ToDecimal(low),
-                                    open_price = DataTypeHelper.ToDecimal(open),
-                                    ltp_price = DataTypeHelper.ToDecimal(lastTrade),
-                                    prev_price = DataTypeHelper.ToDecimal(prev),
-                                    is_prev_price_exist = true
-                                });
+                                symbol = symbol.Replace("&amp;","&");
+                                if(_SYMBOLS_LIST.Contains(symbol) == false) {
+                                    OldSymbol oldSymbol = (from q in oldSymbolList
+                                                           where q.old_symbol == symbol
+                                                           select q).FirstOrDefault();
+                                    if(oldSymbol != null) {
+                                        symbol = oldSymbol.new_symbol;
+                                    }
+                                }
+                                if(_SYMBOLS_LIST.Contains(symbol) == false) {
+                                    //Helper.Log("Symbol does not exist Symbol=" + symbol + ",FileName=" + tempfilename,"CSVDataDownload" + symbol);
+                                    this._IS_NOT_SUCCESS = true;
+                                    break;
+                                } else {
+                                    TradeHelper.ImportPrice(new TempClass {
+                                        symbol = symbol,
+                                        trade_date = dt,
+                                        close_price = DataTypeHelper.ToDecimal(close),
+                                        high_price = DataTypeHelper.ToDecimal(high),
+                                        low_price = DataTypeHelper.ToDecimal(low),
+                                        open_price = DataTypeHelper.ToDecimal(open),
+                                        ltp_price = DataTypeHelper.ToDecimal(lastTrade),
+                                        prev_price = DataTypeHelper.ToDecimal(prev),
+                                        is_prev_price_exist = true
+                                    });
+                                }
                             }
                         }
                     }
@@ -103,211 +137,15 @@ namespace Ecam.Models {
             }
         }
 
-        /*
-        public static void CalculateRSI(string symbol)
-        {
-            using (EcamContext context = new EcamContext())
-            {
-                List<tra_company> companies = (from q in context.tra_company
-                                               where q.symbol == symbol
-                                               orderby q.company_name ascending
-                                               select q).ToList();
-                foreach (var company in companies)
-                {
-                    DateTime today = DateTime.Now.Date;
-                    DateTime endDate = DateTime.Now.Date.AddDays(-120);
-                    var markets = (from q in context.tra_market
-                                   where q.symbol == company.symbol
-                                   //&& q.trade_date <= today
-                                   //&& q.trade_date >= endDate
-                                   orderby q.trade_date ascending
-                                   select q).ToList();
-                    foreach (var market in markets)
-                    {
-                        CalculateRSI(markets, market.trade_date, market.symbol);
-                    }
-                    var updateMarket = (from q in context.tra_market
-                                        where q.symbol == company.symbol
-                                        orderby q.trade_date descending
-                                        select q).FirstOrDefault();
-                    if (updateMarket != null)
-                    {
-                        var prevMarket = (from q in context.tra_market
-                                          where q.symbol == company.symbol
-                                          && q.trade_date < updateMarket.trade_date
-                                          orderby q.trade_date descending
-                                          select q).FirstOrDefault();
-                        if (prevMarket != null)
-                        {
-                            company.prev_rsi = prevMarket.rsi;
-                        }
-                        company.rsi = updateMarket.rsi;
-                        context.Entry(company).State = System.Data.Entity.EntityState.Modified;
-                        context.SaveChanges();
-                    }
-                }
-            }
-        }
-
-        public static void CalculateRSI(List<tra_market> fullMarkets, DateTime date, string symbol)
-        {
-            List<tra_market> markets = (from q in fullMarkets
-                                        where q.trade_date.Date <= date
-                                        orderby q.trade_date descending
-                                        select q).ToList();
-            int total = 15;
-            int i;
-            List<TempRSI> values = new List<TempRSI>();
-            if (markets.Count == 15)
-            {
-                string s = string.Empty;
-            }
-            if (markets.Count < total)
-            {
-                string s = string.Empty;
-            }
-            else
-            {
-                for (i = 0; i < total; i++)
-                {
-                    var market = markets[i];
-                    values.Add(new TempRSI
-                    {
-                        symbol = market.symbol,
-                        date = market.trade_date,
-                        avg_upward = (market.avg_upward ?? 0),
-                        avg_downward = (market.avg_downward ?? 0),
-                        prev = 0, // (market.prev_price ?? 0),
-                        close = (market.close_price ?? 0)
-                    });
-                }
-                values = (from q in values orderby q.date ascending select q).ToList();
-                for (i = 0; i < total; i++)
-                {
-                    var value = values[i];
-                    TempRSI prev = null;
-                    if (i > 0)
-                    {
-                        prev = values[i - 1];
-                    }
-                    if (prev != null)
-                    {
-                        value.prev = prev.close;
-                    }
-                }
-                values = (from q in values orderby q.date ascending select q).ToList();
-                for (i = 0; i < total; i++)
-                {
-                    if (i == 14)
-                    {
-                        TempRSI value = values[i];
-                        TempRSI prev = values[i - 1];
-
-                        //var getPreviousMarket = (from q in markets
-                        //                         where q.trade_date.Date < value.date
-                        //                         select q).FirstOrDefault();
-                        //value.change = value.close - (getPreviousMarket.close_price ?? 0);
-                        int j;
-                        int avgTotal = 15;
-
-                        List<decimal> tempValues = null;
-                        tempValues = new List<decimal>();
-                        decimal calcTotal = 0;
-
-                        if (prev.avg_upward <= 0)
-                        {
-                            for (j = 0; j < avgTotal; j++)
-                            {
-                                if (j > 0)
-                                {
-                                    tempValues.Add(values[j].upward);
-                                    calcTotal += values[j].upward;
-                                }
-                            }
-                            value.avg_upward = (calcTotal / tempValues.Count);
-                        }
-                        else
-                        {
-                            //= ((G17 * ($G$2 - 1)+E18)/$G$2)
-                            value.avg_upward = ((prev.avg_upward * (14 - 1) + value.upward) / 14);
-                        }
-
-                        tempValues = new List<decimal>();
-                        calcTotal = 0;
-
-                        if (prev.avg_downward <= 0)
-                        {
-                            for (j = 0; j < avgTotal; j++)
-                            {
-                                if (j > 0)
-                                {
-                                    tempValues.Add(values[j].downward);
-                                    calcTotal += values[j].downward;
-                                }
-                            }
-                            value.avg_downward = (calcTotal / tempValues.Count);
-                        }
-                        else
-                        {
-                            //= ((H17 * ($H$2 - 1)+F18)/$H$2)
-                            value.avg_downward = ((prev.avg_downward * (14 - 1) + value.downward) / 14);
-                        }
-                    }
-                }
-
-                TempRSI existValue = (from q in values
-                                      where q.symbol == symbol
-                                      && q.date == date
-                                      select q).FirstOrDefault();
-                if (existValue != null)
-                {
-                    using (EcamContext context = new EcamContext())
-                    {
-                        var market = (from q in context.tra_market where q.symbol == existValue.symbol && q.trade_date == existValue.date select q).FirstOrDefault();
-                        if (market != null)
-                        {
-                            var prevRecord = (from q in context.tra_market where q.symbol == existValue.symbol && q.trade_date < existValue.date orderby q.trade_date descending select q).FirstOrDefault();
-                            if (prevRecord != null)
-                            {
-                                market.prev_rsi = prevRecord.rsi;
-                            }
-                            market.rsi = existValue.rsi;
-                            market.upward = existValue.upward;
-                            market.downward = existValue.downward;
-                            market.avg_downward = existValue.avg_downward;
-                            market.avg_upward = existValue.avg_upward;
-                            market.rs = existValue.rs;
-                            context.Entry(market).State = System.Data.Entity.EntityState.Modified;
-                            context.SaveChanges();
-                            var preMarket = (from q in markets
-                                             where q.symbol == existValue.symbol
-                           && q.trade_date == existValue.date
-                                             select q).FirstOrDefault();
-                            preMarket.avg_downward = existValue.avg_downward;
-                            preMarket.avg_upward = existValue.avg_upward;
-                            preMarket.upward = existValue.upward;
-                            preMarket.downward = existValue.downward;
-                            preMarket.rs = existValue.rs;
-                            preMarket.rsi = existValue.rsi;
-                            Console.WriteLine("Update RSI Symbol=" + market.symbol + ",Date=" + market.trade_date.ToString("dd-MMM-yyy") + ",symbol=" + market.symbol + ",rsi=" + existValue.rsi);
-                        }
-                    }
-                }
-                //for (i = 0; i < total; i++)
-                //{
-                //    if (i > 12)
-                //    {
-                //        Console.WriteLine("i=" + i + ",Date=" + values[i].date.ToString("dd/MMM/yyyy") + ",RS=" + FormatHelper.NumberFormat(values[i].rs, 2) + ",RSI=" + FormatHelper.NumberFormat(values[i].rsi, 2));
-                //    }
-                //}
-            }
-        }
-        */
-
-        public string SYMBOL { get { return _Symbol; } }
-        private string _Symbol;
-        private string _OriginalSymbol;
+        public string file_name { get { return _FILE_NAME; } }
+        private string _FILE_NAME;
+        private string _ORIGINAL_FILE_NAME;
 
         private ManualResetEvent _doneEvent;
+    }
+
+    public class OldSymbol {
+        public string old_symbol { get; set; }
+        public string new_symbol { get; set; }
     }
 }

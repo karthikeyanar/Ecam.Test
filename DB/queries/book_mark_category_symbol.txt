@@ -1,0 +1,5 @@
+select * from (select cc.symbol from tra_company_category cc
+join tra_category c on c.category_name = cc.category_name
+where c.is_book_mark=1
+group by cc.symbol
+) as tbl order by symbol asc limit 0,1000

@@ -28,7 +28,7 @@ namespace Ecam.ConsoleApp
         private static int _INDEX = -1;
         private static string[] _COMPANIES;
         private static List<string> _URLS;
-
+        private static List<string> _SYMBOLS_LIST;
         static void Main(string[] args)
         {
             IS_CATEGORY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_CATEGORY_FLAG_CSV"];
@@ -38,8 +38,19 @@ namespace Ecam.ConsoleApp
             MC = System.Configuration.ConfigurationManager.AppSettings["MC"];
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
             MONEY_CONTROL = System.Configuration.ConfigurationManager.AppSettings["MONEY_CONTROL"];
+            //List<tra_split> splits = null;
+            //tra_split baseSplit = new tra_split();
+            //using(EcamContext context = new EcamContext()) {
+            //    splits = (from q in context.tra_split select q).ToList();
+            //}
+            //if(splits != null) {
+            //    foreach(var split in splits) {
+            //        baseSplit.DeleteManually(split.id);
+            //        Console.WriteLine("Delete split id=" + split.id);
+            //    }
+            //}
             DownloadStart();
-            AddSplit();
+            //AddSplit();
             Ecam.Models.Common.CreateCategoryProfit();
         }
 
@@ -190,6 +201,7 @@ namespace Ecam.ConsoleApp
                     if (split != null)
                     {
                         split.UpdatePrice();
+                        Console.WriteLine("Split Completed symbol=" + split.symbol + ",Date=" + split.split_date);
                     }
                 }
             }
@@ -245,6 +257,10 @@ namespace Ecam.ConsoleApp
 
         private static void DownloadStart()
         {
+            using(EcamContext context = new EcamContext()) {
+                _SYMBOLS_LIST = (from q in context.tra_company
+                                 select q.symbol).ToList();
+            }
             //Helper.Log("DownloadStart=" + DateTime.Now.ToString(), "DOWNLOAD");
             DateTime morningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:15AM");
             DateTime morningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 10:15AM");
@@ -1592,7 +1608,7 @@ RegexOptions.IgnoreCase
                     symbol = _COMPANIES[_INDEX];
                 }
                 doneEvents[i] = new ManualResetEvent(false);
-                CSVDownloadData f = new CSVDownloadData(symbol, doneEvents[i]);
+                CSVDownloadData f = new CSVDownloadData(symbol,_SYMBOLS_LIST, doneEvents[i]);
                 downArray[i] = f;
                 ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback, i);
             }
