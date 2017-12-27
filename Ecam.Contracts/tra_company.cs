@@ -81,6 +81,7 @@ namespace Ecam.Contracts
         //public Nullable<decimal> trigger_first_price { get; set; }
         //public Nullable<decimal> trigger_last_price { get; set; }
         //public Nullable<decimal> trigger_profit { get; set; }
+        public Nullable<bool> is_holding { get; set; }
     }
 
     public class TRA_COMPANY_SEARCH : TRA_COMPANY

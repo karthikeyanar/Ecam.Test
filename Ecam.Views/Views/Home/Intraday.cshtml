@@ -314,6 +314,9 @@
                                 <th>
                                     Category
                                 </th>
+                                <th>
+                                    Holding
+                                </th>
                                 @*<th sortname="prev_rsi" class="text-right text-nowrap">
                                         Prev.RSI
                                     </th>*@
@@ -416,6 +419,11 @@
                                 <td style="vertical-align:top;" class="cursor-pointer btn-edit">
                                     <div style="width:250px;overflow:hidden;" data-bind="text:category_name">
                                     </div>
+                                </td>
+                                <td style="vertical-align:top;" class="cursor-pointer text-center">
+                                    <!-- ko if: is_holding()==true -->
+                                    <i class="fa fa-check"></i>
+                                    <!-- /ko -->
                                 </td>
                                 @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                                         <div data-bind="text:formatNumber(prev_rsi())"></div>
@@ -806,6 +814,12 @@
                         </div>
                         <div class="pull-right m-l-15 m-t-5">
                             Maximum Loss
+                        </div>
+                        <div class="pull-right m-l-15 m-r-15">
+                            <input type="text" id="months" value="6" class="form-control input-sm" />
+                        </div>
+                        <div class="pull-right m-l-15 m-t-5">
+                            Months
                         </div><div class="clearfix"></div>
                     </div>
                 </div>

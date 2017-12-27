@@ -719,13 +719,14 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
         this.createLogs = function ($modal, totalAmount) {
             totalAmount = cFloat(totalAmount);
+            var monthCount = cInt($("#months", $modal).val());
             var totalCount = 500;
             self.start_index = cInt(self.start_index) + 1;
             var $selYear = $("#selYear", $modal);
             var index = totalCount - self.start_index;
             var startDate = moment(_TODAYDATE).subtract('month', index).startOf('month').format('MM/DD/YYYY');
             var endDate = moment(_TODAYDATE).subtract('month', index).endOf('month').format('MM/DD/YYYY');
-            var totalStartDate = moment(_TODAYDATE).subtract('month', index + 1).endOf('month').subtract('month', 6).add('days', 7).startOf('month').format('MM/DD/YYYY');
+            var totalStartDate = moment(_TODAYDATE).subtract('month', index + 1).endOf('month').subtract('month', monthCount).add('days', 7).startOf('month').format('MM/DD/YYYY');
             var totalEndDate = moment(_TODAYDATE).subtract('month', index + 1).endOf('month').format('MM/DD/YYYY');
 
             //var startDate = moment(_TODAYDATE).subtract('days', (index * 14)).format('MM/DD/YYYY');

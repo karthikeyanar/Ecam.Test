@@ -315,6 +315,7 @@ namespace Ecam.Models
                            ",ct.pe" + Environment.NewLine +
                            ",ct.volume" + Environment.NewLine +
                            ",ct.eps" + Environment.NewLine +
+                           ",(select ifnull(count(*),0) from tra_holding h where h.symbol = ct.symbol) as is_holding" +
                             //",(select high_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " and m.high_price > 0 order by m.high_price desc limit 0,1) as total_high_price" + Environment.NewLine +
                             //",(select low_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " and m.low_price > 0 order by m.low_price asc limit 0,1) as total_low_price" + Environment.NewLine +
                             //",(select high_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " and m.high_price > 0 order by m.high_price desc limit 0,1) as profit_high_price" + Environment.NewLine +
