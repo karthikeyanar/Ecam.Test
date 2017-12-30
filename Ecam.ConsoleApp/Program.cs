@@ -50,7 +50,7 @@ namespace Ecam.ConsoleApp
             //    }
             //}
             DownloadStart();
-            //AddSplit();
+            AddSplit();
             Ecam.Models.Common.CreateCategoryProfit();
         }
 
