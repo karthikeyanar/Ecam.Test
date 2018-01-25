@@ -51,7 +51,7 @@ namespace Ecam.ConsoleApp
             //}
             DownloadStart();
             AddSplit();
-            Ecam.Models.Common.CreateCategoryProfit();
+            //Ecam.Models.Common.CreateCategoryProfit();
         }
 
         #region MoneyControl
@@ -984,6 +984,13 @@ RegexOptions.IgnoreCase
                     //    query = query.Where(q => (q.is_nifty_200 ?? false) == true);
                     //}
                 }
+                List<tra_company_category> companyCategories = (from q in context.tra_company_category
+                                                                join c in context.tra_category on q.category_name equals c.category_name
+                                                                where (c.is_book_mark ?? false) == true
+                                                                select q).ToList();
+                List<string> categorySymbols = (from q in companyCategories
+                                                select q.symbol).Distinct().ToList();
+                query = (from q in query where categorySymbols.Contains(q.symbol) == true select q);
                 companies = (from q in query
                              orderby q.symbol ascending
                              select q).ToList();
@@ -991,11 +998,11 @@ RegexOptions.IgnoreCase
             _COMPANIES = (from q in companies select q.symbol).ToArray();
             _INDEX = -1;
 
-            string sql = "";
+            //string sql = "";
 
             // Delete yesterday tra_market_intraday
-            sql = "delete from tra_market_intra_day where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(curdate(), '%Y-%m-%d')";
-            MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
+            //sql = "delete from tra_market_intra_day where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(curdate(), '%Y-%m-%d')";
+            //MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
 
             // Delete before 3 months tra_market
             //sql = "delete from tra_market where DATE_FORMAT(trade_date, '%Y-%m-%d') < DATE_FORMAT(DATE_ADD(curdate(), INTERVAL -3 MONTH), '%Y-%m-%d')";
@@ -1092,6 +1099,13 @@ RegexOptions.IgnoreCase
                         query = (from q in query where symbolList.Contains(q.symbol) == true select q);
                     }
                 }
+                List<tra_company_category> companyCategories = (from q in context.tra_company_category
+                                                                join c in context.tra_category on q.category_name equals c.category_name
+                                                                where (c.is_book_mark ?? false) == true
+                                                                select q).ToList();
+                List<string> categorySymbols = (from q in companyCategories
+                                                select q.symbol).Distinct().ToList();
+                query = (from q in query where categorySymbols.Contains(q.symbol) == true select q);
                 companies = (from q in query orderby q.symbol ascending select q).ToList();
             }
             _COMPANIES = (from q in companies select q.symbol).ToArray();

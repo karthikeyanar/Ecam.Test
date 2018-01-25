@@ -737,6 +737,14 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             //var triggerStartDate = moment(_TODAYDATE).subtract('month', index + 1).endOf('month').subtract('month', 1).add('days', 7).startOf('month').format('MM/DD/YYYY');
             //var triggerEndDate = moment(_TODAYDATE).subtract('month', index + 1).endOf('month').format('MM/DD/YYYY');
 
+            var strTotalStartDate = formatDate(startDate, 'MMM');
+            if (strTotalStartDate != 'Jan') {
+                totalStartDate = "01/01/" + $selYear.val();
+            } else {
+                totalStartDate = "01/01/" + (cInt($selYear.val()) - 1);
+                totalEndDate = "12/31/" + (cInt($selYear.val()) - 1);
+            }
+
             if (self.start_index <= totalCount && formatDate(startDate).indexOf($selYear.val()) >= 0) {
 
                 var arr = [];
