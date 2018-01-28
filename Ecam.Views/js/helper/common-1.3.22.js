@@ -86,7 +86,7 @@ function getArrayUnique(arr) {
 }
 
 function findMaxNo(array) {
-    var max = 0;
+    var max = array[0];
     var a = array.length;
     for (counter = 0; counter < a; counter++) {
         if (array[counter] > max) {

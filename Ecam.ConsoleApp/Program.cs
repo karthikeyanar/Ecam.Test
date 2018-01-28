@@ -19,6 +19,7 @@ namespace Ecam.ConsoleApp
     class Program
     {
         public static string IS_DOWNLOAD_HISTORY = "";
+        public static string IS_BOOK_MARK_CATEGORY = "";
         public static string IS_IMPORT_CSV = "";
         public static string IS_NIFTY_FLAG_CSV = "";
         public static string IS_CATEGORY_FLAG_CSV = "";
@@ -35,6 +36,7 @@ namespace Ecam.ConsoleApp
             IS_NIFTY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_FLAG_CSV"];
             IS_IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_IMPORT_CSV"];
             IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
+            IS_BOOK_MARK_CATEGORY = System.Configuration.ConfigurationManager.AppSettings["IS_BOOK_MARK_CATEGORY"];
             MC = System.Configuration.ConfigurationManager.AppSettings["MC"];
             GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
             MONEY_CONTROL = System.Configuration.ConfigurationManager.AppSettings["MONEY_CONTROL"];
@@ -49,14 +51,14 @@ namespace Ecam.ConsoleApp
             //        Console.WriteLine("Delete split id=" + split.id);
             //    }
             //}
-            List<string> symbols;
-            using(EcamContext context = new EcamContext()) {
-                symbols = (from q in context.tra_company orderby q.symbol select q.symbol).ToList();
-            }
-            foreach(string symbol in symbols) {
-                UpdatePrevPriceEquity(symbol);
-            }
-            //DownloadStart();
+            //List<string> symbols;
+            //using(EcamContext context = new EcamContext()) {
+            //    symbols = (from q in context.tra_company orderby q.symbol select q.symbol).ToList();
+            //}
+            //foreach(string symbol in symbols) {
+            //    UpdatePrevPriceEquity(symbol);
+            //}
+            DownloadStart();
             AddSplit();
             //Ecam.Models.Common.CreateCategoryProfit();
         }
@@ -1013,13 +1015,15 @@ RegexOptions.IgnoreCase
                     //    query = query.Where(q => (q.is_nifty_200 ?? false) == true);
                     //}
                 }
-                List<tra_company_category> companyCategories = (from q in context.tra_company_category
-                                                                join c in context.tra_category on q.category_name equals c.category_name
-                                                                where (c.is_book_mark ?? false) == true
-                                                                select q).ToList();
-                List<string> categorySymbols = (from q in companyCategories
-                                                select q.symbol).Distinct().ToList();
-                query = (from q in query where categorySymbols.Contains(q.symbol) == true select q);
+                if(IS_BOOK_MARK_CATEGORY == "true") {
+                    List<tra_company_category> companyCategories = (from q in context.tra_company_category
+                                                                    join c in context.tra_category on q.category_name equals c.category_name
+                                                                    where (c.is_book_mark ?? false) == true
+                                                                    select q).ToList();
+                    List<string> categorySymbols = (from q in companyCategories
+                                                    select q.symbol).Distinct().ToList();
+                    query = (from q in query where categorySymbols.Contains(q.symbol) == true select q);
+                }
                 companies = (from q in query
                              orderby q.symbol ascending
                              select q).ToList();
@@ -1128,13 +1132,15 @@ RegexOptions.IgnoreCase
                         query = (from q in query where symbolList.Contains(q.symbol) == true select q);
                     }
                 }
-                List<tra_company_category> companyCategories = (from q in context.tra_company_category
-                                                                join c in context.tra_category on q.category_name equals c.category_name
-                                                                where (c.is_book_mark ?? false) == true
-                                                                select q).ToList();
-                List<string> categorySymbols = (from q in companyCategories
-                                                select q.symbol).Distinct().ToList();
-                query = (from q in query where categorySymbols.Contains(q.symbol) == true select q);
+                if(IS_BOOK_MARK_CATEGORY == "true") {
+                    List<tra_company_category> companyCategories = (from q in context.tra_company_category
+                                                                    join c in context.tra_category on q.category_name equals c.category_name
+                                                                    where (c.is_book_mark ?? false) == true
+                                                                    select q).ToList();
+                    List<string> categorySymbols = (from q in companyCategories
+                                                    select q.symbol).Distinct().ToList();
+                    query = (from q in query where categorySymbols.Contains(q.symbol) == true select q);
+                }
                 companies = (from q in query orderby q.symbol ascending select q).ToList();
             }
             _COMPANIES = (from q in companies select q.symbol).ToArray();

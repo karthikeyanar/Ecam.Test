@@ -596,10 +596,12 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             self.openDailyLogModal(self.last_params);
         }
 
-        this.openDailyLogModal = function (arr) {
+        this.openDailyLogModal = function (arr, callback, isNotOpen) {
             $('#temp-daily-modal-container').remove();
             var $cnt = $("<div id='temp-daily-modal-container'></div>");
-            $('body').append($cnt);
+            if (isNotOpen != true) {
+                $('body').append($cnt);
+            }
             handleBlockUI();
             var url = apiUrl("/Company/DailyList");
             $.ajax({
@@ -616,9 +618,14 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                    , "width": $(window).width() - 100
                     , "rows": json
                 };
-                $("#modal-daily-template").tmpl(data).appendTo($cnt);
-                var $modal = $("#modal-daily-" + data.name, $cnt);
-                $modal.modal('show');
+                if (callback) {
+                    callback(json);
+                }
+                if (isNotOpen != true) {
+                    $("#modal-daily-template").tmpl(data).appendTo($cnt);
+                    var $modal = $("#modal-daily-" + data.name, $cnt);
+                    $modal.modal('show');
+                }
             }).always(function () {
                 unblockUI();
             });
@@ -812,6 +819,37 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     "type": "GET",
                     "data": arr
                 }).done(function (json) {
+                    self.openDailyLogModal(self.last_params, function (dailyJSON) {
+
+                        var dailyHigh = 0;
+                        var dailyLow = 0;
+                        var dailyArr = [];
+                        var negativeArr = [];
+                        var positiveArr = [];
+                        $.each(dailyJSON, function (i, daily) {
+                            if (daily.percentage != -100 && daily.percentage != 100) {
+                                dailyArr.push(daily.percentage);
+                                if (daily.percentage > 0) {
+                                    positiveArr.push(daily.percentage);
+                                } else {
+                                    negativeArr.push(daily.percentage);
+                                }
+                            }
+                        });
+
+                        if (positiveArr.length > 0) {
+                            dailyHigh = findMaxNo(positiveArr);
+                        } else {
+                            dailyHigh = findMaxNo(negativeArr);
+                        }
+                        if (negativeArr.length > 0) {
+                            dailyLow = findMinNo(negativeArr);
+                        } else {
+                            dailyLow = findMinNo(positiveArr);
+                        }
+                        console.log('positiveArr=', positiveArr);
+                        console.log('negativeArr=', negativeArr);
+                        console.log('dailyHigh=', dailyHigh, 'dailyLow=', dailyLow);
 
                     var totalEquity = json.rows.length;
                     var totalInvestmentPerEquity = cFloat(totalAmount / totalEquity);
@@ -900,7 +938,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         maximumLoss = maximumLoss * -1;
                         var pr = cFloat(cFloat(totalCurrentValue - totalInvestment) / totalInvestment) * 100;
                         //console.log('pr=', pr);
-                        if (pr <= maximumLoss) {
+                        if (dailyLow <= maximumLoss) {
                             pr = maximumLoss * -1;
                             //console.log('pr fixed=' + maximumLoss);
                             totalCurrentValue = (totalInvestment - (cFloat(totalInvestment) * cFloat(pr) / 100));
@@ -925,6 +963,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         'low_avg_profit': 0,
                         'high_avg_profit': 0,
                         'avg_profit': 0,
+                        'daily_high': dailyHigh,
+                        'daily_low': dailyLow,
                         'total_equity': 0,
                         'symbols': symbols,
                         'total_amount': totalAmount,
@@ -957,7 +997,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     //if (self.start_index <= 50
                     //&& formatDate(startDate).indexOf('2016') < 0
                     //   ) {
-
+                   
+                    console.log('data=', data);
                     $("#detail-log-template").tmpl(data).appendTo($tbody);
 
                     self.temp_investments.push(investments);
@@ -980,7 +1021,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     $(":input[name='total_amount']").val(totalAmount);
 
                     //console.log('ignoreSymbols4=', ignoreSymbols);
-                    self.createLogs($modal, totalAmount,ignoreSymbols);
+                    self.createLogs($modal, totalAmount, ignoreSymbols);
 
                     //cFloat($(":input[name='total_amount']").val())
                     ////console.log('cell=', $("tr:eq(0) > td:eq(0)", $tbody)[0]);
@@ -1027,6 +1068,11 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     });
 
                     unblockUI();
+                  
+                   
+
+                    }, true);
+
                 }).always(function () {
                 });
             } else if (self.start_index <= totalCount) {

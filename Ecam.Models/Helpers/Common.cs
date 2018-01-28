@@ -456,7 +456,7 @@ namespace Ecam.Models
             sql + Environment.NewLine +
             ") as tbl {0} {1} {2} {3} ", where, "", orderBy, pageLimit);
 
-            Helper.Log(sql);
+            //Helper.Log(sql);
             List<TRA_COMPANY> rows = new List<TRA_COMPANY>();
             List<tra_company_category> companyCategories;
             using (EcamContext context = new EcamContext())
