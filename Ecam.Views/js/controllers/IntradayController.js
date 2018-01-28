@@ -189,8 +189,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
                 self._investments = investments;
 
-                ////console.log('investments=', investments);
-                ////console.log('totalAmount=', totalAmount, 'totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue, 'balance=', (totalAmount - totalInvestment));
+                //////console.log('investments=', investments);
+                //////console.log('totalAmount=', totalAmount, 'totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue, 'balance=', (totalAmount - totalInvestment));
                 var totalProfitAVG = 0;
 
                 totalProfitAVG = cFloat(cFloat(totalCurrentValue - totalInvestment) / totalInvestment) * 100;
@@ -415,9 +415,9 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             var end = moment(_TODAYDATE).endOf('month'); //moment(_TODAYDATE);//moment(arrlastsixmonths[1]);
             self.start_date(start.format('MM/DD/YYYY'));
             self.end_date(end.format('MM/DD/YYYY'));
-            ////console.log('$pageContent=',$pageContent[0]);
+            //////console.log('$pageContent=',$pageContent[0]);
             var $reportRange = $('#reportrange', $pageContent);
-            ////console.log('reportrange=',$reportRange[0]);
+            //////console.log('reportrange=',$reportRange[0]);
             helper.handleDateRangePicker($reportRange, {
                 'opens': 'left',
                 'start': start,
@@ -438,9 +438,9 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             var end = moment(_TODAYDATE).subtract('month', 1).endOf('month');
             self.total_start_date(start.format('MM/DD/YYYY'));
             self.total_end_date(end.format('MM/DD/YYYY'));
-            ////console.log('$pageContent=',$pageContent[0]);
+            //////console.log('$pageContent=',$pageContent[0]);
             var $totalReportRange = $('#total_reportrange', $pageContent);
-            ////console.log('reportrange=',$totalReportRange[0]);
+            //////console.log('reportrange=',$totalReportRange[0]);
             helper.handleDateRangePicker($totalReportRange, {
                 'opens': 'left',
                 'start': start,
@@ -461,9 +461,9 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             //var end = moment(_TODAYDATE).subtract('month', 1).endOf('month');
             //self.trigger_start_date(start.format('MM/DD/YYYY'));
             //self.trigger_end_date(end.format('MM/DD/YYYY'));
-            //////console.log('$pageContent=',$pageContent[0]);
+            ////////console.log('$pageContent=',$pageContent[0]);
             //var $triggerReportRange = $('#trigger_reportrange', $pageContent);
-            //////console.log('reportrange=',$triggerReportRange[0]);
+            ////////console.log('reportrange=',$triggerReportRange[0]);
             //helper.handleDateRangePicker($triggerReportRange, {
             //    'opens': 'left',
             //    'start': start,
@@ -529,7 +529,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             });
             if (isNew == false) {
                 var arr = [];
-                //console.log(row.category_list);
+                ////console.log(row.category_list);
                 $.each(row.category_list(), function (i, cat) {
                     arr.push({ "id": cat, "text": cat });
                 });
@@ -674,7 +674,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 , "PositiveCount": positiveCount
                 , "NegativeCount": negativeCount
             };
-            //console.log(data);
+            ////console.log(data);
             $("#modal-investment-template").tmpl(data).appendTo($cnt);
             var $modal = $("#modal-investment-" + data.name, $cnt);
             $modal.modal('show');
@@ -712,12 +712,14 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     self.temp_investments = [];
                     self.start_index = -1;
                     self.year_count = 0;
-                    self.createLogs($modal, cFloat($(":input[name='total_amount']").val()));
+                    self.createLogs($modal, cFloat($(":input[name='total_amount']").val()),'');
                 }
             });
         }
 
-        this.createLogs = function ($modal, totalAmount) {
+      
+        this.createLogs = function ($modal, totalAmount, ignoreSymbols) {
+            //console.log('ignoreSymbols7=', ignoreSymbols);
             totalAmount = cFloat(totalAmount);
             var monthCount = cInt($("#months", $modal).val());
             var totalCount = 500;
@@ -737,13 +739,18 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             //var triggerStartDate = moment(_TODAYDATE).subtract('month', index + 1).endOf('month').subtract('month', 1).add('days', 7).startOf('month').format('MM/DD/YYYY');
             //var triggerEndDate = moment(_TODAYDATE).subtract('month', index + 1).endOf('month').format('MM/DD/YYYY');
 
-            var strTotalStartDate = formatDate(startDate, 'MMM');
-            if (strTotalStartDate != 'Jan') {
-                totalStartDate = "01/01/" + $selYear.val();
-            } else {
-                totalStartDate = "01/01/" + (cInt($selYear.val()) - 1);
-                totalEndDate = "12/31/" + (cInt($selYear.val()) - 1);
-            }
+            //var $chkCalcSameYear = $("#chkCalcSameYear", $modal);
+            //if ($chkCalcSameYear[0]) {
+            //    if ($chkCalcSameYear[0].checked == true) {
+            //        var strTotalStartDate = formatDate(startDate, 'MMM');
+            //        if (strTotalStartDate != 'Jan') {
+            //            totalStartDate = "01/01/" + $selYear.val();
+            //        } else {
+            //            totalStartDate = "01/01/" + (cInt($selYear.val()) - 1);
+            //            totalEndDate = "12/31/" + (cInt($selYear.val()) - 1);
+            //        }
+            //    }
+            //}
 
             if (self.start_index <= totalCount && formatDate(startDate).indexOf($selYear.val()) >= 0) {
 
@@ -775,6 +782,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         arr.push(row);
                     });
                 }
+                console.log('ignoreSymbols=', ignoreSymbols);
+                //arr.push({ 'name': 'ignore_symbols', 'value': ignoreSymbols });
                 //arr.push({ 'name': 'PageIndex', 'value': 1 });
                 //arr.push({ 'name': 'PageSize', 'value': 10 });
                 //arr.push({ 'name': 'SortName', 'value': 'total_profit' });
@@ -794,7 +803,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 //});
 
                 handleBlockUI({ "message": 'Loading... - ' + formatDate(startDate) }); // + 'startDate='+  formatDate(startDate) +  'endDate=', formatDate(endDate)+  'totalStartDate='+  formatDate(totalStartDate)+  'totalEndDate='+  formatDate(totalEndDate) + ' ...' });
-                ////console.log('index=', index, 'startDate=', formatDate(startDate), 'endDate=', formatDate(endDate), 'totalStartDate=', formatDate(totalStartDate), 'totalEndDate=', formatDate(totalEndDate));
+                //////console.log('index=', index, 'startDate=', formatDate(startDate), 'endDate=', formatDate(endDate), 'totalStartDate=', formatDate(totalStartDate), 'totalEndDate=', formatDate(totalEndDate));
 
                 var url = apiUrl("/Company/List");
                 $.ajax({
@@ -807,7 +816,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     var totalEquity = json.rows.length;
                     var totalInvestmentPerEquity = cFloat(totalAmount / totalEquity);
 
-                    //console.log('totalAmount=', totalAmount, 'totalEquity=', totalEquity, 'totalInvestmentPerEquity=', totalInvestmentPerEquity);
+                    ////console.log('totalAmount=', totalAmount, 'totalEquity=', totalEquity, 'totalInvestmentPerEquity=', totalInvestmentPerEquity);
 
                     var totalInvestment = 0;
                     var totalCurrentValue = 0;
@@ -856,6 +865,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     }
 
 
+                    ignoreSymbols = '';
                     $.each(investments, function (i, row) {
                         totalInvestment += cFloat(row.investment);
                         totalCurrentValue += cFloat(row.cmv);
@@ -867,8 +877,16 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                             positiveCount += 1;
                         } else {
                             negativeCount += 1;
+                            ignoreSymbols += row.symbol + ",";
+                            //console.log('ignoreSymbols3=', ignoreSymbols);
                         }
                     });
+                    //console.log('ignoreSymbols8=', ignoreSymbols);
+                    if (ignoreSymbols != '') {
+                        //console.log('ignoreSymbols9 substring=', ignoreSymbols.substring(0, ignoreSymbols - 1));
+                        ignoreSymbols = ignoreSymbols.substring(0, ignoreSymbols.length - 1);
+                    }
+                    //console.log('ignoreSymbols2=', ignoreSymbols);
 
                     if (investments.length <= 0) {
                         totalInvestment = totalAmount;
@@ -881,21 +899,21 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     if (maximumLoss > 0) {
                         maximumLoss = maximumLoss * -1;
                         var pr = cFloat(cFloat(totalCurrentValue - totalInvestment) / totalInvestment) * 100;
-                        console.log('pr=', pr);
+                        //console.log('pr=', pr);
                         if (pr <= maximumLoss) {
                             pr = maximumLoss * -1;
-                            console.log('pr fixed=' + maximumLoss);
+                            //console.log('pr fixed=' + maximumLoss);
                             totalCurrentValue = (totalInvestment - (cFloat(totalInvestment) * cFloat(pr) / 100));
                         }
                     }
 
-                    //console.log('before totalAmount=', totalAmount, 'totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue, 'highCurrentValue=', highCurrentValue, 'lowCurrentValue=', lowCurrentValue);
+                    ////console.log('before totalAmount=', totalAmount, 'totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue, 'highCurrentValue=', highCurrentValue, 'lowCurrentValue=', lowCurrentValue);
 
                     totalCurrentValue = self.calcFinalMarketValue(totalCurrentValue, investments.length, false);
                     highCurrentValue = self.calcFinalMarketValue(highCurrentValue, investments.length, false);
                     lowCurrentValue = self.calcFinalMarketValue(lowCurrentValue, investments.length, false);
 
-                    //console.log('after totalAmount=', totalAmount, 'totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue, 'highCurrentValue=', highCurrentValue, 'lowCurrentValue=', lowCurrentValue);
+                    ////console.log('after totalAmount=', totalAmount, 'totalInvestment=', totalInvestment, 'totalCurrentValue=', totalCurrentValue, 'highCurrentValue=', highCurrentValue, 'lowCurrentValue=', lowCurrentValue);
 
                     var totalProfitAVG = 0;
 
@@ -948,9 +966,9 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
                     balance = cFloat(totalAmount - totalInvestment);
 
-                    //console.log('before balance=', balance);
+                    ////console.log('before balance=', balance);
                     balance = cFloat(balance) - cFloat(self.getCharges(totalInvestment, investments.length, true));
-                    //console.log('after balance=', balance);
+                    ////console.log('after balance=', balance);
 
                     profit = cFloat(cFloat(totalCurrentValue - totalInvestment) / totalInvestment) * 100;
                     highProfit = cFloat(cFloat(highCurrentValue - totalInvestment) / totalInvestment) * 100;
@@ -958,13 +976,15 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
                     var monthlyInvestment = cFloat($(":input[name='monthly_investment']").val());
                     totalAmount = cFloat(totalCurrentValue) + cFloat(balance) + monthlyInvestment;
-                    //console.log('follow next year totalCurrentValue=', totalCurrentValue, 'balance=', balance, 'monthlyInvestment=', monthlyInvestment);
+                    ////console.log('follow next year totalCurrentValue=', totalCurrentValue, 'balance=', balance, 'monthlyInvestment=', monthlyInvestment);
                     $(":input[name='total_amount']").val(totalAmount);
-                    self.createLogs($modal, totalAmount);
+
+                    //console.log('ignoreSymbols4=', ignoreSymbols);
+                    self.createLogs($modal, totalAmount,ignoreSymbols);
 
                     //cFloat($(":input[name='total_amount']").val())
-                    //console.log('cell=', $("tr:eq(0) > td:eq(0)", $tbody)[0]);
-                    //console.log('amount=', cFloat($("tr:eq(0) > td:eq(0)", $tbody).html()))
+                    ////console.log('cell=', $("tr:eq(0) > td:eq(0)", $tbody)[0]);
+                    ////console.log('amount=', cFloat($("tr:eq(0) > td:eq(0)", $tbody).html()))
                     var totalFinalAmount = cFloat($("tr:eq(0) > td:eq(0)", $tbody).html()) + (monthlyInvestment * cInt($("tr", $tbody).length));
                     $("#spnFinalTotalAmount", $modal).html(formatNumber(totalFinalAmount));
                     $("#spnFinalTotalCMV", $modal).html(formatNumber(totalAmount));
@@ -1001,7 +1021,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         }
                     });
                     data = data.sort(getDescOrder("count"));
-                    ////console.log('data=', data);
+                    //////console.log('data=', data);
                     $.each(data, function (i, row) {
                         $("tbody", $tblLogCount).append("<tr><td>" + row.symbol + "</td><td class='text-right'>" + row.count + "</td></tr>");
                     });
@@ -1011,7 +1031,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 });
             } else if (self.start_index <= totalCount) {
                 $(":input[name='total_amount']").val(totalAmount);
-                self.createLogs($modal, totalAmount);
+                //console.log('ignoreSymbols5=', ignoreSymbols);
+                self.createLogs($modal, totalAmount, ignoreSymbols);
             }
             if (self.start_index > totalCount) {
                 var $tbl = $("#tblLog", $modal);
@@ -1038,7 +1059,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         self.openDailyLogModal(arr);
                     });
                 });
-                //console.log('self.year_count=', self.year_count);
+                ////console.log('self.year_count=', self.year_count);
                 self.year_count += 1;
                 var finalEndDate = moment(_TODAYDATE).add('year', self.year_count).format('DD/MMM/YYYY');
                 $("#spnFinalEndDate", $modal).html(finalEndDate);
@@ -1054,9 +1075,10 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     $("tbody", $tblLogCount).empty();
                     self.temp_investments = [];
                     self.start_index = -1;
-                    //console.log('start totalAmount=', totalAmount);
+                    ////console.log('start totalAmount=', totalAmount);
                     $(":input[name='total_amount']").val(totalAmount);
-                    self.createLogs($modal, totalAmount);
+                    //console.log('ignoreSymbols6=', ignoreSymbols);
+                    self.createLogs($modal, totalAmount,ignoreSymbols);
                 }
             }
 
@@ -1104,7 +1126,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                         curveType: 'function',
                         legend: { position: 'bottom' }
                     };
-                    ////console.log($('#curve_chart', $rsiBox)[0]);
+                    //////console.log($('#curve_chart', $rsiBox)[0]);
                     var chart = new google.visualization.LineChart($('#curve_chart', $rsiBox)[0]);
                     chart.draw(data, options);
                 });
@@ -1229,14 +1251,14 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             var categories = 'CEMENT & CEMENT PRODUCTS,CHEMICALS,CONSTRUCTION,CONSUMER GOODS,FOOD PROCESSING,RETAIL,TEXTILES,AUTOMOBILE,FINANCIAL SERVICES';
             //self.getTop10Categories(startDate, endDate, function (categories) {
             var caregoryList = categories.split(',');
-            //console.log('caregoryList=', caregoryList);
+            ////console.log('caregoryList=', caregoryList);
             var carr = [];
             $.each(caregoryList, function (i, cat) {
                 if (cString(cat) != '') {
                     carr.push({ "id": cat, "text": cat });
                 }
             });
-            //console.log('carr=', carr);
+            ////console.log('carr=', carr);
             $categories.select2Refresh("data", carr);
             //});
         }
@@ -1264,7 +1286,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 if (categories != '') {
                     categories = categories.substring(0, categories.length - 1);
                 }
-                //console.log('categories=', categories);
+                ////console.log('categories=', categories);
                 if (callback)
                     callback(categories);
             })
@@ -1498,7 +1520,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                 var $tbody = $("tbody", $tbl);
                 var childTRId = "tr_child_" + $tr.attr('index');
                 var $childTR = $("#" + childTRId, $tbody);
-                ////console.log('childTRId=', childTRId, '$childTR=', $childTR[0]);
+                //////console.log('childTRId=', childTRId, '$childTR=', $childTR[0]);
                 var $treeExpand = $(".tree-expand", this);
                 if ($treeExpand.hasClass("ex-plus")) {
                     $treeExpand.removeClass("ex-minus").removeClass("ex-plus");
@@ -1677,7 +1699,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
 
             self.applyPlugins();
             $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-                ////console.log('e.target=', e.target);
+                //////console.log('e.target=', e.target);
                 self.loadGrid();
                 //e.target // newly activated tab
                 //e.relatedTarget // previous active tab

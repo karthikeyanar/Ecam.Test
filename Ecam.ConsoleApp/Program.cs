@@ -49,7 +49,14 @@ namespace Ecam.ConsoleApp
             //        Console.WriteLine("Delete split id=" + split.id);
             //    }
             //}
-            DownloadStart();
+            List<string> symbols;
+            using(EcamContext context = new EcamContext()) {
+                symbols = (from q in context.tra_company orderby q.symbol select q.symbol).ToList();
+            }
+            foreach(string symbol in symbols) {
+                UpdatePrevPriceEquity(symbol);
+            }
+            //DownloadStart();
             AddSplit();
             //Ecam.Models.Common.CreateCategoryProfit();
         }
@@ -142,6 +149,28 @@ namespace Ecam.ConsoleApp
         }
 
         #endregion
+
+        private static void UpdatePrevPriceEquity(string symbol) {
+            using(EcamContext context = new EcamContext()) {
+                List<tra_market> markets = (from q in context.tra_market where q.symbol == symbol orderby q.trade_date descending select q).ToList();
+                int total = markets.Count();
+                int i = 0;
+                foreach(var market in markets) {
+                    i += 1;
+                    tra_market prevMarket = (from q in context.tra_market
+                                      where q.symbol == market.symbol
+                                      && q.trade_date < market.trade_date
+                                             orderby q.trade_date descending
+                                      select q).FirstOrDefault();
+                    if(prevMarket != null) {
+                        market.prev_price = prevMarket.close_price;
+                        context.Entry(market).State = System.Data.Entity.EntityState.Modified;
+                        context.SaveChanges();
+                    }
+                    Console.WriteLine("Symbol=" + symbol + ",Total=" + total + ",i=" + i);
+                }
+            } 
+        }
 
         private static void AddSplit()
         {
