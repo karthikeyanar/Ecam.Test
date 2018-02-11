@@ -798,6 +798,15 @@
                         <div class="pull-right m-r-15">
                             <select id="selYear" class="form-control">
                                 <option value="">--Select Year--</option>
+                                <option value="2006">2006</option>
+                                <option value="2007">2007</option>
+                                <option value="2008">2008</option>
+                                <option value="2009">2009</option>
+                                <option value="2010">2010</option>
+                                <option value="2011">2011</option>
+                                <option value="2012">2012</option>
+                                <option value="2013">2013</option>
+                                <option value="2014">2014</option>
                                 <option value="2015">2015</option>
                                 <option value="2016">2016</option>
                                 <option value="2017">2017</option>
@@ -1068,6 +1077,10 @@
                                     <th class="text-right">CMV</th>
                                     <th class="text-right">High.CMV</th>
                                     <th class="text-right">Low.CMV</th>
+                                    <th class="text-right">Positive</th>
+                                    <th class="text-right">Negative</th>
+                                    <th class="text-right">Diff</th>
+                                    <th class="text-right">Indicator</th>
                                     <th class="text-right">Percentage</th>
                                     <th class="text-right">High.Percentage</th>
                                     <th class="text-right">Low.Percentage</th>
@@ -1080,6 +1093,10 @@
                                     <td class="text-right">${formatNumber(row.cmv)}</td>
                                     <td class="text-right">${formatNumber(row.cmv_high)}</td>
                                     <td class="text-right">${formatNumber(row.cmv_low)}</td>
+                                    <td class="text-right">${formatNumber(row.positive_count)}</td>
+                                    <td class="text-right">${formatNumber(row.negative_count)}</td>
+                                    <td class="text-right">${formatInteger(row.positive_count - row.negative_count)}</td>
+                                    <td class="text-right">{{if row.indicator==true}}<i class="fa fa-check"></i>{{/if}}</td>
                                     <td class="text-right">${formatPercentage(row.percentage)}</td>
                                     <td class="text-right">${formatPercentage(row.percentage_high)}</td>
                                     <td class="text-right">${formatPercentage(row.percentage_low)}</td>

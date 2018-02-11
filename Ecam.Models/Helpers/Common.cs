@@ -638,6 +638,7 @@ namespace Ecam.Models
             List<string> symbols = (from q in list
                                     select q.symbol).Distinct().ToList();
             List<tra_market> markets;
+            List<tra_daily_log> dailyLogs;
             using (EcamContext context = new EcamContext())
             {
                 markets = (from q in context.tra_market
@@ -645,7 +646,14 @@ namespace Ecam.Models
                            && q.trade_date >= criteria.start_date
                            && q.trade_date <= criteria.end_date
                            select q).ToList();
+                dailyLogs = (from q in context.tra_daily_log
+                             where q.trade_date >= criteria.start_date
+                             && q.trade_date <= criteria.end_date
+                             && (q.is_book_mark ?? false) == true
+                             select q).ToList();
             }
+
+            
 
             DateTime monthStartDate = DataTypeHelper.GetFirstDayOfMonth(criteria.end_date ?? minDate);
             DateTime monthLastDate = DataTypeHelper.GetLastDayOfMonth(criteria.end_date ?? minDate);
@@ -655,70 +663,77 @@ namespace Ecam.Models
             for (i = 0; i < ts.TotalDays + 1; i++)
             {
                 DateTime dt = monthStartDate.AddDays(i);
-
-                DailySummary log = (from q in logs
-                                    where q.date == dt
-                                    select q).FirstOrDefault();
-                if (log == null)
-                {
-                    log = new DailySummary
-                    {
-                        date = dt,
-                    };
-                    logs.Add(log);
-                }
-                if (log != null)
-                {
-                    foreach (string symbol in symbols)
-                    {
-                        DailyLog daily = (from q in log.logs
+                int? cnt = (from q in markets
+                              where q.trade_date == dt
+                              select q).Count();
+                if((cnt ?? 0) > 0) {
+                    DailySummary log = (from q in logs
+                                        where q.date == dt
+                                        select q).FirstOrDefault();
+                    if(log == null) {
+                        log = new DailySummary {
+                            date = dt,
+                        };
+                        logs.Add(log);
+                    }
+                    if(log != null) {
+                        foreach(string symbol in symbols) {
+                            var market = (from q in markets
                                           where q.symbol == symbol
-                                          && q.date == dt
+                                          && q.trade_date == dt
                                           select q).FirstOrDefault();
-                        if (daily == null)
-                        {
-                            daily = new DailyLog
-                            {
-                                symbol = symbol,
-                                buy_price = 0,
-                                close_price = 0,
-                                ltp_price = 0,
-                                date = dt,
-                                high_price = 0,
-                                total_amount = (criteria.total_amount ?? 0),
-                                total_equity = symbols.Count(),
-                                low_price = 0
-                            };
-                            log.logs.Add(daily);
+                            if(market != null) {
+                                //if(market == null) {
+                                //    market = (from q in markets
+                                //              where q.symbol == symbol
+                                //              && q.trade_date <= dt
+                                //              orderby q.trade_date descending
+                                //              select q).FirstOrDefault();
+                                //}
+                                DailyLog daily = (from q in log.logs
+                                                  where q.symbol == symbol
+                                                  && q.date == dt
+                                                  select q).FirstOrDefault();
+                                if(daily == null) {
+                                    daily = new DailyLog {
+                                        symbol = symbol,
+                                        buy_price = 0,
+                                        close_price = 0,
+                                        ltp_price = 0,
+                                        date = dt,
+                                        high_price = 0,
+                                        total_amount = (criteria.total_amount ?? 0),
+                                        total_equity = symbols.Count(),
+                                        low_price = 0
+                                    };
+                                    log.logs.Add(daily);
+                                }
+                                daily.date = dt;
+                                daily.buy_price = (from q in markets
+                                                   where q.symbol == symbol
+                                                   && q.trade_date >= monthStartDate
+                                                   orderby q.trade_date ascending
+                                                   select (q.open_price ?? 0)).FirstOrDefault();
+
+                                if(market != null) {
+                                    daily.close_price = (market.close_price ?? 0);
+                                    daily.ltp_price = (market.ltp_price ?? 0);
+                                    daily.high_price = (market.high_price ?? 0);
+                                    daily.low_price = (market.low_price ?? 0);
+                                }
+                            }
                         }
-                        daily.date = dt;
-                        daily.buy_price = (from q in markets
-                                           where q.symbol == symbol
-                                           && q.trade_date >= monthStartDate
-                                           orderby q.trade_date ascending
-                                           select (q.open_price ?? 0)).FirstOrDefault();
-                        var market = (from q in markets
-                                      where q.symbol == symbol
-                                      && q.trade_date == dt
-                                      select q).FirstOrDefault();
-                        if (market == null)
-                        {
-                            market = (from q in markets
-                                      where q.symbol == symbol
-                                      && q.trade_date <= dt
-                                      orderby q.trade_date descending
-                                      select q).FirstOrDefault();
-                        }
-                        if (market != null)
-                        {
-                            daily.close_price = (market.close_price ?? 0);
-                            daily.ltp_price = (market.ltp_price ?? 0);
-                            daily.high_price = (market.high_price ?? 0);
-                            daily.low_price = (market.low_price ?? 0);
+                        if(dailyLogs != null) {
+                            var dailylog = (from q in dailyLogs
+                                            where q.trade_date == dt
+                                            select q).FirstOrDefault();
+                            if(dailylog != null) {
+                                log.positive_count = dailylog.positive;
+                                log.negative_count = dailylog.negative;
+                            }
                         }
                     }
                 }
-
             }
             logs = (from q in logs
                     orderby q.date ascending
@@ -1055,6 +1070,18 @@ namespace Ecam.Models
                 return DataTypeHelper.SafeDivision((this.cmv_low - this.investment), this.investment) * 100;
             }
         }
+        public int? positive_count { get; set; }
+        public int? negative_count { get; set; }
+        public int? total {
+            get {
+                return (this.positive_count ?? 0) + (this.negative_count ?? 0);
+            }
+        }
+        public bool? indicator {
+            get {
+                return (this.positive_count ?? 0) > (this.negative_count ?? 0);
+            }
+        }
     }
 
     public class DailyLog
@@ -1100,6 +1127,7 @@ namespace Ecam.Models
                 return this.quantity * this.low_price;
             }
         }
+       
     }
 
     public class BatchLog

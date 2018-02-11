@@ -115,8 +115,8 @@ namespace Ecam.Models
             }
         }
 
-        /*
-        public static void CalculateRSI(string symbol)
+       
+        public static void CalculateRSI(string symbol, int daysBackWard)
         {
             using (EcamContext context = new EcamContext())
             {
@@ -127,11 +127,11 @@ namespace Ecam.Models
                 foreach (var company in companies)
                 {
                     DateTime today = DateTime.Now.Date;
-                    DateTime endDate = DateTime.Now.Date.AddDays(-120);
+                    DateTime endDate =  DateTime.Now.Date.AddDays(-daysBackWard);
                     var markets = (from q in context.tra_market
                                    where q.symbol == company.symbol
-                                   //&& q.trade_date <= today
-                                   //&& q.trade_date >= endDate
+                                   && q.trade_date <= today
+                                   && q.trade_date >= endDate
                                    orderby q.trade_date ascending
                                    select q).ToList();
                     foreach (var market in markets)
@@ -316,7 +316,7 @@ namespace Ecam.Models
                 //}
             }
         }
-        */
+         
 
         public string SYMBOL { get { return _Symbol; } }
         private string _Symbol;

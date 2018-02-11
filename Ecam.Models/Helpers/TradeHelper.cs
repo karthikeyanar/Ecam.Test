@@ -1089,10 +1089,72 @@ namespace Ecam.Models
                 }
                 context.SaveChanges();
                 CreateAVG(row.symbol, row.trade_date);
+                CreateDailyLog(row.trade_date,"");
+                CreateDailyLog(row.trade_date,"true");
                 //lblError.Text = "ImportPrice Price Index symbol=" + row.symbol + ",Date=" + row.trade_date;
                 Console.WriteLine("ImportPrice Price Index symbol=" + row.symbol + ",Date=" + row.trade_date);
             }
             UpdateCompanyPrice(import.symbol);
+        }
+
+        private static void CreateDailyLog() {
+            DateTime startDate = Convert.ToDateTime("01/01/2014");
+            int total = (365 * 5);
+            int i;
+            for(i = 0;i < total;i++) {
+                DateTime tradeDate = startDate.AddDays(i);
+                CreateDailyLog(tradeDate,"true");
+            }
+        }
+
+        private static void CreateDailyLog(DateTime tradeDate,string isBookMark) {
+            string strDate = tradeDate.ToString("yyyy-MM-dd");
+            string sql = string.Format(" select ((m.close_price-m.prev_price)/m.prev_price) * 100 as profit,m.symbol,m.trade_date  " + Environment.NewLine +
+                         " from tra_market m " + Environment.NewLine +
+                         " join tra_company c on c.symbol = m.symbol " + Environment.NewLine +
+                         " join tra_company_category cc on c.symbol = cc.symbol " + Environment.NewLine +
+                         " join tra_category cat on cat.category_name = cc.category_name " + Environment.NewLine +
+                         " where m.trade_date = '{0}' and ifnull(m.prev_price,0) > 0 ",strDate);
+            if(string.IsNullOrEmpty(isBookMark) == false) {
+                if(isBookMark == "true") {
+                    sql += " and ifnull(cat.is_book_mark,0)=1";
+                }
+            }
+            sql += " group by m.symbol,m.trade_date ";
+            using(MySqlDataReader dr = MySqlHelper.ExecuteReader(Ecam.Framework.Helper.ConnectionString,sql)) {
+                int positive = 0;
+                int negative = 0;
+                while(dr.Read()) {
+                    decimal profit = DataTypeHelper.ToDecimal(dr["profit"].ToString());
+                    if(profit > 0) {
+                        positive += 1;
+                    } else {
+                        negative += 1;
+                    }
+                }
+                if(positive > 0 || negative > 0) {
+                    using(EcamContext context = new EcamContext()) {
+                        tra_daily_log log = (from q in context.tra_daily_log
+                                             where q.trade_date == tradeDate
+                                             && q.is_book_mark == (isBookMark == "true" ? true : false)
+                                             select q).FirstOrDefault();
+                        if(log == null) {
+                            log = new tra_daily_log();
+                        }
+                        log.trade_date = tradeDate;
+                        log.positive = positive;
+                        log.negative = negative;
+                        log.is_book_mark = (isBookMark == "true" ? true : false);
+                        if(log.id > 0) {
+                            context.Entry(log).State = System.Data.Entity.EntityState.Modified;
+                        } else {
+                            context.tra_daily_log.Add(log);
+                        }
+                        context.SaveChanges();
+                        Console.WriteLine("Log Completed Date=" + log.trade_date);
+                    }
+                }
+            }
         }
 
         public static void CreateAVG(string symbol, DateTime date)
@@ -1327,7 +1389,7 @@ RegexOptions.IgnoreCase
         public decimal avg_downward { get; set; }
         public decimal rs {
             get {
-                return this.avg_upward / this.avg_downward;
+                return DataTypeHelper.SafeDivision(this.avg_upward,this.avg_downward);
             }
         }
         public decimal rsi {

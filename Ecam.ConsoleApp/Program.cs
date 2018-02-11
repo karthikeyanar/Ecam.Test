@@ -56,7 +56,7 @@ namespace Ecam.ConsoleApp
             //    symbols = (from q in context.tra_company orderby q.symbol select q.symbol).ToList();
             //}
             //foreach(string symbol in symbols) {
-            //    UpdatePrevPriceEquity(symbol);
+            //    GoogleHistoryDownloadData.CalculateRSI(symbol,(365*6));
             //}
             DownloadStart();
             AddSplit();

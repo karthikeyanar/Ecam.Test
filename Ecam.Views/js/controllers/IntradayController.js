@@ -622,6 +622,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
                     callback(json);
                 }
                 if (isNotOpen != true) {
+                    console.log(data);
                     $("#modal-daily-template").tmpl(data).appendTo($cnt);
                     var $modal = $("#modal-daily-" + data.name, $cnt);
                     $modal.modal('show');
