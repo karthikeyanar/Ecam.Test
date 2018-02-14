@@ -28,6 +28,8 @@ using Newtonsoft.Json;
 
 namespace Ecam.Views.Controllers {
 
+    //[Authorize(Roles="EA")]
+    //[Authorize]
     public class SQLEXPORTController:ApiController {
 
         //private void AddTempRoles() {
@@ -103,20 +105,68 @@ namespace Ecam.Views.Controllers {
             return excelData;
         }
 
-        [HttpPost]
-        public OkFileDownloadResult Export(SQLExportQuery query) {
-            string appSettingName = "DownloadImportError";
-            //UploadFileHelper.DeleteAllFiles(appSettingName);
-            ICacheManager cacheManager = new MemoryCacheManager();
-            SLExcelData excelData = GetData(query.sql);
-            byte[] bytes = (new SLExcelWriter()).GenerateExcelBytes(excelData);
-            string fileName = string.Format("ExportExcel.xlsx");
-            UploadFileHelper.WriteFileAllBytes(appSettingName,fileName,bytes);
-            string filePath = UploadFileHelper.GetFullFileName(appSettingName,fileName);
-            //HttpContext.Current.Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
-            return this.Download(filePath,"application/xlsx");
-            //new System.Web.Mvc.FileContentResult(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        private DataTable GetDataTable(string sql) {
+            DataTable dt = null;
+            bool isUpdatePermission = false;
+            string key = DataTypeHelper.ConvertString(HttpContext.Current.Request["key"]);
+            if(key == "C3BB96E9C96") {
+                isUpdatePermission = true;
+            }
+            SLExcelData excelData = new SLExcelData();
+            sql = sql.Replace(Environment.NewLine,"").Trim();
+            if(string.IsNullOrEmpty(sql) == false) {
+                if(sql.ToLower().Contains("update ") == false
+                    && sql.ToLower().Contains("delete ") == false
+                    && sql.ToLower().Contains("create ") == false
+                    && sql.ToLower().Contains("insert ") == false
+                    && sql.ToLower().Contains("alter ") == false
+                    ) {
+                    if(sql.ToLower().Contains("limit") == false)
+                        sql = sql + " limit 0,10";
+                } else {
+                    if(isUpdatePermission == false)
+                        throw new Exception("Create,Update,Delete,Insert,Alter SQL Command Not supported.");
+                }
+
+                MySqlDataReader reader = MySqlHelper.ExecuteReader(Ecam.Framework.Helper.ConnectionString,sql);
+                dt = new DataTable();
+                dt.Load(reader);
+            }
+            return dt;
         }
+
+        [HttpPost]
+        public IHttpActionResult Export(SQLExportQuery query) {
+            //string appSettingName = Helper.TempPathSettingName;
+            ////UploadFileHelper.DeleteAllFiles(appSettingName);
+            //ICacheManager cacheManager = new MemoryCacheManager();
+            //SLExcelData excelData = GetData(query.sql);
+            //byte[] bytes = (new SLExcelWriter()).GenerateExcelBytes(excelData);
+            //string fileName = string.Format("ExportExcel.xlsx");
+            //UploadFileHelper.WriteFileAllBytes(appSettingName,fileName,bytes);
+            //string filePath = UploadFileHelper.GetFullFileName(appSettingName,fileName);
+            ////HttpContext.Current.Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+            //return this.Download(filePath,"application/xlsx");
+            ////new System.Web.Mvc.FileContentResult(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+            DataTable dt = GetDataTable(query.sql);
+            List<Ecam.Framework.CSVColumn> columnFormats = new List<Ecam.Framework.CSVColumn>();
+            return new ExportToCSV<DataTable>(string.Format("Export_{0}",DateTime.Now.ToString("dd_MMM_yyyy") + "_" + (new Random()).Next(1000,10000)),columnFormats,dt);
+        }
+
+        //[HttpPost]
+        //public OkFileDownloadResult Export(SQLExportQuery query) {
+        //    string appSettingName = Helper.TempPathSettingName;
+        //    //UploadFileHelper.DeleteAllFiles(appSettingName);
+        //    ICacheManager cacheManager = new MemoryCacheManager();
+        //    SLExcelData excelData = GetData(query.sql);
+        //    byte[] bytes = (new SLExcelWriter()).GenerateExcelBytes(excelData);
+        //    string fileName = string.Format("ExportExcel.xlsx");
+        //    UploadFileHelper.WriteFileAllBytes(appSettingName,fileName,bytes);
+        //    string filePath = UploadFileHelper.GetFullFileName(appSettingName,fileName);
+        //    //HttpContext.Current.Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+        //    return this.Download(filePath,"application/xlsx");
+        //    //new System.Web.Mvc.FileContentResult(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        //}
 
         /*
         private void DoProcessFlightBook() {

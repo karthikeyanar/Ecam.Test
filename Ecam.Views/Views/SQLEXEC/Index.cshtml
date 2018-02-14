@@ -126,7 +126,7 @@
                     "type": "POST",
                     "data": param
                 }).done(function (json) {
-                    if (json.rows.length > 1000) {
+                    if (json.rows.length > 1500) {
                         alert("Total Rows " + json.rows.length + " Please apply limit")
                     } else {
                         $btn.button('reset');

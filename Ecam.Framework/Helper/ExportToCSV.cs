@@ -52,10 +52,17 @@ namespace Ecam.Framework {
         private HttpResponseMessage Execute() {
             this._FileName = _FileName.ToString();
             this._FileName = FileHelper.GetValidFileName(this._FileName) + ".csv";
-            IList list;
-            list = (IList)_Model;
-            if(list.Count > 0) {
-                sb.Append(Ecam.Framework.CSVHelper.CreateCSVFromGenericList(list,_ColumnFormats));
+
+            if(_Model != null) {
+                if(_Model.GetType().Name == "DataTable") {
+                    sb.Append(Ecam.Framework.CSVHelper.CreateCSVFromGenericList_ByDataTable(_Model,_ColumnFormats));
+                } else {
+                    IList list;
+                    list = (IList)_Model;
+                    if(list.Count > 0) {
+                        sb.Append(Ecam.Framework.CSVHelper.CreateCSVFromGenericList(list,_ColumnFormats));
+                    }
+                }
             }
 
             MemoryStream stream = new MemoryStream();
@@ -77,7 +84,7 @@ namespace Ecam.Framework {
             // Also, this call is host-specific and will need to be modified for other hosts such as OWIN.
             return HttpContext.Current.Server.MapPath(path);
         }
-          
+
     }
 
     public static class CSVHelper {
@@ -184,7 +191,7 @@ namespace Ecam.Framework {
             if(columnFormats == null) {
                 columnFormats = new List<CSVColumn>();
             }
-            columnFormats.Add(new Ecam.Framework.CSVColumn { PropertyName = "airline_name", DisplayName = "Airline" });
+            columnFormats.Add(new Ecam.Framework.CSVColumn { PropertyName = "airline_name",DisplayName = "Airline" });
             columnFormats.Add(new Ecam.Framework.CSVColumn { PropertyName = "Errors",IsIgNore = true });
             columnFormats.Add(new Ecam.Framework.CSVColumn { PropertyName = "id",IsIgNore = true });
         }
@@ -305,14 +312,9 @@ namespace Ecam.Framework {
                 foreach(PropertyInfo pi in props) {
                     if(pi.CanRead && pi.PropertyType.Name != "List`1"
                          && pi.PropertyType.FullName.Contains("Pepper.") == false) {
-                        int cnt = (from q in columnFormats where q.PropertyName == pi.Name select q).Count();
-                        if (cnt > 0)
-                        {
-                            if (CSVHelper.IsIgNoreColumn(pi.Name, columnFormats) == false)
-                            {
-                                displayName = CSVHelper.GetDisplayName(pi.Name, columnFormats);
-                                sb.Append("\"").Append(displayName).Append("\"").Append(",");
-                            }
+                        if(CSVHelper.IsIgNoreColumn(pi.Name,columnFormats) == false) {
+                            displayName = CSVHelper.GetDisplayName(pi.Name,columnFormats);
+                            sb.Append("\"").Append(displayName).Append("\"").Append(",");
                         }
                     }
                 }
@@ -322,70 +324,206 @@ namespace Ecam.Framework {
                 foreach(var item in list) {
                     //this acts as datacolumn
                     foreach(PropertyInfo pi in props) {
-                        if (pi.CanRead && pi.PropertyType.Name != "List`1"
-                        && pi.PropertyType.FullName.Contains("Pepper.") == false)
-                        {
-                            int cnt = (from q in columnFormats where q.PropertyName == pi.Name select q).Count();
-                            if (cnt > 0)
-                            {
-                                if (CSVHelper.IsIgNoreColumn(pi.Name, columnFormats) == false)
-                                {
-                                    //this is the row+col intersection (the value)
-                                    var value = item.GetType()
-                                                .GetProperty(pi.Name)
-                                                .GetValue(item, null);
-                                    string whatToWrite = Convert.ToString(value);
-                                    if (CSVHelper.IsNoFormatColumn(pi.Name, columnFormats) == false)
-                                    {
-                                        string propertyType = item.GetType().GetProperty(pi.Name).PropertyType.FullName;
-                                        if (propertyType.Contains("System.Boolean"))
-                                        {
-                                            bool b = false;
-                                            bool.TryParse(whatToWrite, out b);
-                                            whatToWrite = (b == true ? "Yes" : "No");
-                                        }
-                                        if (propertyType.Contains("System.DateTime"))
-                                        {
-                                            DateTime d;
-                                            DateTime.TryParse(whatToWrite, out d);
-                                            if (d.Year > 1900)
-                                                whatToWrite = d.ToString("MM/dd/yyyy");
-                                            else
-                                                whatToWrite = string.Empty;
-                                        }
-                                        if (propertyType.Contains("System.Decimal"))
-                                        {
-                                            decimal v;
-                                            decimal.TryParse(whatToWrite, out v);
-                                            if (v == 0)
-                                            {
-                                                whatToWrite = string.Empty;
-                                            }
-                                            else
-                                            {
-                                                int precision = CSVHelper.GetPrecision(pi.Name, columnFormats);
-                                                if (CSVHelper.IsNumberColumn(pi.Name, columnFormats))
-                                                {
-                                                    whatToWrite = FormatHelper.NumberFormat(v, precision);
-                                                }
-                                                else if (CSVHelper.IsPercentageColumn(pi.Name, columnFormats))
-                                                {
-                                                    whatToWrite = FormatHelper.PercentageFormat(v);
-                                                }
-                                                else
-                                                {
-                                                    whatToWrite = FormatHelper.CurrencyFormat(v, precision);
-                                                }
+                        if(pi.CanRead && pi.PropertyType.Name != "List`1"
+                        && pi.PropertyType.FullName.Contains("Pepper.") == false) {
+                            if(CSVHelper.IsIgNoreColumn(pi.Name,columnFormats) == false) {
+                                //this is the row+col intersection (the value)
+                                var value = item.GetType()
+                                            .GetProperty(pi.Name)
+                                            .GetValue(item,null);
+                                string whatToWrite = Convert.ToString(value);
+                                if(CSVHelper.IsNoFormatColumn(pi.Name,columnFormats) == false) {
+                                    string propertyType = item.GetType().GetProperty(pi.Name).PropertyType.FullName;
+                                    if(propertyType.Contains("System.Boolean")) {
+                                        bool b = false;
+                                        bool.TryParse(whatToWrite,out b);
+                                        whatToWrite = (b == true ? "Yes" : "No");
+                                    }
+                                    if(propertyType.Contains("System.DateTime")) {
+                                        DateTime d;
+                                        DateTime.TryParse(whatToWrite,out d);
+                                        if(d.Year > 1900)
+                                            whatToWrite = d.ToString("MM/dd/yyyy");
+                                        else
+                                            whatToWrite = string.Empty;
+                                    }
+                                    if(propertyType.Contains("System.Decimal")) {
+                                        decimal v;
+                                        decimal.TryParse(whatToWrite,out v);
+                                        if(v == 0) {
+                                            whatToWrite = string.Empty;
+                                        } else {
+                                            int precision = CSVHelper.GetPrecision(pi.Name,columnFormats);
+                                            if(CSVHelper.IsNumberColumn(pi.Name,columnFormats)) {
+                                                whatToWrite = FormatHelper.NumberFormat(v,precision);
+                                            } else if(CSVHelper.IsPercentageColumn(pi.Name,columnFormats)) {
+                                                whatToWrite = FormatHelper.PercentageFormat(v);
+                                            } else {
+                                                whatToWrite = FormatHelper.CurrencyFormat(v,precision);
                                             }
                                         }
                                     }
-                                    sb.Append("\"").Append(ReplaceCSVFormat(whatToWrite)).Append("\"").Append(CSVDelimeter);
                                 }
+                                sb.Append("\"").Append(ReplaceCSVFormat(whatToWrite)).Append("\"").Append(CSVDelimeter);
                             }
                         }
                     }
                     sb.Append(newLine);
                 }
+            }
+            return sb.ToString();
+        }
+
+        public static string CreateCSVFromGenericList_ByDataTable(object fromDT,List<CSVColumn> columnFormats = null) {
+            StringBuilder sb = new StringBuilder();
+            AddColumnFormats(ref columnFormats);
+            if(fromDT != null) {
+
+                DataTable dt = (DataTable)fromDT;
+                string newLine = Environment.NewLine;
+
+                //foreach of the properties in class above, write out properties
+                //this is the header row
+                string displayName = string.Empty;
+                foreach(DataColumn pi in dt.Columns) {
+                    if(CSVHelper.IsIgNoreColumn(pi.ColumnName,columnFormats) == false) {
+                        displayName = CSVHelper.GetDisplayName(pi.ColumnName,columnFormats);
+                        sb.Append("\"").Append(displayName).Append("\"").Append(",");
+                    }
+                }
+                sb.Append(newLine);
+
+                //this acts as datarow
+                foreach(DataRow row in dt.Rows) {
+                    //this acts as datacolumn
+                    foreach(DataColumn pi in dt.Columns) {
+
+                        if(CSVHelper.IsIgNoreColumn(pi.ColumnName,columnFormats) == false) {
+                            //this is the row+col intersection (the value)
+                            var value = row[pi.ColumnName];
+                            string whatToWrite = Convert.ToString(value);
+                            if(CSVHelper.IsNoFormatColumn(pi.ColumnName,columnFormats) == false) {
+                                string propertyType = pi.DataType.FullName;
+                                if(propertyType.Contains("System.Boolean")) {
+                                    bool b = false;
+                                    bool.TryParse(whatToWrite,out b);
+                                    whatToWrite = (b == true ? "Yes" : "No");
+                                }
+                                if(propertyType.Contains("System.DateTime")) {
+                                    DateTime d;
+                                    DateTime.TryParse(whatToWrite,out d);
+                                    if(d.Year > 1900)
+                                        whatToWrite = d.ToString("dd/MMM/yyyy");
+                                    else
+                                        whatToWrite = string.Empty;
+                                }
+                                if(propertyType.Contains("System.Decimal")) {
+                                    decimal v;
+                                    decimal.TryParse(whatToWrite,out v);
+                                    if(v == 0) {
+                                        whatToWrite = string.Empty;
+                                    } else {
+                                        int precision = CSVHelper.GetPrecision(pi.ColumnName,columnFormats);
+                                        if(CSVHelper.IsNumberColumn(pi.ColumnName,columnFormats)) {
+                                            whatToWrite = FormatHelper.NumberFormat(v,precision);
+                                        } else if(CSVHelper.IsPercentageColumn(pi.ColumnName,columnFormats)) {
+                                            whatToWrite = FormatHelper.PercentageFormat(v);
+                                        } else {
+                                            whatToWrite = FormatHelper.NumberFormat(v,precision);
+                                        }
+                                    }
+                                }
+                            }
+                            sb.Append("\"").Append(ReplaceCSVFormat(whatToWrite)).Append("\"").Append(CSVDelimeter);
+                        }
+                    }
+                    sb.Append(newLine);
+                }
+            }
+            return sb.ToString();
+        }
+
+        public static string CreateHTMLTableFromGenericList_ByDataTable(object fromDT,List<CSVColumn> columnFormats = null) {
+            StringBuilder sb = new StringBuilder();
+            AddColumnFormats(ref columnFormats);
+            if(fromDT != null) {
+
+                DataTable dt = (DataTable)fromDT;
+                string newLine = Environment.NewLine;
+
+                sb.Append("<table cellpadding=0 cellspacing=0 border=1 style='border-color:#f5f5f5;'>");
+                sb.Append("<thead>");
+                sb.Append("<tr>");
+
+                string displayName = string.Empty;
+                string align = string.Empty;
+                foreach(DataColumn pi in dt.Columns) {
+                    if(CSVHelper.IsIgNoreColumn(pi.ColumnName,columnFormats) == false) {
+                        displayName = CSVHelper.GetDisplayName(pi.ColumnName,columnFormats);
+                        align = "style=\"text-align:left;padding:5px;\"";
+                        string propertyType = pi.DataType.FullName.ToString();
+                        if(propertyType.Contains("System.Decimal")) {
+                            align = "style=\"text-align:right;padding:5px;\"";
+                        }
+                        sb.Append("<th " + align + ">").Append(displayName).Append("</th>");
+                    }
+                }
+
+                sb.Append("</tr>");
+                sb.Append("</thead>");
+
+                sb.Append("<tbody>");
+
+                //this acts as datarow
+                foreach(DataRow row in dt.Rows) {
+                    sb.Append("<tr>");
+                    //this acts as datacolumn
+                    foreach(DataColumn pi in dt.Columns) {
+
+                        if(CSVHelper.IsIgNoreColumn(pi.ColumnName,columnFormats) == false) {
+                            //this is the row+col intersection (the value)
+                            var value = row[pi.ColumnName];
+                            align = "style=\"text-align:left;padding:5px;\"";
+                            string whatToWrite = Convert.ToString(value);
+                            if(CSVHelper.IsNoFormatColumn(pi.ColumnName,columnFormats) == false) {
+                                string propertyType = pi.DataType.FullName.ToString();
+                                if(propertyType.Contains("System.Boolean")) {
+                                    bool b = false;
+                                    bool.TryParse(whatToWrite,out b);
+                                    whatToWrite = (b == true ? "Yes" : "No");
+                                }
+                                if(propertyType.Contains("System.DateTime")) {
+                                    DateTime d;
+                                    DateTime.TryParse(whatToWrite,out d);
+                                    if(d.Year > 1900)
+                                        whatToWrite = d.ToString("dd/MMM/yyyy");
+                                    else
+                                        whatToWrite = string.Empty;
+                                }
+                                if(propertyType.Contains("System.Decimal")) {
+                                    decimal v;
+                                    decimal.TryParse(whatToWrite,out v);
+                                    if(v == 0) {
+                                        whatToWrite = string.Empty;
+                                    } else {
+                                        if(CSVHelper.IsNumberColumn(pi.ColumnName,columnFormats)) {
+                                            whatToWrite = FormatHelper.NumberFormat(v);
+                                        } else if(CSVHelper.IsPercentageColumn(pi.ColumnName,columnFormats)) {
+                                            whatToWrite = FormatHelper.PercentageFormat(v);
+                                        } else {
+                                            whatToWrite = FormatHelper.NumberFormat(v);
+                                        }
+                                    }
+                                    align = "style=\"text-align:right;padding:5px;\"";
+                                }
+                            }
+                            sb.Append("<td " + align + ">").Append(whatToWrite).Append("</td>");
+                        }
+                    }
+                    sb.Append("</tr>");
+                }
+                sb.Append("</tbody>");
+                sb.Append("</table>");
             }
             return sb.ToString();
         }

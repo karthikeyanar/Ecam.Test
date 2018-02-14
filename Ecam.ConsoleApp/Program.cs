@@ -6,10 +6,12 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.Entity.Validation;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Mail;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -32,35 +34,127 @@ namespace Ecam.ConsoleApp
         private static List<string> _SYMBOLS_LIST;
         static void Main(string[] args)
         {
-            IS_CATEGORY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_CATEGORY_FLAG_CSV"];
-            IS_NIFTY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_FLAG_CSV"];
-            IS_IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_IMPORT_CSV"];
-            IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
-            IS_BOOK_MARK_CATEGORY = System.Configuration.ConfigurationManager.AppSettings["IS_BOOK_MARK_CATEGORY"];
-            MC = System.Configuration.ConfigurationManager.AppSettings["MC"];
-            GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
-            MONEY_CONTROL = System.Configuration.ConfigurationManager.AppSettings["MONEY_CONTROL"];
-            //List<tra_split> splits = null;
-            //tra_split baseSplit = new tra_split();
-            //using(EcamContext context = new EcamContext()) {
-            //    splits = (from q in context.tra_split select q).ToList();
-            //}
-            //if(splits != null) {
-            //    foreach(var split in splits) {
-            //        baseSplit.DeleteManually(split.id);
-            //        Console.WriteLine("Delete split id=" + split.id);
-            //    }
-            //}
-            //List<string> symbols;
-            //using(EcamContext context = new EcamContext()) {
-            //    symbols = (from q in context.tra_company orderby q.symbol select q.symbol).ToList();
-            //}
-            //foreach(string symbol in symbols) {
-            //    GoogleHistoryDownloadData.CalculateRSI(symbol,(365*6));
-            //}
-            DownloadStart();
-            AddSplit();
-            //Ecam.Models.Common.CreateCategoryProfit();
+            try {
+                IS_CATEGORY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_CATEGORY_FLAG_CSV"];
+                IS_NIFTY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_FLAG_CSV"];
+                IS_IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_IMPORT_CSV"];
+                IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
+                IS_BOOK_MARK_CATEGORY = System.Configuration.ConfigurationManager.AppSettings["IS_BOOK_MARK_CATEGORY"];
+                MC = System.Configuration.ConfigurationManager.AppSettings["MC"];
+                GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
+                MONEY_CONTROL = System.Configuration.ConfigurationManager.AppSettings["MONEY_CONTROL"];
+
+                DateTime eveningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 3:00PM");
+                DateTime eveningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 3:30PM");
+                DateTime now = DateTime.Now;
+                bool isDontStart = false;
+                if(IS_DOWNLOAD_HISTORY != "true" && IS_IMPORT_CSV != "true" && IS_NIFTY_FLAG_CSV != "true" && IS_CATEGORY_FLAG_CSV != "true") {
+                    if((now >= eveningStart && now <= eveningEnd) == false) {
+                        isDontStart = true;
+                    } else {
+                        string GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
+                        string[] files = System.IO.Directory.GetFiles(GOOGLE_DATA);
+                        foreach(string fileName in files) {
+                            System.IO.FileInfo fileInfo = new FileInfo(fileName);
+                            if(fileInfo.CreationTime < eveningStart) {
+                                System.IO.File.Delete(fileName);
+                            }
+                        }
+                    }
+                }
+                if(isDontStart == false) {
+                    DownloadStart();
+                    AddSplit();
+                    MailSend();
+                }
+            } catch { }
+        }
+
+        private static void MailSend() {
+            try {
+                var fromAddress = new MailAddress("priyatradevnr@gmail.com","Priya");
+                string fromPassword = "priyakarthi333";
+
+                MailMessage msg = new MailMessage();
+                msg.From = fromAddress;
+                msg.To.Add(new MailAddress("karthikeyanar@gmail.com","Karthi"));
+                msg.CC.Add(new MailAddress("priyatradevnr@gmail.com","Priya"));
+                msg.Priority = MailPriority.High;
+                msg.Subject = "Daily Summary: " + (new Random()).Next(1000,100000) + "_" + DateTime.Now.ToString("dd_MMM_yyyy");
+
+                string sql = " select DATE_FORMAT(log.trade_date, \"%d/%b/%Y\") as trade_date,log.positive,log.negative " + Environment.NewLine +
+                             ",if((log.positive > log.negative),'True','') as indicator " + Environment.NewLine +
+                             ",(log.positive - log.negative) as diff " + Environment.NewLine +
+                             ",((((log.positive - (log.positive + log.negative)) / (log.positive + log.negative))) * 100) * -1 as positive_percentage " + Environment.NewLine +
+                             ",((((log.negative - (log.positive + log.negative)) / (log.positive + log.negative))) * 100) * -1 as negative_percentage " + Environment.NewLine +
+                             ",(log.positive + log.negative) as total " + Environment.NewLine +
+                             " from tra_daily_log log where ifnull(log.is_book_mark,0) = 1 order by log.trade_date desc limit 0,60 ";
+
+                DataTable dt = GetDataTable(sql);
+
+                List<Ecam.Framework.CSVColumn> columnFormats = new List<Ecam.Framework.CSVColumn>();
+                string htmlBody = Ecam.Framework.CSVHelper.CreateHTMLTableFromGenericList_ByDataTable(dt,columnFormats);
+
+                msg.Body = htmlBody;
+                msg.IsBodyHtml = true;
+
+                MemoryStream stream = null;
+                string tempFileName = "";
+                if(File.Exists(tempFileName) == true) {
+                    byte[] bytes = System.IO.File.ReadAllBytes(tempFileName);
+                    stream = new MemoryStream(bytes);
+                }
+                if(stream != null) {
+                    msg.Attachments.Add(new Attachment(stream,Path.GetFileName(tempFileName)));
+
+                }
+                var smtp = new SmtpClient {
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    Credentials = new NetworkCredential(fromAddress.Address,fromPassword),
+                    Timeout = 20000
+                };
+                using(msg) {
+                    smtp.Send(msg);
+                }
+            } catch(Exception ex) {
+                Helper.Log("Mail Send Exception=" + ex.Message);
+                if(ex.InnerException != null) {
+                    Helper.Log("Mail Send InnerException=" + ex.Message);
+                }
+            }
+        }
+
+        private static DataTable GetDataTable(string sql) {
+            DataTable dt = null;
+            bool isUpdatePermission = false;
+            string key = ""; // DataTypeHelper.ConvertString(HttpContext.Current.Request["key"]);
+            if(key == "C3BB96E9C96") {
+                isUpdatePermission = true;
+            }
+            SLExcelData excelData = new SLExcelData();
+            sql = sql.Replace(Environment.NewLine,"").Trim();
+            if(string.IsNullOrEmpty(sql) == false) {
+                if(sql.ToLower().Contains("update ") == false
+                    && sql.ToLower().Contains("delete ") == false
+                    && sql.ToLower().Contains("create ") == false
+                    && sql.ToLower().Contains("insert ") == false
+                    && sql.ToLower().Contains("alter ") == false
+                    ) {
+                    if(sql.ToLower().Contains("limit") == false)
+                        sql = sql + " limit 0,10";
+                } else {
+                    if(isUpdatePermission == false)
+                        throw new Exception("Create,Update,Delete,Insert,Alter SQL Command Not supported.");
+                }
+
+                MySqlDataReader reader = MySqlHelper.ExecuteReader(Ecam.Framework.Helper.ConnectionString,sql);
+                dt = new DataTable();
+                dt.Load(reader);
+            }
+            return dt;
         }
 
         #region MoneyControl

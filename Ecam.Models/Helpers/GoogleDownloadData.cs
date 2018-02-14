@@ -87,14 +87,14 @@ namespace Ecam.Models
             //}
             //if ((now >= eveningStart && now <= eveningEnd))
             //{
-            if (File.Exists(fileName) == true)
-            {
-                FileInfo fileInfo = new FileInfo(fileName);
-                if (fileInfo.CreationTime < eveningStart)
-                {
-                    File.Delete(fileName);
-                }
-            }
+            //if (File.Exists(fileName) == true)
+            //{
+            //    FileInfo fileInfo = new FileInfo(fileName);
+            //    if (fileInfo.CreationTime < eveningStart)
+            //    {
+            //        File.Delete(fileName);
+            //    }
+            //}
             if (File.Exists(fileName) == false)
             {
                 try
@@ -106,9 +106,7 @@ namespace Ecam.Models
                     }
                     catch { }
                     Console.WriteLine("Download google data symbol evening=" + symbol);
-                }
-                catch
-                {
+                } catch {
                     //Helper.Log("DownloadErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData_" + rnd.Next(1000, 10000));
                 }
             }
