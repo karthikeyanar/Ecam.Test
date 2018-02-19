@@ -337,13 +337,14 @@ namespace Ecam.Framework {
                                     if(propertyType.Contains("System.Boolean")) {
                                         bool b = false;
                                         bool.TryParse(whatToWrite,out b);
-                                        whatToWrite = (b == true ? "Yes" : "No");
+                                        //whatToWrite = (b == true ? "Yes" : "No");
+                                        whatToWrite = (b == true ? "Yes" : "");
                                     }
                                     if(propertyType.Contains("System.DateTime")) {
                                         DateTime d;
                                         DateTime.TryParse(whatToWrite,out d);
                                         if(d.Year > 1900)
-                                            whatToWrite = d.ToString("MM/dd/yyyy");
+                                            whatToWrite = d.ToString("dd/MMM/yyyy");
                                         else
                                             whatToWrite = string.Empty;
                                     }
@@ -359,7 +360,7 @@ namespace Ecam.Framework {
                                             } else if(CSVHelper.IsPercentageColumn(pi.Name,columnFormats)) {
                                                 whatToWrite = FormatHelper.PercentageFormat(v);
                                             } else {
-                                                whatToWrite = FormatHelper.CurrencyFormat(v,precision);
+                                                whatToWrite = FormatHelper.NumberFormat(v,precision);
                                             }
                                         }
                                     }

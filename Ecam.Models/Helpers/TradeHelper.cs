@@ -1089,15 +1089,13 @@ namespace Ecam.Models
                 }
                 context.SaveChanges();
                 CreateAVG(row.symbol, row.trade_date);
-                CreateDailyLog(row.trade_date,"");
-                CreateDailyLog(row.trade_date,"true");
                 //lblError.Text = "ImportPrice Price Index symbol=" + row.symbol + ",Date=" + row.trade_date;
                 Console.WriteLine("ImportPrice Price Index symbol=" + row.symbol + ",Date=" + row.trade_date);
             }
             UpdateCompanyPrice(import.symbol);
         }
 
-        private static void CreateDailyLog() {
+        public static void CreateDailyLog() {
             DateTime startDate = Convert.ToDateTime("01/01/2014");
             int total = (365 * 5);
             int i;
@@ -1107,7 +1105,8 @@ namespace Ecam.Models
             }
         }
 
-        private static void CreateDailyLog(DateTime tradeDate,string isBookMark) {
+        public static void CreateDailyLog(DateTime tradeDate,string isBookMark) {
+            tradeDate = tradeDate.Date;
             string strDate = tradeDate.ToString("yyyy-MM-dd");
             string sql = string.Format(" select ((m.close_price-m.prev_price)/m.prev_price) * 100 as profit,m.symbol,m.trade_date  " + Environment.NewLine +
                          " from tra_market m " + Environment.NewLine +
@@ -1134,24 +1133,26 @@ namespace Ecam.Models
                 }
                 if(positive > 0 || negative > 0) {
                     using(EcamContext context = new EcamContext()) {
-                        tra_daily_log log = (from q in context.tra_daily_log
-                                             where q.trade_date == tradeDate
-                                             && q.is_book_mark == (isBookMark == "true" ? true : false)
-                                             select q).FirstOrDefault();
-                        if(log == null) {
-                            log = new tra_daily_log();
-                        }
-                        log.trade_date = tradeDate;
-                        log.positive = positive;
-                        log.negative = negative;
-                        log.is_book_mark = (isBookMark == "true" ? true : false);
-                        if(log.id > 0) {
-                            context.Entry(log).State = System.Data.Entity.EntityState.Modified;
-                        } else {
-                            context.tra_daily_log.Add(log);
-                        }
-                        context.SaveChanges();
-                        Console.WriteLine("Log Completed Date=" + log.trade_date);
+                        try {
+                            tra_daily_log log = (from q in context.tra_daily_log
+                                                 where q.trade_date == tradeDate
+                                                 && q.is_book_mark == (isBookMark == "true" ? true : false)
+                                                 select q).FirstOrDefault();
+                            if(log == null) {
+                                log = new tra_daily_log();
+                            }
+                            log.trade_date = tradeDate;
+                            log.positive = positive;
+                            log.negative = negative;
+                            log.is_book_mark = (isBookMark == "true" ? true : false);
+                            if(log.id > 0) {
+                                context.Entry(log).State = System.Data.Entity.EntityState.Modified;
+                            } else {
+                                context.tra_daily_log.Add(log);
+                            }
+                            context.SaveChanges();
+                            Console.WriteLine("Log Completed Date=" + log.trade_date);
+                        } catch { }
                     }
                 }
             }

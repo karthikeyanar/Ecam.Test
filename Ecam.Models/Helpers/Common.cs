@@ -1055,6 +1055,18 @@ namespace Ecam.Models
                 return (from q in this.logs select q.cmv_low).Sum();
             }
         }
+        public int? positive_count { get; set; }
+        public int? negative_count { get; set; }
+        public int? diff {
+            get {
+                return (this.negative_count ?? 0) - (this.positive_count ?? 0);
+            }
+        }
+        public bool? indicator {
+            get {
+                return (this.positive_count ?? 0) > (this.negative_count ?? 0);
+            }
+        }
         public decimal percentage {
             get {
                 return DataTypeHelper.SafeDivision((this.cmv - this.investment), this.investment) * 100;
@@ -1070,16 +1082,9 @@ namespace Ecam.Models
                 return DataTypeHelper.SafeDivision((this.cmv_low - this.investment), this.investment) * 100;
             }
         }
-        public int? positive_count { get; set; }
-        public int? negative_count { get; set; }
         public int? total {
             get {
                 return (this.positive_count ?? 0) + (this.negative_count ?? 0);
-            }
-        }
-        public bool? indicator {
-            get {
-                return (this.positive_count ?? 0) > (this.negative_count ?? 0);
             }
         }
     }

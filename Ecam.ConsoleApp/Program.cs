@@ -50,6 +50,14 @@ namespace Ecam.ConsoleApp
                 bool isDontStart = false;
                 if(IS_DOWNLOAD_HISTORY != "true" && IS_IMPORT_CSV != "true" && IS_NIFTY_FLAG_CSV != "true" && IS_CATEGORY_FLAG_CSV != "true") {
                     if((now >= eveningStart && now <= eveningEnd) == false) {
+                        string GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
+                        string[] files = System.IO.Directory.GetFiles(GOOGLE_DATA);
+                        foreach(string fileName in files) {
+                            System.IO.FileInfo fileInfo = new FileInfo(fileName);
+                            if(fileInfo.CreationTime < eveningStart) {
+                                System.IO.File.Delete(fileName);
+                            }
+                        }
                         isDontStart = true;
                     } else {
                         string GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
@@ -65,7 +73,14 @@ namespace Ecam.ConsoleApp
                 if(isDontStart == false) {
                     DownloadStart();
                     AddSplit();
+                    int i;
+                    for(i = 0;i < 7;i++) {
+                        DateTime dt = DateTime.Now.Date.AddDays(-i);
+                        TradeHelper.CreateDailyLog(dt.Date,"");
+                        TradeHelper.CreateDailyLog(dt.Date,"true");
+                    }
                     MailSend();
+                    MailSendDailyCSV();
                 }
             } catch { }
         }
@@ -82,7 +97,7 @@ namespace Ecam.ConsoleApp
                 msg.Priority = MailPriority.High;
                 msg.Subject = "Daily Summary: " + (new Random()).Next(1000,100000) + "_" + DateTime.Now.ToString("dd_MMM_yyyy");
 
-                string sql = " select DATE_FORMAT(log.trade_date, \"%d/%b/%Y\") as trade_date,log.positive,log.negative " + Environment.NewLine +
+                string sql = " select log.log_id,DATE_FORMAT(log.trade_date, \"%d/%b/%Y\") as trade_date,log.positive,log.negative " + Environment.NewLine +
                              ",if((log.positive > log.negative),'True','') as indicator " + Environment.NewLine +
                              ",(log.positive - log.negative) as diff " + Environment.NewLine +
                              ",((((log.positive - (log.positive + log.negative)) / (log.positive + log.negative))) * 100) * -1 as positive_percentage " + Environment.NewLine +
@@ -104,6 +119,96 @@ namespace Ecam.ConsoleApp
                     byte[] bytes = System.IO.File.ReadAllBytes(tempFileName);
                     stream = new MemoryStream(bytes);
                 }
+                if(stream != null) {
+                    msg.Attachments.Add(new Attachment(stream,Path.GetFileName(tempFileName)));
+
+                }
+                var smtp = new SmtpClient {
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    Credentials = new NetworkCredential(fromAddress.Address,fromPassword),
+                    Timeout = 20000
+                };
+                using(msg) {
+                    smtp.Send(msg);
+                }
+            } catch(Exception ex) {
+                Helper.Log("Mail Send Exception=" + ex.Message);
+                if(ex.InnerException != null) {
+                    Helper.Log("Mail Send InnerException=" + ex.Message);
+                }
+            }
+        }
+
+        private static void MailSendDailyCSV() {
+            try {
+                var fromAddress = new MailAddress("priyatradevnr@gmail.com","Priya");
+                string fromPassword = "priyakarthi333";
+
+                string FILES_PATH = System.Configuration.ConfigurationManager.AppSettings["FilesPath"];
+                MailMessage msg = new MailMessage();
+                msg.From = fromAddress;
+                msg.To.Add(new MailAddress("karthikeyanar@gmail.com","Karthi"));
+                msg.CC.Add(new MailAddress("priyatradevnr@gmail.com","Priya"));
+                msg.Priority = MailPriority.High;
+                msg.Subject = "Daily CSV: " + (new Random()).Next(1000,100000) + "_" + DateTime.Now.ToString("dd_MMM_yyyy");
+
+                msg.Body = "Attachments";
+                msg.IsBodyHtml = true;
+
+                List<Ecam.Framework.CSVColumn> columnFormats = new List<Ecam.Framework.CSVColumn>();
+                int months = 3;
+                int i;
+                List<DailySummary> dailyList = new List<DailySummary>();
+                for(i = 0;i < months;i++) {
+                    DateTime dt = DateTime.Now.Date.AddMonths(-i);
+                    DateTime monthStartDate = DataTypeHelper.GetFirstDayOfMonth(dt);
+                    DateTime monthLastDate = DataTypeHelper.GetLastDayOfMonth(dt);
+                    DateTime totalEndDate = DataTypeHelper.GetLastDayOfMonth(monthStartDate.AddMonths(-1).AddDays(7));
+                    DateTime totalStartDate = DataTypeHelper.GetFirstDayOfMonth(totalEndDate.AddMonths(-6).AddDays(7));
+                   
+
+                    Console.WriteLine("monthStartDate=" + monthStartDate.ToString("dd/MMM/yyyy"));
+                    Console.WriteLine("monthLastDate=" + monthLastDate.ToString("dd/MMM/yyyy"));
+                    Console.WriteLine("totalStartDate=" + totalStartDate.ToString("dd/MMM/yyyy"));
+                    Console.WriteLine("totalEndDate=" + totalEndDate.ToString("dd/MMM/yyyy"));
+
+                    List<DailySummary> templist = Ecam.Models.Common.GetDailySummary(new Contracts.TRA_COMPANY_SEARCH {
+                        categories = "",
+                        end_date = monthLastDate,
+                        is_book_mark_category = true,
+                        monthly_investment = 20000,
+                        start_date = monthStartDate,
+                        total_amount = 1000000,
+                        total_end_date = totalEndDate,
+                        total_start_date = totalStartDate,
+                    }, new Paging {
+                        PageIndex = 1,
+                        PageSize = 10,
+                        SortName = "total_profit",
+                        SortOrder = "desc",
+                   });
+                    if(templist != null) {
+                        dailyList = dailyList.Concat(templist).ToList();
+                    }
+                }
+
+                dailyList = (from q in dailyList
+                             orderby q.date descending
+                             select q).ToList();
+
+                string csv = Ecam.Framework.CSVHelper.CreateCSVFromGenericList(dailyList,columnFormats);
+                string tempFileName = "DailyCSV_"+(new Random()).Next(1000,100000)+"_"+DateTime.Now.ToString("dd_MMM_yyyy")+".csv";
+                              
+
+                MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(csv ?? ""));
+
+                //if(File.Exists(tempFileName) == true) {
+                //    byte[] bytes = System.IO.File.ReadAllBytes(tempFileName);
+                //    stream = new MemoryStream(bytes);
+                //}
                 if(stream != null) {
                     msg.Attachments.Add(new Attachment(stream,Path.GetFileName(tempFileName)));
 
