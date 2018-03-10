@@ -152,50 +152,50 @@ namespace Ecam.Framework
 
         public FileInfo WriteFileText(string appSettingName, string fileName, string contents, bool isAppend)
         {
-            string rootPath = this.ServerMapPath();
-            string tempFileName = Path.Combine(rootPath, string.Format(this.UploadPathKeys[appSettingName].Value, fileName));
-            string directoryName = Path.GetDirectoryName(tempFileName);
-            if (Directory.Exists(directoryName) == false)
-            {
-                Directory.CreateDirectory(directoryName);
-            }
-            //File.WriteAllText(tempFileName,contents);
-            if (isAppend == false)
-            {
-                using (TextWriter w = new StreamWriter(tempFileName, true))
-                {
-                    w.WriteLine(contents);
-                    w.Flush();
-                    w.Close();
+            try {
+                string rootPath = this.ServerMapPath();
+                string tempFileName = Path.Combine(rootPath,string.Format(this.UploadPathKeys[appSettingName].Value,fileName));
+                string directoryName = Path.GetDirectoryName(tempFileName);
+                if(Directory.Exists(directoryName) == false) {
+                    Directory.CreateDirectory(directoryName);
                 }
-            }
-            else
-            {
-                if (File.Exists(tempFileName) == false)
-                {
-                    File.WriteAllText(tempFileName, string.Empty);
+                //File.WriteAllText(tempFileName,contents);
+                if(isAppend == false) {
+                    using(TextWriter w = new StreamWriter(tempFileName,true)) {
+                        w.WriteLine(contents);
+                        w.Flush();
+                        w.Close();
+                    }
+                } else {
+                    if(File.Exists(tempFileName) == false) {
+                        File.WriteAllText(tempFileName,string.Empty);
+                    }
+                    using(StreamWriter w = File.AppendText(tempFileName)) {
+                        w.WriteLine(contents);
+                        w.Flush();
+                        w.Close();
+                    }
                 }
-                using (StreamWriter w = File.AppendText(tempFileName))
-                {
-                    w.WriteLine(contents);
-                    w.Flush();
-                    w.Close();
-                }
+                return new FileInfo(tempFileName);
+            } catch {
+                return null;
             }
-            return new FileInfo(tempFileName);
         }
 
         public FileInfo WriteFileAllBytes(string appSettingName, string fileName, byte[] bytes)
         {
-            string rootPath = this.ServerMapPath();
-            string tempFileName = Path.Combine(rootPath, string.Format(this.UploadPathKeys[appSettingName].Value, fileName));
-            string directoryName = Path.GetDirectoryName(tempFileName);
-            if (Directory.Exists(directoryName) == false)
-            {
-                Directory.CreateDirectory(directoryName);
+            try {
+                string rootPath = this.ServerMapPath();
+                string tempFileName = Path.Combine(rootPath,string.Format(this.UploadPathKeys[appSettingName].Value,fileName));
+                string directoryName = Path.GetDirectoryName(tempFileName);
+                if(Directory.Exists(directoryName) == false) {
+                    Directory.CreateDirectory(directoryName);
+                }
+                File.WriteAllBytes(tempFileName,bytes);
+                return new FileInfo(tempFileName);
+            } catch {
+                return null;
             }
-            File.WriteAllBytes(tempFileName, bytes);
-            return new FileInfo(tempFileName);
         }
 
         public bool FileExist(string appSettingName, string fileName)

@@ -53,9 +53,8 @@ namespace Ecam.Framework
             return result;
         }
     }
-     
-    public static class Helper
-    {
+
+    public static class Helper {
 
         //public static string AuthTokenExpire {
         //    get {
@@ -72,8 +71,7 @@ namespace Ecam.Framework
         public static string SiteUrl {
             get {
                 string siteUrl = string.Empty;
-                try
-                {
+                try {
                     string url = HttpContext.Current.Request.Url.OriginalString.ToLower();
                     Regex regex = new Regex(
                     @"(?<Protocol>\w+):\/\/(?<Domain>[\w|.*|:|-]+\/?)\S*(?x)"
@@ -84,14 +82,12 @@ namespace Ecam.Framework
                     | RegexOptions.Compiled
                     );
                     MatchCollection collection = regex.Matches(url);
-                    foreach (Match m in collection)
-                    {
+                    foreach(Match m in collection) {
                         string protoCol = m.Groups["Protocol"].Value;
-                        string domain = m.Groups["Domain"].Value.ToString().Replace("/", "").Replace(":80", "");
+                        string domain = m.Groups["Domain"].Value.ToString().Replace("/","").Replace(":80","");
                         siteUrl = (string.IsNullOrEmpty(protoCol) == false ? protoCol + "://" : "") + domain;
                     }
-                }
-                catch {
+                } catch {
                     siteUrl = System.Configuration.ConfigurationManager.AppSettings["server_url"].ToString();
                 }
                 return siteUrl;
@@ -121,7 +117,7 @@ namespace Ecam.Framework
         public static bool IsDVL {
             get {
                 var setting = System.Configuration.ConfigurationManager.AppSettings["is_dvl"];
-                if (setting != null)
+                if(setting != null)
                     return (setting.ToString() == "true");
                 else
                     return false;
@@ -148,20 +144,18 @@ namespace Ecam.Framework
 
         public static List<string> ImageFileExtensions {
             get {
-                return new List<string>() { ".jpg", ".jpeg", ".png", ".bmp" };
+                return new List<string>() { ".jpg",".jpeg",".png",".bmp" };
             }
         }
 
         public static string ImageFileErrorMessage {
             get {
                 string err = string.Empty;
-                foreach (string ext in ImageFileExtensions)
-                {
+                foreach(string ext in ImageFileExtensions) {
                     err += ext + ",";
                 }
-                if (string.IsNullOrEmpty(err) == false)
-                {
-                    err = err.Substring(0, err.Length - 1) + "  files only allowed";
+                if(string.IsNullOrEmpty(err) == false) {
+                    err = err.Substring(0,err.Length - 1) + "  files only allowed";
                 }
                 return err;
             }
@@ -227,11 +221,12 @@ namespace Ecam.Framework
             }
         }
 
-        public static void Log(string log)
-        {
-            string fileName = DateTime.Now.ToString("dd-MMM-yyyy") + ".txt";
-            log = string.Format("{0} LOG: {1}", DateTime.Now.ToString("hh:mm:ss fff"), log + Environment.NewLine);
-            UploadFileHelper.WriteFileText(Helper.TempPathSettingName, fileName, log, true);
+        public static void Log(string log) {
+            try {
+                string fileName = DateTime.Now.ToString("dd-MMM-yyyy") + ".txt";
+                log = string.Format("{0} LOG: {1}",DateTime.Now.ToString("hh:mm:ss fff"),log + Environment.NewLine);
+                UploadFileHelper.WriteFileText(Helper.TempPathSettingName,fileName,log,true);
+            } catch { }
             //try
             //{
             //    Console.WriteLine(log);
@@ -239,11 +234,12 @@ namespace Ecam.Framework
             //catch { }
         }
 
-        public static void Log(string log, string description)
-        {
-            string fileName = description + "_" + DateTime.Now.ToString("dd-MMM-yyyy") + ".txt";
-            log = string.Format("{0} LOG: {1}", DateTime.Now.ToString("hh:mm:ss fff"), log + Environment.NewLine);
-            UploadFileHelper.WriteFileText(Helper.TempPathSettingName, fileName, log, true);
+        public static void Log(string log,string description) {
+            try {
+                string fileName = description + "_" + DateTime.Now.ToString("dd-MMM-yyyy") + ".txt";
+                log = string.Format("{0} LOG: {1}",DateTime.Now.ToString("hh:mm:ss fff"),log + Environment.NewLine);
+                UploadFileHelper.WriteFileText(Helper.TempPathSettingName,fileName,log,true);
+            } catch { }
             //try
             //{
             //    Console.WriteLine(log);
@@ -251,10 +247,11 @@ namespace Ecam.Framework
             //catch { }
         }
 
-        public static void WriteSQL(string sql, string description)
-        {
-            string fileName = description + "_" + DateTime.Now.ToString("dd-MMM-yyyy") + ".txt";
-            UploadFileHelper.WriteFileText(Helper.TempPathSettingName, fileName, sql, true);
+        public static void WriteSQL(string sql,string description) {
+            try {
+                string fileName = description + "_" + DateTime.Now.ToString("dd-MMM-yyyy") + ".txt";
+                UploadFileHelper.WriteFileText(Helper.TempPathSettingName,fileName,sql,true);
+            } catch { }
             //try
             //{
             //    Console.WriteLine(log);
@@ -264,9 +261,11 @@ namespace Ecam.Framework
 
         public static void SessionLog(string log)
         {
-            string fileName = "SessionLog_" + DateTime.Now.ToString("dd-MMM-yyyy") + ".txt";
-            log = string.Format("{0} LOG: {1}", DateTime.Now.ToString("hh:mm:ss fff"), log + Environment.NewLine);
-            UploadFileHelper.WriteFileText(Helper.TempPathSettingName, fileName, log, true);
+            try {
+                string fileName = "SessionLog_" + DateTime.Now.ToString("dd-MMM-yyyy") + ".txt";
+                log = string.Format("{0} LOG: {1}",DateTime.Now.ToString("hh:mm:ss fff"),log + Environment.NewLine);
+                UploadFileHelper.WriteFileText(Helper.TempPathSettingName,fileName,log,true);
+            } catch { }
             // try
             //{
             //    Console.WriteLine(log);
@@ -276,9 +275,11 @@ namespace Ecam.Framework
 
         public static void DBErrorLog(string log)
         {
-            string fileName = "DBError_" + DateTime.Now.ToString("dd-MMM-yyyy") + ".txt";
-            log = string.Format("{0} LOG: {1}", DateTime.Now.ToString("hh:mm:ss fff"), log + Environment.NewLine);
-            UploadFileHelper.WriteFileText(Helper.TempPathSettingName, fileName, log, true);
+            try {
+                string fileName = "DBError_" + DateTime.Now.ToString("dd-MMM-yyyy") + ".txt";
+                log = string.Format("{0} LOG: {1}",DateTime.Now.ToString("hh:mm:ss fff"),log + Environment.NewLine);
+                UploadFileHelper.WriteFileText(Helper.TempPathSettingName,fileName,log,true);
+            } catch { }
             //try
             //{
             //    Console.WriteLine(log);
@@ -288,9 +289,11 @@ namespace Ecam.Framework
 
         public static void AlertEmailLog(string log)
         {
-            string fileName = "AlertEmailLog_" + DateTime.Now.ToString("dd-MMM-yyyy") + ".txt";
-            log = string.Format("{0} LOG: {1}", DateTime.Now.ToString("hh:mm:ss fff"), log + Environment.NewLine);
-            UploadFileHelper.WriteFileText(Helper.TempPathSettingName, fileName, log, true);
+            try {
+                string fileName = "AlertEmailLog_" + DateTime.Now.ToString("dd-MMM-yyyy") + ".txt";
+                log = string.Format("{0} LOG: {1}",DateTime.Now.ToString("hh:mm:ss fff"),log + Environment.NewLine);
+                UploadFileHelper.WriteFileText(Helper.TempPathSettingName,fileName,log,true);
+            } catch { }
             //try
             //{
             //    Console.WriteLine(log);
@@ -300,9 +303,11 @@ namespace Ecam.Framework
 
         public static void WriteEmail(string html)
         {
-            Random rnd = new Random();
-            string fileName = "Email_" + DateTime.Now.ToString("yyyy_MMM_dd_hh_mm_ss") + "_" + rnd.Next(1000, 100000) + ".html";
-            UploadFileHelper.WriteFileText(Helper.TempPathSettingName, fileName, html, false);
+            try {
+                Random rnd = new Random();
+                string fileName = "Email_" + DateTime.Now.ToString("yyyy_MMM_dd_hh_mm_ss") + "_" + rnd.Next(1000,100000) + ".html";
+                UploadFileHelper.WriteFileText(Helper.TempPathSettingName,fileName,html,false);
+            } catch { }
         }
 
         public static string ConnectionString {

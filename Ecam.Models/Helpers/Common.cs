@@ -629,7 +629,7 @@ namespace Ecam.Models
             return logs;
         }
 
-        public static List<DailySummary> GetDailySummary(TRA_COMPANY_SEARCH criteria, Paging paging)
+        public static List<DailySummary> GetDailySummary(TRA_COMPANY_SEARCH criteria, Paging paging, bool isDailyBuy = false)
         {
             DateTime minDate = Convert.ToDateTime("01/01/1900");
             List<DailySummary> logs = new List<DailySummary>();
@@ -709,11 +709,23 @@ namespace Ecam.Models
                                     log.logs.Add(daily);
                                 }
                                 daily.date = dt;
-                                daily.buy_price = (from q in markets
-                                                   where q.symbol == symbol
-                                                   && q.trade_date >= monthStartDate
-                                                   orderby q.trade_date ascending
-                                                   select (q.open_price ?? 0)).FirstOrDefault();
+                                if(isDailyBuy == false) {
+                                    daily.buy_price = (from q in markets
+                                                       where q.symbol == symbol
+                                                       && q.trade_date >= monthStartDate
+                                                       orderby q.trade_date ascending
+                                                       select (q.open_price ?? 0)).FirstOrDefault();
+                                } else {
+                                    var tempmarket = (from q in markets
+                                                  where q.symbol == symbol
+                                                  //&& q.trade_date >= monthStartDate
+                                                  && q.trade_date >= dt
+                                                  orderby q.trade_date ascending
+                                                  select q).FirstOrDefault();
+                                    if(tempmarket != null) {
+                                        daily.buy_price = market.open_price ?? 0;
+                                    }
+                                }
 
                                 if(market != null) {
                                     daily.close_price = (market.close_price ?? 0);
