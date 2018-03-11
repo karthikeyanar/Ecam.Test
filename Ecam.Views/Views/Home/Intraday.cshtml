@@ -192,10 +192,10 @@
                         <input type="text" name="ltp_to_percentage" id="ltp_to_percentage" placeholder="To %" class="form-control input-sm" style="width:100px;" />
                     </div>*@
                 <div class="form-group m-r-10 m-t-10">
-                    <span>Total Investment&nbsp;</span><input type="text" name="total_amount" class="form-control input-sm" placeholder="Total Amount" value="165674" />
+                    <span>Total Investment&nbsp;</span><input type="text" name="total_amount" class="form-control input-sm" placeholder="Total Amount" value="1000000" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
-                    <span>Monthly Investment&nbsp;</span><input type="text" name="monthly_investment" class="form-control input-sm" placeholder="Monthly Investment" value="20000" />
+                    <span>Monthly Investment&nbsp;</span><input type="text" name="monthly_investment" class="form-control input-sm" placeholder="Monthly Investment" value="" />
                 </div>
                 @*<div class="form-group m-r-10 m-t-10">
                         <span>Ignore Symbols&nbsp;</span><input type="text" name="ignore_symbols" class="form-control input-sm" placeholder="Ignore Symbols" value="" style="width:800px" />
@@ -1079,7 +1079,7 @@
                                     <th class="text-right">Low.CMV</th>
                                     <th class="text-right">Positive</th>
                                     <th class="text-right">Negative</th>
-                                    <th class="text-right">Diff</th>
+                                    @*<th class="text-right">Diff</th>*@
                                     <th class="text-right">Indicator</th>
                                     <th class="text-right">Percentage</th>
                                     <th class="text-right">High.Percentage</th>
@@ -1095,7 +1095,7 @@
                                     <td class="text-right">${formatNumber(row.cmv_low)}</td>
                                     <td class="text-right">${formatNumber(row.positive_count)}</td>
                                     <td class="text-right">${formatNumber(row.negative_count)}</td>
-                                    <td class="text-right">${formatInteger(row.positive_count - row.negative_count)}</td>
+                                    @*<td class="text-right">${formatInteger(row.positive_count - row.negative_count)}</td>*@
                                     <td class="text-right">{{if row.indicator==true}}<i class="fa fa-check"></i>{{/if}}</td>
                                     <td class="text-right">${formatPercentage(row.percentage)}</td>
                                     <td class="text-right">${formatPercentage(row.percentage_high)}</td>

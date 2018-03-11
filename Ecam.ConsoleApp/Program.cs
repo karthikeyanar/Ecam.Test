@@ -160,7 +160,7 @@ namespace Ecam.ConsoleApp
             try {
                 var fromAddress = new MailAddress("priyatradevnr@gmail.com","Priya");
                 string fromPassword = "priyakarthi333";
-                int rowSize = 50;
+                int rowSize = 10;
                 string FILES_PATH = System.Configuration.ConfigurationManager.AppSettings["FilesPath"];
                 MailMessage msg = new MailMessage();
                 msg.From = fromAddress;
