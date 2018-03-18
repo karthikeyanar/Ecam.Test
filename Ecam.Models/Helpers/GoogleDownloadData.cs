@@ -104,10 +104,12 @@ namespace Ecam.Models
                     {
                         File.WriteAllText(fileName, html);
                     }
-                    catch { }
+                    catch(Exception ex) {
+                         Helper.Log("DownloadErrorOnGoogleData symbol=" + symbol + "_" + ex.Message, "ErrorOnGoogleData_" + rnd.Next(1000, 10000));
+                    }
                     Console.WriteLine("Download google data symbol evening=" + symbol);
                 } catch {
-                    //Helper.Log("DownloadErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData_" + rnd.Next(1000, 10000));
+                    Helper.Log("DownloadErrorOnGoogleData symbol=" + symbol, "ErrorOnGoogleData_" + rnd.Next(1000, 10000));
                 }
             }
             else
@@ -506,7 +508,7 @@ namespace Ecam.Models
                     }
                     else
                     {
-                        //Helper.Log("GoogleException symbol 2=" + symbol, "GoogleException_" + rnd.Next(1000, 10000));
+                        Helper.Log("GoogleException symbol 2=" + symbol, "GoogleException_" + rnd.Next(1000, 10000));
                     }
                 }
                 catch (Exception ex)

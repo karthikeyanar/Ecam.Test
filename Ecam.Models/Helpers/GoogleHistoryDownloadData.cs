@@ -75,7 +75,9 @@ namespace Ecam.Models
                         html = client.DownloadString(url);
                         File.WriteAllText(fileName, html);
                     }
-                    catch { }
+                    catch(Exception ex) {
+                        Helper.Log(ex.Message,"GOOGLE_HISTORY_DOWNLOAD_EXCEPTION_"+symbol);
+                    }
                     Console.WriteLine("Download google data symbol=" + symbol);
                 }
                 else

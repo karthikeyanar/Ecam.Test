@@ -28,6 +28,8 @@ namespace Ecam.ConsoleApp
         public static string GOOGLE_DATA = "";
         public static string MC = "";
         public static string MONEY_CONTROL = "";
+        public static string START_TIME = "";
+        public static string END_TIME = "";
         private static int _INDEX = -1;
         private static string[] _COMPANIES;
         private static List<string> _URLS;
@@ -43,9 +45,11 @@ namespace Ecam.ConsoleApp
                 MC = System.Configuration.ConfigurationManager.AppSettings["MC"];
                 GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
                 MONEY_CONTROL = System.Configuration.ConfigurationManager.AppSettings["MONEY_CONTROL"];
+                START_TIME = System.Configuration.ConfigurationManager.AppSettings["START_TIME"];
+                END_TIME = System.Configuration.ConfigurationManager.AppSettings["END_TIME"];
 
-                DateTime eveningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 3:00PM");
-                DateTime eveningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 3:30PM");
+                DateTime eveningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " " + START_TIME);
+                DateTime eveningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " " + END_TIME);
                 DateTime now = DateTime.Now;
                 bool isDontStart = false;
                 if(IS_DOWNLOAD_HISTORY != "true" && IS_IMPORT_CSV != "true" && IS_NIFTY_FLAG_CSV != "true" && IS_CATEGORY_FLAG_CSV != "true") {
@@ -74,16 +78,20 @@ namespace Ecam.ConsoleApp
                     try {
                         DownloadStart();
                     } catch(Exception ex) {
-                        Helper.Log(ex.Message,"DOWNLOAD_START_ERROR");
+                        Helper.Log(ex.Message,"DOWNLOAD_START_ERROR"+ "_" + (new Random()).Next(1000,10000));
                     }
                     try {
                         AddSplit();
                     } catch(Exception ex) {
-                        Helper.Log(ex.Message,"AddSplit_ERROR");
+                        Helper.Log(ex.Message,"AddSplit_ERROR"+ "_" + (new Random()).Next(1000,10000));
                     }
                     try {
                         int i;
-                        for(i = 0;i < 60;i++) {
+                        int total = 2;
+                        if(IS_DOWNLOAD_HISTORY=="true") {
+                            total = 60;
+                        }
+                        for(i = 0;i < total;i++) {
                             DateTime dt = DateTime.Now.Date.AddDays(-i);
                             TradeHelper.CreateDailyLog(dt.Date,"");
                             TradeHelper.CreateDailyLog(dt.Date,"true");
@@ -92,11 +100,11 @@ namespace Ecam.ConsoleApp
                         MailSend(false);
                         MailSendDailyCSV();
                     } catch(Exception ex) {
-                        Helper.Log(ex.Message,"MAIL_SEND_ERROR");
+                        Helper.Log(ex.Message,"MAIL_SEND_ERROR" + "_" + (new Random()).Next(1000,10000));
                     }
                 }
             } catch(Exception ex) {
-                Helper.Log(ex.Message,"MAIN_ERROR");
+                Helper.Log(ex.Message,"MAIN_ERROR" + "_" + (new Random()).Next(1000,10000));
             }
         }
 
@@ -111,14 +119,14 @@ namespace Ecam.ConsoleApp
                 msg.CC.Add(new MailAddress("priyatradevnr@gmail.com","Priya"));
                 msg.Priority = MailPriority.High;
                 msg.Subject = "Daily Summary" + (isBookMark == false ? "_All" : "")  + ": " + (new Random()).Next(1000,100000) + "_" + DateTime.Now.ToString("dd_MMM_yyyy");
-
+                
                 string sql = string.Format(" select log.log_id,DATE_FORMAT(log.trade_date, \"%d/%b/%Y\") as trade_date,log.positive,log.negative " + Environment.NewLine +
                              ",if((log.positive > log.negative),'True','') as indicator " + Environment.NewLine +
                              //",(log.positive - log.negative) as diff " + Environment.NewLine +
                              ",((((log.positive - (log.positive + log.negative)) / (log.positive + log.negative))) * 100) * -1 as positive_percentage " + Environment.NewLine +
                              ",((((log.negative - (log.positive + log.negative)) / (log.positive + log.negative))) * 100) * -1 as negative_percentage " + Environment.NewLine +
                              ",(log.positive + log.negative) as total " + Environment.NewLine +
-                             " from tra_daily_log log where ifnull(log.is_book_mark,0) = {0} order by log.trade_date desc limit 0,60 ",(isBookMark == true ? 1 : 0));
+                             " from tra_daily_log log where log.trade_date >= '{0}' and log.trade_date <= '{1}' and ifnull(log.is_book_mark,0) = {2} order by log.trade_date desc limit 0,60 ",DateTime.Now.AddDays(-60).ToString("yyyy-MM-dd"),DateTime.Now.ToString("yyyy-MM-dd"),(isBookMark == true ? 1 : 0));
 
                 DataTable dt = GetDataTable(sql);
 
@@ -149,9 +157,9 @@ namespace Ecam.ConsoleApp
                     smtp.Send(msg);
                 }
             } catch(Exception ex) {
-                Helper.Log("Mail Send Exception=" + ex.Message);
+                Helper.Log("Mail Send Exception=" + ex.Message,"MAIL_SEND_" + (new Random()).Next(1000,10000));
                 if(ex.InnerException != null) {
-                    Helper.Log("Mail Send InnerException=" + ex.Message);
+                    Helper.Log("Mail Send InnerException=" + ex.Message,"MAIL_SEND_" + (new Random()).Next(1000,10000));
                 }
             }
         }
@@ -241,9 +249,9 @@ namespace Ecam.ConsoleApp
                     smtp.Send(msg);
                 }
             } catch(Exception ex) {
-                Helper.Log("Mail Send Exception=" + ex.Message);
+                Helper.Log("Mail Send Exception=" + ex.Message,"MAIL_SEND_" + (new Random()).Next(1000,10000));
                 if(ex.InnerException != null) {
-                    Helper.Log("Mail Send InnerException=" + ex.Message);
+                    Helper.Log("Mail Send InnerException=" + ex.Message,"MAIL_SEND_" + (new Random()).Next(1000,10000));
                 }
             }
         }

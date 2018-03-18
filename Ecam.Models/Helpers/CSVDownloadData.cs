@@ -114,7 +114,7 @@ namespace Ecam.Models {
                                     }
                                 }
                                 if(_SYMBOLS_LIST.Contains(symbol) == false) {
-                                    Helper.Log("Symbol does not exist Symbol=" + symbol + ",FileName=" + tempfilename,"CSVDataDownload" + symbol);
+                                    Helper.Log("Symbol does not exist Symbol=" + symbol + ",FileName=" + tempfilename,"CSVDataDownload" + symbol + "_" + (new Random()).Next(1000,10000));
                                     this._IS_NOT_SUCCESS = true;
                                     break;
                                 } else {
