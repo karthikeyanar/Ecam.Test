@@ -59,7 +59,7 @@ namespace Ecam.ConsoleApp
                         foreach(string fileName in files) {
                             System.IO.FileInfo fileInfo = new FileInfo(fileName);
                             if(fileInfo.CreationTime < eveningStart) {
-                                System.IO.File.Delete(fileName);
+                                //System.IO.File.Delete(fileName);
                             }
                         }
                         isDontStart = true;
@@ -69,11 +69,12 @@ namespace Ecam.ConsoleApp
                         foreach(string fileName in files) {
                             System.IO.FileInfo fileInfo = new FileInfo(fileName);
                             if(fileInfo.CreationTime < eveningStart) {
-                                System.IO.File.Delete(fileName);
+                                //System.IO.File.Delete(fileName);
                             }
                         }
                     }
                 }
+                isDontStart = false;
                 if(isDontStart == false) {
                     try {
                         DownloadStart();
@@ -1275,7 +1276,7 @@ RegexOptions.IgnoreCase
         private static void GoogleDownloadStart()
         {
             int totalCount = _COMPANIES.Length;
-            int queueCount = 64;
+            int queueCount = 1;
             // One event is used for each Fibonacci object
             ManualResetEvent[] doneEvents = new ManualResetEvent[queueCount];
             GoogleDownloadData[] downArray = new GoogleDownloadData[queueCount];
