@@ -52,6 +52,7 @@ namespace Ecam.ConsoleApp
                 DateTime eveningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " " + END_TIME);
                 DateTime now = DateTime.Now;
                 bool isDontStart = false;
+                ScriptGenerate();
                 if(IS_DOWNLOAD_HISTORY != "true" && IS_IMPORT_CSV != "true" && IS_NIFTY_FLAG_CSV != "true" && IS_CATEGORY_FLAG_CSV != "true") {
                     if((now >= eveningStart && now <= eveningEnd) == false) {
                         string GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
@@ -59,7 +60,7 @@ namespace Ecam.ConsoleApp
                         foreach(string fileName in files) {
                             System.IO.FileInfo fileInfo = new FileInfo(fileName);
                             if(fileInfo.CreationTime < eveningStart) {
-                                //System.IO.File.Delete(fileName);
+                                System.IO.File.Delete(fileName);
                             }
                         }
                         isDontStart = true;
@@ -69,12 +70,11 @@ namespace Ecam.ConsoleApp
                         foreach(string fileName in files) {
                             System.IO.FileInfo fileInfo = new FileInfo(fileName);
                             if(fileInfo.CreationTime < eveningStart) {
-                                //System.IO.File.Delete(fileName);
+                                System.IO.File.Delete(fileName);
                             }
                         }
                     }
                 }
-                isDontStart = false;
                 if(isDontStart == false) {
                     try {
                         DownloadStart();
@@ -103,10 +103,91 @@ namespace Ecam.ConsoleApp
                     } catch(Exception ex) {
                         Helper.Log(ex.Message,"MAIL_SEND_ERROR" + "_" + (new Random()).Next(1000,10000));
                     }
+                   
                 }
             } catch(Exception ex) {
                 Helper.Log(ex.Message,"MAIN_ERROR" + "_" + (new Random()).Next(1000,10000));
             }
+        }
+
+        private static void ScriptGenerate() {
+            List<tra_company> companies;
+            using (EcamContext context = new EcamContext())
+            {
+                IQueryable<tra_company> query = context.tra_company;
+
+                DateTime morningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:15AM");
+                DateTime morningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 10:15AM");
+                DateTime eveningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 3:31PM");
+                DateTime eveningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 11:59PM");
+                DateTime now = DateTime.Now;
+                DateTime targetTime = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 3:30PM");
+
+                if ((now >= morningStart && now <= eveningStart))
+                {
+                    //query = (from q in query
+                    //         join h in context.tra_holding on q.symbol equals h.symbol
+                    //         select q);
+                    //string IS_NIFTY_50 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_50"];
+                    //string IS_NIFTY_100 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_100"];
+                    //string IS_NIFTY_200 = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_200"];
+                    //if (IS_NIFTY_50 == "true")
+                    //{
+                    //    query = query.Where(q => (q.is_nifty_50 ?? false) == true);
+                    //}
+                    //if (IS_NIFTY_100 == "true")
+                    //{
+                    //    query = query.Where(q => (q.is_nifty_100 ?? false) == true);
+                    //}
+                    //if (IS_NIFTY_200 == "true")
+                    //{
+                    //    query = query.Where(q => (q.is_nifty_200 ?? false) == true);
+                    //}
+                }
+                if(IS_BOOK_MARK_CATEGORY == "true") {
+                    List<tra_company_category> companyCategories = (from q in context.tra_company_category
+                                                                    join c in context.tra_category on q.category_name equals c.category_name
+                                                                    where (c.is_book_mark ?? false) == true
+                                                                    select q).ToList();
+                    List<string> categorySymbols = (from q in companyCategories
+                                                    select q.symbol).Distinct().ToList();
+                    query = (from q in query where categorySymbols.Contains(q.symbol) == true select q);
+                }
+                companies = (from q in query
+                             orderby q.symbol ascending
+                             select q).ToList();
+            }
+            string script = "";
+            var symbols = "";
+            if(companies != null) {
+                foreach(var company in companies) {
+                    symbols += string.Format("'{0}',",company.symbol);
+                }
+            }
+            if(string.IsNullOrEmpty(symbols)==false) {
+                symbols = symbols.Substring(0,symbols.Length-1);
+            }
+            script += "var companies = ["+symbols+ "];";
+            script += "$('#dataType').val(\"priceVolume\");";
+            script += "$('#series').val(\"EQ\");";
+            script += "$('#rdPeriod')[0].checked=true;";
+            script += "$('#dateRange').val(\"week\");";
+            script += "$('#symbol').val(\"RAIN\");";
+            script += "$('.getdata-button').click();";
+            script += "setTimeout(function(){";
+            script += " try { ";
+            script += " var fileName = $('#csvFileName').val(); var csv=$('#csvContentDiv').html();";
+            script += " var csvFile;";
+            script += " var downloadLink;";
+            script += " csvFile = new Blob([csv], {type: \"text/csv\"});";
+            script += " downloadLink = document.createElement(\"a\");";
+            script += " downloadLink.download = fileName;";
+            script += " downloadLink.href = window.URL.createObjectURL(csvFile);";
+            script += " downloadLink.style.display = \"none\";";
+            script += " document.body.appendChild(downloadLink);";
+            script += " downloadLink.click();";
+            script += " alert(fileName); } catch(e) { alert(e); } },5000);";
+            Helper.Log(script,"TorBrowser_Script");
         }
 
         private static void MailSend(bool isBookMark) {
@@ -121,7 +202,7 @@ namespace Ecam.ConsoleApp
                 msg.Priority = MailPriority.High;
                 msg.Subject = "Daily Summary" + (isBookMark == false ? "_All" : "")  + ": " + (new Random()).Next(1000,100000) + "_" + DateTime.Now.ToString("dd_MMM_yyyy");
                 
-                string sql = string.Format(" select log.log_id,DATE_FORMAT(log.trade_date, \"%d/%b/%Y\") as trade_date,log.positive,log.negative " + Environment.NewLine +
+                string sql = string.Format(" select log.log_id,log.trade_date as trade_date,log.positive,log.negative " + Environment.NewLine +
                              ",if((log.positive > log.negative),'True','') as indicator " + Environment.NewLine +
                              //",(log.positive - log.negative) as diff " + Environment.NewLine +
                              ",((((log.positive - (log.positive + log.negative)) / (log.positive + log.negative))) * 100) * -1 as positive_percentage " + Environment.NewLine +
@@ -1276,7 +1357,7 @@ RegexOptions.IgnoreCase
         private static void GoogleDownloadStart()
         {
             int totalCount = _COMPANIES.Length;
-            int queueCount = 1;
+            int queueCount = 64;
             // One event is used for each Fibonacci object
             ManualResetEvent[] doneEvents = new ManualResetEvent[queueCount];
             GoogleDownloadData[] downArray = new GoogleDownloadData[queueCount];
@@ -1308,7 +1389,7 @@ RegexOptions.IgnoreCase
         private static void GoogleHistoryDownloadStart()
         {
             int totalCount = _COMPANIES.Length;
-            int queueCount = 64;
+            int queueCount = 1;
             if (totalCount <= queueCount)
             {
                 queueCount = totalCount;
