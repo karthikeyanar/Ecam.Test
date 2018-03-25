@@ -1,0 +1,79 @@
+var arr=[{{SYMBOLS}}];
+window.alert=function(){};
+$('#dataType').val("priceVolume");
+$('#series').val("EQ");
+if($('#rdPeriod')[0]) {
+	$('#rdPeriod')[0].checked=true;
+}
+$('#dateRange').val("1month");
+var $log=$("#download_log");
+if(!$log[0]) {
+	$('body').append("<div id='download_log' style='position:absolute;top:5px;left:5px;width:420px;background:#fff;color:333;z-index:9999;font-size:14px;font-weight:bold;font-family:Calibri,Arial,Helvetica,sans-serif;'></div>");
+	$log=$("#download_log");
+}
+var index=-1;
+var checkCSVCount=0;
+function doDownload() {
+	$log.html('');
+	index+=1;
+	checkCSVCount=0;
+	$log.html($log.html()+'index='+index+',arr.length='+arr.length+'<br/>');
+	if(index<arr.length) {
+		var symbol=arr[index];
+		$('#symbol').val(symbol);
+		$log.html($log.html()+'symbol='+symbol+'<br/>');
+		var $csvFileName=$('#csvFileName');
+		$csvFileName.val('');
+		$('.getdata-button').click();
+		checkCSVContent();
+	} else {
+		alert('Completed');
+	}
+}
+function checkCSVContent() {
+	setTimeout(function() {
+		try {
+			checkCSVCount+=1;
+			var $csvFileName=$('#csvFileName');
+			var $csvContentDiv=$('#csvContentDiv');
+
+			var isDone=false;
+			var fileName='';
+			var csv='';
+			if($csvFileName[0]) {
+				if($csvFileName.val()!='') {
+					fileName=$csvFileName.val();
+					csv=$csvContentDiv.html();
+				}
+			}
+			if(csv!='') {
+				csv=csv.replace(/:/g,"\n");
+				var csvFile;
+				var downloadLink;
+				csvFile=new Blob([csv],{
+					type: "text/csv"
+				});
+				downloadLink=document.createElement("a");
+				downloadLink.download=fileName;
+				downloadLink.href=window.URL.createObjectURL(csvFile);
+				downloadLink.style.display="none";
+				document.body.appendChild(downloadLink);
+				downloadLink.click();
+				isDone=true;
+			}
+			$log.html($log.html()+'isDone='+isDone+',checkCSVCount='+checkCSVCount+',$csvFileName='+fileName+'<br/>');
+			if(isDone==true) {
+				doDownload();
+			} else {
+				if(checkCSVCount<=2) {
+					checkCSVContent();
+				} else {
+					doDownload();
+				}
+			}
+		} catch(e) {
+			alert(e);
+		}
+	},7000);
+}
+doDownload();

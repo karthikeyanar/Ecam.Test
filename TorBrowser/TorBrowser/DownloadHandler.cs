@@ -13,12 +13,12 @@ namespace TorBrowser
 
         public void OnBeforeDownload(IBrowser browser, DownloadItem downloadItem, IBeforeDownloadCallback callback)
         {
+            string download_path = System.Configuration.ConfigurationManager.AppSettings["download_path"];
             if (!callback.IsDisposed)
             {
-                using (callback)
-                {
+                using (callback) {
                     myForm.UpdateDownloadItem(downloadItem);
-                    callback.Continue(downloadItem.SuggestedFileName, showDialog: false);
+                    callback.Continue(System.IO.Path.Combine(download_path,downloadItem.SuggestedFileName), showDialog: false);
                 }
             }
         }

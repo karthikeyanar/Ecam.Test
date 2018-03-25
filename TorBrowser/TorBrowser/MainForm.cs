@@ -128,25 +128,7 @@ namespace TorBrowser {
 
         private void Browser_FrameLoadEnd(object sender,CefSharp.FrameLoadEndEventArgs e) {
              if(e.Url.ToLower().StartsWith("https://www.nseindia.com/products/content")) {
-                string script = "$('#dataType').val(\"priceVolume\");";
-                script += "$('#series').val(\"EQ\");";
-                script += "$('#rdPeriod')[0].checked=true;";
-                script += "$('#dateRange').val(\"week\");";
-                script += "$('#symbol').val(\"RAIN\");";
-                script += "$('.getdata-button').click();";
-                script += "setTimeout(function(){";
-                script += " try { ";
-                script += " var fileName = $('#csvFileName').val(); var csv=$('#csvContentDiv').html();";
-                script += " var csvFile;";
-                script += " var downloadLink;";
-                script += " csvFile = new Blob([csv], {type: \"text/csv\"});";
-                script += " downloadLink = document.createElement(\"a\");";
-                script += " downloadLink.download = fileName;";
-                script += " downloadLink.href = window.URL.createObjectURL(csvFile);";
-                script += " downloadLink.style.display = \"none\";";
-                script += " document.body.appendChild(downloadLink);";
-                script += " downloadLink.click();";
-                script += " alert(fileName); } catch(e) { alert(e); } },5000);";
+                string script = System.IO.File.ReadAllText("E:\\Projects\\Ecam.Test2\\Ecam.Test\\CSV_SCRIPT.txt");
                 Browser.ExecuteScriptAsync(script);
             }
         }

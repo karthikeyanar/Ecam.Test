@@ -78,6 +78,16 @@ namespace Ecam.Models {
                 new OldSymbol { old_symbol = "GULFCORP", new_symbol = "GOCLCORP" },
                 new OldSymbol { old_symbol = "IBSEC", new_symbol = "IBVENTURES" },
                 new OldSymbol { old_symbol = "VIKASGLOB", new_symbol = "VIKASECO" },
+                new OldSymbol { old_symbol = "FINANTECH", new_symbol = "63MOONS" },
+                new OldSymbol { old_symbol = "CROMPGREAV", new_symbol = "CGPOWER" },
+                new OldSymbol { old_symbol = "FEDDERLOYD", new_symbol = "FEDDERELEC" },
+                new OldSymbol { old_symbol = "GEOJITBNPP", new_symbol = "GEOJITFSL" },
+                new OldSymbol { old_symbol = "HITECHPLAS", new_symbol = "HITECHCORP" },
+                new OldSymbol { old_symbol = "LLOYDELENG", new_symbol = "LEEL" },
+                new OldSymbol { old_symbol = "NAGAAGRI", new_symbol = "NACLIND" },
+                new OldSymbol { old_symbol = "SUJANATWR", new_symbol = "NTL" },
+                new OldSymbol { old_symbol = "VIDHIDYE", new_symbol = "VIDHIING" },
+                new OldSymbol { old_symbol = "STOREONE", new_symbol = "SORILINFRA" },
             };
             if(string.IsNullOrEmpty(tempfilename) == false) {
                 string url = string.Empty;
@@ -102,8 +112,7 @@ namespace Ecam.Models {
                             string lastTrade = csv.GetField<string>("Last Price");
                             string prev = csv.GetField<string>("Prev Close");
                             DateTime dt = DataTypeHelper.ToDateTime(date);
-                            if(string.IsNullOrEmpty(symbol) == false
-                                && series == "EQ") {
+                            if(string.IsNullOrEmpty(symbol) == false) {
                                 symbol = symbol.Replace("&amp;","&");
                                 if(_SYMBOLS_LIST.Contains(symbol) == false) {
                                     OldSymbol oldSymbol = (from q in oldSymbolList

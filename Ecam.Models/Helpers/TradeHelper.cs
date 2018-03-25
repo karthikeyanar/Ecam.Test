@@ -1055,39 +1055,41 @@ namespace Ecam.Models
                     row = new tra_market();
                     isNew = true;
                 }
-
-                row.symbol = import.symbol;
-                row.trade_date = import.trade_date.Date;
-                row.open_price = import.open_price;
-                row.high_price = import.high_price;
-                row.low_price = import.low_price;
-                row.close_price = import.close_price;
-                row.ltp_price = import.ltp_price;
-                if (import.is_prev_price_exist == false)
-                {
-                    tra_market market = (from q in context.tra_market
-                                         where q.symbol == import.symbol
-                                         && q.trade_date < row.trade_date
-                                         orderby q.trade_date descending
-                                         select q).FirstOrDefault();
-                    if (market != null)
-                    {
-                        row.prev_price = market.close_price;
-                    }
-                }
-                else
-                {
-                    row.prev_price = import.prev_price;
-                }
                 if (isNew == true)
                 {
-                    context.tra_market.Add(row);
+                    row.symbol = import.symbol;
+                    row.trade_date = import.trade_date.Date;
+                    row.open_price = import.open_price;
+                    row.high_price = import.high_price;
+                    row.low_price = import.low_price;
+                    row.close_price = import.close_price;
+                    row.ltp_price = import.ltp_price;
+                    if (import.is_prev_price_exist == false)
+                    {
+                        tra_market market = (from q in context.tra_market
+                                             where q.symbol == import.symbol
+                                             && q.trade_date < row.trade_date
+                                             orderby q.trade_date descending
+                                             select q).FirstOrDefault();
+                        if (market != null)
+                        {
+                            row.prev_price = market.close_price;
+                        }
+                    }
+                    else
+                    {
+                        row.prev_price = import.prev_price;
+                    }
+                    if (isNew == true)
+                    {
+                        context.tra_market.Add(row);
+                    }
+                    else
+                    {
+                        context.Entry(row).State = System.Data.Entity.EntityState.Modified;
+                    }
+                    context.SaveChanges();
                 }
-                else
-                {
-                    context.Entry(row).State = System.Data.Entity.EntityState.Modified;
-                }
-                context.SaveChanges();
                 CreateAVG(row.symbol, row.trade_date);
                 //lblError.Text = "ImportPrice Price Index symbol=" + row.symbol + ",Date=" + row.trade_date;
                 Console.WriteLine("ImportPrice Price Index symbol=" + row.symbol + ",Date=" + row.trade_date);

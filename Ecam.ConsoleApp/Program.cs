@@ -79,18 +79,18 @@ namespace Ecam.ConsoleApp
                     try {
                         DownloadStart();
                     } catch(Exception ex) {
-                        Helper.Log(ex.Message,"DOWNLOAD_START_ERROR"+ "_" + (new Random()).Next(1000,10000));
+                        Helper.Log(ex.Message,"DOWNLOAD_START_ERROR" + "_" + (new Random()).Next(1000,10000));
                     }
                     try {
                         AddSplit();
                     } catch(Exception ex) {
-                        Helper.Log(ex.Message,"AddSplit_ERROR"+ "_" + (new Random()).Next(1000,10000));
+                        Helper.Log(ex.Message,"AddSplit_ERROR" + "_" + (new Random()).Next(1000,10000));
                     }
                     try {
                         int i;
                         int total = 2;
-                        if(IS_DOWNLOAD_HISTORY=="true") {
-                            total = 60;
+                        if(IS_DOWNLOAD_HISTORY=="true" || IS_IMPORT_CSV == "true") {
+                            total = 750;
                         }
                         for(i = 0;i < total;i++) {
                             DateTime dt = DateTime.Now.Date.AddDays(-i);
@@ -103,7 +103,6 @@ namespace Ecam.ConsoleApp
                     } catch(Exception ex) {
                         Helper.Log(ex.Message,"MAIL_SEND_ERROR" + "_" + (new Random()).Next(1000,10000));
                     }
-                   
                 }
             } catch(Exception ex) {
                 Helper.Log(ex.Message,"MAIN_ERROR" + "_" + (new Random()).Next(1000,10000));
@@ -157,37 +156,36 @@ namespace Ecam.ConsoleApp
                              orderby q.symbol ascending
                              select q).ToList();
             }
-            string script = "";
+
             var symbols = "";
             if(companies != null) {
                 foreach(var company in companies) {
-                    symbols += string.Format("'{0}',",company.symbol);
+                    string type = "EQ";
+                    //switch(company.symbol) {
+                    //    case "EIFFL":
+                    //    case "SIL":
+                    //    case "SITASHREE":
+                    //    case "SKML":
+                    //    case "VSCL":
+                    //        type = "ALL";
+                    //        break;
+                    //}
+                    symbols += "{'symbol':'"+company.symbol+"','type':'"+type+"'},";
                 }
             }
             if(string.IsNullOrEmpty(symbols)==false) {
                 symbols = symbols.Substring(0,symbols.Length-1);
-            }
-            script += "var companies = ["+symbols+ "];";
-            script += "$('#dataType').val(\"priceVolume\");";
-            script += "$('#series').val(\"EQ\");";
-            script += "$('#rdPeriod')[0].checked=true;";
-            script += "$('#dateRange').val(\"week\");";
-            script += "$('#symbol').val(\"RAIN\");";
-            script += "$('.getdata-button').click();";
-            script += "setTimeout(function(){";
-            script += " try { ";
-            script += " var fileName = $('#csvFileName').val(); var csv=$('#csvContentDiv').html();";
-            script += " var csvFile;";
-            script += " var downloadLink;";
-            script += " csvFile = new Blob([csv], {type: \"text/csv\"});";
-            script += " downloadLink = document.createElement(\"a\");";
-            script += " downloadLink.download = fileName;";
-            script += " downloadLink.href = window.URL.createObjectURL(csvFile);";
-            script += " downloadLink.style.display = \"none\";";
-            script += " document.body.appendChild(downloadLink);";
-            script += " downloadLink.click();";
-            script += " alert(fileName); } catch(e) { alert(e); } },5000);";
-            Helper.Log(script,"TorBrowser_Script");
+            } 
+            string script = System.IO.File.ReadAllText("E:\\Projects\\Ecam.Test2\\Ecam.Test\\ORI_CSV_SCRIPT.txt");
+            script = script.Replace("{{SYMBOLS}}",symbols);
+            string p = "";
+            p += string.Format("p.data_type='{0}';",System.Configuration.ConfigurationManager.AppSettings["DATA_TYPE"]);
+            p += string.Format("p.date_range='{0}';",System.Configuration.ConfigurationManager.AppSettings["DATA_RANGE"]);
+            p += string.Format("p.period_type='{0}';",System.Configuration.ConfigurationManager.AppSettings["PERIOD_TYPE"]);
+            p += string.Format("p.from_date='{0}';",System.Configuration.ConfigurationManager.AppSettings["FROM_DATE"]);
+            p += string.Format("p.to_date='{0}';",System.Configuration.ConfigurationManager.AppSettings["TO_DATE"]);
+            script = script.Replace("{{PARAMS}}",p);
+            System.IO.File.WriteAllText("E:\\Projects\\Ecam.Test2\\Ecam.Test\\CSV_SCRIPT.txt",script);
         }
 
         private static void MailSend(bool isBookMark) {
@@ -510,9 +508,11 @@ namespace Ecam.ConsoleApp
                                  where q.symbol == symbol
                                  && q.split_date == tradeDate
                                  select q).FirstOrDefault();
+                        bool isNew = false;
                         if (split == null)
                         {
                             split = new tra_split();
+                            isNew = true;
                         }
                         else
                         {
@@ -521,18 +521,20 @@ namespace Ecam.ConsoleApp
                                                  q.id == split.id
                                                  select q).FirstOrDefault();
                         }
-                        split.symbol = symbol;
-                        split.split_date = tradeDate;
-                        split.split_factor = factor;
-                        if (split.id > 0)
-                        {
-                            context.Entry(split).State = System.Data.Entity.EntityState.Modified;
+                        if(isNew==true) {
+                            split.symbol = symbol;
+                            split.split_date = tradeDate;
+                            split.split_factor = factor;
+                            if (split.id > 0)
+                            {
+                                context.Entry(split).State = System.Data.Entity.EntityState.Modified;
+                            }
+                            else
+                            {
+                                context.tra_split.Add(split);
+                            }
+                            context.SaveChanges();
                         }
-                        else
-                        {
-                            context.tra_split.Add(split);
-                        }
-                        context.SaveChanges();
                     }
                     if (split != null)
                     {
@@ -1810,6 +1812,7 @@ RegexOptions.IgnoreCase
                     symbols.Add(System.IO.Path.GetFileNameWithoutExtension(fullFileName));
                 }
             }
+            symbols = (from q in symbols orderby q ascending select q).ToList();
             _COMPANIES = symbols.ToArray();
             _INDEX = -1;
             CSVDownloadStart();

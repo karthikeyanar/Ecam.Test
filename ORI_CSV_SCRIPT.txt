@@ -1,0 +1,108 @@
+window.alert=function() { };
+var arr=[{{SYMBOLS}}];
+var p={ 'data_type': 'priceVolume','period_type': '','date_range': 'week','from_date': '','to_date': '' };
+{{PARAMS}}
+$('#dataType').val(p.data_type);
+switch(p.period_type) {
+	case 'DP':
+		if($('#rdDateToDate')[0]) {
+			$('#rdDateToDate')[0].checked=true;
+		}
+		$('#fromDate').val(p.from_date);
+		$('#toDate').val(p.to_date);
+		break;
+	default:
+		if($('#rdPeriod')[0]) {
+			$('#rdPeriod')[0].checked=true;
+		}
+		break;
+}
+$('#dateRange').val(p.date_range);
+var $log=$("#download_log");
+var $error=$("#download_error");
+if(!$log[0]) {
+	var html='';
+	html+="<div id='download_log' style='position:absolute;top:5px;left:5px;width:420px;background:#fff;color:333;z-index:9999;font-size:18px;font-family:Calibri,Arial,Helvetica,sans-serif;'></div>";
+	html+="<div id='download_error' style='position:absolute;top:5px;right:5px;width:200px;background:#fff;color:333;z-index:9999;font-size:18px;font-family:Calibri,Arial,Helvetica,sans-serif;'><ol style='padding:0;margin:0;'></ol></div>";
+	$('body').append(html);
+	$log=$("#download_log");
+	$error=$("#download_error > ol");
+}
+var index=-1;
+var checkCSVCount=0;
+function doDownload() {
+	index+=1;
+	if(index<arr.length) {
+		$log.html('');
+		$log.html($log.html()+'index='+(index+1)+',arr.length='+arr.length+'<br/>');
+		var d=arr[index];
+		var symbol=d.symbol;
+		var type=d.type;
+		if(d.type==''){
+			d.type='EQ';
+		}
+		if(d.type!='') {
+			$('#series').val(d.type);
+		}
+		$('#symbol').val(symbol);
+		$log.html($log.html()+'symbol='+symbol+',type='+type+'<br/>');
+		var $csvFileName=$('#csvFileName');
+		$csvFileName.val('');
+		$('.getdata-button').click();
+		checkCSVContent(symbol);
+	} else {
+		$log.html($log.html()+"<h1 style='font-size:40px;margin:5px 0;font-weight:normal;'>Completed</h1><br/>");
+	}
+}
+function checkCSVContent(symbol) {
+	setTimeout(function() {
+		try {
+			checkCSVCount+=1;
+			var $csvFileName=$('#csvFileName');
+			var $csvContentDiv=$('#csvContentDiv');
+
+			var isDone=false;
+			var fileName='';
+			var csv='';
+			if($csvFileName[0]) {
+				if($csvFileName.val()!='') {
+					fileName=$csvFileName.val();
+					csv=$csvContentDiv.html();
+				}
+			}
+			if(csv!='') {
+				csv=csv.replace(/:/g,"\n");
+				var csvFile;
+				var downloadLink;
+				csvFile=new Blob([csv],{
+					type: "text/csv"
+				});
+				downloadLink=document.createElement("a");
+				downloadLink.download=fileName;
+				downloadLink.href=window.URL.createObjectURL(csvFile);
+				downloadLink.style.display="none";
+				document.body.appendChild(downloadLink);
+				downloadLink.click();
+				isDone=true;
+			}
+			$log.html($log.html()+'check='+checkCSVCount+',fileName='+fileName+'<br/>');
+			if(isDone==true) {
+				doDownload();
+			} else {
+				if(checkCSVCount<=2){
+					arr[index].type='ALL';
+					index=index-1;
+					doDownload();
+				} else {
+					checkCSVCount=0;
+					$error.append("<li style='margin:5px 0;list-style-type:number;'>"+symbol+"</li>");
+					doDownload();
+				}
+			}
+		} catch(e) {
+			checkCSVCount=0;
+			$error.append("<li style='margin:5px 0;color:red;list-style-type:number;'>Exception:"+e+"</li>");
+		}
+	},10000);
+}
+doDownload();

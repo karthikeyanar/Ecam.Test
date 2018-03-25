@@ -743,16 +743,6 @@ namespace Ecam.Models
                                 log.positive_count = dailylog.positive;
                                 log.negative_count = dailylog.negative;
                             }
-                            var nifty = (from q in markets
-                                            where q.trade_date == dt
-                                            select q).FirstOrDefault();
-                            if(nifty != null) {
-                                try { 
-                                    log.nifty_50 = (nifty.prev_price ?? 0) < (nifty.close_price ?? 0); //(((nifty.close_price ?? 0) - (nifty.prev_price ?? 0)) / (nifty.prev_price ?? 0)) * 100;
-                                } catch {
-                                    log.nifty_50 = false;
-                                }
-                            }
                         }
                     }
                 }
@@ -1089,7 +1079,6 @@ namespace Ecam.Models
                 return (this.positive_count ?? 0) > (this.negative_count ?? 0);
             }
         }
-        public bool nifty_50 { get; set; }
         public decimal percentage {
             get {
                 return DataTypeHelper.SafeDivision((this.cmv - this.investment), this.investment) * 100;
