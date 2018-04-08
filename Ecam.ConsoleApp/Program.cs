@@ -90,7 +90,17 @@ namespace Ecam.ConsoleApp
                         int i;
                         int total = 2;
                         if(IS_DOWNLOAD_HISTORY=="true" || IS_IMPORT_CSV == "true") {
-                            total = 750;
+                            tra_daily_log dailyLog = null;
+                            using(EcamContext context = new EcamContext()) {
+                                dailyLog = (from q in context.tra_daily_log
+                                           orderby q.trade_date descending
+                                           select q).FirstOrDefault();
+                            }
+                            if(dailyLog!=null) {
+                                TimeSpan ts = DateTime.Now.Date - dailyLog.trade_date;
+                                total = (int)ts.TotalDays + 1;
+                            }
+                            //total = 30;
                         }
                         for(i = 0;i < total;i++) {
                             DateTime dt = DateTime.Now.Date.AddDays(-i);
