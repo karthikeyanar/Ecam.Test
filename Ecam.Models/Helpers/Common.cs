@@ -242,6 +242,8 @@ namespace Ecam.Models
 
             sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, "", "");
 
+            //Helper.Log(sql,"GET_COUNT");
+
             paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString, sql));
 
             if (string.IsNullOrEmpty(paging.SortOrder))
@@ -262,7 +264,7 @@ namespace Ecam.Models
             DateTime? minDate = Convert.ToDateTime("01/01/1900");
             if (criteria.start_date.HasValue && criteria.end_date.HasValue)
             {
-                dateFilter = string.Format(" and m.trade_date>='{0}' and m.trade_date<='{1}' ", criteria.start_date.Value.ToString("yyyy-MM-dd"), criteria.end_date.Value.ToString("yyyy-MM-dd"));
+                dateFilter = string.Format(" m.trade_date>='{0}' and m.trade_date<='{1}' ", criteria.start_date.Value.ToString("yyyy-MM-dd"), criteria.end_date.Value.ToString("yyyy-MM-dd"));
             }
 
             if (criteria.total_start_date.HasValue == false)
@@ -271,7 +273,7 @@ namespace Ecam.Models
                 criteria.total_end_date = DateTime.Now.Date;
 
             string totalDateFilter = string.Empty;
-            totalDateFilter = string.Format(" and m.trade_date>='{0}' and m.trade_date<='{1}' "
+            totalDateFilter = string.Format(" m.trade_date>='{0}' and m.trade_date<='{1}' "
                 , criteria.total_start_date.Value.ToString("yyyy-MM-dd")
                 , criteria.total_end_date.Value.ToString("yyyy-MM-dd")) + Environment.NewLine;
 
@@ -315,7 +317,7 @@ namespace Ecam.Models
                            ",ct.pe" + Environment.NewLine +
                            ",ct.volume" + Environment.NewLine +
                            ",ct.eps" + Environment.NewLine +
-                           ",(select ifnull(count(*),0) from tra_holding h where h.symbol = ct.symbol) as is_holding" +
+                            //",(select ifnull(count(*),0) from tra_holding h where h.symbol = ct.symbol) as is_holding" +
                             //",(select high_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " and m.high_price > 0 order by m.high_price desc limit 0,1) as total_high_price" + Environment.NewLine +
                             //",(select low_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " and m.low_price > 0 order by m.low_price asc limit 0,1) as total_low_price" + Environment.NewLine +
                             //",(select high_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " and m.high_price > 0 order by m.high_price desc limit 0,1) as profit_high_price" + Environment.NewLine +
@@ -323,14 +325,14 @@ namespace Ecam.Models
                             //",(select ifnull(rsi,0) from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date desc limit 0,1) as profit_rsi" + Environment.NewLine +
                             //",(select ifnull(rsi,0) from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " order by m.trade_date desc limit 0,1) as total_rsi" + Environment.NewLine +
 
-                            ",(select open_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " order by m.trade_date asc limit 0,1) as total_first_price" + Environment.NewLine +
-                            ",(select ltp_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " order by m.trade_date desc limit 0,1) as total_last_price" + Environment.NewLine +
+                            ",(select open_price from tra_market m where " + totalDateFilter + " and m.symbol = ct.symbol order by m.trade_date asc limit 0,1) as total_first_price" + Environment.NewLine +
+                            ",(select ltp_price from tra_market m where " + totalDateFilter + " and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as total_last_price" + Environment.NewLine +
 
                             //",(select open_price from tra_market m where m.symbol = ct.symbol " + triggerDateFilter + " order by m.trade_date asc limit 0,1) as trigger_first_price" + Environment.NewLine +
                             //",(select ltp_price from tra_market m where m.symbol = ct.symbol " + triggerDateFilter + " order by m.trade_date desc limit 0,1) as trigger_last_price" + Environment.NewLine +
 
-                            ",(select open_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date asc limit 0,1) as first_price" + Environment.NewLine +
-                            ",(select ltp_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date desc limit 0,1) as last_price" + Environment.NewLine +
+                            ",(select open_price from tra_market m where " + dateFilter + " and m.symbol = ct.symbol order by m.trade_date asc limit 0,1) as first_price" + Environment.NewLine +
+                            ",(select ltp_price from tra_market m where " + dateFilter + " and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_price" + Environment.NewLine +
                            //",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + " and ifnull(m.percentage, 0) < 0) as negative" + Environment.NewLine +
                            //",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + "  and ifnull(m.percentage, 0) > 0) as positive" + Environment.NewLine +
                            //",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + " ) as total" + Environment.NewLine +
@@ -456,7 +458,7 @@ namespace Ecam.Models
             sql + Environment.NewLine +
             ") as tbl {0} {1} {2} {3} ", where, "", orderBy, pageLimit);
 
-            //Helper.Log(sql);
+            //Helper.Log(sql,"GET_SQL");
             List<TRA_COMPANY> rows = new List<TRA_COMPANY>();
             List<tra_company_category> companyCategories;
             using (EcamContext context = new EcamContext())

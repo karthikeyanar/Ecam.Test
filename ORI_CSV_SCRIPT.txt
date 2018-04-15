@@ -84,12 +84,13 @@ function checkCSVContent(symbol) {
 				document.body.appendChild(downloadLink);
 				downloadLink.click();
 				isDone=true;
+				checkCSVCount=0;
 			}
 			$log.html($log.html()+'check='+checkCSVCount+',fileName='+fileName+'<br/>');
 			if(isDone==true) {
 				doDownload();
 			} else {
-				if(checkCSVCount<=2){
+				if(checkCSVCount<=3){
 					arr[index].type='ALL';
 					index=index-1;
 					doDownload();

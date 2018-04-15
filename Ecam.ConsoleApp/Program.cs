@@ -82,33 +82,38 @@ namespace Ecam.ConsoleApp
                         Helper.Log(ex.Message,"DOWNLOAD_START_ERROR" + "_" + (new Random()).Next(1000,10000));
                     }
                     try {
-                        AddSplit();
+                        int i;
+                        for(i=0;i<1;i++) {
+                            DateTime startDate = Convert.ToDateTime("01/01/" +  (DateTime.Now.Year - i).ToString());
+                            DateTime endDate = Convert.ToDateTime("12/31/" +  (DateTime.Now.Year - i).ToString());
+                            AddSplit(startDate,endDate);
+                        }
                     } catch(Exception ex) {
                         Helper.Log(ex.Message,"AddSplit_ERROR" + "_" + (new Random()).Next(1000,10000));
                     }
                     try {
-                        int i;
-                        int total = 2;
-                        if(IS_DOWNLOAD_HISTORY=="true" || IS_IMPORT_CSV == "true") {
-                            tra_daily_log dailyLog = null;
-                            using(EcamContext context = new EcamContext()) {
-                                dailyLog = (from q in context.tra_daily_log
-                                           orderby q.trade_date descending
-                                           select q).FirstOrDefault();
-                            }
-                            if(dailyLog!=null) {
-                                TimeSpan ts = DateTime.Now.Date - dailyLog.trade_date;
-                                total = (int)ts.TotalDays + 1;
-                            }
-                            //total = 30;
-                        }
-                        for(i = 0;i < total;i++) {
-                            DateTime dt = DateTime.Now.Date.AddDays(-i);
-                            TradeHelper.CreateDailyLog(dt.Date,"");
-                            TradeHelper.CreateDailyLog(dt.Date,"true");
-                        }
-                        MailSend(true);
-                        MailSend(false);
+                        //int i;
+                        //int total = (365*15);
+                        ////if(IS_DOWNLOAD_HISTORY == "true" || IS_IMPORT_CSV == "true") {
+                        ////    tra_daily_log dailyLog = null;
+                        ////    using(EcamContext context = new EcamContext()) {
+                        ////        dailyLog = (from q in context.tra_daily_log
+                        ////                    orderby q.trade_date descending
+                        ////                    select q).FirstOrDefault();
+                        ////    }
+                        ////    if(dailyLog != null) {
+                        ////        TimeSpan ts = DateTime.Now.Date - dailyLog.trade_date;
+                        ////        total = (int)ts.TotalDays + 1;
+                        ////    }
+                        ////    total = 30;
+                        ////}
+                        //for(i = 0;i < total;i++) {
+                        //    DateTime dt = DateTime.Now.Date.AddDays(-i);
+                        //    TradeHelper.CreateDailyLog(dt.Date,"");
+                        //    TradeHelper.CreateDailyLog(dt.Date,"true");
+                        //}
+                        //MailSend(true);
+                        //MailSend(false);
                         MailSendDailyCSV();
                     } catch(Exception ex) {
                         Helper.Log(ex.Message,"MAIL_SEND_ERROR" + "_" + (new Random()).Next(1000,10000));
@@ -274,7 +279,7 @@ namespace Ecam.ConsoleApp
                 columnFormats.Add(new Ecam.Framework.CSVColumn { PropertyName = "diff",IsIgNore = true });
                 columnFormats.Add(new Ecam.Framework.CSVColumn { PropertyName = "percentage_high",IsIgNore = true });
                 columnFormats.Add(new Ecam.Framework.CSVColumn { PropertyName = "percentage_low",IsIgNore = true });
-                int months = 6;
+                int months = 144;
                 int i;
                 List<DailySummary> dailyList = new List<DailySummary>();
                 for(i = 0;i < months;i++) {
@@ -487,7 +492,7 @@ namespace Ecam.ConsoleApp
             } 
         }
 
-        private static void AddSplit()
+        private static void AddSplit(DateTime startDate, DateTime endDate)
         {
             string sql = "select " + Environment.NewLine +
                             " m.symbol" + Environment.NewLine +
@@ -500,7 +505,8 @@ namespace Ecam.ConsoleApp
                             //" ,m.prev_price" + Environment.NewLine +
                             //" ,m.* " + Environment.NewLine +
                             " from tra_market m" + Environment.NewLine +
-                            " where (((ifnull(m.ltp_price,0) - ifnull(m.prev_price,0)) / ifnull(m.prev_price,0))*100) != 0" + Environment.NewLine +
+                            " where m.trade_date>='" + startDate.ToString("yyyy-MM-dd") + "' and m.trade_date<='" + endDate.ToString("yyyy-MM-dd") + "'" + Environment.NewLine +
+                            " and (((ifnull(m.ltp_price,0) - ifnull(m.prev_price,0)) / ifnull(m.prev_price,0))*100) != 0" + Environment.NewLine +
                             " and(((ifnull(m.ltp_price,0) - ifnull(m.prev_price,0)) / ifnull(m.prev_price,0))*100) <= -48" + Environment.NewLine +
                             " order by trade_date asc,symbol asc limit 0,100";
             using (MySqlDataReader dr = MySqlHelper.ExecuteReader(Ecam.Framework.Helper.ConnectionString, sql))
