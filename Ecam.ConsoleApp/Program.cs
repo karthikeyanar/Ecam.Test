@@ -92,28 +92,28 @@ namespace Ecam.ConsoleApp
                         Helper.Log(ex.Message,"AddSplit_ERROR" + "_" + (new Random()).Next(1000,10000));
                     }
                     try {
-                        //int i;
-                        //int total = (365*15);
-                        ////if(IS_DOWNLOAD_HISTORY == "true" || IS_IMPORT_CSV == "true") {
-                        ////    tra_daily_log dailyLog = null;
-                        ////    using(EcamContext context = new EcamContext()) {
-                        ////        dailyLog = (from q in context.tra_daily_log
-                        ////                    orderby q.trade_date descending
-                        ////                    select q).FirstOrDefault();
-                        ////    }
-                        ////    if(dailyLog != null) {
-                        ////        TimeSpan ts = DateTime.Now.Date - dailyLog.trade_date;
-                        ////        total = (int)ts.TotalDays + 1;
-                        ////    }
-                        ////    total = 30;
-                        ////}
-                        //for(i = 0;i < total;i++) {
-                        //    DateTime dt = DateTime.Now.Date.AddDays(-i);
-                        //    TradeHelper.CreateDailyLog(dt.Date,"");
-                        //    TradeHelper.CreateDailyLog(dt.Date,"true");
-                        //}
-                        //MailSend(true);
-                        //MailSend(false);
+                        int i;
+                        int total = 0;
+                        if(IS_DOWNLOAD_HISTORY == "true" || IS_IMPORT_CSV == "true") {
+                            tra_daily_log dailyLog = null;
+                            using(EcamContext context = new EcamContext()) {
+                                dailyLog = (from q in context.tra_daily_log
+                                            orderby q.trade_date descending
+                                            select q).FirstOrDefault();
+                            }
+                            if(dailyLog != null) {
+                                TimeSpan ts = DateTime.Now.Date - dailyLog.trade_date;
+                                total = (int)ts.TotalDays + 1;
+                            }
+                            total = 30;
+                        }
+                        for(i = 0;i < total;i++) {
+                            DateTime dt = DateTime.Now.Date.AddDays(-i);
+                            TradeHelper.CreateDailyLog(dt.Date,"");
+                            TradeHelper.CreateDailyLog(dt.Date,"true");
+                        }
+                        MailSend(true);
+                        MailSend(false);
                         MailSendDailyCSV();
                     } catch(Exception ex) {
                         Helper.Log(ex.Message,"MAIL_SEND_ERROR" + "_" + (new Random()).Next(1000,10000));
@@ -279,7 +279,7 @@ namespace Ecam.ConsoleApp
                 columnFormats.Add(new Ecam.Framework.CSVColumn { PropertyName = "diff",IsIgNore = true });
                 columnFormats.Add(new Ecam.Framework.CSVColumn { PropertyName = "percentage_high",IsIgNore = true });
                 columnFormats.Add(new Ecam.Framework.CSVColumn { PropertyName = "percentage_low",IsIgNore = true });
-                int months = 144;
+                int months = 3;
                 int i;
                 List<DailySummary> dailyList = new List<DailySummary>();
                 for(i = 0;i < months;i++) {
@@ -321,6 +321,8 @@ namespace Ecam.ConsoleApp
 
                 string csv = Ecam.Framework.CSVHelper.CreateCSVFromGenericList(dailyList,columnFormats);
                 string tempFileName = "DailyCSV_"+ rowSize + "_"+(new Random()).Next(1000,100000)+"_"+DateTime.Now.ToString("dd_MMM_yyyy")+".csv";
+
+                System.IO.File.WriteAllText("E:\\"+tempFileName,csv);
 
                 MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(csv ?? ""));
 
