@@ -16,10 +16,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 
-namespace Ecam.ConsoleApp
-{
-    class Program
-    {
+namespace Ecam.ConsoleApp {
+    class Program {
         public static string IS_DOWNLOAD_HISTORY = "";
         public static string IS_BOOK_MARK_CATEGORY = "";
         public static string IS_IMPORT_CSV = "";
@@ -34,9 +32,9 @@ namespace Ecam.ConsoleApp
         private static string[] _COMPANIES;
         private static List<string> _URLS;
         private static List<string> _SYMBOLS_LIST;
-        static void Main(string[] args)
-        {
+        static void Main(string[] args) {
             try {
+                NiftyListGenerate();
                 IS_CATEGORY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_CATEGORY_FLAG_CSV"];
                 IS_NIFTY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_FLAG_CSV"];
                 IS_IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_IMPORT_CSV"];
@@ -83,9 +81,9 @@ namespace Ecam.ConsoleApp
                     }
                     try {
                         int i;
-                        for(i=0;i<1;i++) {
-                            DateTime startDate = Convert.ToDateTime("01/01/" +  (DateTime.Now.Year - i).ToString());
-                            DateTime endDate = Convert.ToDateTime("12/31/" +  (DateTime.Now.Year - i).ToString());
+                        for(i = 0;i < 1;i++) {
+                            DateTime startDate = Convert.ToDateTime("01/01/" + (DateTime.Now.Year - i).ToString());
+                            DateTime endDate = Convert.ToDateTime("12/31/" + (DateTime.Now.Year - i).ToString());
                             AddSplit(startDate,endDate);
                         }
                     } catch(Exception ex) {
@@ -124,10 +122,57 @@ namespace Ecam.ConsoleApp
             }
         }
 
+        private static void NiftyListGenerate() {
+            string NIFTY_LIST = System.Configuration.ConfigurationManager.AppSettings["NIFTY_LIST"];
+            string[] files = System.IO.Directory.GetFiles(NIFTY_LIST);
+            string scriptFileName = System.IO.Path.Combine(NIFTY_LIST,"script.txt");
+            string script = "";
+            if(File.Exists(scriptFileName) == true) {
+                File.Delete(scriptFileName);
+            }
+            foreach(string fileName in files) {
+                if(fileName.Contains(".csv")) {
+                    CsvReader csv = null;
+                    int i = 0;
+                    if(File.Exists(fileName) == true) {
+                        using(TextReader reader = File.OpenText(fileName)) {
+                            csv = new CsvReader(reader);
+                            i = 0;
+                            while(csv.Read()) {
+                                i += 1;
+                                string symbol = csv.GetField<string>("Symbol");
+                                string open = csv.GetField<string>("Open");
+                                string high = csv.GetField<string>("High");
+                                string low = csv.GetField<string>("Low");
+                                string lastTrade = csv.GetField<string>("Last Traded Price");
+                                if(string.IsNullOrEmpty(symbol) == false) {
+                                    if(symbol.Contains("NIFTY") == false) {
+                                        decimal high_price = DataTypeHelper.ToDecimal(high);
+                                        decimal low_price = DataTypeHelper.ToDecimal(low);
+                                        decimal open_price = DataTypeHelper.ToDecimal(open);
+                                        decimal ltp_price = DataTypeHelper.ToDecimal(lastTrade);
+                                        if(open_price == high_price) {
+                                            script += string.Format("{0}:{1}|",symbol,"S");
+                                        } else if(open_price == low_price) {
+                                            script += string.Format("{0}:{1}|",symbol,"B");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if(string.IsNullOrEmpty(script) == false) {
+                script = script.Substring(0,script.Length - 1);
+            }
+            System.IO.File.WriteAllText(NIFTY_LIST + "\\script.txt",script);
+            Console.WriteLine("NiftyListGenerate Completed");
+        }
+
         private static void ScriptGenerate() {
             List<tra_company> companies;
-            using (EcamContext context = new EcamContext())
-            {
+            using(EcamContext context = new EcamContext()) {
                 IQueryable<tra_company> query = context.tra_company;
 
                 DateTime morningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:15AM");
@@ -137,8 +182,7 @@ namespace Ecam.ConsoleApp
                 DateTime now = DateTime.Now;
                 DateTime targetTime = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 3:30PM");
 
-                if ((now >= morningStart && now <= eveningStart))
-                {
+                if((now >= morningStart && now <= eveningStart)) {
                     //query = (from q in query
                     //         join h in context.tra_holding on q.symbol equals h.symbol
                     //         select q);
@@ -185,12 +229,12 @@ namespace Ecam.ConsoleApp
                     //        type = "ALL";
                     //        break;
                     //}
-                    symbols += "{'symbol':'"+company.symbol+"','type':'"+type+"'},";
+                    symbols += "{'symbol':'" + company.symbol + "','type':'" + type + "'},";
                 }
             }
-            if(string.IsNullOrEmpty(symbols)==false) {
-                symbols = symbols.Substring(0,symbols.Length-1);
-            } 
+            if(string.IsNullOrEmpty(symbols) == false) {
+                symbols = symbols.Substring(0,symbols.Length - 1);
+            }
             string script = System.IO.File.ReadAllText("E:\\Projects\\Ecam.Test2\\Ecam.Test\\ORI_CSV_SCRIPT.txt");
             script = script.Replace("{{SYMBOLS}}",symbols);
             string p = "";
@@ -213,8 +257,8 @@ namespace Ecam.ConsoleApp
                 msg.To.Add(new MailAddress("karthikeyanar@gmail.com","Karthi"));
                 msg.CC.Add(new MailAddress("priyatradevnr@gmail.com","Priya"));
                 msg.Priority = MailPriority.High;
-                msg.Subject = "Daily Summary" + (isBookMark == false ? "_All" : "")  + ": " + (new Random()).Next(1000,100000) + "_" + DateTime.Now.ToString("dd_MMM_yyyy");
-                
+                msg.Subject = "Daily Summary" + (isBookMark == false ? "_All" : "") + ": " + (new Random()).Next(1000,100000) + "_" + DateTime.Now.ToString("dd_MMM_yyyy");
+
                 string sql = string.Format(" select log.log_id,log.trade_date as trade_date,log.positive,log.negative " + Environment.NewLine +
                              ",if((log.positive > log.negative),'True','') as indicator " + Environment.NewLine +
                              //",(log.positive - log.negative) as diff " + Environment.NewLine +
@@ -288,7 +332,7 @@ namespace Ecam.ConsoleApp
                     DateTime monthLastDate = DataTypeHelper.GetLastDayOfMonth(dt);
                     DateTime totalEndDate = DataTypeHelper.GetLastDayOfMonth(monthStartDate.AddMonths(-1).AddDays(7));
                     DateTime totalStartDate = DataTypeHelper.GetFirstDayOfMonth(totalEndDate.AddMonths(-6).AddDays(7));
-                   
+
 
                     Console.WriteLine("monthStartDate=" + monthStartDate.ToString("dd/MMM/yyyy"));
                     Console.WriteLine("monthLastDate=" + monthLastDate.ToString("dd/MMM/yyyy"));
@@ -304,7 +348,7 @@ namespace Ecam.ConsoleApp
                         total_amount = 1000000,
                         total_end_date = totalEndDate,
                         total_start_date = totalStartDate,
-                    }, new Paging {
+                    },new Paging {
                         PageIndex = 1,
                         PageSize = rowSize,
                         SortName = "total_profit",
@@ -320,9 +364,9 @@ namespace Ecam.ConsoleApp
                              select q).ToList();
 
                 string csv = Ecam.Framework.CSVHelper.CreateCSVFromGenericList(dailyList,columnFormats);
-                string tempFileName = "DailyCSV_"+ rowSize + "_"+(new Random()).Next(1000,100000)+"_"+DateTime.Now.ToString("dd_MMM_yyyy")+".csv";
+                string tempFileName = "DailyCSV_" + rowSize + "_" + (new Random()).Next(1000,100000) + "_" + DateTime.Now.ToString("dd_MMM_yyyy") + ".csv";
 
-                System.IO.File.WriteAllText("E:\\"+tempFileName,csv);
+                System.IO.File.WriteAllText("E:\\" + tempFileName,csv);
 
                 MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(csv ?? ""));
 
@@ -385,23 +429,19 @@ namespace Ecam.ConsoleApp
 
         #region MoneyControl
 
-        private static void DoMoneyControl()
-        {
+        private static void DoMoneyControl() {
             _URLS = GetURLList();
             MoneyControlDownloadStart();
         }
 
-        private static List<string> GetURLList()
-        {
+        private static List<string> GetURLList() {
             List<string> urls = new List<string>();
             Regex regex = null;
-            if (string.IsNullOrEmpty(MONEY_CONTROL) == false)
-            {
+            if(string.IsNullOrEmpty(MONEY_CONTROL) == false) {
                 string[] files = System.IO.Directory.GetFiles(MONEY_CONTROL);
-                foreach (string fileName in files)
-                {
+                foreach(string fileName in files) {
                     string html = System.IO.File.ReadAllText(fileName);
-                    html = html.Replace("\n", "").Replace("\r", "").Replace("\r\n", "");
+                    html = html.Replace("\n","").Replace("\r","").Replace("\r\n","");
                     regex = new Regex(
                                             @"<tr(.*?)>(.*?)</tr>",
                                             RegexOptions.IgnoreCase
@@ -411,8 +451,7 @@ namespace Ecam.ConsoleApp
                                             );
                     MatchCollection trCollections = regex.Matches(html);
                     int i, j;
-                    for (i = 0; i < trCollections.Count; i++)
-                    {
+                    for(i = 0;i < trCollections.Count;i++) {
                         Match trMatch = trCollections[i];
                         string tr = trMatch.Value;
                         regex = new Regex(
@@ -424,13 +463,10 @@ namespace Ecam.ConsoleApp
                                         );
                         MatchCollection tdCollections = regex.Matches(tr);
                         RowCollections row = new RowCollections();
-                        for (j = 0; j < tdCollections.Count; j++)
-                        {
+                        for(j = 0;j < tdCollections.Count;j++) {
                             string v = tdCollections[j].Groups[2].Value;
-                            if (string.IsNullOrEmpty(v) == false)
-                            {
-                                if (v.Contains("<a") == true)
-                                {
+                            if(string.IsNullOrEmpty(v) == false) {
+                                if(v.Contains("<a") == true) {
                                     regex = new Regex(
                                                 @"(\S+)=[""']?((?:.(?![""']?\s+(?:\S+)=|[>""']))+.)[""']?",
                                                 RegexOptions.IgnoreCase
@@ -439,21 +475,15 @@ namespace Ecam.ConsoleApp
                                                 | RegexOptions.Compiled
                                                 );
                                     MatchCollection attrCollections = regex.Matches(v);
-                                    if (attrCollections.Count > 0)
-                                    {
-                                        if (attrCollections[0].Groups.Count >= 3)
-                                        {
-                                            if (attrCollections[0].Groups[1].Value == "href")
-                                            {
-                                                if (string.IsNullOrEmpty(attrCollections[0].Groups[2].Value) == false)
-                                                {
+                                    if(attrCollections.Count > 0) {
+                                        if(attrCollections[0].Groups.Count >= 3) {
+                                            if(attrCollections[0].Groups[1].Value == "href") {
+                                                if(string.IsNullOrEmpty(attrCollections[0].Groups[2].Value) == false) {
                                                     string url = attrCollections[0].Groups[2].Value;
-                                                    if (attrCollections[0].Groups[2].Value.Contains("moneycontrol.com") == false)
-                                                    {
+                                                    if(attrCollections[0].Groups[2].Value.Contains("moneycontrol.com") == false) {
                                                         url = "http://www.moneycontrol.com" + attrCollections[0].Groups[2].Value;
                                                     }
-                                                    if (urls.Contains(url) == false)
-                                                    {
+                                                    if(urls.Contains(url) == false) {
                                                         urls.Add(url);
                                                     }
                                                 }
@@ -480,10 +510,10 @@ namespace Ecam.ConsoleApp
                 foreach(var market in markets) {
                     i += 1;
                     tra_market prevMarket = (from q in context.tra_market
-                                      where q.symbol == market.symbol
-                                      && q.trade_date < market.trade_date
+                                             where q.symbol == market.symbol
+                                             && q.trade_date < market.trade_date
                                              orderby q.trade_date descending
-                                      select q).FirstOrDefault();
+                                             select q).FirstOrDefault();
                     if(prevMarket != null) {
                         market.prev_price = prevMarket.close_price;
                         context.Entry(market).State = System.Data.Entity.EntityState.Modified;
@@ -491,11 +521,10 @@ namespace Ecam.ConsoleApp
                     }
                     Console.WriteLine("Symbol=" + symbol + ",Total=" + total + ",i=" + i);
                 }
-            } 
+            }
         }
 
-        private static void AddSplit(DateTime startDate, DateTime endDate)
-        {
+        private static void AddSplit(DateTime startDate,DateTime endDate) {
             string sql = "select " + Environment.NewLine +
                             " m.symbol" + Environment.NewLine +
                             " ,DATE_FORMAT(m.trade_date,'%d/%b/%Y') as trade_date" + Environment.NewLine +
@@ -511,51 +540,41 @@ namespace Ecam.ConsoleApp
                             " and (((ifnull(m.ltp_price,0) - ifnull(m.prev_price,0)) / ifnull(m.prev_price,0))*100) != 0" + Environment.NewLine +
                             " and(((ifnull(m.ltp_price,0) - ifnull(m.prev_price,0)) / ifnull(m.prev_price,0))*100) <= -48" + Environment.NewLine +
                             " order by trade_date asc,symbol asc limit 0,100";
-            using (MySqlDataReader dr = MySqlHelper.ExecuteReader(Ecam.Framework.Helper.ConnectionString, sql))
-            {
-                while (dr.Read())
-                {
+            using(MySqlDataReader dr = MySqlHelper.ExecuteReader(Ecam.Framework.Helper.ConnectionString,sql)) {
+                while(dr.Read()) {
                     string symbol = dr["symbol"].ToString();
                     DateTime tradeDate = DataTypeHelper.ToDateTime(dr["trade_date"]);
                     decimal factor = DataTypeHelper.ToDecimal(dr["prev_diff"].ToString());
                     tra_split split = null;
 
-                    using (EcamContext context = new EcamContext())
-                    {
+                    using(EcamContext context = new EcamContext()) {
                         split = (from q in context.tra_split
                                  where q.symbol == symbol
                                  && q.split_date == tradeDate
                                  select q).FirstOrDefault();
                         bool isNew = false;
-                        if (split == null)
-                        {
+                        if(split == null) {
                             split = new tra_split();
                             isNew = true;
-                        }
-                        else
-                        {
+                        } else {
                             split._prev_split = (from q in context.tra_split
                                                  where
                                                  q.id == split.id
                                                  select q).FirstOrDefault();
                         }
-                        if(isNew==true) {
+                        if(isNew == true) {
                             split.symbol = symbol;
                             split.split_date = tradeDate;
                             split.split_factor = factor;
-                            if (split.id > 0)
-                            {
+                            if(split.id > 0) {
                                 context.Entry(split).State = System.Data.Entity.EntityState.Modified;
-                            }
-                            else
-                            {
+                            } else {
                                 context.tra_split.Add(split);
                             }
                             context.SaveChanges();
                         }
                     }
-                    if (split != null)
-                    {
+                    if(split != null) {
                         split.UpdatePrice();
                         Console.WriteLine("Split Completed symbol=" + split.symbol + ",Date=" + split.split_date);
                     }
@@ -563,32 +582,27 @@ namespace Ecam.ConsoleApp
             }
         }
 
-        private static void UpdatePrevPrice()
-        {
+        private static void UpdatePrevPrice() {
 
             GoogleHistoryDownloadData history = new GoogleHistoryDownloadData();
             List<tra_company> companies;
-            using (EcamContext context = new EcamContext())
-            {
+            using(EcamContext context = new EcamContext()) {
                 companies = (from q in context.tra_company
                              orderby q.symbol ascending
                              select q).ToList();
             }
-            foreach (var company in companies)
-            {
+            foreach(var company in companies) {
                 List<TempClass> tempList;
                 DateTime today = DateTime.Now.Date;
                 DateTime monthStartDate = DataTypeHelper.GetFirstDayOfMonth(today);
                 DateTime monthEndDate = DataTypeHelper.GetLastDayOfMonth(today);
-                using (EcamContext context = new EcamContext())
-                {
+                using(EcamContext context = new EcamContext()) {
                     tempList = (from q in context.tra_market
                                 where q.symbol == company.symbol
                                 && q.trade_date >= monthStartDate
                                 && q.trade_date <= monthEndDate
                                 orderby q.symbol ascending
-                                select new TempClass
-                                {
+                                select new TempClass {
                                     symbol = company.symbol,
                                     trade_date = q.trade_date,
                                     close_price = q.close_price,
@@ -601,8 +615,7 @@ namespace Ecam.ConsoleApp
                 }
                 tempList = (from q in tempList orderby q.trade_date ascending select q).ToList();
                 int rowIndex = 0;
-                foreach (var temprow in tempList)
-                {
+                foreach(var temprow in tempList) {
                     rowIndex += 1;
                     TradeHelper.ImportPrice(temprow);
                     Console.WriteLine("Symbol=" + temprow.symbol + ",Date=" + temprow.trade_date.ToString("dd/MM/yyyy") + " Completed");
@@ -611,8 +624,7 @@ namespace Ecam.ConsoleApp
             }
         }
 
-        private static void DownloadStart()
-        {
+        private static void DownloadStart() {
             using(EcamContext context = new EcamContext()) {
                 _SYMBOLS_LIST = (from q in context.tra_company
                                  select q.symbol).ToList();
@@ -623,24 +635,15 @@ namespace Ecam.ConsoleApp
             DateTime eveningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 3:31PM");
             DateTime eveningEnd = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 11:59PM");
             DateTime now = DateTime.Now;
-            if (IS_DOWNLOAD_HISTORY == "true")
-            {
+            if(IS_DOWNLOAD_HISTORY == "true") {
                 GoogleHistoryData();
-            }
-            else if (IS_IMPORT_CSV == "true")
-            {
+            } else if(IS_IMPORT_CSV == "true") {
                 CSVData();
-            }
-            else if (IS_NIFTY_FLAG_CSV == "true")
-            {
+            } else if(IS_NIFTY_FLAG_CSV == "true") {
                 UpdateNiftyFlagCSV();
-            }
-            else if (IS_CATEGORY_FLAG_CSV == "true")
-            {
+            } else if(IS_CATEGORY_FLAG_CSV == "true") {
                 UpdateCategoryFlagCSV();
-            }
-            else
-            {
+            } else {
                 //if ((now >= morningStart && now <= morningEnd) || (now >= eveningStart && now <= eveningEnd))
                 //{
                 GoogleData();
@@ -657,27 +660,22 @@ namespace Ecam.ConsoleApp
             }
         }
 
-        private static string GetString(string html, string startWord, string endWord)
-        {
+        private static string GetString(string html,string startWord,string endWord) {
             int startIndex = html.IndexOf(startWord);
             int endIndex = html.IndexOf(endWord);
             int length = endIndex - startIndex + endWord.Length;
-            if (startIndex > 0 && endIndex > 0)
-            {
-                html = html.Substring(startIndex, length);
-            }
-            else
-            {
+            if(startIndex > 0 && endIndex > 0) {
+                html = html.Substring(startIndex,length);
+            } else {
                 html = "";
                 Helper.Log("ErrorOnGoogleData DownloadMC");
             }
             return html;
         }
-        private static void DownloadMC()
-        {
-            string originalHtml = File.ReadAllText(Path.Combine(MC, "DMART.html"));
-            string html = GetString(originalHtml, "<div id=\"mktdet_1\" name=\"mktdet_1\">", "<div id=\"mktdet_2\"");
-            html = html.Replace("\n", "").Replace("\r", "").Replace("\r\n", "");
+        private static void DownloadMC() {
+            string originalHtml = File.ReadAllText(Path.Combine(MC,"DMART.html"));
+            string html = GetString(originalHtml,"<div id=\"mktdet_1\" name=\"mktdet_1\">","<div id=\"mktdet_2\"");
+            html = html.Replace("\n","").Replace("\r","").Replace("\r\n","");
             decimal marketValue = 0;
             decimal pe = 0;
             decimal bookValue = 0;
@@ -691,9 +689,8 @@ namespace Ecam.ConsoleApp
             decimal faceValue = 0;
             decimal delivarable = 0;
             Regex regex = null;
-            if (string.IsNullOrEmpty(html) == false)
-            {
-                html = Regex.Replace(html, @"\s*(<[^>]+>)\s*", "$1", RegexOptions.Singleline);
+            if(string.IsNullOrEmpty(html) == false) {
+                html = Regex.Replace(html,@"\s*(<[^>]+>)\s*","$1",RegexOptions.Singleline);
                 regex = new Regex(
                           @"<div\s+class=\""PA7\s+brdb\""(.*?)>(.*?)<div\s+class=\""CL\"""
                           + @">",
@@ -703,8 +700,7 @@ namespace Ecam.ConsoleApp
                           | RegexOptions.Compiled
                           );
                 MatchCollection mc = regex.Matches(html);
-                foreach (Match m in mc)
-                {
+                foreach(Match m in mc) {
                     regex = new Regex(
   @"<div(.*?)>(.*?)</div>",
   RegexOptions.IgnoreCase
@@ -713,13 +709,11 @@ namespace Ecam.ConsoleApp
   | RegexOptions.Compiled
   );
                     MatchCollection rowMatches = regex.Matches(m.Value);
-                    if (rowMatches.Count >= 2)
-                    {
+                    if(rowMatches.Count >= 2) {
                         Match m1 = rowMatches[0];
                         Match m2 = rowMatches[1];
                         string colName = TradeHelper.RemoveHTMLTag(m1.Groups[2].Value);
-                        switch (colName)
-                        {
+                        switch(colName) {
                             case "MARKET CAP (Rs Cr)":
                                 marketValue = GetDecimalValue(m2.Groups[2].Value);
                                 break;
@@ -761,8 +755,8 @@ namespace Ecam.ConsoleApp
                 }
             }
             List<RowCollections> rows = new List<RowCollections>();
-            html = GetString(originalHtml, "<div id=\"findet_1\"", "<div id=\"findet_2\"");
-            html = html.Replace("\n", "").Replace("\r", "").Replace("\r\n", "");
+            html = GetString(originalHtml,"<div id=\"findet_1\"","<div id=\"findet_2\"");
+            html = html.Replace("\n","").Replace("\r","").Replace("\r\n","");
             regex = new Regex(
   @">\s*<",
   RegexOptions.IgnoreCase
@@ -770,7 +764,7 @@ namespace Ecam.ConsoleApp
   | RegexOptions.IgnorePatternWhitespace
   | RegexOptions.Compiled
   );
-            html = regex.Replace(html, "><");
+            html = regex.Replace(html,"><");
 
             regex = new Regex(
    @"<table(.*?)>(.*?)</table>",
@@ -780,8 +774,7 @@ namespace Ecam.ConsoleApp
    | RegexOptions.Compiled
    );
             MatchCollection collections = regex.Matches(html);
-            if (collections.Count > 0)
-            {
+            if(collections.Count > 0) {
                 string tableContent = collections[0].Groups[2].Value;
 
                 regex = new Regex(
@@ -793,8 +786,7 @@ RegexOptions.IgnoreCase
 );
                 MatchCollection trCollections = regex.Matches(tableContent);
                 int i, j;
-                for (i = 0; i < trCollections.Count; i++)
-                {
+                for(i = 0;i < trCollections.Count;i++) {
                     Match trMatch = trCollections[i];
                     string tr = trMatch.Value;
                     regex = new Regex(
@@ -806,11 +798,9 @@ RegexOptions.IgnoreCase
 );
                     MatchCollection tdCollections = regex.Matches(tr);
                     RowCollections row = new RowCollections();
-                    for (j = 0; j < tdCollections.Count; j++)
-                    {
+                    for(j = 0;j < tdCollections.Count;j++) {
                         string v = TradeHelper.RemoveHTMLTag(tdCollections[j].Groups[2].Value);
-                        if (j <= 0)
-                        {
+                        if(j <= 0) {
                             row.name = v;
                         }
                         row.cells.Add(v);
@@ -821,8 +811,7 @@ RegexOptions.IgnoreCase
 
         }
 
-        private static decimal GetDecimalValue(string html)
-        {
+        private static decimal GetDecimalValue(string html) {
             Regex regex = new Regex(
     @"(?<d>(\d{1,3},\d{3}(,\d{3})*)(\.\d*)?|\d+\.?\d*)",
     RegexOptions.IgnoreCase
@@ -832,15 +821,12 @@ RegexOptions.IgnoreCase
     );
             string removeHTML = TradeHelper.RemoveHTMLTag(html);
             decimal v = 0;
-            try
-            {
+            try {
                 MatchCollection mc = regex.Matches(removeHTML);
-                foreach (Match m in mc)
-                {
+                foreach(Match m in mc) {
                     v = DataTypeHelper.ToDecimal(m.Groups["d"].Value);
                 }
-            }
-            catch { }
+            } catch { }
             return v;
         }
 
@@ -1305,11 +1291,9 @@ RegexOptions.IgnoreCase
         //}
 
 
-        private static void GoogleData()
-        {
+        private static void GoogleData() {
             List<tra_company> companies;
-            using (EcamContext context = new EcamContext())
-            {
+            using(EcamContext context = new EcamContext()) {
                 IQueryable<tra_company> query = context.tra_company;
 
                 DateTime morningStart = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 9:15AM");
@@ -1319,8 +1303,7 @@ RegexOptions.IgnoreCase
                 DateTime now = DateTime.Now;
                 DateTime targetTime = Convert.ToDateTime(DateTime.Now.ToString("dd/MMM/yyyy") + " 3:30PM");
 
-                if ((now >= morningStart && now <= eveningStart))
-                {
+                if((now >= morningStart && now <= eveningStart)) {
                     //query = (from q in query
                     //         join h in context.tra_holding on q.symbol equals h.symbol
                     //         select q);
@@ -1374,8 +1357,7 @@ RegexOptions.IgnoreCase
             //}
         }
 
-        private static void GoogleDownloadStart()
-        {
+        private static void GoogleDownloadStart() {
             int totalCount = _COMPANIES.Length;
             int queueCount = 64;
             // One event is used for each Fibonacci object
@@ -1383,35 +1365,30 @@ RegexOptions.IgnoreCase
             GoogleDownloadData[] downArray = new GoogleDownloadData[queueCount];
             //Random r = new Random();
             // Configure and launch threads using ThreadPool:
-            Console.WriteLine("launching {0} tasks...", totalCount);
-            for (int i = 0; i < queueCount; i++)
-            {
+            Console.WriteLine("launching {0} tasks...",totalCount);
+            for(int i = 0;i < queueCount;i++) {
                 _INDEX += 1;
                 string symbol = "";
-                if (_INDEX < _COMPANIES.Length)
-                {
+                if(_INDEX < _COMPANIES.Length) {
                     symbol = _COMPANIES[_INDEX];
                 }
                 doneEvents[i] = new ManualResetEvent(false);
-                GoogleDownloadData f = new GoogleDownloadData(symbol, doneEvents[i]);
+                GoogleDownloadData f = new GoogleDownloadData(symbol,doneEvents[i]);
                 downArray[i] = f;
-                ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback, i);
+                ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback,i);
             }
             // Wait for all threads in pool to calculation...
             WaitHandle.WaitAll(doneEvents);
-            if (_INDEX < _COMPANIES.Length)
-            {
+            if(_INDEX < _COMPANIES.Length) {
                 Console.WriteLine("All calculations are complete.");
                 GoogleDownloadStart();
             }
         }
 
-        private static void GoogleHistoryDownloadStart()
-        {
+        private static void GoogleHistoryDownloadStart() {
             int totalCount = _COMPANIES.Length;
             int queueCount = 1;
-            if (totalCount <= queueCount)
-            {
+            if(totalCount <= queueCount) {
                 queueCount = totalCount;
             }
             // One event is used for each Fibonacci object
@@ -1419,41 +1396,34 @@ RegexOptions.IgnoreCase
             GoogleHistoryDownloadData[] downArray = new GoogleHistoryDownloadData[queueCount];
             //Random r = new Random();
             // Configure and launch threads using ThreadPool:
-            Console.WriteLine("launching {0} tasks...", totalCount);
-            for (int i = 0; i < queueCount; i++)
-            {
+            Console.WriteLine("launching {0} tasks...",totalCount);
+            for(int i = 0;i < queueCount;i++) {
                 _INDEX += 1;
                 string symbol = "";
-                if (_INDEX < _COMPANIES.Length)
-                {
+                if(_INDEX < _COMPANIES.Length) {
                     symbol = _COMPANIES[_INDEX];
                 }
                 doneEvents[i] = new ManualResetEvent(false);
-                GoogleHistoryDownloadData f = new GoogleHistoryDownloadData(symbol, doneEvents[i]);
+                GoogleHistoryDownloadData f = new GoogleHistoryDownloadData(symbol,doneEvents[i]);
                 downArray[i] = f;
-                ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback, i);
+                ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback,i);
             }
             // Wait for all threads in pool to calculation...
             WaitHandle.WaitAll(doneEvents);
-            if (_INDEX < _COMPANIES.Length)
-            {
+            if(_INDEX < _COMPANIES.Length) {
                 Console.WriteLine("All calculations are complete.");
                 GoogleHistoryDownloadStart();
             }
         }
 
-        private static void GoogleHistoryData()
-        {
+        private static void GoogleHistoryData() {
             List<tra_company> companies;
-            using (EcamContext context = new EcamContext())
-            {
+            using(EcamContext context = new EcamContext()) {
                 IQueryable<tra_company> query = context.tra_company;
                 string SYMBOLS = System.Configuration.ConfigurationManager.AppSettings["SYMBOLS"];
-                if (string.IsNullOrEmpty(SYMBOLS) == false)
-                {
+                if(string.IsNullOrEmpty(SYMBOLS) == false) {
                     List<string> symbolList = Helper.ConvertStringList(SYMBOLS);
-                    if (symbolList.Count > 0)
-                    {
+                    if(symbolList.Count > 0) {
                         query = (from q in query where symbolList.Contains(q.symbol) == true select q);
                     }
                 }
@@ -1473,8 +1443,7 @@ RegexOptions.IgnoreCase
             GoogleHistoryDownloadStart();
         }
 
-        private static void MoneyControlDownloadStart()
-        {
+        private static void MoneyControlDownloadStart() {
             int totalCount = _URLS.Count;
             int queueCount = 64;
             // One event is used for each Fibonacci object
@@ -1482,50 +1451,41 @@ RegexOptions.IgnoreCase
             MoneyControlData[] downArray = new MoneyControlData[queueCount];
             //Random r = new Random();
             // Configure and launch threads using ThreadPool:
-            Console.WriteLine("launching {0} tasks...", totalCount);
-            for (int i = 0; i < queueCount; i++)
-            {
+            Console.WriteLine("launching {0} tasks...",totalCount);
+            for(int i = 0;i < queueCount;i++) {
                 _INDEX += 1;
                 string url = "";
-                if (_INDEX < _URLS.Count)
-                {
+                if(_INDEX < _URLS.Count) {
                     url = _URLS[_INDEX];
                 }
                 doneEvents[i] = new ManualResetEvent(false);
-                MoneyControlData f = new MoneyControlData(url, doneEvents[i]);
+                MoneyControlData f = new MoneyControlData(url,doneEvents[i]);
                 downArray[i] = f;
-                ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback, i);
+                ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback,i);
             }
             // Wait for all threads in pool to calculation...
             WaitHandle.WaitAll(doneEvents);
-            if (_INDEX < _URLS.Count)
-            {
+            if(_INDEX < _URLS.Count) {
                 Console.WriteLine("All calculations are complete.");
                 MoneyControlDownloadStart();
             }
         }
 
-        private static void MutualFunds()
-        {
+        private static void MutualFunds() {
             string linkFileName = System.Configuration.ConfigurationManager.AppSettings["LINK_FILE_NAME"];
-            if (string.IsNullOrEmpty(linkFileName) == false)
-            {
+            if(string.IsNullOrEmpty(linkFileName) == false) {
                 string content = System.IO.File.ReadAllText(linkFileName);
-                string[] arr = content.Split(("\r\n").ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                foreach (string url in arr)
-                {
-                    if (string.IsNullOrEmpty(url) == false)
-                    {
+                string[] arr = content.Split(("\r\n").ToCharArray(),StringSplitOptions.RemoveEmptyEntries);
+                foreach(string url in arr) {
+                    if(string.IsNullOrEmpty(url) == false) {
                         ParseMainHTML(url);
                     }
                 }
             }
-            using (EcamContext context = new EcamContext())
-            {
+            using(EcamContext context = new EcamContext()) {
                 var companies = (from q in context.tra_company select q).ToList();
                 var funds = (from q in context.tra_mutual_fund_pf select q).ToList();
-                foreach (var company in companies)
-                {
+                foreach(var company in companies) {
                     company.mf_cnt = (from q in funds
                                       where q.symbol == company.symbol
                                       select q.fund_id).Count();
@@ -1538,40 +1498,34 @@ RegexOptions.IgnoreCase
             }
         }
 
-        private static void ParseMainHTML(string url)
-        {
+        private static void ParseMainHTML(string url) {
             //string fileName = "C:\\Users\\kart\\Desktop\\MF\\1.html";
             //string content = System.IO.File.ReadAllText(fileName);
             string MF_HTML_PATH = System.Configuration.ConfigurationManager.AppSettings["MF_HTML_PATH"];
-            string fundCode = url.Replace("http://www.moneycontrol.com/india/mutualfunds/mfinfo/portfolio_holdings/", "");
+            string fundCode = url.Replace("http://www.moneycontrol.com/india/mutualfunds/mfinfo/portfolio_holdings/","");
             string fileName = MF_HTML_PATH + "\\" + fundCode + ".html";
             string content = "";
-            if (File.Exists(fileName) == true)
-            {
+            if(File.Exists(fileName) == true) {
                 content = System.IO.File.ReadAllText(fileName);
-            }
-            else
-            {
+            } else {
                 WebClient client = new WebClient();
                 content = client.DownloadString(url);
-                System.IO.File.WriteAllText(fileName, content);
+                System.IO.File.WriteAllText(fileName,content);
             }
-            if (string.IsNullOrEmpty(content) == false)
-            {
+            if(string.IsNullOrEmpty(content) == false) {
                 Console.WriteLine("ParseMainHTML url=" + url);
                 string startWord = "<table width=\"100%\" class=\"tblporhd\">";
                 string endWord = "<table width=\"100%\" class=\"tblporhd MT25\">";
                 int startIndex = content.IndexOf(startWord);
                 int endIndex = content.IndexOf(endWord);
                 int length = endIndex - startIndex + endWord.Length;
-                if (startIndex > 0 && endIndex > 0)
-                {
-                    string parseContent = content.Substring(startIndex, length);
+                if(startIndex > 0 && endIndex > 0) {
+                    string parseContent = content.Substring(startIndex,length);
                     endWord = "</table>";
                     startIndex = parseContent.IndexOf(startWord);
                     endIndex = parseContent.IndexOf(endWord);
                     length = endIndex - startIndex + endWord.Length;
-                    parseContent = parseContent.Substring(startIndex, length);
+                    parseContent = parseContent.Substring(startIndex,length);
                     Regex regex = null;
 
                     string fundName = string.Empty;
@@ -1584,19 +1538,15 @@ RegexOptions.IgnoreCase
             | RegexOptions.Compiled
             );
                     MatchCollection collections = regex.Matches(content);
-                    if (collections.Count > 0)
-                    {
+                    if(collections.Count > 0) {
                         fundName = collections[0].Groups["fund_name"].Value;
                     }
-                    if (string.IsNullOrEmpty(fundName) == false)
-                    {
-                        using (EcamContext context = new EcamContext())
-                        {
+                    if(string.IsNullOrEmpty(fundName) == false) {
+                        using(EcamContext context = new EcamContext()) {
                             fund = (from q in context.tra_mutual_fund
                                     where q.fund_name == fundName
                                     select q).FirstOrDefault();
-                            if (fund == null)
-                            {
+                            if(fund == null) {
                                 fund = new tra_mutual_fund();
                                 fund.fund_name = fundName;
                                 context.tra_mutual_fund.Add(fund);
@@ -1605,8 +1555,7 @@ RegexOptions.IgnoreCase
                             var rows = (from q in context.tra_mutual_fund_pf
                                         where q.fund_id == fund.id
                                         select q).ToList();
-                            foreach (var row in rows)
-                            {
+                            foreach(var row in rows) {
                                 context.tra_mutual_fund_pf.Remove(row);
                             }
                             context.SaveChanges();
@@ -1622,8 +1571,7 @@ RegexOptions.IgnoreCase
 
                     MatchCollection trCollections = regex.Matches(parseContent);
                     int i = 0;
-                    foreach (Match trMatch in trCollections)
-                    {
+                    foreach(Match trMatch in trCollections) {
                         i += 1;
                         string tr = trMatch.Value;
                         string tagName = "td";
@@ -1643,21 +1591,17 @@ RegexOptions.IgnoreCase
                         string percentage = "";
 
                         int colIndex = -1;
-                        foreach (Match colMatch in rowMatches)
-                        {
+                        foreach(Match colMatch in rowMatches) {
                             colIndex += 1;
 
                             string value = string.Empty;
-                            if (colMatch.Groups.Count >= 2)
-                            {
+                            if(colMatch.Groups.Count >= 2) {
                                 value = colMatch.Groups[1].Value;
                             }
-                            if (string.IsNullOrEmpty(value) == false)
-                            {
+                            if(string.IsNullOrEmpty(value) == false) {
                                 value = value.Trim();
                             }
-                            switch (colIndex)
-                            {
+                            switch(colIndex) {
                                 case 0: equity = value; break;
                                 case 1: sector = value; break;
                                 case 2: qty = value; break;
@@ -1668,8 +1612,7 @@ RegexOptions.IgnoreCase
                         }
                         string symbol = "";
                         string symbolName = "";
-                        if (string.IsNullOrEmpty(equity) == false)
-                        {
+                        if(string.IsNullOrEmpty(equity) == false) {
                             regex = new Regex(
                                     @"<[^>].+?>",
                                     RegexOptions.IgnoreCase
@@ -1677,56 +1620,44 @@ RegexOptions.IgnoreCase
                                     | RegexOptions.IgnorePatternWhitespace
                                     | RegexOptions.Compiled
                                     );
-                            symbolName = regex.Replace(equity, "").Trim();
-                            if (string.IsNullOrEmpty(symbolName) == false)
-                            {
-                                using (EcamContext context = new EcamContext())
-                                {
+                            symbolName = regex.Replace(equity,"").Trim();
+                            if(string.IsNullOrEmpty(symbolName) == false) {
+                                using(EcamContext context = new EcamContext()) {
                                     tra_mutual_fund_pf temp = (from q in context.tra_mutual_fund_pf
                                                                where q.stock_name == symbolName
                                                                select q).FirstOrDefault();
-                                    if (temp != null)
-                                    {
+                                    if(temp != null) {
                                         symbol = temp.symbol;
                                     }
-                                    if (string.IsNullOrEmpty(symbol) == false)
-                                    {
+                                    if(string.IsNullOrEmpty(symbol) == false) {
                                         tra_company company = (from q in context.tra_company
                                                                where q.symbol == symbol
                                                                select q).FirstOrDefault();
-                                        if (company == null)
-                                        {
+                                        if(company == null) {
                                             symbol = string.Empty;
-                                        }
-                                        else
-                                        {
+                                        } else {
                                             Console.WriteLine("Symbol already get symbol=" + symbol);
                                         }
                                     }
                                 }
                             }
-                            if (string.IsNullOrEmpty(symbol) == true)
-                            {
-                                symbol = GetSymbol(equity, symbolName);
+                            if(string.IsNullOrEmpty(symbol) == true) {
+                                symbol = GetSymbol(equity,symbolName);
                             }
                         }
-                        if (string.IsNullOrEmpty(symbol) == false
-                            && fund != null)
-                        {
-                            using (EcamContext context = new EcamContext())
-                            {
+                        if(string.IsNullOrEmpty(symbol) == false
+                            && fund != null) {
+                            using(EcamContext context = new EcamContext()) {
                                 tra_company company = (from q in context.tra_company
                                                        where q.symbol == symbol
                                                        select q).FirstOrDefault();
-                                if (company != null)
-                                {
+                                if(company != null) {
                                     tra_mutual_fund_pf pf = (from q in context.tra_mutual_fund_pf
                                                              where q.fund_id == fund.id
                                                              && q.symbol == symbol
                                                              select q).FirstOrDefault();
                                     bool isNew = false;
-                                    if (pf == null)
-                                    {
+                                    if(pf == null) {
                                         pf = new tra_mutual_fund_pf();
                                         isNew = true;
                                     }
@@ -1736,19 +1667,14 @@ RegexOptions.IgnoreCase
                                     pf.stock_value = DataTypeHelper.ToDecimal(totalValue);
                                     pf.stock_percentage = DataTypeHelper.ToDecimal(percentage);
                                     pf.stock_name = symbolName;
-                                    if (isNew == true)
-                                    {
+                                    if(isNew == true) {
                                         context.tra_mutual_fund_pf.Add(pf);
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         context.Entry(pf).State = System.Data.Entity.EntityState.Modified;
                                     }
                                     context.SaveChanges();
-                                }
-                                else
-                                {
-                                    Helper.Log("equity=" + equity + ",symbol=" + symbol, "FundDoesNotExist");
+                                } else {
+                                    Helper.Log("equity=" + equity + ",symbol=" + symbol,"FundDoesNotExist");
                                 }
                             }
                         }
@@ -1757,11 +1683,9 @@ RegexOptions.IgnoreCase
             }
         }
 
-        private static string GetSymbol(string equity, string symbolName)
-        {
+        private static string GetSymbol(string equity,string symbolName) {
             string symbol = "";
-            try
-            {
+            try {
                 Regex regex = new Regex(
         @"href=[""|'](.*?)[""|']",
         RegexOptions.IgnoreCase
@@ -1770,22 +1694,18 @@ RegexOptions.IgnoreCase
         | RegexOptions.Compiled
         );
                 MatchCollection collections = regex.Matches(equity);
-                if (collections.Count > 0)
-                {
+                if(collections.Count > 0) {
                     string content = string.Empty;
                     string HTML_PATH = System.Configuration.ConfigurationManager.AppSettings["HTML_PATH"];
                     string fileName = HTML_PATH + "\\" + symbolName + ".html";
-                    if (File.Exists(fileName) == true)
-                    {
+                    if(File.Exists(fileName) == true) {
                         content = System.IO.File.ReadAllText(fileName);
                         Console.WriteLine("Process File Text=" + symbolName);
-                    }
-                    else
-                    {
+                    } else {
                         string href = "http://www.moneycontrol.com/" + collections[0].Groups[1].Value;
                         WebClient client = new WebClient();
                         content = client.DownloadString(href);
-                        System.IO.File.WriteAllText(fileName, content);
+                        System.IO.File.WriteAllText(fileName,content);
                         Console.WriteLine("Download equity=" + href);
                     }
                     //string fileName = "C:\\Users\\kart\\Desktop\\MF\\relianceindustries_RI.html";
@@ -1798,35 +1718,28 @@ RegexOptions.IgnoreCase
         | RegexOptions.Compiled
         );
                     collections = regex.Matches(content);
-                    if (collections.Count > 0)
-                    {
+                    if(collections.Count > 0) {
                         symbol = collections[0].Groups[1].Value.Trim();
                     }
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch(Exception ex) {
                 string msg = ex.Message;
-                if (ex.InnerException != null)
-                {
+                if(ex.InnerException != null) {
                     msg += ex.InnerException.Message;
                 }
                 Console.WriteLine("GetSymbol_Error=" + msg);
-                Helper.Log(msg, "GetSymbol_Error");
+                Helper.Log(msg,"GetSymbol_Error");
             }
             return symbol;
         }
 
-        private static void CSVData()
-        {
+        private static void CSVData() {
             string isImportCSV = System.Configuration.ConfigurationManager.AppSettings["IS_IMPORT_CSV"];
             string importCSVDirectoryPath = System.Configuration.ConfigurationManager.AppSettings["IMPORT_CSV"];
             List<string> symbols = new List<string>();
-            if (isImportCSV == "true")
-            {
+            if(isImportCSV == "true") {
                 string[] files = System.IO.Directory.GetFiles(importCSVDirectoryPath);
-                foreach (string fullFileName in files)
-                {
+                foreach(string fullFileName in files) {
                     symbols.Add(System.IO.Path.GetFileNameWithoutExtension(fullFileName));
                 }
             }
@@ -1836,38 +1749,29 @@ RegexOptions.IgnoreCase
             CSVDownloadStart();
         }
 
-        private static void UpdateNiftyFlagCSV()
-        {
+        private static void UpdateNiftyFlagCSV() {
             string niftyFlagCSVDirectoryPath = System.Configuration.ConfigurationManager.AppSettings["NIFTY_FLAG_CSV"];
             List<string> symbols = new List<string>();
-            if (IS_NIFTY_FLAG_CSV == "true")
-            {
+            if(IS_NIFTY_FLAG_CSV == "true") {
                 string[] files = System.IO.Directory.GetFiles(niftyFlagCSVDirectoryPath);
-                foreach (string fullFileName in files)
-                {
+                foreach(string fullFileName in files) {
                     string flag = System.IO.Path.GetFileNameWithoutExtension(fullFileName);
                     int i;
-                    using (TextReader reader = File.OpenText(fullFileName))
-                    {
+                    using(TextReader reader = File.OpenText(fullFileName)) {
                         CsvReader csv = new CsvReader(reader);
                         i = 0;
-                        while (csv.Read())
-                        {
+                        while(csv.Read()) {
                             i += 1;
                             string symbol = csv.GetField<string>("Symbol");
                             string series = csv.GetField<string>("Series");
-                            if (string.IsNullOrEmpty(symbol) == false
-                                && series == "EQ")
-                            {
-                                using (EcamContext context = new EcamContext())
-                                {
+                            if(string.IsNullOrEmpty(symbol) == false
+                                && series == "EQ") {
+                                using(EcamContext context = new EcamContext()) {
                                     tra_company company = (from q in context.tra_company
                                                            where q.symbol == symbol
                                                            select q).FirstOrDefault();
-                                    if (company != null)
-                                    {
-                                        switch (flag)
-                                        {
+                                    if(company != null) {
+                                        switch(flag) {
                                             case "200":
                                                 company.is_nifty_200 = true;
                                                 break;
@@ -1890,40 +1794,31 @@ RegexOptions.IgnoreCase
             }
         }
 
-        private static void UpdateCategoryFlagCSV()
-        {
+        private static void UpdateCategoryFlagCSV() {
             string categoryFlagCSVDirectoryPath = System.Configuration.ConfigurationManager.AppSettings["CATEGORY_FLAG_CSV"];
             List<string> symbols = new List<string>();
-            if (IS_CATEGORY_FLAG_CSV == "true")
-            {
+            if(IS_CATEGORY_FLAG_CSV == "true") {
                 string[] files = System.IO.Directory.GetFiles(categoryFlagCSVDirectoryPath);
-                foreach (string fullFileName in files)
-                {
+                foreach(string fullFileName in files) {
                     string flag = System.IO.Path.GetFileNameWithoutExtension(fullFileName);
                     int i;
-                    using (TextReader reader = File.OpenText(fullFileName))
-                    {
+                    using(TextReader reader = File.OpenText(fullFileName)) {
                         CsvReader csv = new CsvReader(reader);
                         i = 0;
-                        while (csv.Read())
-                        {
+                        while(csv.Read()) {
                             i += 1;
                             string symbol = csv.GetField<string>("Symbol");
                             string series = csv.GetField<string>("Series");
                             string industry = csv.GetField<string>("Industry");
-                            if (string.IsNullOrEmpty(symbol) == false
+                            if(string.IsNullOrEmpty(symbol) == false
                                 && string.IsNullOrEmpty(industry) == false
-                                && series == "EQ")
-                            {
-                                using (EcamContext context = new EcamContext())
-                                {
+                                && series == "EQ") {
+                                using(EcamContext context = new EcamContext()) {
                                     tra_category category = (from q in context.tra_category
                                                              where q.category_name == industry
                                                              select q).FirstOrDefault();
-                                    if (category == null)
-                                    {
-                                        context.tra_category.Add(new tra_category
-                                        {
+                                    if(category == null) {
+                                        context.tra_category.Add(new tra_category {
                                             category_name = industry
                                         });
                                         context.SaveChanges();
@@ -1931,26 +1826,21 @@ RegexOptions.IgnoreCase
                                     tra_company company = (from q in context.tra_company
                                                            where q.symbol == symbol
                                                            select q).FirstOrDefault();
-                                    if (company != null)
-                                    {
+                                    if(company != null) {
                                         tra_company_category companyCategory = (from q in context.tra_company_category
                                                                                 where q.symbol == symbol
                                                                                 && q.category_name == industry
                                                                                 select q).FirstOrDefault();
-                                        if (companyCategory == null)
-                                        {
-                                            context.tra_company_category.Add(new tra_company_category
-                                            {
+                                        if(companyCategory == null) {
+                                            context.tra_company_category.Add(new tra_company_category {
                                                 category_name = industry,
                                                 symbol = symbol
                                             });
                                             context.SaveChanges();
                                         }
                                         Console.WriteLine("Update category=" + industry + ",symbol=" + company.symbol);
-                                    }
-                                    else
-                                    {
-                                        Helper.Log("Company does not exist symbol=" + symbol, "UpdateCategoryFlagCSV");
+                                    } else {
+                                        Helper.Log("Company does not exist symbol=" + symbol,"UpdateCategoryFlagCSV");
                                     }
                                 }
                             }
@@ -1960,12 +1850,10 @@ RegexOptions.IgnoreCase
             }
         }
 
-        private static void CSVDownloadStart()
-        {
+        private static void CSVDownloadStart() {
             int totalCount = _COMPANIES.Length;
             int queueCount = 64;
-            if (totalCount <= queueCount)
-            {
+            if(totalCount <= queueCount) {
                 queueCount = totalCount;
             }
             // One event is used for each Fibonacci object
@@ -1973,24 +1861,21 @@ RegexOptions.IgnoreCase
             CSVDownloadData[] downArray = new CSVDownloadData[queueCount];
             //Random r = new Random();
             // Configure and launch threads using ThreadPool:
-            Console.WriteLine("launching {0} tasks...", totalCount);
-            for (int i = 0; i < queueCount; i++)
-            {
+            Console.WriteLine("launching {0} tasks...",totalCount);
+            for(int i = 0;i < queueCount;i++) {
                 _INDEX += 1;
                 string symbol = "";
-                if (_INDEX < _COMPANIES.Length)
-                {
+                if(_INDEX < _COMPANIES.Length) {
                     symbol = _COMPANIES[_INDEX];
                 }
                 doneEvents[i] = new ManualResetEvent(false);
-                CSVDownloadData f = new CSVDownloadData(symbol,_SYMBOLS_LIST, doneEvents[i]);
+                CSVDownloadData f = new CSVDownloadData(symbol,_SYMBOLS_LIST,doneEvents[i]);
                 downArray[i] = f;
-                ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback, i);
+                ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback,i);
             }
             // Wait for all threads in pool to calculation...
             WaitHandle.WaitAll(doneEvents);
-            if (_INDEX < _COMPANIES.Length)
-            {
+            if(_INDEX < _COMPANIES.Length) {
                 Console.WriteLine("All calculations are complete.");
                 CSVDownloadStart();
             }

@@ -15,7 +15,7 @@
     <AssemblyName>Ecam.Views</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
@@ -484,6 +484,21 @@
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="Global.asax" />
+    <Content Include="GoogleChromeExtension\background.js" />
+    <Content Include="GoogleChromeExtension\bootstrap.min.css" />
+    <Content Include="GoogleChromeExtension\ext.js" />
+    <Content Include="GoogleChromeExtension\form-fill.js" />
+    <Content Include="GoogleChromeExtension\images\get_started128.png" />
+    <Content Include="GoogleChromeExtension\images\get_started16.png" />
+    <Content Include="GoogleChromeExtension\images\get_started32.png" />
+    <Content Include="GoogleChromeExtension\images\get_started48.png" />
+    <Content Include="GoogleChromeExtension\init.js" />
+    <Content Include="GoogleChromeExtension\jquery-3.3.1.min.js" />
+    <Content Include="GoogleChromeExtension\knockout-3.4.2.js" />
+    <Content Include="GoogleChromeExtension\options.html" />
+    <Content Include="GoogleChromeExtension\options.js" />
+    <Content Include="GoogleChromeExtension\popup.html" />
+    <Content Include="GoogleChromeExtension\popup.js" />
     <Content Include="img\ack-32.png" />
     <Content Include="img\avatar_default.jpg" />
     <Content Include="img\botton2-act.png" />
@@ -1188,6 +1203,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="GoogleChromeExtension\manifest.json" />
+    <Content Include="GoogleChromeExtension\packages.config" />
     <None Include="Properties\PublishProfiles\local.pubxml" />
     <Content Include="Views\Home\Company.cshtml" />
     <Content Include="Views\Home\AddCompany.cshtml" />
