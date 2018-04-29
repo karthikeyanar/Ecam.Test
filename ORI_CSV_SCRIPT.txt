@@ -104,6 +104,6 @@ function checkCSVContent(symbol) {
 			checkCSVCount=0;
 			$error.append("<li style='margin:5px 0;color:red;list-style-type:number;'>Exception:"+e+"</li>");
 		}
-	},10000);
+	},5000);
 }
 doDownload();

@@ -21,13 +21,10 @@ using Ecam.Models.Helpers;
 using Ecam.Contracts.Enums;
 using Ecam.Framework.ExcelHelper;
 
-namespace Ecam.Models
-{
+namespace Ecam.Models {
 
-    public static class Common
-    {
-        public static PaginatedListResult<TRA_COMPANY> Get(TRA_COMPANY_SEARCH criteria, Paging paging)
-        {
+    public static class Common {
+        public static PaginatedListResult<TRA_COMPANY> Get(TRA_COMPANY_SEARCH criteria,Paging paging) {
             StringBuilder where = new StringBuilder();
             string selectFields = "";
             string pageLimit = "";
@@ -39,248 +36,200 @@ namespace Ecam.Models
             string sql = string.Empty;
             //string role = Authentication.CurrentRole;
 
-            if ((criteria.id ?? 0) > 0)
-            {
-                where.AppendFormat(" ct.company_id={0}", criteria.id);
-            }
-            else
-            {
+            if((criteria.id ?? 0) > 0) {
+                where.AppendFormat(" ct.company_id={0}",criteria.id);
+            } else {
                 where.AppendFormat(" ct.company_id>0 ");
 
-                if (string.IsNullOrEmpty(criteria.company_name) == false)
-                {
-                    where.AppendFormat(" and ct.company_name like '%{0}%", criteria.company_name);
+                if(string.IsNullOrEmpty(criteria.company_name) == false) {
+                    where.AppendFormat(" and ct.company_name like '%{0}%",criteria.company_name);
                 }
             }
 
-            if (string.IsNullOrEmpty(criteria.symbols) == false)
-            {
-                where.AppendFormat(" and ct.symbol in({0})", Helper.ConvertStringSQLFormat(criteria.symbols));
+            if(string.IsNullOrEmpty(criteria.symbols) == false) {
+                where.AppendFormat(" and ct.symbol in({0})",Helper.ConvertStringSQLFormat(criteria.symbols));
             }
 
             List<string> categoryList = null;
-            if ((criteria.is_book_mark_category ?? false) == true)
-            {
-                using (EcamContext context = new EcamContext())
-                {
+            if((criteria.is_book_mark_category ?? false) == true) {
+                using(EcamContext context = new EcamContext()) {
                     var categoryNameList = (from q in context.tra_category where (q.is_book_mark ?? false) == true select q.category_name).ToList();
                     criteria.categories += Helper.ConvertStringIds(categoryNameList);
                 }
             }
 
-            if (string.IsNullOrEmpty(criteria.categories) == false)
-            {
+            if(string.IsNullOrEmpty(criteria.categories) == false) {
                 categoryList = Helper.ConvertStringList(criteria.categories);
             }
 
-            if (categoryList != null)
-            {
-                if (categoryList.Count > 0)
-                {
+            if(categoryList != null) {
+                if(categoryList.Count > 0) {
                     string categorySymbols = "-1";
-                    using (EcamContext context = new EcamContext())
-                    {
+                    using(EcamContext context = new EcamContext()) {
                         List<tra_company_category> categories = null;
                         List<string> categorySymbolList = null;
                         categories = (from q in context.tra_company_category
                                       where categoryList.Contains(q.category_name) == true
                                       select q).ToList();
-                        if ((criteria.is_all_category ?? false) == true)
-                        {
+                        if((criteria.is_all_category ?? false) == true) {
                             categorySymbolList = new List<string>();
-                            foreach (var row in categories)
-                            {
+                            foreach(var row in categories) {
                                 var tempList = (from q in categories where q.symbol == row.symbol select q).ToList();
                                 int selCnt = 0;
-                                foreach (var tempRow in tempList)
-                                {
-                                    foreach (string str in categoryList)
-                                    {
-                                        if (string.IsNullOrEmpty(str) == false)
-                                        {
-                                            if (tempRow.category_name == str)
-                                            {
+                                foreach(var tempRow in tempList) {
+                                    foreach(string str in categoryList) {
+                                        if(string.IsNullOrEmpty(str) == false) {
+                                            if(tempRow.category_name == str) {
                                                 selCnt += 1;
                                             }
                                         }
                                     }
                                 }
-                                if (selCnt == categoryList.Count)
-                                {
+                                if(selCnt == categoryList.Count) {
                                     categorySymbolList.Add(row.symbol);
                                 }
                             }
                             categorySymbolList = categorySymbolList.Distinct().ToList();
-                        }
-                        else
-                        {
+                        } else {
                             categorySymbolList = (from q in categories select q.symbol).Distinct().ToList();
                         }
-                        if (categorySymbolList.Count > 0)
-                        {
+                        if(categorySymbolList.Count > 0) {
                             categorySymbols = "";
                         }
-                        foreach (var str in categorySymbolList)
-                        {
+                        foreach(var str in categorySymbolList) {
                             categorySymbols += str + ",";
                         }
-                        if (string.IsNullOrEmpty(categorySymbols) == false)
-                        {
-                            categorySymbols = categorySymbols.Substring(0, categorySymbols.Length - 1);
+                        if(string.IsNullOrEmpty(categorySymbols) == false) {
+                            categorySymbols = categorySymbols.Substring(0,categorySymbols.Length - 1);
                         }
                     }
-                    if (string.IsNullOrEmpty(categorySymbols) == false)
-                    {
-                        where.AppendFormat(" and ct.symbol in({0})", Helper.ConvertStringSQLFormat(categorySymbols));
+                    if(string.IsNullOrEmpty(categorySymbols) == false) {
+                        where.AppendFormat(" and ct.symbol in({0})",Helper.ConvertStringSQLFormat(categorySymbols));
                     }
                 }
             }
 
-            if (string.IsNullOrEmpty(criteria.mf_ids) == false)
-            {
+            if(string.IsNullOrEmpty(criteria.mf_ids) == false) {
                 string symbols = "";
-                using (EcamContext context = new EcamContext())
-                {
+                using(EcamContext context = new EcamContext()) {
                     List<int> ids = Helper.ConvertIntIds(criteria.mf_ids);
-                    if (ids.Count > 0)
-                    {
+                    if(ids.Count > 0) {
                         var list = (from q in context.tra_mutual_fund_pf
                                     where ids.Contains(q.fund_id) == true
                                     select q.symbol).Distinct().ToList();
-                        foreach (var str in list)
-                        {
+                        foreach(var str in list) {
                             symbols += str + ",";
                         }
-                        if (string.IsNullOrEmpty(symbols) == false)
-                        {
-                            symbols = symbols.Substring(0, symbols.Length - 1);
+                        if(string.IsNullOrEmpty(symbols) == false) {
+                            symbols = symbols.Substring(0,symbols.Length - 1);
                         }
                     }
                 }
-                if (string.IsNullOrEmpty(symbols) == false)
-                {
-                    where.AppendFormat(" and ct.symbol in({0})", Helper.ConvertStringSQLFormat(symbols));
-                }
-                else
-                {
+                if(string.IsNullOrEmpty(symbols) == false) {
+                    where.AppendFormat(" and ct.symbol in({0})",Helper.ConvertStringSQLFormat(symbols));
+                } else {
                     where.Append(" and ct.symbol='-1'");
                 }
             }
 
             //if (criteria.is_archive.HasValue)
             //{
-            where.AppendFormat(" and ifnull(ct.is_archive,0)={0}", ((criteria.is_archive ?? false) == true ? "1" : "0"));
+            where.AppendFormat(" and ifnull(ct.is_archive,0)={0}",((criteria.is_archive ?? false) == true ? "1" : "0"));
             //}
 
-            if (criteria.is_book_mark.HasValue)
-            {
-                where.AppendFormat(" and ifnull(ct.is_book_mark,0)={0}", ((criteria.is_book_mark ?? false) == true ? "1" : "0"));
+            if(criteria.is_book_mark.HasValue) {
+                where.AppendFormat(" and ifnull(ct.is_book_mark,0)={0}",((criteria.is_book_mark ?? false) == true ? "1" : "0"));
             }
 
-            if (criteria.from_price.HasValue)
-            {
-                where.AppendFormat(" and ifnull(ct.close_price,0)>={0}", criteria.from_price);
+            if(criteria.from_price.HasValue) {
+                where.AppendFormat(" and ifnull(ct.close_price,0)>={0}",criteria.from_price);
             }
 
-            if (criteria.to_price.HasValue)
-            {
-                where.AppendFormat(" and ifnull(ct.close_price,0)<={0}", criteria.to_price);
+            if(criteria.to_price.HasValue) {
+                where.AppendFormat(" and ifnull(ct.close_price,0)<={0}",criteria.to_price);
             }
 
 
-            if (criteria.from_rsi.HasValue)
-            {
-                where.AppendFormat(" and ifnull(ct.rsi,0)>={0}", criteria.from_rsi);
+            if(criteria.from_rsi.HasValue) {
+                where.AppendFormat(" and ifnull(ct.rsi,0)>={0}",criteria.from_rsi);
             }
 
-            if (criteria.to_rsi.HasValue)
-            {
-                where.AppendFormat(" and ifnull(ct.rsi,0)<={0}", criteria.to_rsi);
+            if(criteria.to_rsi.HasValue) {
+                where.AppendFormat(" and ifnull(ct.rsi,0)<={0}",criteria.to_rsi);
             }
 
-            if (criteria.from_prev_rsi.HasValue)
-            {
-                where.AppendFormat(" and ifnull(ct.prev_rsi,0)>={0}", criteria.from_prev_rsi);
+            if(criteria.from_prev_rsi.HasValue) {
+                where.AppendFormat(" and ifnull(ct.prev_rsi,0)>={0}",criteria.from_prev_rsi);
             }
 
-            if (criteria.to_prev_rsi.HasValue)
-            {
-                where.AppendFormat(" and ifnull(ct.prev_rsi,0)<={0}", criteria.to_prev_rsi);
+            if(criteria.to_prev_rsi.HasValue) {
+                where.AppendFormat(" and ifnull(ct.prev_rsi,0)<={0}",criteria.to_prev_rsi);
             }
 
-            if (criteria.is_nifty_50.HasValue)
-            {
-                where.AppendFormat(" and ifnull(ct.is_nifty_50,0)={0}", ((criteria.is_nifty_50 ?? false) == true ? "1" : "0"));
+            if(criteria.is_nifty_50.HasValue) {
+                where.AppendFormat(" and ifnull(ct.is_nifty_50,0)={0}",((criteria.is_nifty_50 ?? false) == true ? "1" : "0"));
             }
 
-            if (criteria.is_nifty_100.HasValue)
-            {
-                where.AppendFormat(" and ifnull(ct.is_nifty_100,0)={0}", ((criteria.is_nifty_100 ?? false) == true ? "1" : "0"));
+            if(criteria.is_nifty_100.HasValue) {
+                where.AppendFormat(" and ifnull(ct.is_nifty_100,0)={0}",((criteria.is_nifty_100 ?? false) == true ? "1" : "0"));
             }
 
-            if (criteria.is_nifty_200.HasValue)
-            {
-                where.AppendFormat(" and ifnull(ct.is_nifty_200,0)={0}", ((criteria.is_nifty_200 ?? false) == true ? "1" : "0"));
+            if(criteria.is_nifty_200.HasValue) {
+                where.AppendFormat(" and ifnull(ct.is_nifty_200,0)={0}",((criteria.is_nifty_200 ?? false) == true ? "1" : "0"));
             }
 
-            if (criteria.is_old.HasValue)
-            {
-                where.AppendFormat(" and ifnull(ct.is_old,0)={0}", ((criteria.is_old ?? false) == true ? "1" : "0"));
+            if(criteria.is_old.HasValue) {
+                where.AppendFormat(" and ifnull(ct.is_old,0)={0}",((criteria.is_old ?? false) == true ? "1" : "0"));
             }
 
-            if (string.IsNullOrEmpty(criteria.ignore_symbols) == false)
-            {
-                where.AppendFormat(" and ifnull(ct.symbol,0) not in({0})", Helper.ConvertStringSQLFormat(criteria.ignore_symbols));
+            if(string.IsNullOrEmpty(criteria.ignore_symbols) == false) {
+                where.AppendFormat(" and ifnull(ct.symbol,0) not in({0})",Helper.ConvertStringSQLFormat(criteria.ignore_symbols));
             }
 
-            if ((criteria.is_current_stock ?? false) == true)
-            {
+            if((criteria.is_current_stock ?? false) == true) {
                 joinTables += " join tra_holding h on h.symbol = ct.symbol ";
             }
 
             selectFields = "count(*) as cnt";
 
-            sql = string.Format(sqlFormat, selectFields, joinTables, where, groupByName, "", "");
+            sql = string.Format(sqlFormat,selectFields,joinTables,where,groupByName,"","");
 
             //Helper.Log(sql,"GET_COUNT");
 
-            paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString, sql));
+            paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString,sql));
 
-            if (string.IsNullOrEmpty(paging.SortOrder))
-            {
+            if(string.IsNullOrEmpty(paging.SortOrder)) {
                 paging.SortOrder = "asc";
             }
 
-            if (paging.PageSize > 0)
-            {
+            if(paging.PageSize > 0) {
                 int from = (paging.PageIndex > 1) ? ((paging.PageIndex - 1) * paging.PageSize) : 0;
                 int to = paging.PageSize;
-                pageLimit = string.Format("limit {0},{1}", from, to);
+                pageLimit = string.Format("limit {0},{1}",from,to);
             }
 
-            orderBy = string.Format("order by {0} {1}", paging.SortName, paging.SortOrder);
+            orderBy = string.Format("order by {0} {1}",paging.SortName,paging.SortOrder);
 
             string dateFilter = string.Empty;
             DateTime? minDate = Convert.ToDateTime("01/01/1900");
-            if (criteria.start_date.HasValue && criteria.end_date.HasValue)
-            {
-                dateFilter = string.Format(" m.trade_date>='{0}' and m.trade_date<='{1}' ", criteria.start_date.Value.ToString("yyyy-MM-dd"), criteria.end_date.Value.ToString("yyyy-MM-dd"));
+            if(criteria.start_date.HasValue && criteria.end_date.HasValue) {
+                dateFilter = string.Format(" m.trade_date>='{0}' and m.trade_date<='{1}' ",criteria.start_date.Value.ToString("yyyy-MM-dd"),criteria.end_date.Value.ToString("yyyy-MM-dd"));
             }
 
-            if (criteria.total_start_date.HasValue == false)
+            if(criteria.total_start_date.HasValue == false)
                 criteria.total_start_date = DateTime.Now.Date.AddDays(-(365 * 3));
-            if (criteria.total_end_date.HasValue == false)
+            if(criteria.total_end_date.HasValue == false)
                 criteria.total_end_date = DateTime.Now.Date;
 
             string totalDateFilter = string.Empty;
             totalDateFilter = string.Format(" m.trade_date>='{0}' and m.trade_date<='{1}' "
-                , criteria.total_start_date.Value.ToString("yyyy-MM-dd")
-                , criteria.total_end_date.Value.ToString("yyyy-MM-dd")) + Environment.NewLine;
+                ,criteria.total_start_date.Value.ToString("yyyy-MM-dd")
+                ,criteria.total_end_date.Value.ToString("yyyy-MM-dd")) + Environment.NewLine;
 
             string totalDateAVGFilter = string.Empty;
             totalDateAVGFilter = string.Format(" and m.avg_date>='{0}' and m.avg_date<='{1}' "
-                , DataTypeHelper.GetFirstDayOfMonth(criteria.total_start_date.Value).ToString("yyyy-MM-dd")
-                , DataTypeHelper.GetLastDayOfMonth(criteria.total_end_date.Value).ToString("yyyy-MM-dd")) + Environment.NewLine;
+                ,DataTypeHelper.GetFirstDayOfMonth(criteria.total_start_date.Value).ToString("yyyy-MM-dd")
+                ,DataTypeHelper.GetLastDayOfMonth(criteria.total_end_date.Value).ToString("yyyy-MM-dd")) + Environment.NewLine;
 
             //if (criteria.trigger_start_date.HasValue == false)
             //    criteria.trigger_start_date = criteria.total_start_date;
@@ -366,56 +315,48 @@ namespace Ecam.Models
                            ",ct.company_id as id" + Environment.NewLine +
                            "";
 
-            sql = string.Format(sqlFormat, selectFields, joinTables, where, "", "", "");
+            sql = string.Format(sqlFormat,selectFields,joinTables,where,"","","");
 
             where = new StringBuilder();
 
             where.AppendFormat(" where company_id > 0");
 
-            if ((criteria.is_sell_to_buy ?? false) == true)
-            {
+            if((criteria.is_sell_to_buy ?? false) == true) {
                 where.AppendFormat(" and ifnull(open_price,0)>=ifnull(low_price,0)");
                 where.AppendFormat(" and ifnull(open_price,0)>=ifnull(high_price,0)");
                 //where.AppendFormat(" and ifnull(high_percentage,0)>=0");
                 //where.AppendFormat(" and ifnull(high_percentage,0)<=0.5");
             }
 
-            if ((criteria.is_buy_to_sell ?? false) == true)
-            {
+            if((criteria.is_buy_to_sell ?? false) == true) {
                 where.AppendFormat(" and ifnull(open_price,0)<=ifnull(high_price,0)");
                 //where.AppendFormat(" and ifnull(low_percentage,0)<=0");
                 //where.AppendFormat(" and ifnull(low_percentage,0)>=-0.5");
                 where.AppendFormat(" and ifnull(open_price,0)<=ifnull(low_price,0)");
             }
 
-            if (string.IsNullOrEmpty(criteria.ltp_from_percentage) == false)
-            {
-                where.AppendFormat(" and ifnull(ltp_percentage,0)>={0}", criteria.ltp_from_percentage);
+            if(string.IsNullOrEmpty(criteria.ltp_from_percentage) == false) {
+                where.AppendFormat(" and ifnull(ltp_percentage,0)>={0}",criteria.ltp_from_percentage);
             }
 
-            if (string.IsNullOrEmpty(criteria.ltp_to_percentage) == false)
-            {
-                where.AppendFormat(" and ifnull(ltp_percentage,0)<={0}", criteria.ltp_to_percentage);
+            if(string.IsNullOrEmpty(criteria.ltp_to_percentage) == false) {
+                where.AppendFormat(" and ifnull(ltp_percentage,0)<={0}",criteria.ltp_to_percentage);
             }
 
-            if ((criteria.from_profit ?? 0) != 0)
-            {
-                where.AppendFormat(" and ifnull((((last_price - first_price)/first_price) * 100),0)>={0}", criteria.from_profit);
+            if((criteria.from_profit ?? 0) != 0) {
+                where.AppendFormat(" and ifnull((((last_price - first_price)/first_price) * 100),0)>={0}",criteria.from_profit);
             }
 
-            if ((criteria.to_profit ?? 0) != 0)
-            {
-                where.AppendFormat(" and ifnull((((last_price - first_price)/first_price) * 100),0)<={0}", criteria.to_profit);
+            if((criteria.to_profit ?? 0) != 0) {
+                where.AppendFormat(" and ifnull((((last_price - first_price)/first_price) * 100),0)<={0}",criteria.to_profit);
             }
 
-            if ((criteria.total_from_profit ?? 0) != 0)
-            {
-                where.AppendFormat(" and ifnull((((total_last_price - total_first_price)/total_first_price) * 100),0)>={0}", criteria.total_from_profit);
+            if((criteria.total_from_profit ?? 0) != 0) {
+                where.AppendFormat(" and ifnull((((total_last_price - total_first_price)/total_first_price) * 100),0)>={0}",criteria.total_from_profit);
             }
 
-            if ((criteria.total_to_profit ?? 0) != 0)
-            {
-                where.AppendFormat(" and ifnull((((total_last_price - total_first_price)/total_first_price) * 100),0)<={0}", criteria.total_to_profit);
+            if((criteria.total_to_profit ?? 0) != 0) {
+                where.AppendFormat(" and ifnull((((total_last_price - total_first_price)/total_first_price) * 100),0)<={0}",criteria.total_to_profit);
             }
 
             where.Append(" and ifnull(total_first_price,0)>0 and ifnull(total_last_price,0)>0 and ifnull(first_price,0)>0 and ifnull(last_price,0)>0 ");
@@ -439,11 +380,11 @@ namespace Ecam.Models
        "tbl.*" + Environment.NewLine +
        " from(" + Environment.NewLine +
        sql + Environment.NewLine +
-       ") as tbl {0} {1} {2} {3} ", where, "", "", "");
+       ") as tbl {0} {1} {2} {3} ",where,"","","");
 
             tempsql = "select count(*) as cnt from(" + tempsql + ") as tbl2";
 
-            paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString, tempsql));
+            paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString,tempsql));
 
             sql = string.Format("select " +
             "(((last_price - first_price)/first_price) * 100) as profit" + Environment.NewLine +
@@ -456,13 +397,12 @@ namespace Ecam.Models
             ",tbl.*" + Environment.NewLine +
             " from(" + Environment.NewLine +
             sql + Environment.NewLine +
-            ") as tbl {0} {1} {2} {3} ", where, "", orderBy, pageLimit);
+            ") as tbl {0} {1} {2} {3} ",where,"",orderBy,pageLimit);
 
             //Helper.Log(sql,"GET_SQL");
             List<TRA_COMPANY> rows = new List<TRA_COMPANY>();
             List<tra_company_category> companyCategories;
-            using (EcamContext context = new EcamContext())
-            {
+            using(EcamContext context = new EcamContext()) {
                 rows = context.Database.SqlQuery<TRA_COMPANY>(sql).ToList();
                 List<string> symbols = (from q in rows select q.symbol).ToList();
                 companyCategories = (from q in context.tra_company_category
@@ -470,19 +410,16 @@ namespace Ecam.Models
                                      select q).ToList();
             }
 
-            foreach (var row in rows)
-            {
+            foreach(var row in rows) {
                 row.category_list = (from q in companyCategories
                                      where q.symbol == row.symbol
                                      select q.category_name).ToList();
                 string categoryName = "";
-                foreach (var cat in row.category_list)
-                {
+                foreach(var cat in row.category_list) {
                     categoryName += cat + ",";
                 }
-                if (string.IsNullOrEmpty(categoryName) == false)
-                {
-                    categoryName = categoryName.Substring(0, categoryName.Length - 1);
+                if(string.IsNullOrEmpty(categoryName) == false) {
+                    categoryName = categoryName.Substring(0,categoryName.Length - 1);
                 }
                 row.category_name = categoryName;
             }
@@ -509,20 +446,18 @@ namespace Ecam.Models
             //        row.profit = DataTypeHelper.SafeDivision(((row.last_price ?? 0) - (row.first_price ?? 0)), (row.first_price ?? 0)) * 100;
             //    }
             //}
-            return new PaginatedListResult<TRA_COMPANY> { total = paging.Total, rows = rows };
+            return new PaginatedListResult<TRA_COMPANY> { total = paging.Total,rows = rows };
         }
 
-        public static List<BatchLog> GetBatchLog(TRA_COMPANY_SEARCH criteria, Paging paging)
-        {
+        public static List<BatchLog> GetBatchLog(TRA_COMPANY_SEARCH criteria,Paging paging) {
             DateTime minDate = Convert.ToDateTime("01/01/1900");
             List<BatchLog> logs = new List<BatchLog>();
-            List<TRA_COMPANY> list = Common.Get(criteria, paging).rows.ToList();
+            List<TRA_COMPANY> list = Common.Get(criteria,paging).rows.ToList();
 
             List<string> symbols = (from q in list
                                     select q.symbol).Distinct().ToList();
             List<tra_market> markets;
-            using (EcamContext context = new EcamContext())
-            {
+            using(EcamContext context = new EcamContext()) {
                 markets = (from q in context.tra_market
                            where symbols.Contains(q.symbol) == true
                            && q.trade_date >= criteria.start_date
@@ -535,19 +470,15 @@ namespace Ecam.Models
             List<Weeks> weeks = DataTypeHelper.GetMonthWeeks(monthStartDate);
             decimal firstPrice, lastPrice, percentage;
 
-            foreach (var row in list)
-            {
-                foreach (var week in weeks)
-                {
+            foreach(var row in list) {
+                foreach(var week in weeks) {
                     BatchLog log = (from q in logs
                                     where q.symbol == row.symbol
                                     && q.batch_index == paging.PageIndex
                                     && q.date == monthStartDate
                                     select q).FirstOrDefault();
-                    if (log == null)
-                    {
-                        log = new BatchLog
-                        {
+                    if(log == null) {
+                        log = new BatchLog {
                             batch_index = paging.PageIndex,
                             symbol = row.symbol,
                             date = monthStartDate
@@ -566,12 +497,11 @@ namespace Ecam.Models
                                      select (q.close_price ?? 0)).FirstOrDefault();
                         log.first_price = firstPrice;
                         log.last_price = lastPrice;
-                        percentage = DataTypeHelper.SafeDivision((lastPrice - firstPrice), firstPrice) * 100;
+                        percentage = DataTypeHelper.SafeDivision((lastPrice - firstPrice),firstPrice) * 100;
                         log.percentage = percentage;
                         logs.Add(log);
                     }
-                    if (log != null)
-                    {
+                    if(log != null) {
                         firstPrice = (from q in markets
                                       where q.symbol == row.symbol
                                       && q.trade_date >= week.first_date
@@ -584,9 +514,8 @@ namespace Ecam.Models
                                      && q.trade_date <= week.last_date
                                      orderby q.trade_date descending
                                      select (q.close_price ?? 0)).FirstOrDefault();
-                        percentage = DataTypeHelper.SafeDivision((lastPrice - firstPrice), firstPrice) * 100;
-                        switch (week.week_number)
-                        {
+                        percentage = DataTypeHelper.SafeDivision((lastPrice - firstPrice),firstPrice) * 100;
+                        switch(week.week_number) {
                             case 1:
                                 log.w1_first_price = firstPrice;
                                 log.w1_last_price = lastPrice;
@@ -616,13 +545,11 @@ namespace Ecam.Models
                     }
                 }
             }
-            foreach (var log in logs)
-            {
-                if (log.w1_first_price <= 0 && log.w1_last_price <= 0)
-                {
+            foreach(var log in logs) {
+                if(log.w1_first_price <= 0 && log.w1_last_price <= 0) {
                     log.w1_first_price = log.w2_first_price;
                     log.w1_last_price = log.w2_last_price;
-                    log.w1 = DataTypeHelper.SafeDivision((log.w1_last_price - log.w1_first_price), log.w1_first_price) * 100;
+                    log.w1 = DataTypeHelper.SafeDivision((log.w1_last_price - log.w1_first_price),log.w1_first_price) * 100;
                 }
             }
             logs = (from q in logs
@@ -631,18 +558,16 @@ namespace Ecam.Models
             return logs;
         }
 
-        public static List<DailySummary> GetDailySummary(TRA_COMPANY_SEARCH criteria, Paging paging, bool isDailyBuy = false)
-        {
+        public static List<DailySummary> GetDailySummary(TRA_COMPANY_SEARCH criteria,Paging paging,bool isDailyBuy = false) {
             DateTime minDate = Convert.ToDateTime("01/01/1900");
             List<DailySummary> logs = new List<DailySummary>();
-            List<TRA_COMPANY> list = Common.Get(criteria, paging).rows.ToList();
+            List<TRA_COMPANY> list = Common.Get(criteria,paging).rows.ToList();
 
             List<string> symbols = (from q in list
                                     select q.symbol).Distinct().ToList();
             List<tra_market> markets;
             List<tra_daily_log> dailyLogs;
-            using (EcamContext context = new EcamContext())
-            {
+            using(EcamContext context = new EcamContext()) {
                 markets = (from q in context.tra_market
                            where symbols.Contains(q.symbol) == true
                            && q.trade_date >= criteria.start_date
@@ -655,19 +580,18 @@ namespace Ecam.Models
                              select q).ToList();
             }
 
-            
+
 
             DateTime monthStartDate = DataTypeHelper.GetFirstDayOfMonth(criteria.end_date ?? minDate);
             DateTime monthLastDate = DataTypeHelper.GetLastDayOfMonth(criteria.end_date ?? minDate);
             TimeSpan ts = monthLastDate - monthStartDate;
             List<Weeks> weeks = new List<Weeks>();
             int i;
-            for (i = 0; i < ts.TotalDays + 1; i++)
-            {
+            for(i = 0;i < ts.TotalDays + 1;i++) {
                 DateTime dt = monthStartDate.AddDays(i);
                 int? cnt = (from q in markets
-                              where q.trade_date == dt
-                              select q).Count();
+                            where q.trade_date == dt
+                            select q).Count();
                 if((cnt ?? 0) > 0) {
                     DailySummary log = (from q in logs
                                         where q.date == dt
@@ -719,11 +643,11 @@ namespace Ecam.Models
                                                        select (q.open_price ?? 0)).FirstOrDefault();
                                 } else {
                                     var tempmarket = (from q in markets
-                                                  where q.symbol == symbol
-                                                  //&& q.trade_date >= monthStartDate
-                                                  && q.trade_date >= dt
-                                                  orderby q.trade_date ascending
-                                                  select q).FirstOrDefault();
+                                                      where q.symbol == symbol
+                                                      //&& q.trade_date >= monthStartDate
+                                                      && q.trade_date >= dt
+                                                      orderby q.trade_date ascending
+                                                      select q).FirstOrDefault();
                                     if(tempmarket != null) {
                                         daily.buy_price = market.open_price ?? 0;
                                     }
@@ -755,31 +679,26 @@ namespace Ecam.Models
             return logs;
         }
 
-        public static void CreateCategoryProfit()
-        {
+        public static void CreateCategoryProfit() {
             List<tra_category> categories;
-            using (EcamContext context = new EcamContext())
-            {
+            using(EcamContext context = new EcamContext()) {
                 categories = (from q in context.tra_category
                               orderby q.category_name ascending
                               select q).ToList();
             }
-            foreach (var category in categories)
-            {
-                Common.CreateCategoryProfit(category.category_name, DateTime.Now.Year);
+            foreach(var category in categories) {
+                Common.CreateCategoryProfit(category.category_name,DateTime.Now.Year);
             }
         }
 
-        public static void CreateCategoryProfit(string categoryName, int year)
-        {
+        public static void CreateCategoryProfit(string categoryName,int year) {
             DateTime yearStartDate = Convert.ToDateTime("01/01/" + year);
             decimal initialAmount = 500000;
             decimal totalAmount = initialAmount;
             decimal monthlyInvestment = 20000;
             int totalMonths = 12;
             int i;
-            for (i = 1; i <= totalMonths; i++)
-            {
+            for(i = 1;i <= totalMonths;i++) {
                 DateTime dt = Convert.ToDateTime("01" + "/" + DataTypeHelper.GetMonthName(i) + "/" + year);
                 DateTime startDate = DataTypeHelper.GetFirstDayOfMonth(dt);
                 DateTime endDate = DataTypeHelper.GetLastDayOfMonth(dt);
@@ -787,8 +706,7 @@ namespace Ecam.Models
                 DateTime totalEndDate = DataTypeHelper.GetLastDayOfMonth(totalStartDate.AddMonths(6).AddDays(-7));
 
                 //Console.WriteLine("StartDate=" + startDate.ToString("dd/MMM/yyyyy") + ",EndDate=" + endDate.ToString("dd/MMM/yyyyy"));
-                List<TRA_COMPANY> list = Common.Get(new TRA_COMPANY_SEARCH
-                {
+                List<TRA_COMPANY> list = Common.Get(new TRA_COMPANY_SEARCH {
                     categories = categoryName,
                     start_date = startDate,
                     end_date = endDate,
@@ -797,8 +715,7 @@ namespace Ecam.Models
                     total_amount = totalAmount,
                     monthly_investment = monthlyInvestment,
                     max_negative_count = -1,
-                }, new Paging
-                {
+                },new Paging {
                     PageIndex = 1,
                     PageSize = 10,
                     SortName = "total_profit",
@@ -807,11 +724,9 @@ namespace Ecam.Models
 
                 int totalEquity = list.Count();
                 decimal totalInvestmentPerEquity = 0;
-                try
-                {
+                try {
                     totalInvestmentPerEquity = (totalAmount / totalEquity);
-                }
-                catch { }
+                } catch { }
                 decimal totalInvestment = 0;
                 decimal totalCurrentValue = 0;
                 decimal positiveCount = 0;
@@ -824,38 +739,31 @@ namespace Ecam.Models
                 List<Investment> investments = new List<Investment>();
                 string symbols = "";
 
-                if (list != null)
-                {
-                    foreach (var row in list)
-                    {
+                if(list != null) {
+                    foreach(var row in list) {
                         symbols += row.symbol + ",";
 
-                        if ((row.first_price ?? 0) <= 0) { row.first_price = 0; }
-                        if ((row.last_price ?? 0) <= 0) { row.last_price = 0; }
+                        if((row.first_price ?? 0) <= 0) { row.first_price = 0; }
+                        if((row.last_price ?? 0) <= 0) { row.last_price = 0; }
                         //if ((row.profit_high_price ?? 0) <= 0) { row.profit_high_price = 1; }
                         //if ((row.profit_low_price ?? 0) <= 0) { row.profit_low_price = 1; }
 
                         int quantity = 0;
-                        try
-                        {
+                        try {
                             quantity = (int)(totalInvestmentPerEquity / row.first_price);
-                        }
-                        catch { }
+                        } catch { }
                         decimal investment = (quantity * (row.first_price ?? 0));
                         decimal cmv = quantity * (row.last_price ?? 0);
                         //decimal high_cmv = quantity * (row.profit_high_price ?? 0);
                         //decimal low_cmv = quantity * (row.profit_low_price ?? 0);
                         profit = 0;
-                        try
-                        {
+                        try {
                             profit = (((cmv - investment) / investment) * 100);
-                        }
-                        catch { }
+                        } catch { }
                         //highProfit = (((high_cmv - investment) / investment) * 100);
                         //lowProfit = (((low_cmv - investment) / investment) * 100);
 
-                        investments.Add(new Models.Investment
-                        {
+                        investments.Add(new Models.Investment {
                             symbol = row.symbol,
                             quantity = quantity,
                             investment = investment,
@@ -873,26 +781,21 @@ namespace Ecam.Models
                     }
 
 
-                    foreach (var row in investments)
-                    {
+                    foreach(var row in investments) {
                         totalInvestment += (row.investment);
                         totalCurrentValue += (row.cmv);
 
                         //highCurrentValue += (row.high_cmv);
                         //lowCurrentValue += (row.low_cmv);
 
-                        if (row.profit > 0)
-                        {
+                        if(row.profit > 0) {
                             positiveCount += 1;
-                        }
-                        else
-                        {
+                        } else {
                             negativeCount += 1;
                         }
                     }
 
-                    if (investments.Count <= 0)
-                    {
+                    if(investments.Count <= 0) {
                         totalInvestment = totalAmount;
                         totalCurrentValue = totalAmount;
                         //highCurrentValue = totalAmount;
@@ -900,29 +803,25 @@ namespace Ecam.Models
                     }
 
 
-                    totalCurrentValue = Common.CalcFinalMarketValue(totalCurrentValue, investments.Count, false);
+                    totalCurrentValue = Common.CalcFinalMarketValue(totalCurrentValue,investments.Count,false);
                     //highCurrentValue = Common.CalcFinalMarketValue(highCurrentValue, investments.Count, false);
                     //lowCurrentValue = Common.CalcFinalMarketValue(lowCurrentValue, investments.Count, false);
 
                     decimal totalProfitAVG = 0;
-                    try
-                    {
+                    try {
                         totalProfitAVG = ((totalCurrentValue - totalInvestment) / totalInvestment) * 100;
-                    }
-                    catch { totalProfitAVG = 0; }
+                    } catch { totalProfitAVG = 0; }
 
                     balance = 0; profit = 0; //highProfit = 0; lowProfit = 0;
 
                     balance = (totalAmount - totalInvestment);
 
-                    balance = balance - (Common.GetCharges(totalInvestment, investments.Count, true));
+                    balance = balance - (Common.GetCharges(totalInvestment,investments.Count,true));
 
                     profit = 0;
-                    try
-                    {
+                    try {
                         profit = ((totalCurrentValue - totalInvestment) / totalInvestment) * 100;
-                    }
-                    catch { profit = 0; }
+                    } catch { profit = 0; }
                     //highProfit = ((highCurrentValue - totalInvestment) / totalInvestment) * 100;
                     //lowProfit = ((lowCurrentValue - totalInvestment) / totalInvestment) * 100;
 
@@ -931,38 +830,29 @@ namespace Ecam.Models
                     decimal totalFinalAmount = initialAmount + (monthlyInvestment * i);
 
                     decimal yearProfit = 0;
-                    try
-                    {
+                    try {
                         yearProfit = (((totalAmount) - (totalFinalAmount)) / (totalFinalAmount)) * 100;
-                    }
-                    catch { yearProfit = 0; }
+                    } catch { yearProfit = 0; }
 
-                    using (EcamContext context = new EcamContext())
-                    {
+                    using(EcamContext context = new EcamContext()) {
                         tra_category_profit categoryProfit = (from q in context.tra_category_profit
                                                               where q.category_name == categoryName
                                                               && q.profit_date == startDate
                                                               && q.profit_type == "M"
                                                               select q).FirstOrDefault();
                         bool isExist = false;
-                        if (categoryProfit == null)
-                        {
+                        if(categoryProfit == null) {
                             categoryProfit = new tra_category_profit();
-                        }
-                        else
-                        {
+                        } else {
                             isExist = true;
                         }
                         categoryProfit.category_name = categoryName;
                         categoryProfit.profit_date = startDate;
                         categoryProfit.profit_type = "M";
                         categoryProfit.profit = totalProfitAVG;
-                        if (isExist == true)
-                        {
+                        if(isExist == true) {
                             context.Entry(categoryProfit).State = System.Data.Entity.EntityState.Modified;
-                        }
-                        else
-                        {
+                        } else {
                             context.tra_category_profit.Add(categoryProfit);
                         }
                         context.SaveChanges();
@@ -974,24 +864,18 @@ namespace Ecam.Models
                                           && q.profit_type == "Y"
                                           select q).FirstOrDefault();
                         isExist = false;
-                        if (categoryProfit == null)
-                        {
+                        if(categoryProfit == null) {
                             categoryProfit = new tra_category_profit();
-                        }
-                        else
-                        {
+                        } else {
                             isExist = true;
                         }
                         categoryProfit.category_name = categoryName;
                         categoryProfit.profit_date = yearStartDate;
                         categoryProfit.profit_type = "Y";
                         categoryProfit.profit = yearProfit;
-                        if (isExist == true)
-                        {
+                        if(isExist == true) {
                             context.Entry(categoryProfit).State = System.Data.Entity.EntityState.Modified;
-                        }
-                        else
-                        {
+                        } else {
                             context.tra_category_profit.Add(categoryProfit);
                         }
                         context.SaveChanges();
@@ -1001,13 +885,11 @@ namespace Ecam.Models
             Console.WriteLine("Completed category=" + categoryName + ",Year=" + year);
         }
 
-        public static decimal CalcFinalMarketValue(decimal totalMarketValue, decimal totalEquity, bool isInvestment)
-        {
-            return ((totalMarketValue) - Common.GetCharges(totalMarketValue, totalEquity, isInvestment));
+        public static decimal CalcFinalMarketValue(decimal totalMarketValue,decimal totalEquity,bool isInvestment) {
+            return ((totalMarketValue) - Common.GetCharges(totalMarketValue,totalEquity,isInvestment));
         }
 
-        public static decimal GetCharges(decimal totalMarketValue, decimal totalEquity, bool isInvestment)
-        {
+        public static decimal GetCharges(decimal totalMarketValue,decimal totalEquity,bool isInvestment) {
             //totalMarketValue = cFloat(totalMarketValue);
             //totalEquity = cInt(totalEquity);
             decimal stt = (decimal)(totalMarketValue * (decimal)0.1) / 100;
@@ -1016,16 +898,14 @@ namespace Ecam.Models
             decimal stamb = (decimal)(totalMarketValue * (decimal)0.006) / 100;
             decimal sebi = ((15 * totalMarketValue) / 10000000);
             decimal dpcharges = (decimal)(totalEquity * (decimal)15.93);
-            if (isInvestment == true)
-            {
+            if(isInvestment == true) {
                 dpcharges = 0;
             }
             return (stt + txn + gst + stamb + sebi + dpcharges);
         }
     }
 
-    public class Investment
-    {
+    public class Investment {
         public string symbol { get; set; }
         public int quantity { get; set; }
         public decimal investment { get; set; }
@@ -1041,10 +921,8 @@ namespace Ecam.Models
         //public decimal profit_low_price { get; set; }
     }
 
-    public class DailySummary
-    {
-        public DailySummary()
-        {
+    public class DailySummary {
+        public DailySummary() {
             this.logs = new List<DailyLog>();
         }
         public List<DailyLog> logs { get; set; }
@@ -1083,17 +961,17 @@ namespace Ecam.Models
         }
         public decimal percentage {
             get {
-                return DataTypeHelper.SafeDivision((this.cmv - this.investment), this.investment) * 100;
+                return DataTypeHelper.SafeDivision((this.cmv - this.investment),this.investment) * 100;
             }
         }
         public decimal percentage_high {
             get {
-                return DataTypeHelper.SafeDivision((this.cmv_high - this.investment), this.investment) * 100;
+                return DataTypeHelper.SafeDivision((this.cmv_high - this.investment),this.investment) * 100;
             }
         }
         public decimal percentage_low {
             get {
-                return DataTypeHelper.SafeDivision((this.cmv_low - this.investment), this.investment) * 100;
+                return DataTypeHelper.SafeDivision((this.cmv_low - this.investment),this.investment) * 100;
             }
         }
         public int? total {
@@ -1103,21 +981,20 @@ namespace Ecam.Models
         }
     }
 
-    public class DailyLog
-    {
+    public class DailyLog {
         public DateTime date { get; set; }
         public string symbol { get; set; }
         public decimal total_amount { get; set; }
         public decimal total_equity { get; set; }
         public decimal investment {
             get {
-                return DataTypeHelper.SafeDivision(this.total_amount, this.total_equity);
+                return DataTypeHelper.SafeDivision(this.total_amount,this.total_equity);
             }
         }
         public decimal buy_price { get; set; }
         public int quantity {
             get {
-                return (int)DataTypeHelper.SafeDivision(this.investment, this.buy_price);
+                return (int)DataTypeHelper.SafeDivision(this.investment,this.buy_price);
             }
         }
         public decimal buy_amount {
@@ -1146,11 +1023,10 @@ namespace Ecam.Models
                 return this.quantity * this.low_price;
             }
         }
-       
+
     }
 
-    public class BatchLog
-    {
+    public class BatchLog {
         public DateTime date { get; set; }
         public int batch_index { get; set; }
         public string symbol { get; set; }
@@ -1164,7 +1040,7 @@ namespace Ecam.Models
         public decimal w2_last_price { get; set; }
         public decimal w2_total_percentage {
             get {
-                return DataTypeHelper.SafeDivision((this.w2_last_price - this.w1_first_price), this.w1_first_price) * 100;
+                return DataTypeHelper.SafeDivision((this.w2_last_price - this.w1_first_price),this.w1_first_price) * 100;
             }
         }
 
@@ -1173,7 +1049,7 @@ namespace Ecam.Models
         public decimal w3_last_price { get; set; }
         public decimal w3_total_percentage {
             get {
-                return DataTypeHelper.SafeDivision((this.w3_last_price - this.w1_first_price), this.w1_first_price) * 100;
+                return DataTypeHelper.SafeDivision((this.w3_last_price - this.w1_first_price),this.w1_first_price) * 100;
             }
         }
 
@@ -1182,7 +1058,7 @@ namespace Ecam.Models
         public decimal w4_last_price { get; set; }
         public decimal w4_total_percentage {
             get {
-                return DataTypeHelper.SafeDivision((this.w4_last_price - this.w1_first_price), this.w1_first_price) * 100;
+                return DataTypeHelper.SafeDivision((this.w4_last_price - this.w1_first_price),this.w1_first_price) * 100;
             }
         }
 
@@ -1191,7 +1067,7 @@ namespace Ecam.Models
         public decimal w5_last_price { get; set; }
         public decimal w5_total_percentage {
             get {
-                return DataTypeHelper.SafeDivision((this.w5_last_price - this.w1_first_price), this.w1_first_price) * 100;
+                return DataTypeHelper.SafeDivision((this.w5_last_price - this.w1_first_price),this.w1_first_price) * 100;
             }
         }
 

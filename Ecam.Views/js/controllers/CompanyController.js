@@ -91,7 +91,7 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             if (is_mf == true) {
                 arr[arr.length] = { "name": "is_mf", "value": is_mf };
             }
-            var url = apiUrl("/Company/List");
+            var url = apiUrl("/Company/Companies");
             $.ajax({
                 "url": url,
                 "cache": false,
