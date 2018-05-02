@@ -201,193 +201,194 @@ namespace Ecam.Framework.Repository {
                 if(string.IsNullOrEmpty(criteria.company_name) == false) {
                     where.AppendFormat(" and ct.company_name like '%{0}%",criteria.company_name);
                 }
-            }
 
-            if(string.IsNullOrEmpty(criteria.symbols) == false) {
-                where.AppendFormat(" and ct.symbol in({0})",Helper.ConvertStringSQLFormat(criteria.symbols));
-            }
 
-            List<string> categoryList = null;
-            if((criteria.is_book_mark_category ?? false) == true) {
-                using(EcamContext context = new EcamContext()) {
-                    var categoryNameList = (from q in context.tra_category where (q.is_book_mark ?? false) == true select q.category_name).ToList();
-                    criteria.categories += Helper.ConvertStringIds(categoryNameList);
+                if(string.IsNullOrEmpty(criteria.symbols) == false) {
+                    where.AppendFormat(" and ct.symbol in({0})",Helper.ConvertStringSQLFormat(criteria.symbols));
                 }
-            }
 
-            if(string.IsNullOrEmpty(criteria.categories) == false) {
-                categoryList = Helper.ConvertStringList(criteria.categories);
-            }
-
-            if(categoryList != null) {
-                if(categoryList.Count > 0) {
-                    string categorySymbols = "-1";
+                List<string> categoryList = null;
+                if((criteria.is_book_mark_category ?? false) == true) {
                     using(EcamContext context = new EcamContext()) {
-                        List<tra_company_category> categories = null;
-                        List<string> categorySymbolList = null;
-                        categories = (from q in context.tra_company_category
-                                      where categoryList.Contains(q.category_name) == true
-                                      select q).ToList();
-                        if((criteria.is_all_category ?? false) == true) {
-                            categorySymbolList = new List<string>();
-                            foreach(var row in categories) {
-                                var tempList = (from q in categories where q.symbol == row.symbol select q).ToList();
-                                int selCnt = 0;
-                                foreach(var tempRow in tempList) {
-                                    foreach(string str in categoryList) {
-                                        if(string.IsNullOrEmpty(str) == false) {
-                                            if(tempRow.category_name == str) {
-                                                selCnt += 1;
+                        var categoryNameList = (from q in context.tra_category where (q.is_book_mark ?? false) == true select q.category_name).ToList();
+                        criteria.categories += Helper.ConvertStringIds(categoryNameList);
+                    }
+                }
+
+                if(string.IsNullOrEmpty(criteria.categories) == false) {
+                    categoryList = Helper.ConvertStringList(criteria.categories);
+                }
+
+                if(categoryList != null) {
+                    if(categoryList.Count > 0) {
+                        string categorySymbols = "-1";
+                        using(EcamContext context = new EcamContext()) {
+                            List<tra_company_category> categories = null;
+                            List<string> categorySymbolList = null;
+                            categories = (from q in context.tra_company_category
+                                          where categoryList.Contains(q.category_name) == true
+                                          select q).ToList();
+                            if((criteria.is_all_category ?? false) == true) {
+                                categorySymbolList = new List<string>();
+                                foreach(var row in categories) {
+                                    var tempList = (from q in categories where q.symbol == row.symbol select q).ToList();
+                                    int selCnt = 0;
+                                    foreach(var tempRow in tempList) {
+                                        foreach(string str in categoryList) {
+                                            if(string.IsNullOrEmpty(str) == false) {
+                                                if(tempRow.category_name == str) {
+                                                    selCnt += 1;
+                                                }
                                             }
                                         }
                                     }
+                                    if(selCnt == categoryList.Count) {
+                                        categorySymbolList.Add(row.symbol);
+                                    }
                                 }
-                                if(selCnt == categoryList.Count) {
-                                    categorySymbolList.Add(row.symbol);
-                                }
+                                categorySymbolList = categorySymbolList.Distinct().ToList();
+                            } else {
+                                categorySymbolList = (from q in categories select q.symbol).Distinct().ToList();
                             }
-                            categorySymbolList = categorySymbolList.Distinct().ToList();
-                        } else {
-                            categorySymbolList = (from q in categories select q.symbol).Distinct().ToList();
-                        }
-                        if(categorySymbolList.Count > 0) {
-                            categorySymbols = "";
-                        }
-                        foreach(var str in categorySymbolList) {
-                            categorySymbols += str + ",";
+                            if(categorySymbolList.Count > 0) {
+                                categorySymbols = "";
+                            }
+                            foreach(var str in categorySymbolList) {
+                                categorySymbols += str + ",";
+                            }
+                            if(string.IsNullOrEmpty(categorySymbols) == false) {
+                                categorySymbols = categorySymbols.Substring(0,categorySymbols.Length - 1);
+                            }
                         }
                         if(string.IsNullOrEmpty(categorySymbols) == false) {
-                            categorySymbols = categorySymbols.Substring(0,categorySymbols.Length - 1);
-                        }
-                    }
-                    if(string.IsNullOrEmpty(categorySymbols) == false) {
-                        where.AppendFormat(" and ct.symbol in({0})",Helper.ConvertStringSQLFormat(categorySymbols));
-                    }
-                }
-            }
-
-            if(string.IsNullOrEmpty(criteria.mf_ids) == false) {
-                string symbols = "";
-                using(EcamContext context = new EcamContext()) {
-                    List<int> ids = Helper.ConvertIntIds(criteria.mf_ids);
-                    if(ids.Count > 0) {
-                        var list = (from q in context.tra_mutual_fund_pf
-                                    where ids.Contains(q.fund_id) == true
-                                    select q.symbol).Distinct().ToList();
-                        foreach(var str in list) {
-                            symbols += str + ",";
-                        }
-                        if(string.IsNullOrEmpty(symbols) == false) {
-                            symbols = symbols.Substring(0,symbols.Length - 1);
+                            where.AppendFormat(" and ct.symbol in({0})",Helper.ConvertStringSQLFormat(categorySymbols));
                         }
                     }
                 }
-                if(string.IsNullOrEmpty(symbols) == false) {
-                    where.AppendFormat(" and ct.symbol in({0})",Helper.ConvertStringSQLFormat(symbols));
-                } else {
-                    where.Append(" and ct.symbol='-1'");
+
+                if(string.IsNullOrEmpty(criteria.mf_ids) == false) {
+                    string symbols = "";
+                    using(EcamContext context = new EcamContext()) {
+                        List<int> ids = Helper.ConvertIntIds(criteria.mf_ids);
+                        if(ids.Count > 0) {
+                            var list = (from q in context.tra_mutual_fund_pf
+                                        where ids.Contains(q.fund_id) == true
+                                        select q.symbol).Distinct().ToList();
+                            foreach(var str in list) {
+                                symbols += str + ",";
+                            }
+                            if(string.IsNullOrEmpty(symbols) == false) {
+                                symbols = symbols.Substring(0,symbols.Length - 1);
+                            }
+                        }
+                    }
+                    if(string.IsNullOrEmpty(symbols) == false) {
+                        where.AppendFormat(" and ct.symbol in({0})",Helper.ConvertStringSQLFormat(symbols));
+                    } else {
+                        where.Append(" and ct.symbol='-1'");
+                    }
                 }
+
+                //if (criteria.is_archive.HasValue)
+                //{
+                where.AppendFormat(" and ifnull(ct.is_archive,0)={0}",((criteria.is_archive ?? false) == true ? "1" : "0"));
+                //}
+
+                if(criteria.is_book_mark.HasValue) {
+                    where.AppendFormat(" and ifnull(ct.is_book_mark,0)={0}",((criteria.is_book_mark ?? false) == true ? "1" : "0"));
+                }
+
+                if(criteria.from_price.HasValue) {
+                    where.AppendFormat(" and ifnull(ct.close_price,0)>={0}",criteria.from_price);
+                }
+
+                if(criteria.to_price.HasValue) {
+                    where.AppendFormat(" and ifnull(ct.close_price,0)<={0}",criteria.to_price);
+                }
+
+
+                if(criteria.from_rsi.HasValue) {
+                    where.AppendFormat(" and ifnull(ct.rsi,0)>={0}",criteria.from_rsi);
+                }
+
+                if(criteria.to_rsi.HasValue) {
+                    where.AppendFormat(" and ifnull(ct.rsi,0)<={0}",criteria.to_rsi);
+                }
+
+                if(criteria.from_prev_rsi.HasValue) {
+                    where.AppendFormat(" and ifnull(ct.prev_rsi,0)>={0}",criteria.from_prev_rsi);
+                }
+
+                if(criteria.to_prev_rsi.HasValue) {
+                    where.AppendFormat(" and ifnull(ct.prev_rsi,0)<={0}",criteria.to_prev_rsi);
+                }
+
+                if(criteria.is_nifty_50.HasValue) {
+                    where.AppendFormat(" and ifnull(ct.is_nifty_50,0)={0}",((criteria.is_nifty_50 ?? false) == true ? "1" : "0"));
+                }
+
+                if(criteria.is_nifty_100.HasValue) {
+                    where.AppendFormat(" and ifnull(ct.is_nifty_100,0)={0}",((criteria.is_nifty_100 ?? false) == true ? "1" : "0"));
+                }
+
+                if(criteria.is_nifty_200.HasValue) {
+                    where.AppendFormat(" and ifnull(ct.is_nifty_200,0)={0}",((criteria.is_nifty_200 ?? false) == true ? "1" : "0"));
+                }
+
+                if(criteria.is_old.HasValue) {
+                    where.AppendFormat(" and ifnull(ct.is_old,0)={0}",((criteria.is_old ?? false) == true ? "1" : "0"));
+                }
+
+                if(string.IsNullOrEmpty(criteria.ignore_symbols) == false) {
+                    where.AppendFormat(" and ifnull(ct.symbol,0) not in({0})",Helper.ConvertStringSQLFormat(criteria.ignore_symbols));
+                }
+
+                if((criteria.is_current_stock ?? false) == true) {
+                    joinTables += " join tra_holding h on h.symbol = ct.symbol ";
+                }
+
+                selectFields = "count(*) as cnt";
+
+                sql = string.Format(sqlFormat,selectFields,joinTables,where,groupByName,"","");
+
+                //Helper.Log(sql,"GET_COUNT");
+
+                paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString,sql));
+
+                if(string.IsNullOrEmpty(paging.SortOrder)) {
+                    paging.SortOrder = "asc";
+                }
+
+                if(paging.PageSize > 0) {
+                    int from = (paging.PageIndex > 1) ? ((paging.PageIndex - 1) * paging.PageSize) : 0;
+                    int to = paging.PageSize;
+                    pageLimit = string.Format("limit {0},{1}",from,to);
+                }
+
+                orderBy = string.Format("order by {0} {1}",paging.SortName,paging.SortOrder);
+
+                string dateFilter = string.Empty;
+                DateTime? minDate = Convert.ToDateTime("01/01/1900");
+                if(criteria.start_date.HasValue && criteria.end_date.HasValue) {
+                    dateFilter = string.Format(" m.trade_date>='{0}' and m.trade_date<='{1}' ",criteria.start_date.Value.ToString("yyyy-MM-dd"),criteria.end_date.Value.ToString("yyyy-MM-dd"));
+                }
+
+                if(criteria.total_start_date.HasValue == false)
+                    criteria.total_start_date = DateTime.Now.Date.AddDays(-(365 * 3));
+                if(criteria.total_end_date.HasValue == false)
+                    criteria.total_end_date = DateTime.Now.Date;
+
+                string totalDateFilter = string.Empty;
+                totalDateFilter = string.Format(" m.trade_date>='{0}' and m.trade_date<='{1}' "
+                    ,criteria.total_start_date.Value.ToString("yyyy-MM-dd")
+                    ,criteria.total_end_date.Value.ToString("yyyy-MM-dd")) + Environment.NewLine;
+
+                string totalDateAVGFilter = string.Empty;
+                totalDateAVGFilter = string.Format(" and m.avg_date>='{0}' and m.avg_date<='{1}' "
+                    ,DataTypeHelper.GetFirstDayOfMonth(criteria.total_start_date.Value).ToString("yyyy-MM-dd")
+                    ,DataTypeHelper.GetLastDayOfMonth(criteria.total_end_date.Value).ToString("yyyy-MM-dd")) + Environment.NewLine;
+
             }
-
-            //if (criteria.is_archive.HasValue)
-            //{
-            where.AppendFormat(" and ifnull(ct.is_archive,0)={0}",((criteria.is_archive ?? false) == true ? "1" : "0"));
-            //}
-
-            if(criteria.is_book_mark.HasValue) {
-                where.AppendFormat(" and ifnull(ct.is_book_mark,0)={0}",((criteria.is_book_mark ?? false) == true ? "1" : "0"));
-            }
-
-            if(criteria.from_price.HasValue) {
-                where.AppendFormat(" and ifnull(ct.close_price,0)>={0}",criteria.from_price);
-            }
-
-            if(criteria.to_price.HasValue) {
-                where.AppendFormat(" and ifnull(ct.close_price,0)<={0}",criteria.to_price);
-            }
-
-
-            if(criteria.from_rsi.HasValue) {
-                where.AppendFormat(" and ifnull(ct.rsi,0)>={0}",criteria.from_rsi);
-            }
-
-            if(criteria.to_rsi.HasValue) {
-                where.AppendFormat(" and ifnull(ct.rsi,0)<={0}",criteria.to_rsi);
-            }
-
-            if(criteria.from_prev_rsi.HasValue) {
-                where.AppendFormat(" and ifnull(ct.prev_rsi,0)>={0}",criteria.from_prev_rsi);
-            }
-
-            if(criteria.to_prev_rsi.HasValue) {
-                where.AppendFormat(" and ifnull(ct.prev_rsi,0)<={0}",criteria.to_prev_rsi);
-            }
-
-            if(criteria.is_nifty_50.HasValue) {
-                where.AppendFormat(" and ifnull(ct.is_nifty_50,0)={0}",((criteria.is_nifty_50 ?? false) == true ? "1" : "0"));
-            }
-
-            if(criteria.is_nifty_100.HasValue) {
-                where.AppendFormat(" and ifnull(ct.is_nifty_100,0)={0}",((criteria.is_nifty_100 ?? false) == true ? "1" : "0"));
-            }
-
-            if(criteria.is_nifty_200.HasValue) {
-                where.AppendFormat(" and ifnull(ct.is_nifty_200,0)={0}",((criteria.is_nifty_200 ?? false) == true ? "1" : "0"));
-            }
-
-            if(criteria.is_old.HasValue) {
-                where.AppendFormat(" and ifnull(ct.is_old,0)={0}",((criteria.is_old ?? false) == true ? "1" : "0"));
-            }
-
-            if(string.IsNullOrEmpty(criteria.ignore_symbols) == false) {
-                where.AppendFormat(" and ifnull(ct.symbol,0) not in({0})",Helper.ConvertStringSQLFormat(criteria.ignore_symbols));
-            }
-
-            if((criteria.is_current_stock ?? false) == true) {
-                joinTables += " join tra_holding h on h.symbol = ct.symbol ";
-            }
-
-            selectFields = "count(*) as cnt";
-
-            sql = string.Format(sqlFormat,selectFields,joinTables,where,groupByName,"","");
-
-            //Helper.Log(sql,"GET_COUNT");
-
-            paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString,sql));
-
-            if(string.IsNullOrEmpty(paging.SortOrder)) {
-                paging.SortOrder = "asc";
-            }
-
-            if(paging.PageSize > 0) {
-                int from = (paging.PageIndex > 1) ? ((paging.PageIndex - 1) * paging.PageSize) : 0;
-                int to = paging.PageSize;
-                pageLimit = string.Format("limit {0},{1}",from,to);
-            }
-
-            orderBy = string.Format("order by {0} {1}",paging.SortName,paging.SortOrder);
-
-            string dateFilter = string.Empty;
-            DateTime? minDate = Convert.ToDateTime("01/01/1900");
-            if(criteria.start_date.HasValue && criteria.end_date.HasValue) {
-                dateFilter = string.Format(" m.trade_date>='{0}' and m.trade_date<='{1}' ",criteria.start_date.Value.ToString("yyyy-MM-dd"),criteria.end_date.Value.ToString("yyyy-MM-dd"));
-            }
-
-            if(criteria.total_start_date.HasValue == false)
-                criteria.total_start_date = DateTime.Now.Date.AddDays(-(365 * 3));
-            if(criteria.total_end_date.HasValue == false)
-                criteria.total_end_date = DateTime.Now.Date;
-
-            string totalDateFilter = string.Empty;
-            totalDateFilter = string.Format(" m.trade_date>='{0}' and m.trade_date<='{1}' "
-                ,criteria.total_start_date.Value.ToString("yyyy-MM-dd")
-                ,criteria.total_end_date.Value.ToString("yyyy-MM-dd")) + Environment.NewLine;
-
-            string totalDateAVGFilter = string.Empty;
-            totalDateAVGFilter = string.Format(" and m.avg_date>='{0}' and m.avg_date<='{1}' "
-                ,DataTypeHelper.GetFirstDayOfMonth(criteria.total_start_date.Value).ToString("yyyy-MM-dd")
-                ,DataTypeHelper.GetLastDayOfMonth(criteria.total_end_date.Value).ToString("yyyy-MM-dd")) + Environment.NewLine;
-
             //if (criteria.trigger_start_date.HasValue == false)
             //    criteria.trigger_start_date = criteria.total_start_date;
             //if (criteria.trigger_end_date.HasValue == false)
@@ -398,51 +399,40 @@ namespace Ecam.Framework.Repository {
             //    , criteria.trigger_start_date.Value.ToString("yyyy-MM-dd")
             //    , criteria.trigger_end_date.Value.ToString("yyyy-MM-dd")) + Environment.NewLine;
 
-            selectFields = "ct.company_id" + Environment.NewLine +
-                           ",ct.company_name" + Environment.NewLine +
-                           ",ct.symbol" + Environment.NewLine +
-                           ",ct.open_price" + Environment.NewLine +
-                           ",ct.high_price" + Environment.NewLine +
-                           ",ct.low_price" + Environment.NewLine +
-                           ",ct.ltp_price" + Environment.NewLine +
-                           ",ct.close_price" + Environment.NewLine +
-                           ",ct.prev_price" + Environment.NewLine +
-                           ",ct.week_52_high" + Environment.NewLine +
-                           ",ct.week_52_low" + Environment.NewLine +
-                           ",ct.is_archive" + Environment.NewLine +
-                           ",ct.is_book_mark" + Environment.NewLine +
-                           ",ct.is_nifty_50" + Environment.NewLine +
-                           ",ct.is_nifty_100" + Environment.NewLine +
-                           ",ct.is_nifty_200" + Environment.NewLine +
-                           ",ct.is_old" + Environment.NewLine +
-                           ",ct.rsi" + Environment.NewLine +
-                           ",ct.prev_rsi" + Environment.NewLine +
-                           ",ct.monthly_avg" + Environment.NewLine +
-                           ",ct.weekly_avg" + Environment.NewLine +
-                           ",ct.mc" + Environment.NewLine +
-                           ",ct.pe" + Environment.NewLine +
-                           ",ct.volume" + Environment.NewLine +
-                           ",ct.eps" + Environment.NewLine +
-                            //",(select ifnull(count(*),0) from tra_holding h where h.symbol = ct.symbol) as is_holding" +
-                            //",(select high_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " and m.high_price > 0 order by m.high_price desc limit 0,1) as total_high_price" + Environment.NewLine +
-                            //",(select low_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " and m.low_price > 0 order by m.low_price asc limit 0,1) as total_low_price" + Environment.NewLine +
-                            //",(select high_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " and m.high_price > 0 order by m.high_price desc limit 0,1) as profit_high_price" + Environment.NewLine +
-                            //",(select low_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " and m.low_price > 0 order by m.low_price asc limit 0,1) as profit_low_price" + Environment.NewLine +
-                            //",(select ifnull(rsi,0) from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date desc limit 0,1) as profit_rsi" + Environment.NewLine +
-                            //",(select ifnull(rsi,0) from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " order by m.trade_date desc limit 0,1) as total_rsi" + Environment.NewLine +
+            selectFields = "ct.*" + Environment.NewLine + "";
 
-                            //",(select open_price from tra_market m where " + totalDateFilter + " and m.symbol = ct.symbol order by m.trade_date asc limit 0,1) as total_first_price" + Environment.NewLine +
-                            //",(select ltp_price from tra_market m where " + totalDateFilter + " and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as total_last_price" + Environment.NewLine +
 
-                            //",(select open_price from tra_market m where m.symbol = ct.symbol " + triggerDateFilter + " order by m.trade_date asc limit 0,1) as trigger_first_price" + Environment.NewLine +
-                            //",(select ltp_price from tra_market m where m.symbol = ct.symbol " + triggerDateFilter + " order by m.trade_date desc limit 0,1) as trigger_last_price" + Environment.NewLine +
+            if((criteria.id ?? 0) <= 0) {
+                selectFields += ",(select ifnull(open_price,0) from tra_market m where m.trade_date>='2016-04-01' and m.trade_date<='2017-03-31' and m.symbol = ct.symbol order by m.trade_date asc limit 0,1) as 2016_open" + Environment.NewLine +
+                ",(select ifnull(close_price,0) from tra_market m where m.trade_date>='2016-04-01' and m.trade_date<='2017-03-31' and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as 2016_close" + Environment.NewLine +
 
-                            //",(select open_price from tra_market m where " + dateFilter + " and m.symbol = ct.symbol order by m.trade_date asc limit 0,1) as first_price" + Environment.NewLine +
-                            //",(select ltp_price from tra_market m where " + dateFilter + " and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_price" + Environment.NewLine +
-                           //",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + " and ifnull(m.percentage, 0) < 0) as negative" + Environment.NewLine +
-                           //",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + "  and ifnull(m.percentage, 0) > 0) as positive" + Environment.NewLine +
-                           //",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + " ) as total" + Environment.NewLine +
-                           "";
+                ",(select ifnull(open_price,0) from tra_market m where m.trade_date>='2017-04-01' and m.trade_date<='2018-03-31' and m.symbol = ct.symbol order by m.trade_date asc limit 0,1) as 2017_open" + Environment.NewLine +
+                ",(select ifnull(close_price,0) from tra_market m where m.trade_date>='2017-04-01' and m.trade_date<='2018-03-31' and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as 2017_close" + Environment.NewLine +
+
+                ",(select ifnull(open_price,0) from tra_market m where m.trade_date>='2018-04-01' and m.trade_date<='2019-03-31' and m.symbol = ct.symbol order by m.trade_date asc limit 0,1) as 2018_open" + Environment.NewLine +
+                ",(select ifnull(close_price,0) from tra_market m where m.trade_date>='2018-04-01' and m.trade_date<='2019-03-31' and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as 2018_close" + Environment.NewLine +
+                "";
+            }
+
+            //",(select ifnull(count(*),0) from tra_holding h where h.symbol = ct.symbol) as is_holding" +
+            //",(select high_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " and m.high_price > 0 order by m.high_price desc limit 0,1) as total_high_price" + Environment.NewLine +
+            //",(select low_price from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " and m.low_price > 0 order by m.low_price asc limit 0,1) as total_low_price" + Environment.NewLine +
+            //",(select high_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " and m.high_price > 0 order by m.high_price desc limit 0,1) as profit_high_price" + Environment.NewLine +
+            //",(select low_price from tra_market m where m.symbol = ct.symbol " + dateFilter + " and m.low_price > 0 order by m.low_price asc limit 0,1) as profit_low_price" + Environment.NewLine +
+            //",(select ifnull(rsi,0) from tra_market m where m.symbol = ct.symbol " + dateFilter + " order by m.trade_date desc limit 0,1) as profit_rsi" + Environment.NewLine +
+            //",(select ifnull(rsi,0) from tra_market m where m.symbol = ct.symbol " + totalDateFilter + " order by m.trade_date desc limit 0,1) as total_rsi" + Environment.NewLine +
+
+            //",(select open_price from tra_market m where " + totalDateFilter + " and m.symbol = ct.symbol order by m.trade_date asc limit 0,1) as total_first_price" + Environment.NewLine +
+            //",(select ltp_price from tra_market m where " + totalDateFilter + " and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as total_last_price" + Environment.NewLine +
+
+            //",(select open_price from tra_market m where m.symbol = ct.symbol " + triggerDateFilter + " order by m.trade_date asc limit 0,1) as trigger_first_price" + Environment.NewLine +
+            //",(select ltp_price from tra_market m where m.symbol = ct.symbol " + triggerDateFilter + " order by m.trade_date desc limit 0,1) as trigger_last_price" + Environment.NewLine +
+
+            //",(select open_price from tra_market m where " + dateFilter + " and m.symbol = ct.symbol order by m.trade_date asc limit 0,1) as first_price" + Environment.NewLine +
+            //",(select ltp_price from tra_market m where " + dateFilter + " and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as last_price" + Environment.NewLine +
+            //",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + " and ifnull(m.percentage, 0) < 0) as negative" + Environment.NewLine +
+            //",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + "  and ifnull(m.percentage, 0) > 0) as positive" + Environment.NewLine +
+            //",(select count(*) from tra_market_avg m where m.symbol = ct.symbol and m.avg_type = 'M' " + totalDateAVGFilter + " ) as total" + Environment.NewLine +
 
             //if (string.IsNullOrEmpty(criteria.mf_ids) == false)
             //{
@@ -458,13 +448,13 @@ namespace Ecam.Framework.Repository {
             //}
 
             selectFields += "" +
-                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.prev_price, 0)) / ifnull(ct.prev_price, 0)) * 100) as prev_percentage" + Environment.NewLine +
-                           ",(ifnull(ct.open_price,0) - ifnull(ct.prev_price,0)) as diff" + Environment.NewLine +
+                           //",(((ifnull(ct.ltp_price, 0) - ifnull(ct.prev_price, 0)) / ifnull(ct.prev_price, 0)) * 100) as prev_percentage" + Environment.NewLine +
+                           //",(ifnull(ct.open_price,0) - ifnull(ct.prev_price,0)) as diff" + Environment.NewLine +
                            //",(ifnull(ct.rsi,0) - ifnull(ct.prev_rsi,0)) as rsi_diff" + Environment.NewLine +
 
-                           ",(((ifnull(ct.ltp_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as ltp_percentage" + Environment.NewLine +
-                           ",(((ifnull(ct.high_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as high_percentage" + Environment.NewLine +
-                           ",(((ifnull(ct.low_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as low_percentage" + Environment.NewLine +
+                           //",(((ifnull(ct.ltp_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as ltp_percentage" + Environment.NewLine +
+                           //",(((ifnull(ct.high_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as high_percentage" + Environment.NewLine +
+                           //",(((ifnull(ct.low_price, 0) - ifnull(ct.open_price, 0)) / ifnull(ct.open_price, 0)) * 100) as low_percentage" + Environment.NewLine +
 
                            //",(((ifnull(ct.ltp_price, 0) - ifnull(ct.week_52_high, 0)) / ifnull(ct.week_52_high, 0)) * 100) as week_52_percentage" + Environment.NewLine +
                            //",(((ifnull(ct.week_52_high, 0) - ifnull(ct.ltp_price, 0)) / ifnull(ct.ltp_price, 0)) * 100) as week_52_positive_percentage" + Environment.NewLine +
@@ -543,7 +533,13 @@ namespace Ecam.Framework.Repository {
 
             paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString,tempsql));
 
+            string yearPercentage = ",if(2016_open>0,(((2016_close-2016_open)/2016_open) * 100),0) as percentage_2016" + Environment.NewLine +
+            ",if(2017_open>0,(((2017_close-2017_open)/2017_open) * 100),0) as percentage_2017" + Environment.NewLine +
+            ",if(2018_open>0,(((2018_close-2018_open)/2018_open) * 100),0) as percentage_2018" + Environment.NewLine +
+            "";
+
             sql = string.Format("select " +
+
             //"(((last_price - first_price)/first_price) * 100) as profit" + Environment.NewLine +
             //",(((total_last_price - total_first_price)/total_first_price) * 100) as total_profit" + Environment.NewLine +
             //",(((trigger_last_price - trigger_first_price)/trigger_first_price) * 100) as trigger_profit" + Environment.NewLine +
@@ -552,11 +548,12 @@ namespace Ecam.Framework.Repository {
             //",(((profit_high_price - ltp_price)/ltp_price) * 100) as profit_high_percentage" + Environment.NewLine +
             //",(((profit_low_price - ltp_price)/ltp_price) * 100) as profit_low_percentage" + Environment.NewLine +
             " tbl.*" + Environment.NewLine +
+            ((criteria.id ?? 0) <= 0 ? yearPercentage : "") + Environment.NewLine +
             " from(" + Environment.NewLine +
             sql + Environment.NewLine +
             ") as tbl {0} {1} {2} {3} ",where,"",orderBy,pageLimit);
 
-            //Helper.Log(sql,"GET_SQL");
+            Helper.Log(sql,"GET_SQL");
             List<TRA_COMPANY> rows = new List<TRA_COMPANY>();
             List<tra_company_category> companyCategories;
             using(EcamContext context = new EcamContext()) {

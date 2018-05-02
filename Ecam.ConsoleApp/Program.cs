@@ -20,6 +20,7 @@ namespace Ecam.ConsoleApp {
     class Program {
         public static string IS_DOWNLOAD_HISTORY = "";
         public static string IS_BOOK_MARK_CATEGORY = "";
+        public static string IS_BOOK_MARK_SYMBOL = "";
         public static string IS_IMPORT_CSV = "";
         public static string IS_NIFTY_FLAG_CSV = "";
         public static string IS_CATEGORY_FLAG_CSV = "";
@@ -40,6 +41,7 @@ namespace Ecam.ConsoleApp {
                 IS_IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_IMPORT_CSV"];
                 IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
                 IS_BOOK_MARK_CATEGORY = System.Configuration.ConfigurationManager.AppSettings["IS_BOOK_MARK_CATEGORY"];
+                IS_BOOK_MARK_SYMBOL = System.Configuration.ConfigurationManager.AppSettings["IS_BOOK_MARK_SYMBOL"];
                 MC = System.Configuration.ConfigurationManager.AppSettings["MC"];
                 GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
                 MONEY_CONTROL = System.Configuration.ConfigurationManager.AppSettings["MONEY_CONTROL"];
@@ -80,15 +82,16 @@ namespace Ecam.ConsoleApp {
                         Helper.Log(ex.Message,"DOWNLOAD_START_ERROR" + "_" + (new Random()).Next(1000,10000));
                     }
                     try {
-                        int i;
-                        for(i = 0;i < 1;i++) {
-                            DateTime startDate = Convert.ToDateTime("01/01/" + (DateTime.Now.Year - i).ToString());
-                            DateTime endDate = Convert.ToDateTime("12/31/" + (DateTime.Now.Year - i).ToString());
-                            AddSplit(startDate,endDate);
-                        }
+                        //int i;
+                        //for(i = 0;i < 1;i++) {
+                        //    DateTime startDate = Convert.ToDateTime("01/01/" + (DateTime.Now.Year - i).ToString());
+                        //    DateTime endDate = Convert.ToDateTime("12/31/" + (DateTime.Now.Year - i).ToString());
+                        AddSplit();
+                        //}
                     } catch(Exception ex) {
                         Helper.Log(ex.Message,"AddSplit_ERROR" + "_" + (new Random()).Next(1000,10000));
                     }
+
                     try {
                         int i;
                         int total = 0;
@@ -102,8 +105,9 @@ namespace Ecam.ConsoleApp {
                             if(dailyLog != null) {
                                 TimeSpan ts = DateTime.Now.Date - dailyLog.trade_date;
                                 total = (int)ts.TotalDays + 1;
+                            } else {
+                                total = (365 * 5);
                             }
-                            total = 30;
                         }
                         for(i = 0;i < total;i++) {
                             DateTime dt = DateTime.Now.Date.AddDays(-i);
@@ -116,6 +120,7 @@ namespace Ecam.ConsoleApp {
                     } catch(Exception ex) {
                         Helper.Log(ex.Message,"MAIL_SEND_ERROR" + "_" + (new Random()).Next(1000,10000));
                     }
+
                 }
             } catch(Exception ex) {
                 Helper.Log(ex.Message,"MAIN_ERROR" + "_" + (new Random()).Next(1000,10000));
@@ -210,6 +215,11 @@ namespace Ecam.ConsoleApp {
                     List<string> categorySymbols = (from q in companyCategories
                                                     select q.symbol).Distinct().ToList();
                     query = (from q in query where categorySymbols.Contains(q.symbol) == true select q);
+                }
+                if(IS_BOOK_MARK_SYMBOL == "true") {
+                    query = (from q in query
+                             where (q.is_book_mark ?? false) == true
+                             select q);
                 }
                 companies = (from q in query
                              orderby q.symbol ascending
@@ -524,7 +534,9 @@ namespace Ecam.ConsoleApp {
             }
         }
 
-        private static void AddSplit(DateTime startDate,DateTime endDate) {
+        private static void AddSplit() {
+            DateTime startDate = DateTime.Now.AddMonths(-6);
+            DateTime endDate = DateTime.Now.AddMonths(6);
             string sql = "select " + Environment.NewLine +
                             " m.symbol" + Environment.NewLine +
                             " ,DATE_FORMAT(m.trade_date,'%d/%b/%Y') as trade_date" + Environment.NewLine +
@@ -536,9 +548,10 @@ namespace Ecam.ConsoleApp {
                             //" ,m.prev_price" + Environment.NewLine +
                             //" ,m.* " + Environment.NewLine +
                             " from tra_market m" + Environment.NewLine +
-                            " where m.trade_date>='" + startDate.ToString("yyyy-MM-dd") + "' and m.trade_date<='" + endDate.ToString("yyyy-MM-dd") + "'" + Environment.NewLine +
+                            " where " + Environment.NewLine +
+                            " m.trade_date>='" + startDate.ToString("yyyy-MM-dd") + "' and m.trade_date<='" + endDate.ToString("yyyy-MM-dd") + "'" + Environment.NewLine +
                             " and (((ifnull(m.ltp_price,0) - ifnull(m.prev_price,0)) / ifnull(m.prev_price,0))*100) != 0" + Environment.NewLine +
-                            " and(((ifnull(m.ltp_price,0) - ifnull(m.prev_price,0)) / ifnull(m.prev_price,0))*100) <= -48" + Environment.NewLine +
+                            " and (((ifnull(m.ltp_price,0) - ifnull(m.prev_price,0)) / ifnull(m.prev_price,0))*100) <= -48" + Environment.NewLine +
                             " order by trade_date asc,symbol asc limit 0,100";
             using(MySqlDataReader dr = MySqlHelper.ExecuteReader(Ecam.Framework.Helper.ConnectionString,sql)) {
                 while(dr.Read()) {

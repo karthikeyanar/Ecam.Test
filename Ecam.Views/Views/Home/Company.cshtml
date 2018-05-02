@@ -184,12 +184,15 @@
                 </div>
             </div>
             <input type="hidden" name="page_index" value="1" />
-            <input type="hidden" name="sort_name" value="prev_percentage" />
+            <input type="hidden" name="sort_name" value="percentage_2018" />
             <input type="hidden" name="sort_order" value="desc" />
         </div>
         <table id="CompanyTable" class="table table-striped table-bordered table-hover table-condensed table-gray">
             <thead>
                 <tr>
+                    <th style="width: 50px" sortname="">
+                        #
+                    </th>
                     <th style="width: 50px" sortname="is_archive">
                         Mark
                     </th>
@@ -204,13 +207,25 @@
                     </th>
                     <th>
                         Category
-                    </th> 
-                    <th sortname="ltp_price" class="text-right text-nowrap">
+                    </th>
+                    <th sortname="mc" class="text-right text-nowrap">
+                        MC
+                    </th>
+                    <th sortname="percentage_2016" class="text-right text-nowrap">
+                        2016 %
+                    </th>
+                    <th sortname="percentage_2017" class="text-right text-nowrap">
+                        2017 %
+                    </th>
+                    <th sortname="percentage_2018" class="text-right text-nowrap">
+                        2018 %
+                    </th>
+                    @*<th sortname="ltp_price" class="text-right text-nowrap">
                         LTP
                     </th>
                     <th sortname="prev_percentage" class="text-right text-nowrap">
                         Change %
-                    </th>
+                    </th>*@
                     <th style="width: 50px">
                     </th>
                     <th style="width: 50px">
@@ -219,6 +234,8 @@
             </thead>
             <tbody data-bind="foreach:rows">
                 <tr>
+                    <td style="text-align:center;" data-bind="text:$index()+1">
+                    </td>
                     <td style="text-align:center;">
                         <a href="javascript:;" class="is-book-mark">
                             <i data-bind="css:{'fa-bookmark fg-primary': cBool(is_archive)==true,'fa-bookmark-o': cBool(is_archive)==false}" class="fa fa-bookmark"></i>
@@ -233,11 +250,23 @@
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:symbol"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:category_name"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(mc)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(percentage_2016)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(percentage_2017)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(percentage_2018)"></div>
+                    </td>
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(ltp_price)"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(prev_percentage)"></div>
-                    </td>
+                    </td>*@
                     <td style="text-align:center;white-space:nowrap;width:120px;">
                         <div class="pull-left">
                             <a data-bind="attr:{'href': 'https://www.google.com/search?q=NSE:'+symbol.replace('&','%26')}" target="_blank">G</a>

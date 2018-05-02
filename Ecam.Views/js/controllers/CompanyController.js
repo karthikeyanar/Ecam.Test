@@ -293,7 +293,7 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
                     }).done(function (json) {
                         //jAlert("Saved");
                         $modal.modal('hide');
-                        self.loadGrid();
+                        //self.loadGrid();
                     }).fail(function (jqxhr) {
                         alertErrorMessage(jqxhr.responseJSON);
                     }).always(function (jqxhr) {

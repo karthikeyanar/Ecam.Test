@@ -269,7 +269,7 @@ namespace Ecam.Views.Controllers {
             bool isNifty200 = (contract.is_nifty_200 ?? false);
             bool isOld = (contract.is_old ?? false);
             if((contract.id ?? 0) > 0) {
-                contract = _CompanyRepository.Get(new TRA_COMPANY_SEARCH { id = contract.id },new Paging { }).rows.FirstOrDefault();
+                contract = _CompanyRepository.GetCompanies(new TRA_COMPANY_SEARCH { id = contract.id },new Paging { }).rows.FirstOrDefault();
                 contract.company_name = companyName;
                 contract.symbol = symbol;
                 contract.category_name = categoryName;
@@ -305,7 +305,7 @@ namespace Ecam.Views.Controllers {
                         context.SaveChanges();
                     }
                 }
-                return Ok(_CompanyRepository.Get(new TRA_COMPANY_SEARCH { id = saveContract.id },new Paging { }).rows.FirstOrDefault());
+                return Ok(_CompanyRepository.GetCompanies(new TRA_COMPANY_SEARCH { id = saveContract.id },new Paging { }).rows.FirstOrDefault());
             } else {
                 int index = 0;
                 foreach(var err in saveContract.Errors) {
