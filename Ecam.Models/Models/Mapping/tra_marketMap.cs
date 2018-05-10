@@ -58,6 +58,12 @@ namespace Ecam.Models
             this.Property(t => t.prev_ltp_price)
                 .HasPrecision(13, 4);
 
+            this.Property(t => t.turn_over)
+                .HasPrecision(13,4);
+
+            this.Property(t => t.percentage)
+                .HasPrecision(13,4);
+
             // Table & Column Mappings
             this.ToTable("tra_market");
             this.Property(t => t.symbol).HasColumnName("symbol");
@@ -76,6 +82,8 @@ namespace Ecam.Models
             this.Property(t => t.avg_downward).HasColumnName("avg_downward");
             this.Property(t => t.rs).HasColumnName("rs");
             this.Property(t => t.prev_ltp_price).HasColumnName("prev_ltp_price");
+            this.Property(t => t.turn_over).HasColumnName("turn_over");
+            this.Property(t => t.percentage).HasColumnName("percentage");
         }
     }
 }

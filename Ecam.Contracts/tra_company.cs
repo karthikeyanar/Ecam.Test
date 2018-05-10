@@ -133,6 +133,8 @@ namespace Ecam.Contracts
         public decimal? trigger_from_profit { get; set; }
         public decimal? trigger_to_profit { get; set; }
         public decimal? monthly_investment { get; set; }
+
+        public string where_condition { get; set; }
     }
 
     public class TRA_CATEGORY_GROUP

@@ -33,7 +33,7 @@ var checkCSVCount=0;
 function doDownload() {
 	index+=1;
 	if(index<arr.length) {
-		$log.html("<span style='font-size:150px;'>"+(index+1)+ " Of " + arr.length +"</span><br/>");
+		$log.html("<span style='font-size:100px;'>"+(index+1)+ " Of " + arr.length +"</span><br/>");
 		$log.html($log.html()+'index='+(index+1)+',arr.length='+arr.length+'<br/>');
 		var d=arr[index];
 		var symbol=d.symbol;

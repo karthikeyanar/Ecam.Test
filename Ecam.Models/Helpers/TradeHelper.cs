@@ -22,11 +22,9 @@ using Ecam.Contracts.Enums;
 using Ecam.Framework.ExcelHelper;
 using CsvHelper;
 
-namespace Ecam.Models
-{
+namespace Ecam.Models {
 
-    public class TempClass
-    {
+    public class TempClass {
         public string symbol { get; set; }
         public System.DateTime trade_date { get; set; }
         public Nullable<decimal> open_price { get; set; }
@@ -35,14 +33,13 @@ namespace Ecam.Models
         public Nullable<decimal> close_price { get; set; }
         public Nullable<decimal> ltp_price { get; set; }
         public Nullable<decimal> prev_price { get; set; }
+        public Nullable<decimal> turn_over { get; set; }
         public bool is_prev_price_exist { get; set; }
     }
 
-    public class TradeHelper
-    {
+    public class TradeHelper {
 
-        private static string ReplaceTagAttributes(string html, string tagName)
-        {
+        private static string ReplaceTagAttributes(string html,string tagName) {
             Regex regex = new Regex(
         @"<" + tagName + "(.*?)>",
         RegexOptions.IgnoreCase
@@ -50,12 +47,11 @@ namespace Ecam.Models
         | RegexOptions.IgnorePatternWhitespace
         | RegexOptions.Compiled
         );
-            html = regex.Replace(html, "<" + tagName + ">");
+            html = regex.Replace(html,"<" + tagName + ">");
             return html;
         }
 
-        private static string ReplaceAttributes(string html, string attrName, string replaceContent)
-        {
+        private static string ReplaceAttributes(string html,string attrName,string replaceContent) {
             string exp = attrName + "\\s*=\\s*\"(.*?)\"";
             Regex regex = new Regex(
         exp,
@@ -64,15 +60,14 @@ namespace Ecam.Models
         | RegexOptions.IgnorePatternWhitespace
         | RegexOptions.Compiled
         );
-            html = regex.Replace(html, replaceContent);
+            html = regex.Replace(html,replaceContent);
             return html;
         }
 
-        public static void GoogleFinance52WeekImport(string symbol, string html)
-        {
+        public static void GoogleFinance52WeekImport(string symbol,string html) {
             decimal low = 0;
             decimal high = 0;
-            html = html.Replace("\n", "").Replace("\r", "").Replace("\r\n", "");
+            html = html.Replace("\n","").Replace("\r","").Replace("\r\n","");
             //int startIndex = html.IndexOf("<table class=\"snap-data\">");
             //int endIndex = html.IndexOf("</table>");
             //int length = endIndex - startIndex + 8;
@@ -88,15 +83,12 @@ namespace Ecam.Models
 
             MatchCollection tblCollections = regex.Matches(html);
             int i = 0;
-            foreach (Match tblMatch in tblCollections)
-            {
-                if (high > 0)
-                {
+            foreach(Match tblMatch in tblCollections) {
+                if(high > 0) {
                     break;
                 }
                 i += 1;
-                if (i == 1)
-                {
+                if(i == 1) {
                     string tbl = tblMatch.Value;
                     regex = new Regex(
         @"<tr>(.*?)</tr>",
@@ -106,10 +98,8 @@ namespace Ecam.Models
         | RegexOptions.Compiled
         );
                     MatchCollection trCollections = regex.Matches(tbl);
-                    foreach (Match trMatch in trCollections)
-                    {
-                        if (high > 0)
-                        {
+                    foreach(Match trMatch in trCollections) {
+                        if(high > 0) {
                             break;
                         }
                         string tr = trMatch.Value;
@@ -122,39 +112,31 @@ namespace Ecam.Models
     );
                         MatchCollection tdCollections = regex.Matches(tr);
                         bool is52WeekStart = false;
-                        foreach (Match tdMatch in tdCollections)
-                        {
+                        foreach(Match tdMatch in tdCollections) {
                             string cell1 = string.Empty;
                             string cell2 = string.Empty;
                             string cell3 = string.Empty;
-                            if (tdMatch.Groups.Count >= 1)
-                            {
+                            if(tdMatch.Groups.Count >= 1) {
                                 cell1 = tdMatch.Groups[0].Value;
                             }
-                            if (tdMatch.Groups.Count >= 2)
-                            {
+                            if(tdMatch.Groups.Count >= 2) {
                                 cell2 = tdMatch.Groups[1].Value;
                             }
-                            if (tdMatch.Groups.Count >= 3)
-                            {
+                            if(tdMatch.Groups.Count >= 3) {
                                 cell3 = tdMatch.Groups[2].Value;
                             }
-                            if (is52WeekStart == true)
-                            {
+                            if(is52WeekStart == true) {
                                 is52WeekStart = false;
-                                string[] arr = cell3.Split((" - ").ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                                if (arr.Length >= 1)
-                                {
+                                string[] arr = cell3.Split((" - ").ToCharArray(),StringSplitOptions.RemoveEmptyEntries);
+                                if(arr.Length >= 1) {
                                     low = DataTypeHelper.ToDecimal(arr[0].Trim());
                                 }
-                                if (arr.Length >= 2)
-                                {
+                                if(arr.Length >= 2) {
                                     high = DataTypeHelper.ToDecimal(arr[1].Trim());
                                 }
                                 break;
                             }
-                            if (cell2.Contains("data-snapfield=\"range_52week\"") == true)
-                            {
+                            if(cell2.Contains("data-snapfield=\"range_52week\"") == true) {
                                 is52WeekStart = true;
                             }
                         }
@@ -162,16 +144,14 @@ namespace Ecam.Models
                 }
             }
 
-            string sql = string.Format(" update tra_company set week_52_low={0},week_52_high={1} where symbol='{2}'", low, high, symbol);
-            MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-            if (high <= 0 || low <= 0)
-            {
-                Helper.Log("Not update google finace value symbol=" + symbol, "NOT_UPDATE_GOOGLEFINANCE");
+            string sql = string.Format(" update tra_company set week_52_low={0},week_52_high={1} where symbol='{2}'",low,high,symbol);
+            MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString,sql);
+            if(high <= 0 || low <= 0) {
+                Helper.Log("Not update google finace value symbol=" + symbol,"NOT_UPDATE_GOOGLEFINANCE");
             }
         }
 
-        public static void NSEIndia52WeekImport(string html)
-        {
+        public static void NSEIndia52WeekImport(string html) {
             decimal week_52_low = 0;
             decimal week_52_high = 0;
             string low = "";
@@ -185,14 +165,13 @@ namespace Ecam.Models
             string sql = "";
             string lastUpdateTime = "";
             List<TempClass> tempList = new List<TempClass>();
-            html = html.Replace("\n", "").Replace("\r", "").Replace("\r\n", "").Replace("DIV", "div");
-            if (html.Contains("futLink") == true)
-            {
+            html = html.Replace("\n","").Replace("\r","").Replace("\r\n","").Replace("DIV","div");
+            if(html.Contains("futLink") == true) {
                 int startIndex = html.IndexOf("{\"futLink\"");
                 int endIndex = html.IndexOf("],\"optLink\"");
                 int length = endIndex - startIndex + 8;
 
-                html = html.Substring(startIndex, length);
+                html = html.Substring(startIndex,length);
 
                 //int startIndex = html.IndexOf("<table class=\"snap-data\">");
                 //int endIndex = html.IndexOf("</table>");
@@ -207,10 +186,8 @@ namespace Ecam.Models
         | RegexOptions.Compiled
         );
                 MatchCollection collections = regex.Matches(html);
-                foreach (Match col in collections)
-                {
-                    if (col.Groups.Count > 0)
-                    {
+                foreach(Match col in collections) {
+                    if(col.Groups.Count > 0) {
                         week_52_high = DataTypeHelper.ToDecimal(col.Groups["v"].Value);
                     }
                 }
@@ -223,10 +200,8 @@ namespace Ecam.Models
          | RegexOptions.Compiled
          );
                 collections = regex.Matches(html);
-                foreach (Match col in collections)
-                {
-                    if (col.Groups.Count > 0)
-                    {
+                foreach(Match col in collections) {
+                    if(col.Groups.Count > 0) {
                         week_52_low = DataTypeHelper.ToDecimal(col.Groups["v"].Value);
                     }
                 }
@@ -239,12 +214,10 @@ namespace Ecam.Models
         | RegexOptions.Compiled
         );
                 collections = regex.Matches(html);
-                foreach (Match col in collections)
-                {
-                    if (col.Groups.Count > 0)
-                    {
+                foreach(Match col in collections) {
+                    if(col.Groups.Count > 0) {
                         symbol = col.Groups["v"].Value;
-                        symbol = symbol.Replace("&amp;", "&");
+                        symbol = symbol.Replace("&amp;","&");
                     }
                 }
 
@@ -257,10 +230,8 @@ namespace Ecam.Models
         );
 
                 collections = regex.Matches(html);
-                foreach (Match col in collections)
-                {
-                    if (col.Groups.Count > 0)
-                    {
+                foreach(Match col in collections) {
+                    if(col.Groups.Count > 0) {
                         series = col.Groups["v"].Value;
                     }
                 }
@@ -274,10 +245,8 @@ namespace Ecam.Models
        );
 
                 collections = regex.Matches(html);
-                foreach (Match col in collections)
-                {
-                    if (col.Groups.Count > 0)
-                    {
+                foreach(Match col in collections) {
+                    if(col.Groups.Count > 0) {
                         lastUpdateTime = col.Groups["v"].Value;
                     }
                 }
@@ -291,10 +260,8 @@ namespace Ecam.Models
      );
 
                 collections = regex.Matches(html);
-                foreach (Match col in collections)
-                {
-                    if (col.Groups.Count > 0)
-                    {
+                foreach(Match col in collections) {
+                    if(col.Groups.Count > 0) {
                         low = col.Groups["v"].Value;
                     }
                 }
@@ -308,10 +275,8 @@ namespace Ecam.Models
     );
 
                 collections = regex.Matches(html);
-                foreach (Match col in collections)
-                {
-                    if (col.Groups.Count > 0)
-                    {
+                foreach(Match col in collections) {
+                    if(col.Groups.Count > 0) {
                         high = col.Groups["v"].Value;
                     }
                 }
@@ -325,10 +290,8 @@ namespace Ecam.Models
     );
 
                 collections = regex.Matches(html);
-                foreach (Match col in collections)
-                {
-                    if (col.Groups.Count > 0)
-                    {
+                foreach(Match col in collections) {
+                    if(col.Groups.Count > 0) {
                         close = col.Groups["v"].Value;
                     }
                 }
@@ -342,10 +305,8 @@ namespace Ecam.Models
     );
 
                 collections = regex.Matches(html);
-                foreach (Match col in collections)
-                {
-                    if (col.Groups.Count > 0)
-                    {
+                foreach(Match col in collections) {
+                    if(col.Groups.Count > 0) {
                         open = col.Groups["v"].Value;
                     }
                 }
@@ -359,10 +320,8 @@ namespace Ecam.Models
     );
 
                 collections = regex.Matches(html);
-                foreach (Match col in collections)
-                {
-                    if (col.Groups.Count > 0)
-                    {
+                foreach(Match col in collections) {
+                    if(col.Groups.Count > 0) {
                         lastTrade = col.Groups["v"].Value;
                     }
                 }
@@ -376,25 +335,20 @@ namespace Ecam.Models
     );
 
                 collections = regex.Matches(html);
-                foreach (Match col in collections)
-                {
-                    if (col.Groups.Count > 0)
-                    {
+                foreach(Match col in collections) {
+                    if(col.Groups.Count > 0) {
                         prev = col.Groups["v"].Value;
                     }
                 }
 
-                if (string.IsNullOrEmpty(symbol) == false
-                    && string.IsNullOrEmpty(series) == false)
-                {
-                    if (series != "EQ")
-                    {
-                        Helper.Log("Not EQ Series symbol=" + symbol, "NOT_EQ_SERIES_NSEINDIA_Week_52");
+                if(string.IsNullOrEmpty(symbol) == false
+                    && string.IsNullOrEmpty(series) == false) {
+                    if(series != "EQ") {
+                        Helper.Log("Not EQ Series symbol=" + symbol,"NOT_EQ_SERIES_NSEINDIA_Week_52");
                         week_52_low = 0; week_52_high = 0;
                     }
                     DateTime dt = DataTypeHelper.ToDateTime(lastUpdateTime);
-                    tempList.Add(new TempClass
-                    {
+                    tempList.Add(new TempClass {
                         symbol = symbol,
                         trade_date = dt,
                         close_price = DataTypeHelper.ToDecimal(close),
@@ -405,58 +359,53 @@ namespace Ecam.Models
                         prev_price = DataTypeHelper.ToDecimal(prev),
                     });
                     int rowIndex = 0;
-                    foreach (var row in tempList)
-                    {
+                    foreach(var row in tempList) {
                         rowIndex += 1;
                         //Console.WriteLine(" Rows " + rowIndex + " Of " + tempList.Count());
                         //lblTotalRecords.Text = " Import Price Rows " + rowIndex + " Of " + tempList.Count();
                         ImportPrice(row);
                     }
                     TradeHelper.UpdateCompanyPrice(symbol);
-                    sql = string.Format(" update tra_company set week_52_low={0},week_52_high={1} where symbol='{2}'", week_52_low, week_52_high, symbol);
-                    MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString, sql);
-                    if (week_52_high <= 0 || week_52_low <= 0)
-                    {
-                        Helper.Log("Not update nse india symbol=" + symbol, "NOT_Update_Week_52_SERIES_NSEINDIA_Week_52");
+                    sql = string.Format(" update tra_company set week_52_low={0},week_52_high={1} where symbol='{2}'",week_52_low,week_52_high,symbol);
+                    MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString,sql);
+                    if(week_52_high <= 0 || week_52_low <= 0) {
+                        Helper.Log("Not update nse india symbol=" + symbol,"NOT_Update_Week_52_SERIES_NSEINDIA_Week_52");
                     }
                 }
-            }
-            else
-            {
-                Helper.Log("NO CONTENT in futLink", "futLink");
+            } else {
+                Helper.Log("NO CONTENT in futLink","futLink");
             }
         }
 
-        public static void GoogleIndiaImport(string html, string symbol)
-        {
+        public static void GoogleIndiaImport(string html,string symbol) {
             //try
             //{
-            html = ReplaceTagAttributes(html, "table");
-            html = ReplaceTagAttributes(html, "tbody");
-            html = ReplaceTagAttributes(html, "tr");
-            html = ReplaceTagAttributes(html, "td");
-            html = ReplaceTagAttributes(html, "th");
-            html = ReplaceTagAttributes(html, "img");
-            html = ReplaceTagAttributes(html, "div");
-            html = ReplaceAttributes(html, "style", "");
-            html = ReplaceAttributes(html, "class", "");
-            html = ReplaceAttributes(html, "nowrap", "");
-            html = ReplaceAttributes(html, "title", "");
-            html = html.Replace("<TH nowrap=\"\">", "<th>");
-            html = html.Replace("<TD class=\"normalText\" nowrap=\"\">", "<td>");
-            html = html.Replace("<TD class=\"date\" nowrap=\"\">", "<td>");
-            html = html.Replace("<TD class=\"number\" nowrap=\"\">", "<td>");
-            html = html.Replace("\n", "").Replace("\r", "").Replace("\r\n", "").Replace("TABLE", "table").Replace("TR", "tr").Replace("TD", "td").Replace("TH", "th").Replace("TBODY", "tbody");
+            html = ReplaceTagAttributes(html,"table");
+            html = ReplaceTagAttributes(html,"tbody");
+            html = ReplaceTagAttributes(html,"tr");
+            html = ReplaceTagAttributes(html,"td");
+            html = ReplaceTagAttributes(html,"th");
+            html = ReplaceTagAttributes(html,"img");
+            html = ReplaceTagAttributes(html,"div");
+            html = ReplaceAttributes(html,"style","");
+            html = ReplaceAttributes(html,"class","");
+            html = ReplaceAttributes(html,"nowrap","");
+            html = ReplaceAttributes(html,"title","");
+            html = html.Replace("<TH nowrap=\"\">","<th>");
+            html = html.Replace("<TD class=\"normalText\" nowrap=\"\">","<td>");
+            html = html.Replace("<TD class=\"date\" nowrap=\"\">","<td>");
+            html = html.Replace("<TD class=\"number\" nowrap=\"\">","<td>");
+            html = html.Replace("\n","").Replace("\r","").Replace("\r\n","").Replace("TABLE","table").Replace("TR","tr").Replace("TD","td").Replace("TH","th").Replace("TBODY","tbody");
             int startIndex = html.IndexOf("<tbody>");
             int endIndex = html.IndexOf("</tbody>");
             int length = endIndex - startIndex + 8;
             string tblHTML = html;//.Substring(startIndex, length);
-            tblHTML = tblHTML.Replace(" ", "");
+            tblHTML = tblHTML.Replace(" ","");
             List<TempClass> tempList = new List<TempClass>();
-            tblHTML = tblHTML.Replace("<tr>", "||");
-            tblHTML = tblHTML.Replace("<td>", "~");
-            tblHTML = tblHTML.Replace("<table>", "");
-            tblHTML = tblHTML.Replace("</table>", "");
+            tblHTML = tblHTML.Replace("<tr>","||");
+            tblHTML = tblHTML.Replace("<td>","~");
+            tblHTML = tblHTML.Replace("<table>","");
+            tblHTML = tblHTML.Replace("</table>","");
             string date = "";
             //string prev = "";
             string open = "";
@@ -465,17 +414,14 @@ namespace Ecam.Models
             string lastTrade = "";
             string close = "";
             string tradeType = "NSE";
-            string[] rows = tblHTML.Split(("||").ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-            foreach (string row in rows)
-            {
+            string[] rows = tblHTML.Split(("||").ToCharArray(),StringSplitOptions.RemoveEmptyEntries);
+            foreach(string row in rows) {
 
-                string[] cells = row.Split(("~").ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                string[] cells = row.Split(("~").ToCharArray(),StringSplitOptions.RemoveEmptyEntries);
                 int index = 0;
-                for (index = 0; index < cells.Length; index++)
-                {
+                for(index = 0;index < cells.Length;index++) {
                     string value = cells[index].Trim();
-                    switch (index)
-                    {
+                    switch(index) {
                         case 0: date = value; break;
                         case 1: open = value; break;
                         case 2: high = value; break;
@@ -484,15 +430,12 @@ namespace Ecam.Models
                     }
                 }
                 lastTrade = close;
-                if (string.IsNullOrEmpty(date) == false
+                if(string.IsNullOrEmpty(date) == false
                   && string.IsNullOrEmpty(symbol) == false
-                  )
-                {
+                  ) {
                     DateTime dt = DataTypeHelper.ToDateTime(date);
-                    if (dt.Year > 1900)
-                    {
-                        tempList.Add(new TempClass
-                        {
+                    if(dt.Year > 1900) {
+                        tempList.Add(new TempClass {
                             symbol = symbol,
                             trade_date = dt,
                             close_price = DataTypeHelper.ToDecimal(close),
@@ -507,8 +450,7 @@ namespace Ecam.Models
             }
             tempList = (from q in tempList orderby q.trade_date ascending select q).ToList();
             int rowIndex = 0;
-            foreach (var temprow in tempList)
-            {
+            foreach(var temprow in tempList) {
                 rowIndex += 1;
                 ImportPrice(temprow);
                 Console.WriteLine("Symbol=" + symbol + ",Date=" + temprow.trade_date.ToString("dd/MM/yyyy") + " Completed");
@@ -651,31 +593,30 @@ namespace Ecam.Models
             */
         }
 
-        public static void NSEIndiaImport(string html)
-        {
+        public static void NSEIndiaImport(string html) {
             //try
             //{
-            html = ReplaceTagAttributes(html, "table");
-            html = ReplaceTagAttributes(html, "tbody");
-            html = ReplaceTagAttributes(html, "tr");
-            html = ReplaceTagAttributes(html, "td");
-            html = ReplaceTagAttributes(html, "th");
-            html = ReplaceTagAttributes(html, "img");
-            html = ReplaceTagAttributes(html, "div");
-            html = ReplaceAttributes(html, "style", "");
-            html = ReplaceAttributes(html, "class", "");
-            html = ReplaceAttributes(html, "nowrap", "");
-            html = ReplaceAttributes(html, "title", "");
-            html = html.Replace("<TH nowrap=\"\">", "<th>");
-            html = html.Replace("<TD class=\"normalText\" nowrap=\"\">", "<td>");
-            html = html.Replace("<TD class=\"date\" nowrap=\"\">", "<td>");
-            html = html.Replace("<TD class=\"number\" nowrap=\"\">", "<td>");
-            html = html.Replace("\n", "").Replace("\r", "").Replace("\r\n", "").Replace("TABLE", "table").Replace("TR", "tr").Replace("TD", "td").Replace("TH", "th").Replace("TBODY", "tbody");
+            html = ReplaceTagAttributes(html,"table");
+            html = ReplaceTagAttributes(html,"tbody");
+            html = ReplaceTagAttributes(html,"tr");
+            html = ReplaceTagAttributes(html,"td");
+            html = ReplaceTagAttributes(html,"th");
+            html = ReplaceTagAttributes(html,"img");
+            html = ReplaceTagAttributes(html,"div");
+            html = ReplaceAttributes(html,"style","");
+            html = ReplaceAttributes(html,"class","");
+            html = ReplaceAttributes(html,"nowrap","");
+            html = ReplaceAttributes(html,"title","");
+            html = html.Replace("<TH nowrap=\"\">","<th>");
+            html = html.Replace("<TD class=\"normalText\" nowrap=\"\">","<td>");
+            html = html.Replace("<TD class=\"date\" nowrap=\"\">","<td>");
+            html = html.Replace("<TD class=\"number\" nowrap=\"\">","<td>");
+            html = html.Replace("\n","").Replace("\r","").Replace("\r\n","").Replace("TABLE","table").Replace("TR","tr").Replace("TD","td").Replace("TH","th").Replace("TBODY","tbody");
             int startIndex = html.IndexOf("<tbody>");
             int endIndex = html.IndexOf("</tbody>");
             int length = endIndex - startIndex + 8;
-            string tblHTML = html.Substring(startIndex, length);
-            tblHTML = tblHTML.Replace(" ", "");
+            string tblHTML = html.Substring(startIndex,length);
+            tblHTML = tblHTML.Replace(" ","");
             List<TempClass> tempList = new List<TempClass>();
             Regex regex = new Regex(
         @"<tr>(.*?)</tr>",
@@ -687,13 +628,11 @@ namespace Ecam.Models
 
             MatchCollection trCollections = regex.Matches(tblHTML);
             int i = 0;
-            foreach (Match trMatch in trCollections)
-            {
+            foreach(Match trMatch in trCollections) {
                 i += 1;
                 string tr = trMatch.Value;
                 string tagName = "td";
-                if (i == 1)
-                {
+                if(i == 1) {
                     tagName = "th";
                 }
                 regex = new Regex(
@@ -715,22 +654,17 @@ namespace Ecam.Models
                 string close = "";
                 string tradeType = "NSE";
                 int colIndex = -1;
-                foreach (Match colMatch in rowMatches)
-                {
+                foreach(Match colMatch in rowMatches) {
                     colIndex += 1;
-                    if (i > 1)
-                    {
+                    if(i > 1) {
                         string value = string.Empty;
-                        if (colMatch.Groups.Count >= 2)
-                        {
+                        if(colMatch.Groups.Count >= 2) {
                             value = colMatch.Groups[1].Value;
                         }
-                        if (string.IsNullOrEmpty(value) == false)
-                        {
+                        if(string.IsNullOrEmpty(value) == false) {
                             value = value.Trim();
                         }
-                        switch (colIndex)
-                        {
+                        switch(colIndex) {
                             case 0: symbol = value; break;
                             case 1: series = value; break;
                             case 2: date = value; break;
@@ -743,21 +677,17 @@ namespace Ecam.Models
                         }
                     }
                 }
-                if (string.IsNullOrEmpty(series) == false)
-                {
-                    if (series != "EQ")
-                    {
-                        Helper.Log("NOTSERIES Symbol =" + symbol, "NOTSERIES");
+                if(string.IsNullOrEmpty(series) == false) {
+                    if(series != "EQ") {
+                        Helper.Log("NOTSERIES Symbol =" + symbol,"NOTSERIES");
                     }
                 }
-                if (string.IsNullOrEmpty(date) == false
+                if(string.IsNullOrEmpty(date) == false
                     && string.IsNullOrEmpty(symbol) == false
                     && series == "EQ"
-                    )
-                {
+                    ) {
                     DateTime dt = DataTypeHelper.ToDateTime(date);
-                    tempList.Add(new TempClass
-                    {
+                    tempList.Add(new TempClass {
                         symbol = symbol,
                         trade_date = dt,
                         close_price = DataTypeHelper.ToDecimal(close),
@@ -769,13 +699,11 @@ namespace Ecam.Models
                     });
                 }
             }
-            if (tempList.Count() <= 0)
-            {
-                Helper.Log("NSEIndiaImport Temp List No Records Found " + Environment.NewLine + html, "ERROR");
+            if(tempList.Count() <= 0) {
+                Helper.Log("NSEIndiaImport Temp List No Records Found " + Environment.NewLine + html,"ERROR");
             }
             int rowIndex = 0;
-            foreach (var row in tempList)
-            {
+            foreach(var row in tempList) {
                 rowIndex += 1;
                 //Console.WriteLine(" Rows " + rowIndex + " Of " + tempList.Count());
                 //lblTotalRecords.Text = " Import Price Rows " + rowIndex + " Of " + tempList.Count();
@@ -798,16 +726,13 @@ namespace Ecam.Models
             //}
         }
 
-        public static void UpdateCompanyPrice(string symbol)
-        {
+        public static void UpdateCompanyPrice(string symbol) {
             #region Update Company Price
-            using (EcamContext context = new EcamContext())
-            {
+            using(EcamContext context = new EcamContext()) {
                 tra_company company = (from q in context.tra_company
                                        where q.symbol == symbol
                                        select q).FirstOrDefault();
-                if (company != null)
-                {
+                if(company != null) {
                     company.open_price = 0;
                     company.high_price = 0;
                     company.low_price = 0;
@@ -820,8 +745,7 @@ namespace Ecam.Models
                                              where q.symbol == symbol
                                              orderby q.trade_date descending
                                              select q).FirstOrDefault();
-                    if (lastMarket != null)
-                    {
+                    if(lastMarket != null) {
                         company.open_price = lastMarket.open_price;
                         company.high_price = lastMarket.high_price;
                         company.low_price = lastMarket.low_price;
@@ -838,13 +762,13 @@ namespace Ecam.Models
                                    where q.symbol == symbol && q.avg_type == "M"
                                    select q).ToList();
                     total = (from q in monthly select q.percentage).Sum();
-                    company.monthly_avg = DataTypeHelper.SafeDivision(total, monthly.Count());
+                    company.monthly_avg = DataTypeHelper.SafeDivision(total,monthly.Count());
 
                     var weekly = (from q in avgs
                                   where q.symbol == symbol && q.avg_type == "W"
                                   select q).ToList();
                     total = (from q in monthly select q.percentage).Sum();
-                    company.weekly_avg = DataTypeHelper.SafeDivision(total, weekly.Count());
+                    company.weekly_avg = DataTypeHelper.SafeDivision(total,weekly.Count());
 
                     context.Entry(company).State = System.Data.Entity.EntityState.Modified;
                     context.SaveChanges();
@@ -1010,28 +934,22 @@ namespace Ecam.Models
         //            }
         //        }
 
-        private static decimal CalculateAVG(List<tra_market> markets, int dayCount)
-        {
+        private static decimal CalculateAVG(List<tra_market> markets,int dayCount) {
             int i = 0;
             //decimal total = 0;
             List<tra_market> temp = new List<tra_market>();
-            foreach (var market in markets)
-            {
-                if (dayCount > i)
-                {
+            foreach(var market in markets) {
+                if(dayCount > i) {
                     //      total += (market.close_price ?? 0);
                     temp.Add(market);
                     i += 1;
-                }
-                else
-                {
+                } else {
                     break;
                 }
             }
             //decimal avg = DataTypeHelper.SafeDivision(total, dayCount);
             decimal value = 0;
-            if (temp.Count > 0)
-            {
+            if(temp.Count > 0) {
                 var tempRow = (from q in temp
                                orderby q.trade_date ascending
                                select q).FirstOrDefault();
@@ -1040,57 +958,48 @@ namespace Ecam.Models
             return value; // DataTypeHelper.SafeDivision((currentPrice - avg), avg) * 100;
         }
 
-        public static void ImportPrice(TempClass import)
-        {
-            using (EcamContext context = new EcamContext())
-            {
-                import.symbol = import.symbol.Replace("&amp;", "&");
+        public static void ImportPrice(TempClass import) {
+            using(EcamContext context = new EcamContext()) {
+                import.symbol = import.symbol.Replace("&amp;","&");
                 var row = (from q in context.tra_market
                            where q.symbol == import.symbol
                            && q.trade_date == import.trade_date.Date
                            select q).FirstOrDefault();
                 bool isNew = false;
-                if (row == null)
-                {
+                if(row == null) {
                     row = new tra_market();
                     isNew = true;
                 }
-                if (isNew == true)
-                {
-                    row.symbol = import.symbol;
-                    row.trade_date = import.trade_date.Date;
-                    row.open_price = import.open_price;
-                    row.high_price = import.high_price;
-                    row.low_price = import.low_price;
-                    row.close_price = import.close_price;
-                    row.ltp_price = import.ltp_price;
-                    if (import.is_prev_price_exist == false)
-                    {
-                        tra_market market = (from q in context.tra_market
-                                             where q.symbol == import.symbol
-                                             && q.trade_date < row.trade_date
-                                             orderby q.trade_date descending
-                                             select q).FirstOrDefault();
-                        if (market != null)
-                        {
-                            row.prev_price = market.close_price;
-                        }
+                //if(isNew == true) {
+                row.symbol = import.symbol;
+                row.trade_date = import.trade_date.Date;
+                row.open_price = import.open_price;
+                row.high_price = import.high_price;
+                row.low_price = import.low_price;
+                row.close_price = import.close_price;
+                row.ltp_price = import.ltp_price;
+                if(import.is_prev_price_exist == false) {
+                    tra_market market = (from q in context.tra_market
+                                         where q.symbol == import.symbol
+                                         && q.trade_date < row.trade_date
+                                         orderby q.trade_date descending
+                                         select q).FirstOrDefault();
+                    if(market != null) {
+                        row.prev_price = market.close_price;
                     }
-                    else
-                    {
-                        row.prev_price = import.prev_price;
-                    }
-                    if (isNew == true)
-                    {
-                        context.tra_market.Add(row);
-                    }
-                    else
-                    {
-                        context.Entry(row).State = System.Data.Entity.EntityState.Modified;
-                    }
-                    context.SaveChanges();
+                } else {
+                    row.prev_price = import.prev_price;
                 }
-                CreateAVG(row.symbol, row.trade_date);
+                row.percentage = DataTypeHelper.SafeDivision(((row.ltp_price ?? 0) - (row.prev_price ?? 0)),(row.prev_price ?? 0)) * 100;
+                if(isNew == true) {
+                    context.tra_market.Add(row);
+                } else {
+                    context.Entry(row).State = System.Data.Entity.EntityState.Modified;
+                }
+                context.SaveChanges();
+                //}
+                CreateAVG(row.symbol,row.trade_date);
+                CreateYearLog(row.symbol,row.trade_date);
                 //lblError.Text = "ImportPrice Price Index symbol=" + row.symbol + ",Date=" + row.trade_date;
                 Console.WriteLine("ImportPrice Price Index symbol=" + row.symbol + ",Date=" + row.trade_date);
             }
@@ -1160,18 +1069,56 @@ namespace Ecam.Models
             }
         }
 
-        public static void CreateAVG(string symbol, DateTime date)
-        {
-            using (EcamContext context = new EcamContext())
-            {
+        public static void CreateYearLog(string symbol,DateTime date) {
+            DateTime startDate = DataTypeHelper.ToDateTime(date.Year + "/04/01");
+            DateTime endDate = DataTypeHelper.ToDateTime((date.Year + 1) + "/03/31");
+            int year = date.Year;
+            using(EcamContext context = new EcamContext()) {
+                tra_market openMarket = (from q in context.tra_market
+                                         where q.symbol == symbol
+                                         && q.trade_date >= startDate
+                                         && q.trade_date <= endDate
+                                         orderby q.trade_date ascending
+                                         select q).FirstOrDefault();
+                tra_market closeMarket = (from q in context.tra_market
+                                          where q.symbol == symbol
+                                          && q.trade_date >= startDate
+                                          && q.trade_date <= endDate
+                                          orderby q.trade_date descending
+                                          select q).FirstOrDefault();
+                if(openMarket != null && closeMarket != null) {
+                    tra_year_log log = (from q in context.tra_year_log
+                                        where q.symbol == symbol
+                                        && q.year == year
+                                        select q).FirstOrDefault();
+                    bool isNew = false;
+                    if(log == null) {
+                        log = new tra_year_log();
+                        isNew = true;
+                    }
+                    log.symbol = symbol;
+                    log.year = year;
+                    log.open_price = openMarket.open_price;
+                    log.close_price = closeMarket.close_price;
+                    log.percentage = DataTypeHelper.SafeDivision((log.close_price ?? 0) - (log.open_price ?? 0),(log.open_price ?? 0)) * 100;
+                    if(isNew == true) {
+                        context.tra_year_log.Add(log);
+                    } else {
+                        context.Entry(log).State = System.Data.Entity.EntityState.Modified;
+                    }
+                    context.SaveChanges();
+                }
+            }
+        }
+
+        public static void CreateAVG(string symbol,DateTime date) {
+            using(EcamContext context = new EcamContext()) {
                 IQueryable<tra_market> markets = context.tra_market.Where(q => q.symbol == symbol);
-                if (date.Year > 1900)
-                {
+                if(date.Year > 1900) {
                     markets = markets.Where(q => q.trade_date == date);
                 }
                 tra_market market = (from q in markets orderby q.trade_date descending select q).FirstOrDefault();
-                if (market != null)
-                {
+                if(market != null) {
                     DateTime monthStartDate = DataTypeHelper.GetFirstDayOfMonth(market.trade_date);
                     DateTime monthEndDate = DataTypeHelper.GetLastDayOfMonth(market.trade_date);
                     DateTime weekFirstDate = DataTypeHelper.GetFirstDayOfWeek(market.trade_date);
@@ -1179,37 +1126,32 @@ namespace Ecam.Models
 
                     var monthFirstTrade = (from q in context.tra_market where q.symbol == market.symbol && q.trade_date >= monthStartDate orderby q.trade_date ascending select q).FirstOrDefault();
                     var monthLastTrade = (from q in context.tra_market where q.symbol == market.symbol && q.trade_date <= monthEndDate orderby q.trade_date descending select q).FirstOrDefault();
-                    if (monthFirstTrade != null && monthLastTrade != null)
-                    {
+                    if(monthFirstTrade != null && monthLastTrade != null) {
                         //if (monthLastTrade.trade_date.Day >= 15)
                         //{
                         decimal openPrice = (monthFirstTrade.open_price ?? 0);
                         decimal lastPrice = (monthLastTrade.close_price ?? 0);
-                        CreateAVGRecord(market.symbol, "M", openPrice, lastPrice, monthStartDate);
+                        CreateAVGRecord(market.symbol,"M",openPrice,lastPrice,monthStartDate);
                         //}
                     }
 
                     var weekFirstTrade = (from q in context.tra_market where q.symbol == market.symbol && q.trade_date >= weekFirstDate orderby q.trade_date ascending select q).FirstOrDefault();
                     var weekLastTrade = (from q in context.tra_market where q.symbol == market.symbol && q.trade_date <= weekLastDate orderby q.trade_date descending select q).FirstOrDefault();
-                    if (weekFirstTrade != null && weekLastTrade != null)
-                    {
+                    if(weekFirstTrade != null && weekLastTrade != null) {
                         decimal openPrice = (weekFirstTrade.open_price ?? 0);
                         decimal lastPrice = (weekLastTrade.close_price ?? 0);
-                        CreateAVGRecord(market.symbol, "W", openPrice, lastPrice, weekFirstDate);
+                        CreateAVGRecord(market.symbol,"W",openPrice,lastPrice,weekFirstDate);
                     }
                 }
             }
         }
 
-        public static void _CreateAVG(string symbol)
-        {
+        public static void _CreateAVG(string symbol) {
             List<tra_market> markets;
-            using (EcamContext context = new EcamContext())
-            {
+            using(EcamContext context = new EcamContext()) {
                 markets = (from q in context.tra_market where q.symbol == symbol orderby q.trade_date select q).ToList();
             }
-            foreach (var market in markets)
-            {
+            foreach(var market in markets) {
                 DateTime monthStartDate = DataTypeHelper.GetFirstDayOfMonth(market.trade_date);
                 DateTime monthEndDate = DataTypeHelper.GetLastDayOfMonth(market.trade_date);
                 DateTime weekFirstDate = DataTypeHelper.GetFirstDayOfWeek(market.trade_date);
@@ -1217,60 +1159,51 @@ namespace Ecam.Models
 
                 var monthFirstTrade = (from q in markets where q.trade_date >= monthStartDate orderby q.trade_date ascending select q).FirstOrDefault();
                 var monthLastTrade = (from q in markets where q.trade_date <= monthEndDate orderby q.trade_date descending select q).FirstOrDefault();
-                if (monthFirstTrade != null && monthLastTrade != null)
-                {
+                if(monthFirstTrade != null && monthLastTrade != null) {
                     //if (monthLastTrade.trade_date.Day >= 15)
                     //{
                     decimal openPrice = (monthFirstTrade.open_price ?? 0);
                     decimal lastPrice = (monthLastTrade.close_price ?? 0);
-                    CreateAVGRecord(symbol, "M", openPrice, lastPrice, monthStartDate);
+                    CreateAVGRecord(symbol,"M",openPrice,lastPrice,monthStartDate);
                     //}
                 }
 
                 var weekFirstTrade = (from q in markets where q.trade_date >= weekFirstDate orderby q.trade_date ascending select q).FirstOrDefault();
                 var weekLastTrade = (from q in markets where q.trade_date <= weekLastDate orderby q.trade_date descending select q).FirstOrDefault();
-                if (weekFirstTrade != null && weekLastTrade != null)
-                {
+                if(weekFirstTrade != null && weekLastTrade != null) {
                     decimal openPrice = (weekFirstTrade.open_price ?? 0);
                     decimal lastPrice = (weekLastTrade.close_price ?? 0);
-                    CreateAVGRecord(symbol, "W", openPrice, lastPrice, weekFirstDate);
+                    CreateAVGRecord(symbol,"W",openPrice,lastPrice,weekFirstDate);
                 }
             }
         }
 
-        private static void CreateAVGRecord(string symbol, string type, decimal openPrice, decimal lastPrice, DateTime date)
-        {
+        private static void CreateAVGRecord(string symbol,string type,decimal openPrice,decimal lastPrice,DateTime date) {
             decimal profit = 0;
             try { profit = ((lastPrice - openPrice) / openPrice) * 100; } catch { }
-            using (EcamContext context = new EcamContext())
-            {
+            using(EcamContext context = new EcamContext()) {
                 tra_market_avg avg = (from q in context.tra_market_avg
                                       where q.symbol == symbol
                                       && q.avg_type == type
                                       && q.avg_date == date
                                       select q).FirstOrDefault();
-                if (avg == null)
-                {
+                if(avg == null) {
                     avg = new tra_market_avg();
                 }
                 avg.symbol = symbol;
                 avg.avg_type = type;
                 avg.avg_date = date;
                 avg.percentage = profit;
-                if (avg.id > 0)
-                {
+                if(avg.id > 0) {
                     context.Entry(avg).State = System.Data.Entity.EntityState.Modified;
-                }
-                else
-                {
+                } else {
                     context.tra_market_avg.Add(avg);
                 }
                 context.SaveChanges();
             }
         }
 
-        public static string RemoveHTMLTag(string html)
-        {
+        public static string RemoveHTMLTag(string html) {
             Regex regex = new Regex(
 @"<[^>]*>",
 RegexOptions.IgnoreCase
@@ -1278,13 +1211,12 @@ RegexOptions.IgnoreCase
 | RegexOptions.IgnorePatternWhitespace
 | RegexOptions.Compiled
 );
-            string result = regex.Replace(html, "");
-            result = result.Replace("&nbsp;", "");
+            string result = regex.Replace(html,"");
+            result = result.Replace("&nbsp;","");
             return result;
         }
 
-        public static void GetUpdatePriceUsingGoogle(string symbol)
-        {
+        public static void GetUpdatePriceUsingGoogle(string symbol) {
             //string type = "NSE";
             //string url = string.Format("http://finance.google.com/finance/info?client=ig&q={0}:{1}", type, symbol.Replace("&", "%26"));
             //WebClient client = new WebClient();
@@ -1368,8 +1300,7 @@ RegexOptions.IgnoreCase
         //}
     }
 
-    public class TempRSI
-    {
+    public class TempRSI {
         public string symbol { get; set; }
         public decimal close { get; set; }
         public decimal prev { get; set; }
@@ -1397,7 +1328,7 @@ RegexOptions.IgnoreCase
         }
         public decimal rsi {
             get {
-                if (this.avg_downward == 0)
+                if(this.avg_downward == 0)
                     return 100;
                 else
                     return (100 - (100 / (1 + this.rs)));
@@ -1406,8 +1337,7 @@ RegexOptions.IgnoreCase
         public DateTime date { get; set; }
     }
 
-    public class PriceDetailJSON
-    {
+    public class PriceDetailJSON {
         public string id { get; set; }
         public string t { get; set; }
         public string e { get; set; }
@@ -1421,10 +1351,8 @@ RegexOptions.IgnoreCase
         public string cp_fix { get; set; }
     }
 
-    public class RowCollections
-    {
-        public RowCollections()
-        {
+    public class RowCollections {
+        public RowCollections() {
             this.cells = new List<string>();
         }
         public int index { get; set; }

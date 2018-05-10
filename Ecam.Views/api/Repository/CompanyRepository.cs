@@ -193,6 +193,10 @@ namespace Ecam.Framework.Repository {
             string sql = string.Empty;
             //string role = Authentication.CurrentRole;
 
+            if(string.IsNullOrEmpty(paging.SortName) == true) {
+                paging.SortName = " percentage_" + DateTime.Now.Year + " desc";
+            }
+
             if((criteria.id ?? 0) > 0) {
                 where.AppendFormat(" ct.company_id={0}",criteria.id);
             } else {
@@ -347,17 +351,22 @@ namespace Ecam.Framework.Repository {
                     joinTables += " join tra_holding h on h.symbol = ct.symbol ";
                 }
 
+
+                joinTables += " left outer join tra_year_log yoy2016 on yoy2016.symbol = ct.symbol and yoy2016.year = 2016 ";
+                joinTables += " left outer join tra_year_log yoy2017 on yoy2017.symbol = ct.symbol and yoy2017.year = 2017 ";
+                joinTables += " left outer join tra_year_log yoy2018 on yoy2018.symbol = ct.symbol and yoy2018.year = 2018 ";
+
                 selectFields = "count(*) as cnt";
+
+                if(string.IsNullOrEmpty(criteria.where_condition) == false) {
+                    where.Append(" " + criteria.where_condition + " ");
+                }
 
                 sql = string.Format(sqlFormat,selectFields,joinTables,where,groupByName,"","");
 
                 //Helper.Log(sql,"GET_COUNT");
 
                 paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString,sql));
-
-                if(string.IsNullOrEmpty(paging.SortOrder)) {
-                    paging.SortOrder = "asc";
-                }
 
                 if(paging.PageSize > 0) {
                     int from = (paging.PageIndex > 1) ? ((paging.PageIndex - 1) * paging.PageSize) : 0;
@@ -403,14 +412,9 @@ namespace Ecam.Framework.Repository {
 
 
             if((criteria.id ?? 0) <= 0) {
-                selectFields += ",(select ifnull(open_price,0) from tra_market m where m.trade_date>='2016-04-01' and m.trade_date<='2017-03-31' and m.symbol = ct.symbol order by m.trade_date asc limit 0,1) as 2016_open" + Environment.NewLine +
-                ",(select ifnull(close_price,0) from tra_market m where m.trade_date>='2016-04-01' and m.trade_date<='2017-03-31' and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as 2016_close" + Environment.NewLine +
-
-                ",(select ifnull(open_price,0) from tra_market m where m.trade_date>='2017-04-01' and m.trade_date<='2018-03-31' and m.symbol = ct.symbol order by m.trade_date asc limit 0,1) as 2017_open" + Environment.NewLine +
-                ",(select ifnull(close_price,0) from tra_market m where m.trade_date>='2017-04-01' and m.trade_date<='2018-03-31' and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as 2017_close" + Environment.NewLine +
-
-                ",(select ifnull(open_price,0) from tra_market m where m.trade_date>='2018-04-01' and m.trade_date<='2019-03-31' and m.symbol = ct.symbol order by m.trade_date asc limit 0,1) as 2018_open" + Environment.NewLine +
-                ",(select ifnull(close_price,0) from tra_market m where m.trade_date>='2018-04-01' and m.trade_date<='2019-03-31' and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as 2018_close" + Environment.NewLine +
+                selectFields += ",yoy2016.percentage as percentage_2016" + Environment.NewLine +
+                ",yoy2017.percentage as percentage_2017" + Environment.NewLine +
+                ",yoy2018.percentage as percentage_2018" + Environment.NewLine +
                 "";
             }
 
@@ -533,10 +537,7 @@ namespace Ecam.Framework.Repository {
 
             paging.Total = Convert.ToInt32(MySqlHelper.ExecuteScalar(Ecam.Framework.Helper.ConnectionString,tempsql));
 
-            string yearPercentage = ",if(2016_open>0,(((2016_close-2016_open)/2016_open) * 100),0) as percentage_2016" + Environment.NewLine +
-            ",if(2017_open>0,(((2017_close-2017_open)/2017_open) * 100),0) as percentage_2017" + Environment.NewLine +
-            ",if(2018_open>0,(((2018_close-2018_open)/2018_open) * 100),0) as percentage_2018" + Environment.NewLine +
-            "";
+            string yearPercentage = "";
 
             sql = string.Format("select " +
 

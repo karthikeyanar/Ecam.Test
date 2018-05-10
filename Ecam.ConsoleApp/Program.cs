@@ -91,7 +91,21 @@ namespace Ecam.ConsoleApp {
                     } catch(Exception ex) {
                         Helper.Log(ex.Message,"AddSplit_ERROR" + "_" + (new Random()).Next(1000,10000));
                     }
-
+                    try {
+                        List<string> symbols;
+                        using(EcamContext context = new EcamContext()) {
+                            symbols = (from q in context.tra_company select q.symbol).ToList();
+                        }
+                        int i;
+                        for(i = 0;i < 7;i++) {
+                            DateTime startDate = Convert.ToDateTime("01/01/" + (DateTime.Now.Year - i).ToString());
+                            foreach(string symbol in symbols) {
+                                TradeHelper.CreateYearLog(symbol,startDate);
+                            }
+                        }
+                    } catch(Exception ex) {
+                        Helper.Log(ex.Message,"AddSplit_ERROR" + "_" + (new Random()).Next(1000,10000));
+                    }
                     try {
                         int i;
                         int total = 0;
@@ -535,65 +549,112 @@ namespace Ecam.ConsoleApp {
         }
 
         private static void AddSplit() {
-            DateTime startDate = DateTime.Now.AddMonths(-6);
-            DateTime endDate = DateTime.Now.AddMonths(6);
-            string sql = "select " + Environment.NewLine +
-                            " m.symbol" + Environment.NewLine +
-                            " ,DATE_FORMAT(m.trade_date,'%d/%b/%Y') as trade_date" + Environment.NewLine +
-                            " ,(((ifnull(m.prev_price,0)/ifnull(m.open_price,0)))) as prev_diff" + Environment.NewLine +
-                            " ,(((ifnull(m.open_price,0)-ifnull(m.prev_price,0))/ifnull(m.prev_price,0)) *100) as prev_percentage" + Environment.NewLine +
-                            " ,m.symbol" + Environment.NewLine +
-                            " ,m.trade_date as trade_date2" + Environment.NewLine +
-                            //" ,m.open_price" + Environment.NewLine +
-                            //" ,m.prev_price" + Environment.NewLine +
-                            //" ,m.* " + Environment.NewLine +
-                            " from tra_market m" + Environment.NewLine +
-                            " where " + Environment.NewLine +
-                            " m.trade_date>='" + startDate.ToString("yyyy-MM-dd") + "' and m.trade_date<='" + endDate.ToString("yyyy-MM-dd") + "'" + Environment.NewLine +
-                            " and (((ifnull(m.ltp_price,0) - ifnull(m.prev_price,0)) / ifnull(m.prev_price,0))*100) != 0" + Environment.NewLine +
-                            " and (((ifnull(m.ltp_price,0) - ifnull(m.prev_price,0)) / ifnull(m.prev_price,0))*100) <= -48" + Environment.NewLine +
-                            " order by trade_date asc,symbol asc limit 0,100";
-            using(MySqlDataReader dr = MySqlHelper.ExecuteReader(Ecam.Framework.Helper.ConnectionString,sql)) {
-                while(dr.Read()) {
-                    string symbol = dr["symbol"].ToString();
-                    DateTime tradeDate = DataTypeHelper.ToDateTime(dr["trade_date"]);
-                    decimal factor = DataTypeHelper.ToDecimal(dr["prev_diff"].ToString());
-                    tra_split split = null;
+            List<tra_market> markets = null;
+            using(EcamContext context = new EcamContext()) {
+                markets = (from q in context.tra_market
+                           where (q.percentage ?? 0) != 0 && (q.percentage ?? 0) <= -48
+                           select q).ToList();
+            }
+            foreach(var market in markets) {
+                string symbol = market.symbol;
+                DateTime tradeDate = market.trade_date;
+                decimal factor = DataTypeHelper.SafeDivision((market.prev_price ?? 0),(market.open_price ?? 0));
+                tra_split split = null;
 
-                    using(EcamContext context = new EcamContext()) {
-                        split = (from q in context.tra_split
-                                 where q.symbol == symbol
-                                 && q.split_date == tradeDate
-                                 select q).FirstOrDefault();
-                        bool isNew = false;
-                        if(split == null) {
-                            split = new tra_split();
-                            isNew = true;
+                using(EcamContext context = new EcamContext()) {
+                    split = (from q in context.tra_split
+                             where q.symbol == symbol
+                             && q.split_date == tradeDate
+                             select q).FirstOrDefault();
+                    bool isNew = false;
+                    if(split == null) {
+                        split = new tra_split();
+                        isNew = true;
+                    } else {
+                        split._prev_split = (from q in context.tra_split
+                                             where
+                                             q.id == split.id
+                                             select q).FirstOrDefault();
+                    }
+                    if(isNew == true) {
+                        split.symbol = symbol;
+                        split.split_date = tradeDate;
+                        split.split_factor = factor;
+                        if(split.id > 0) {
+                            context.Entry(split).State = System.Data.Entity.EntityState.Modified;
                         } else {
-                            split._prev_split = (from q in context.tra_split
-                                                 where
-                                                 q.id == split.id
-                                                 select q).FirstOrDefault();
+                            context.tra_split.Add(split);
                         }
-                        if(isNew == true) {
-                            split.symbol = symbol;
-                            split.split_date = tradeDate;
-                            split.split_factor = factor;
-                            if(split.id > 0) {
-                                context.Entry(split).State = System.Data.Entity.EntityState.Modified;
-                            } else {
-                                context.tra_split.Add(split);
-                            }
-                            context.SaveChanges();
-                        }
+                        context.SaveChanges();
                     }
-                    if(split != null) {
-                        split.UpdatePrice();
-                        Console.WriteLine("Split Completed symbol=" + split.symbol + ",Date=" + split.split_date);
-                    }
+                }
+                if(split != null) {
+                    split.UpdatePrice();
+                    Console.WriteLine("Split Completed symbol=" + split.symbol + ",Date=" + split.split_date);
                 }
             }
         }
+
+        //private static void AddSplit() {
+        //    DateTime startDate = DateTime.Now.AddMonths(-6);
+        //    DateTime endDate = DateTime.Now.AddMonths(6);
+        //    string sql = "select " + Environment.NewLine +
+        //                    " m.symbol" + Environment.NewLine +
+        //                    " ,DATE_FORMAT(m.trade_date,'%d/%b/%Y') as trade_date" + Environment.NewLine +
+        //                    " ,(((ifnull(m.prev_price,0)/ifnull(m.open_price,0)))) as prev_diff" + Environment.NewLine +
+        //                    " ,(((ifnull(m.open_price,0)-ifnull(m.prev_price,0))/ifnull(m.prev_price,0)) *100) as prev_percentage" + Environment.NewLine +
+        //                    " ,m.symbol" + Environment.NewLine +
+        //                    " ,m.trade_date as trade_date2" + Environment.NewLine +
+        //                    //" ,m.open_price" + Environment.NewLine +
+        //                    //" ,m.prev_price" + Environment.NewLine +
+        //                    //" ,m.* " + Environment.NewLine +
+        //                    " from tra_market m" + Environment.NewLine +
+        //                    " where " + Environment.NewLine +
+        //                    " m.trade_date>='" + startDate.ToString("yyyy-MM-dd") + "' and m.trade_date<='" + endDate.ToString("yyyy-MM-dd") + "'" + Environment.NewLine +
+        //                    " and (((ifnull(m.ltp_price,0) - ifnull(m.prev_price,0)) / ifnull(m.prev_price,0))*100) != 0" + Environment.NewLine +
+        //                    " and (((ifnull(m.ltp_price,0) - ifnull(m.prev_price,0)) / ifnull(m.prev_price,0))*100) <= -48" + Environment.NewLine +
+        //                    " order by trade_date asc,symbol asc limit 0,100";
+        //    using(MySqlDataReader dr = MySqlHelper.ExecuteReader(Ecam.Framework.Helper.ConnectionString,sql)) {
+        //        while(dr.Read()) {
+        //            string symbol = dr["symbol"].ToString();
+        //            DateTime tradeDate = DataTypeHelper.ToDateTime(dr["trade_date"]);
+        //            decimal factor = DataTypeHelper.ToDecimal(dr["prev_diff"].ToString());
+        //            tra_split split = null;
+
+        //            using(EcamContext context = new EcamContext()) {
+        //                split = (from q in context.tra_split
+        //                         where q.symbol == symbol
+        //                         && q.split_date == tradeDate
+        //                         select q).FirstOrDefault();
+        //                bool isNew = false;
+        //                if(split == null) {
+        //                    split = new tra_split();
+        //                    isNew = true;
+        //                } else {
+        //                    split._prev_split = (from q in context.tra_split
+        //                                         where
+        //                                         q.id == split.id
+        //                                         select q).FirstOrDefault();
+        //                }
+        //                if(isNew == true) {
+        //                    split.symbol = symbol;
+        //                    split.split_date = tradeDate;
+        //                    split.split_factor = factor;
+        //                    if(split.id > 0) {
+        //                        context.Entry(split).State = System.Data.Entity.EntityState.Modified;
+        //                    } else {
+        //                        context.tra_split.Add(split);
+        //                    }
+        //                    context.SaveChanges();
+        //                }
+        //            }
+        //            if(split != null) {
+        //                split.UpdatePrice();
+        //                Console.WriteLine("Split Completed symbol=" + split.symbol + ",Date=" + split.split_date);
+        //            }
+        //        }
+        //    }
+        //}
 
         private static void UpdatePrevPrice() {
 
