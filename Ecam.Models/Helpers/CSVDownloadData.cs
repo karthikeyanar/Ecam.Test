@@ -130,6 +130,8 @@ namespace Ecam.Models {
                 new OldSymbol { old_symbol = "VISHALRET", new_symbol = "V2RETAIL" },
                 new OldSymbol { old_symbol = "WABCO-TVS", new_symbol = "WABCOINDIA" },
                 new OldSymbol { old_symbol = "WELGUJ", new_symbol = "WELCORP" },
+                new OldSymbol { old_symbol = "PRSMJOHNSN", new_symbol = "PRISMCEM" },
+                new OldSymbol { old_symbol = "UTIBANK", new_symbol = "AXISBANK" },
             };
             if(string.IsNullOrEmpty(tempfilename) == false) {
                 string url = string.Empty;
@@ -153,6 +155,7 @@ namespace Ecam.Models {
                             string close = csv.GetField<string>("Close Price");
                             string lastTrade = csv.GetField<string>("Last Price");
                             string prev = csv.GetField<string>("Prev Close");
+                            string turnOver = csv.GetField<string>("Turnover"); 
                             DateTime dt = DataTypeHelper.ToDateTime(date);
                             if(string.IsNullOrEmpty(symbol) == false) {
                                 symbol = symbol.Replace("&amp;","&");
@@ -178,6 +181,7 @@ namespace Ecam.Models {
                                         open_price = DataTypeHelper.ToDecimal(open),
                                         ltp_price = DataTypeHelper.ToDecimal(lastTrade),
                                         prev_price = DataTypeHelper.ToDecimal(prev),
+                                        turn_over = DataTypeHelper.ToDecimal(turnOver),
                                         is_prev_price_exist = true
                                     });
                                 }

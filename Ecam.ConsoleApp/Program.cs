@@ -35,7 +35,7 @@ namespace Ecam.ConsoleApp {
         private static List<string> _SYMBOLS_LIST;
         static void Main(string[] args) {
             try {
-                NiftyListGenerate();
+                //NiftyListGenerate();
                 IS_CATEGORY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_CATEGORY_FLAG_CSV"];
                 IS_NIFTY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_FLAG_CSV"];
                 IS_IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_IMPORT_CSV"];
@@ -86,7 +86,14 @@ namespace Ecam.ConsoleApp {
                         //for(i = 0;i < 1;i++) {
                         //    DateTime startDate = Convert.ToDateTime("01/01/" + (DateTime.Now.Year - i).ToString());
                         //    DateTime endDate = Convert.ToDateTime("12/31/" + (DateTime.Now.Year - i).ToString());
-                        AddSplit();
+                        List<string> symbols;
+                        using(EcamContext context = new EcamContext()) {
+                            symbols = (from q in context.tra_company select q.symbol).ToList();
+                        }
+                        foreach(string symbol in symbols) {
+                            //Console.WriteLine("Split Symbol=" + symbol);
+                            AddSplit(symbol);
+                        }
                         //}
                     } catch(Exception ex) {
                         Helper.Log(ex.Message,"AddSplit_ERROR" + "_" + (new Random()).Next(1000,10000));
@@ -97,9 +104,10 @@ namespace Ecam.ConsoleApp {
                             symbols = (from q in context.tra_company select q.symbol).ToList();
                         }
                         int i;
-                        for(i = 0;i < 7;i++) {
+                        for(i = 0;i < 1;i++) {
                             DateTime startDate = Convert.ToDateTime("01/01/" + (DateTime.Now.Year - i).ToString());
                             foreach(string symbol in symbols) {
+                                Console.WriteLine("Symbol=" + symbol + ",Date=" + startDate.Year);
                                 TradeHelper.CreateYearLog(symbol,startDate);
                             }
                         }
@@ -107,34 +115,33 @@ namespace Ecam.ConsoleApp {
                         Helper.Log(ex.Message,"AddSplit_ERROR" + "_" + (new Random()).Next(1000,10000));
                     }
                     try {
-                        int i;
-                        int total = 0;
-                        if(IS_DOWNLOAD_HISTORY == "true" || IS_IMPORT_CSV == "true") {
-                            tra_daily_log dailyLog = null;
-                            using(EcamContext context = new EcamContext()) {
-                                dailyLog = (from q in context.tra_daily_log
-                                            orderby q.trade_date descending
-                                            select q).FirstOrDefault();
-                            }
-                            if(dailyLog != null) {
-                                TimeSpan ts = DateTime.Now.Date - dailyLog.trade_date;
-                                total = (int)ts.TotalDays + 1;
-                            } else {
-                                total = (365 * 5);
-                            }
-                        }
-                        for(i = 0;i < total;i++) {
-                            DateTime dt = DateTime.Now.Date.AddDays(-i);
-                            TradeHelper.CreateDailyLog(dt.Date,"");
-                            TradeHelper.CreateDailyLog(dt.Date,"true");
-                        }
-                        MailSend(true);
-                        MailSend(false);
-                        MailSendDailyCSV();
+                        //int i;
+                        //int total = 0;
+                        //if(IS_DOWNLOAD_HISTORY == "true" || IS_IMPORT_CSV == "true") {
+                        //    tra_daily_log dailyLog = null;
+                        //    using(EcamContext context = new EcamContext()) {
+                        //        dailyLog = (from q in context.tra_daily_log
+                        //                    orderby q.trade_date descending
+                        //                    select q).FirstOrDefault();
+                        //    }
+                        //    if(dailyLog != null) {
+                        //        TimeSpan ts = DateTime.Now.Date - dailyLog.trade_date;
+                        //        total = (int)ts.TotalDays + 1;
+                        //    } else {
+                        //        total = (365 * 15);
+                        //    }
+                        //}
+                        //for(i = 0;i < total;i++) {
+                        //    DateTime dt = DateTime.Now.Date.AddDays(-i);
+                        //    TradeHelper.CreateDailyLog(dt.Date,"");
+                        //    TradeHelper.CreateDailyLog(dt.Date,"true");
+                        //}
+                        //MailSend(true);
+                        //MailSend(false);
+                        //MailSendDailyCSV();
                     } catch(Exception ex) {
                         Helper.Log(ex.Message,"MAIL_SEND_ERROR" + "_" + (new Random()).Next(1000,10000));
                     }
-
                 }
             } catch(Exception ex) {
                 Helper.Log(ex.Message,"MAIN_ERROR" + "_" + (new Random()).Next(1000,10000));
@@ -548,11 +555,13 @@ namespace Ecam.ConsoleApp {
             }
         }
 
-        private static void AddSplit() {
+        private static void AddSplit(string splitSymbol) {
             List<tra_market> markets = null;
             using(EcamContext context = new EcamContext()) {
                 markets = (from q in context.tra_market
-                           where (q.percentage ?? 0) != 0 && (q.percentage ?? 0) <= -48
+                           where q.symbol == splitSymbol
+                           && (q.percentage ?? 0) != 0 && (q.percentage ?? 0) <= -48
+                           orderby q.trade_date ascending,q.symbol ascending
                            select q).ToList();
             }
             foreach(var market in markets) {

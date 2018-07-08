@@ -295,6 +295,9 @@
                     <table id="CompanyTable" class="table table-striped table-bordered table-hover table-condensed table-gray">
                         <thead>
                             <tr>
+								<th style="width: 10px">
+                                    #
+                                </th>
                                 <th style="width: 10px">
                                     &nbsp;
                                 </th>
@@ -313,9 +316,9 @@
                                 <th>
                                     Category
                                 </th>
-                                <th>
+                                @*<th>
                                     Holding
-                                </th>
+                                </th>*@
                                 @*<th sortname="prev_rsi" class="text-right text-nowrap">
                                         Prev.RSI
                                     </th>*@
@@ -325,18 +328,18 @@
                                 @*<th sortname="profit_rsi" class="text-right text-nowrap">
                                         Profit RSI
                                     </th>*@
-                                <th sortname="prev_percentage" class="text-right text-nowrap">
+                                @*<th sortname="prev_percentage" class="text-right text-nowrap">
                                     Last %
-                                </th>
+                                </th>*@
                                 <th sortname="ltp_price" class="text-right text-nowrap">
                                     LTP
                                 </th>
-                                <th sortname="first_price" class="text-right text-nowrap">
+                                @*<th sortname="first_price" class="text-right text-nowrap">
                                     F.P
                                 </th>
                                 <th sortname="last_price" class="text-right text-nowrap">
                                     L.P
-                                </th>
+                                </th>*@
                                 @*<th sortname="mf_cnt" class="text-right">
                                         MFCNT
                                     </th>
@@ -393,6 +396,10 @@
                         </thead>
                         <tbody data-bind="foreach:rows">
                             <tr>
+								<td>
+                                    <div style="width:15px;" data-bind="text:$index()+1">
+                                    </div>
+                                </td>
                                 <td class="cls-symbol">
                                     <div style="width:5px;">
                                         <a href="javascript:;" data-bind="attr:{'cid':id()}" class="tree-expand ex-plus pull-left">
@@ -419,11 +426,11 @@
                                     <div style="width:250px;overflow:hidden;" data-bind="text:category_name">
                                     </div>
                                 </td>
-                                <td style="vertical-align:top;" class="cursor-pointer text-center">
+                                @*<td style="vertical-align:top;" class="cursor-pointer text-center">
                                     <!-- ko if: is_holding()==true -->
                                     <i class="fa fa-check"></i>
                                     <!-- /ko -->
-                                </td>
+                                </td>*@
                                 @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                                         <div data-bind="text:formatNumber(prev_rsi())"></div>
                                     </td>*@
@@ -433,18 +440,18 @@
                                 @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                                         <div data-bind="text:formatNumber(profit_rsi())"></div>
                                     </td>*@
-                                <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                                     <div data-bind="text:formatPercentage(prev_percentage())"></div>
-                                </td>
+                                </td>*@
                                 <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                                     <div data-bind="text:formatNumber(ltp_price())"></div>
                                 </td>
-                                <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                                @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                                     <div data-bind="text:formatNumber(first_price())"></div>
                                 </td>
                                 <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                                     <div data-bind="text:formatNumber(last_price())"></div>
-                                </td>
+                                </td>*@
                                 @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                                         <div data-bind="text:formatNumber(mf_cnt())"></div>
                                     </td>

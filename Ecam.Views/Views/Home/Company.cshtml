@@ -32,7 +32,7 @@
                 <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" id="is_book_mark" /> Show Book Mark
+                            <input type="checkbox" id="is_book_mark" checked /> Show Book Mark
                         </label>
                     </div>
                 </div>
@@ -75,10 +75,19 @@
             <div class="clearfix"></div>
             <div class="m-l-15">
                 <div class="form-group m-r-10 m-t-10">
-                    <input type="text" name="where_condition" class="form-control input-sm" style="width:900px;" />
+                    <input type="text" name="where_condition" class="form-control input-sm" style="width:900px;" placeholder="Where condition" />
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <input type="text" name="positive_percentage" class="form-control input-sm" placeholder="Positive Percentage"  />
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <input type="text" name="avg" class="form-control input-sm" placeholder="AVG"  />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <button type="button" id="btn" class="btn btn-success btn-sm" data-bind="click:refresh">Refresh</button>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <button type="button" id="btnLog" class="btn btn-primary btn-sm" data-bind="click:openLog">Log</button>
                 </div>
             </div>
             <div class="m-l-15" style="display:none;">
@@ -176,8 +185,9 @@
                     <select id="rows" name="rows" class="pull-left form-control input-sm input-60">
                         <option value="10">10</option>
                         <option value="50">50</option>
-                        <option value="200" selected>200</option>
+                        <option value="200">200</option>
                         <option value="500">500</option>
+                        <option value="2000" selected>2000</option>
                     </select>
                 </div>
                 <div class="pull-left">
@@ -196,14 +206,17 @@
         <table id="CompanyTable" class="table table-striped table-bordered table-hover table-condensed table-gray">
             <thead>
                 <tr>
+                    <th>
+                        <input type="checkbox" id="chkSelectAll" />
+                    </th>
                     <th style="width: 50px" sortname="">
                         #
                     </th>
                     <th style="width: 50px" sortname="is_archive">
-                        Mark
+                        Ar
                     </th>
                     <th style="width: 50px" sortname="is_book_mark">
-                        CS
+                        BM
                     </th>
                     <th sortname="company_name">
                         Company
@@ -214,8 +227,38 @@
                     <th>
                         Category
                     </th>
-                    <th sortname="mc" class="text-right text-nowrap">
+                    @*<th sortname="mc" class="text-right text-nowrap">
                         MC
+                    </th>*@
+                    <th sortname="ltp_price" class="text-right text-nowrap">
+                        LTP
+                    </th>
+                    <th sortname="percentage_2007" class="text-right text-nowrap">
+                        2007 %
+                    </th>
+                    <th sortname="percentage_2008" class="text-right text-nowrap">
+                        2008 %
+                    </th>
+                    <th sortname="percentage_2009" class="text-right text-nowrap">
+                        2009 %
+                    </th>
+                    <th sortname="percentage_2010" class="text-right text-nowrap">
+                        2010 %
+                    </th>
+                    <th sortname="percentage_2011" class="text-right text-nowrap">
+                        2011 %
+                    </th>
+                    <th sortname="percentage_2012" class="text-right text-nowrap">
+                        2012 %
+                    </th>
+                    <th sortname="percentage_2013" class="text-right text-nowrap">
+                        2013 %
+                    </th>
+                    <th sortname="percentage_2014" class="text-right text-nowrap">
+                        2014 %
+                    </th>
+                    <th sortname="percentage_2015" class="text-right text-nowrap">
+                        2015 %
                     </th>
                     <th sortname="percentage_2016" class="text-right text-nowrap">
                         2016 %
@@ -226,6 +269,12 @@
                     <th sortname="percentage_2018" class="text-right text-nowrap">
                         2018 %
                     </th>  
+                    <th sortname="" class="text-right text-nowrap">
+                        P %
+                    </th>
+                    <th sortname="" class="text-right text-nowrap">
+                        AVG
+                    </th>
                     <th style="width: 50px">
                     </th>
                     <th style="width: 50px">
@@ -234,6 +283,10 @@
             </thead>
             <tbody data-bind="foreach:rows">
                 <tr>
+                    <td style="text-align:center;width:10px;">
+                        <input type="checkbox" id="chk" class="chk-symbol" />
+                        <input type="hidden" id="symbol" data-bind="value:symbol" />
+                    </td>
                     <td style="text-align:center;" data-bind="text:$index()+1">
                     </td>
                     <td style="text-align:center;">
@@ -249,8 +302,38 @@
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:company_name"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:symbol"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:category_name"></td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                    @*<td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(mc)"></div>
+                    </td>*@
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(ltp_price)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(percentage_2007)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(percentage_2008)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(percentage_2009)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(percentage_2010)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(percentage_2011)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(percentage_2012)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(percentage_2013)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(percentage_2014)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(percentage_2015)"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(percentage_2016)"></div>
@@ -260,6 +343,12 @@
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(percentage_2018)"></div>
+                    </td>  
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(positive_cnt)"></div>
+                    </td>  
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(avg)"></div>
                     </td>  
                     <td style="text-align:center;white-space:nowrap;width:120px;">
                         <div class="pull-left">
@@ -364,4 +453,68 @@
             </div>
         </div>
     </div>
+</script>
+<script type="text/html" id="modal-investment-template">
+    <div id="modal-investment-${name}" class="modal {{if is_modal_full==true}}container{{/if}} {{if position=='top'}}modal-top{{/if}}" tabindex="-1" data-focus-on="input:first" data-width="${width}" style="display: none;">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">${title}</h4>
+        </div>
+        <div class="modal-body">
+            <div class="form-group m-r-10 m-t-10 pull-left">
+                <input type="text" name="investment" class="form-control input-sm" placeholder="Investment" style="width:200px;" value="250000" />
+            </div>
+            <div class="form-group m-r-10 m-t-10 pull-left">
+                <button type="button" id="btn" class="btn btn-success btn-sm">Refresh</button>
+            </div>
+            <br />
+            <div id="detailTable"></div>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="detail-template">
+    <div class="clearfix">&nbsp;</div>
+    <div>
+        <div class="pull-left m-r-15 font-18">
+            Investment:&nbsp;<span>${formatNumber(investment)}</span>
+        </div>
+        <div class="pull-left m-l-15 m-r-15 font-18">
+            Final Amount:&nbsp;<span>${formatNumber(final_amount)}</span>
+        </div>
+        <div class="pull-left m-l-15 m-r-15 font-18">
+            Final Percentage:&nbsp;<span>${formatPercentage(total_final_percentage)}</span>
+        </div><div class="clearfix"></div>
+    </div><div class="clearfix">&nbsp;</div>
+    <table cellpadding="0" cellspacing="0" class="table table-striped table-bordered table-hover table-condensed table-gray">
+        <thead>
+            <tr>
+                <th>
+                    Year
+                </th>
+                <th class="text-right">
+                    Total Equity
+                </th>
+                <th class="text-right">
+                    Investment
+                </th>
+                <th class="text-right">
+                    CMV
+                </th>
+                <th class="text-right">
+                    Percentage
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {{each(j,row) rows}}
+            <tr>
+                <td>${row.year}</td>
+                <td class="text-right">${formatNumber(row.total_equity)}</td>
+                <td class="text-right">${formatNumber(row.investment)}</td>
+                <td class="text-right">${formatNumber(row.cmv)}</td>
+                <td class="text-right">${formatPercentage(row.percentage)}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
 </script>

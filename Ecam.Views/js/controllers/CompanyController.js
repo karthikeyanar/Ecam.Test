@@ -4,14 +4,13 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
         var self = this;
         this.template = "/Home/Company";
 
-       
-
         this.rows = ko.observableArray([]);
 
         this.refresh = function () {
             self.loadGrid();
         }
 
+        this.last_grid_data = null;
         this.loadGrid = function (callback) {
             handleBlockUI();
             var $Company = $("#Company");
@@ -98,8 +97,54 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
                 "type": "GET",
                 "data": arr
             }).done(function (json) {
+                var arr = [];
+                var cnt = 0;
+                var positiveCnt = 0;
+                var totalPercentage = 0;
+                var i, j;
+                for (j = 0; j < json.rows.length; j++) {
+                    cnt = 0;
+                    totalPercentage = 0;
+                    positiveCnt = 0;
+                    var year = 2018;
+                    for (i = 1; i <= 12; i++) {
+                        //console.log('percentage_' + (year - i) + '=', cFloat(json.rows[j]['percentage_' + (year - i)]))
+                        var p = cFloat(json.rows[j]['percentage_' + (year - i)]);
+                        if (p != 0) {
+                            cnt += 1;
+                            if (p > 0) {
+                                positiveCnt += 1;
+                            }
+                            totalPercentage = cFloat(totalPercentage) + p;
+                            //console.log('i=', i, 'totalPercentage=', totalPercentage)
+                        }
+                    }
+                    var avg = cFloat((totalPercentage / cnt));
+                    json.rows[j].avg = avg;
+                    json.rows[j].positive_cnt = (positiveCnt / cnt) * 100;
+                    var positive_percentage = cFloat($(":input[name='positive_percentage']", "#frmCompanySearch").val());
+                    var avg = cFloat($(":input[name='avg']", "#frmCompanySearch").val());
+                    console.log('positive_percentage=', positive_percentage, 'avg=', avg);
+                    if (positive_percentage > 0 && avg > 0) {
+                        if (json.rows[j].positive_cnt >= positive_percentage && json.rows[j].avg > avg) {
+                            arr.push(json.rows[j]);
+                        }
+                    } else if (positive_percentage > 0) {
+                        if (json.rows[j].positive_cnt >= positive_percentage) {
+                            arr.push(json.rows[j]);
+                        }
+                    } else if (avg > 0) {
+                        if (json.rows[j].avg >= avg) {
+                            arr.push(json.rows[j]);
+                        }
+                    } else {
+                        arr.push(json.rows[j]);
+                    }
+                }
+                arr = arr.sort(getDescOrder('avg'));
                 self.rows.removeAll();
-                self.rows(json.rows);
+                self.rows(arr);
+                self.last_grid_data = arr;
                 $(".manual-pagination", $Company).each(function () {
                     var element = this;
                     $(element).twbsPagination({
@@ -305,6 +350,109 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
 
         }
 
+        this.openLog = function () {
+            $('#temp-investment-modal-container').remove();
+            var $cnt = $("<div id='temp-investment-modal-container'></div>");
+            $('body').append($cnt);
+            var data = {
+                "name": "Investment"
+                , "title": "Investment"
+                , "is_modal_full": false
+                , "position": "top"
+                , "width": $(window).width() - 100
+            };
+            $("#modal-investment-template").tmpl(data).appendTo($cnt);
+            var $modal = $("#modal-investment-" + data.name, $cnt);
+            $modal.modal('show');
+            var $btn = $("#btn", $modal);
+            $btn.unbind('click').click(function () {
+                var investment = cFloat($(":input[name='investment']", $modal).val());
+                var totalInv = cFloat($(":input[name='investment']", $modal).val());
+                var data = [];
+                var rows = self.last_grid_data;
+                var z;
+                var startYear = 2007;
+                for (z = 0; z < 12; z++) {
+                    var year = startYear + z;
+                    var totalEquity = 0;
+                    var i;
+                    var $CompanyTable = $("#CompanyTable");
+                    $("tbody > tr", $CompanyTable).each(function () {
+                        var symbol = $("#symbol", this).val();
+                        var $tr = $(this);
+                        var $chk = $("#chk", $tr);
+                        if ($chk[0]) {
+                            if ($chk[0].checked) {
+                                for (i = 0; i < rows.length; i++) {
+                                    console.log('symbol=', symbol);
+                                    if (rows[i].symbol == symbol) {
+                                        var p = cFloat(rows[i]['percentage_' + year]);
+                                        console.log('symbol=', rows[i].symbol, 'p=', p);
+                                        if (p != 0) {
+                                            totalEquity += 1;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    console.log('totalEquity=', totalEquity);
+                    if (totalEquity > 0) {
+                        //if (z > 0) {
+                        //    investment = cFloat(investment) + 240000;
+                        //}
+                        var investmentPerEquity = cFloat(investment) / cFloat(totalEquity);
+                        if (investmentPerEquity > 0) {
+                            var total = 0;
+
+                            $("tbody > tr", $CompanyTable).each(function () {
+                                var symbol = $("#symbol", this).val();
+                                var $tr = $(this);
+                                var $chk = $("#chk", $tr);
+                                if ($chk[0]) {
+                                    if ($chk[0].checked) {
+                                        for (i = 0; i < rows.length; i++) {
+                                            if (rows[i].symbol == symbol) {
+                                                var p = cFloat(rows[i]['percentage_' + year]);
+                                                if (p != 0) {
+                                                    var eqp = cFloat(investmentPerEquity) + ((cFloat(investmentPerEquity) * p) / 100);
+                                                    console.log('symbol=', rows[i].symbol, 'eqp=', eqp);
+                                                    total = total + eqp;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                            var totalPercentage = ((cFloat(total) - cFloat(investment)) / cFloat(investment)) * 100;
+                            console.log('totalEquity=', totalEquity, 'investmentPerEquity=', investmentPerEquity, 'investment=', investment, 'total=', total, 'totalPercentage=', totalPercentage);
+                            data.push({
+                                'year': year, 'total_equity': totalEquity, 'investment': investment, 'cmv': total, 'percentage': totalPercentage
+                            });
+                            investment = cFloat(total);
+                        } else {
+                            totalEquity = totalEquity - 1;
+                        }
+                    }
+                }
+                var $detailTable = $("#detailTable", $modal);
+                var d = { 'rows': data };
+                var finalAmount = 0;
+                if (data.length > 0) {
+                    finalAmount = data[data.length - 1].cmv;
+                }
+                if (finalAmount > 0) {
+                    d.investment = totalInv; // cFloat($(":input[name='investment']", $modal).val());
+                    d.final_amount = finalAmount;
+                    var totalFinalPercentage = ((cFloat(d.final_amount) - cFloat(d.investment)) / cFloat(d.investment)) * 100;
+                    d.total_final_percentage = totalFinalPercentage;
+                }
+                console.log('d=', d);
+                $("#detail-template").tmpl(d).appendTo($detailTable);
+            });
+        }
+
         this.onElements = function () {
             self.offElements();
             $("body").on("click", "#frmCompanySearch #is_archive", function (event) {
@@ -433,6 +581,12 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
                     "type": "POST",
                     "data": arr
                 }).done(function (json) {
+                });
+            });
+            $("body").on("click", "#chkSelectAll", function (event) {
+                var that = this;
+                $(".chk-symbol").each(function () {
+                    this.checked = that.checked;
                 });
             });
         }

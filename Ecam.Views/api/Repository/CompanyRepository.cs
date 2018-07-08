@@ -351,10 +351,11 @@ namespace Ecam.Framework.Repository {
                     joinTables += " join tra_holding h on h.symbol = ct.symbol ";
                 }
 
-
-                joinTables += " left outer join tra_year_log yoy2016 on yoy2016.symbol = ct.symbol and yoy2016.year = 2016 ";
-                joinTables += " left outer join tra_year_log yoy2017 on yoy2017.symbol = ct.symbol and yoy2017.year = 2017 ";
-                joinTables += " left outer join tra_year_log yoy2018 on yoy2018.symbol = ct.symbol and yoy2018.year = 2018 ";
+                int i;
+                for(i = 0;i < 12;i++) {
+                    int year = DateTime.Now.Year - i;
+                    joinTables += string.Format(" left outer join tra_year_log yoy{0} on yoy{0}.symbol = ct.symbol and yoy{0}.year = {0} ",year);
+                }
 
                 selectFields = "count(*) as cnt";
 
@@ -412,10 +413,11 @@ namespace Ecam.Framework.Repository {
 
 
             if((criteria.id ?? 0) <= 0) {
-                selectFields += ",yoy2016.percentage as percentage_2016" + Environment.NewLine +
-                ",yoy2017.percentage as percentage_2017" + Environment.NewLine +
-                ",yoy2018.percentage as percentage_2018" + Environment.NewLine +
-                "";
+                int i;
+                for(i = 0;i < 12;i++) {
+                    int year = DateTime.Now.Year - i;
+                    selectFields += string.Format(",yoy{0}.percentage as percentage_{0}",year) + Environment.NewLine;
+                } 
             }
 
             //",(select ifnull(count(*),0) from tra_holding h where h.symbol = ct.symbol) as is_holding" +

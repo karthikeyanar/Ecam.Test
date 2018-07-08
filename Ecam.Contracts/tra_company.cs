@@ -83,6 +83,15 @@ namespace Ecam.Contracts
         //public Nullable<decimal> trigger_profit { get; set; }
         public Nullable<bool> is_holding { get; set; }
 
+        public Nullable<decimal> percentage_2007 { get; set; }
+        public Nullable<decimal> percentage_2008 { get; set; }
+        public Nullable<decimal> percentage_2009 { get; set; }
+        public Nullable<decimal> percentage_2010 { get; set; }
+        public Nullable<decimal> percentage_2011 { get; set; }
+        public Nullable<decimal> percentage_2012 { get; set; }
+        public Nullable<decimal> percentage_2013 { get; set; }
+        public Nullable<decimal> percentage_2014 { get; set; }
+        public Nullable<decimal> percentage_2015 { get; set; }
         public Nullable<decimal> percentage_2016 { get; set; }
         public Nullable<decimal> percentage_2017 { get; set; }
         public Nullable<decimal> percentage_2018 { get; set; }
