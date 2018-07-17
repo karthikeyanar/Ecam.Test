@@ -386,28 +386,28 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             //});
             //$categories.select2Refresh("data", arr);
 
-            select2Setup($mf_ids[0], {
-                multiple: true
-               , width: 300
-               , url: apiUrl("/Company/SelectMFS")
-               , placeholder: "Select MFS"
-               , resultsCallBack: function (data, page) {
-                   var s2data = [];
-                   $.each(data, function (i, d) {
-                       s2data.push({ "id": d.id, "text": d.label, "source": d });
-                   });
-                   return { results: s2data };
-               }
-               , onParam: function (term, page) {
-                   return {
-                       term: term
-                   };
-               }
-               , onChange: function (e, ui) {
-                   var $target = $(".page-content");
-                   self.loadGrid();
-               }
-            });
+            //select2Setup($mf_ids[0], {
+            //    multiple: true
+            //   , width: 300
+            //   , url: apiUrl("/Company/SelectMFS")
+            //   , placeholder: "Select MFS"
+            //   , resultsCallBack: function (data, page) {
+            //       var s2data = [];
+            //       $.each(data, function (i, d) {
+            //           s2data.push({ "id": d.id, "text": d.label, "source": d });
+            //       });
+            //       return { results: s2data };
+            //   }
+            //   , onParam: function (term, page) {
+            //       return {
+            //           term: term
+            //       };
+            //   }
+            //   , onChange: function (e, ui) {
+            //       var $target = $(".page-content");
+            //       self.loadGrid();
+            //   }
+            //});
 
             // Current month
             var arrlastsixmonths = helper.getLastSixMonths();
@@ -1207,8 +1207,8 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             var $rsiBox = $(".rsi-box", $childTD);
             var $avgMonthBox = $(".avg-month-box", $childTD);
             self.loadRSI(symbol, $rsiBox, function () {
-                self.loadAVG(symbol, $avgMonthBox, function () {
-                });
+                //self.loadAVG(symbol, $avgMonthBox, function () {
+                //});
             });
         }
 

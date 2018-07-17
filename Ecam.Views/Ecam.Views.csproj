@@ -290,6 +290,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="api\Controllers\BaseApiController.cs" />
+    <Compile Include="api\Controllers\FinancialCategoryController.cs" />
     <Compile Include="api\Controllers\SplitController.cs" />
     <Compile Include="api\Controllers\HoldingController.cs" />
     <Compile Include="api\Controllers\MFController.cs" />

@@ -1006,7 +1006,7 @@ namespace Ecam.Models {
                         }
                     }
                 }
-                CreateAVG(row.symbol,row.trade_date);
+                //CreateAVG(row.symbol,row.trade_date);
                 //lblError.Text = "ImportPrice Price Index symbol=" + row.symbol + ",Date=" + row.trade_date;
                 Console.WriteLine("ImportPrice Price Index symbol=" + row.symbol + ",Date=" + row.trade_date);
             }
@@ -1118,104 +1118,104 @@ namespace Ecam.Models {
             }
         }
 
-        public static void CreateAVG(string symbol,DateTime date) {
-            using(EcamContext context = new EcamContext()) {
-                IQueryable<tra_market> markets = context.tra_market.Where(q => q.symbol == symbol);
-                if(date.Year > 1900) {
-                    markets = markets.Where(q => q.trade_date == date);
-                }
-                tra_market market = (from q in markets orderby q.trade_date descending select q).FirstOrDefault();
-                if(market != null) {
-                    DateTime monthStartDate = DataTypeHelper.GetFirstDayOfMonth(market.trade_date);
-                    DateTime monthEndDate = DataTypeHelper.GetLastDayOfMonth(market.trade_date);
-                    DateTime weekFirstDate = DataTypeHelper.GetFirstDayOfWeek(market.trade_date);
-                    DateTime weekLastDate = DataTypeHelper.GetLastDayOfWeek(market.trade_date);
+        //public static void CreateAVG(string symbol,DateTime date) {
+        //    using(EcamContext context = new EcamContext()) {
+        //        IQueryable<tra_market> markets = context.tra_market.Where(q => q.symbol == symbol);
+        //        if(date.Year > 1900) {
+        //            markets = markets.Where(q => q.trade_date == date);
+        //        }
+        //        tra_market market = (from q in markets orderby q.trade_date descending select q).FirstOrDefault();
+        //        if(market != null) {
+        //            DateTime monthStartDate = DataTypeHelper.GetFirstDayOfMonth(market.trade_date);
+        //            DateTime monthEndDate = DataTypeHelper.GetLastDayOfMonth(market.trade_date);
+        //            DateTime weekFirstDate = DataTypeHelper.GetFirstDayOfWeek(market.trade_date);
+        //            DateTime weekLastDate = DataTypeHelper.GetLastDayOfWeek(market.trade_date);
 
-                    var monthFirstTrade = (from q in context.tra_market where q.symbol == market.symbol && q.trade_date >= monthStartDate orderby q.trade_date ascending select q).FirstOrDefault();
-                    var monthLastTrade = (from q in context.tra_market where q.symbol == market.symbol && q.trade_date <= monthEndDate orderby q.trade_date descending select q).FirstOrDefault();
-                    if(monthFirstTrade != null && monthLastTrade != null) {
-                        //if (monthLastTrade.trade_date.Day >= 15)
-                        //{
-                        decimal openPrice = (monthFirstTrade.open_price ?? 0);
-                        decimal lastPrice = (monthLastTrade.close_price ?? 0);
-                        CreateAVGRecord(market.symbol,"M",openPrice,lastPrice,monthStartDate);
-                        //}
-                    }
+        //            var monthFirstTrade = (from q in context.tra_market where q.symbol == market.symbol && q.trade_date >= monthStartDate orderby q.trade_date ascending select q).FirstOrDefault();
+        //            var monthLastTrade = (from q in context.tra_market where q.symbol == market.symbol && q.trade_date <= monthEndDate orderby q.trade_date descending select q).FirstOrDefault();
+        //            if(monthFirstTrade != null && monthLastTrade != null) {
+        //                //if (monthLastTrade.trade_date.Day >= 15)
+        //                //{
+        //                decimal openPrice = (monthFirstTrade.open_price ?? 0);
+        //                decimal lastPrice = (monthLastTrade.close_price ?? 0);
+        //                CreateAVGRecord(market.symbol,"M",openPrice,lastPrice,monthStartDate);
+        //                //}
+        //            }
 
-                    var weekFirstTrade = (from q in context.tra_market where q.symbol == market.symbol && q.trade_date >= weekFirstDate orderby q.trade_date ascending select q).FirstOrDefault();
-                    var weekLastTrade = (from q in context.tra_market where q.symbol == market.symbol && q.trade_date <= weekLastDate orderby q.trade_date descending select q).FirstOrDefault();
-                    if(weekFirstTrade != null && weekLastTrade != null) {
-                        decimal openPrice = (weekFirstTrade.open_price ?? 0);
-                        decimal lastPrice = (weekLastTrade.close_price ?? 0);
-                        CreateAVGRecord(market.symbol,"W",openPrice,lastPrice,weekFirstDate);
-                    }
-                }
-            }
-        }
+        //            var weekFirstTrade = (from q in context.tra_market where q.symbol == market.symbol && q.trade_date >= weekFirstDate orderby q.trade_date ascending select q).FirstOrDefault();
+        //            var weekLastTrade = (from q in context.tra_market where q.symbol == market.symbol && q.trade_date <= weekLastDate orderby q.trade_date descending select q).FirstOrDefault();
+        //            if(weekFirstTrade != null && weekLastTrade != null) {
+        //                decimal openPrice = (weekFirstTrade.open_price ?? 0);
+        //                decimal lastPrice = (weekLastTrade.close_price ?? 0);
+        //                CreateAVGRecord(market.symbol,"W",openPrice,lastPrice,weekFirstDate);
+        //            }
+        //        }
+        //    }
+        //}
 
-        public static void _CreateAVG(string symbol) {
-            List<tra_market> markets;
-            using(EcamContext context = new EcamContext()) {
-                markets = (from q in context.tra_market where q.symbol == symbol orderby q.trade_date select q).ToList();
-            }
-            foreach(var market in markets) {
-                DateTime monthStartDate = DataTypeHelper.GetFirstDayOfMonth(market.trade_date);
-                DateTime monthEndDate = DataTypeHelper.GetLastDayOfMonth(market.trade_date);
-                DateTime weekFirstDate = DataTypeHelper.GetFirstDayOfWeek(market.trade_date);
-                DateTime weekLastDate = DataTypeHelper.GetLastDayOfWeek(market.trade_date);
+        //public static void _CreateAVG(string symbol) {
+        //    List<tra_market> markets;
+        //    using(EcamContext context = new EcamContext()) {
+        //        markets = (from q in context.tra_market where q.symbol == symbol orderby q.trade_date select q).ToList();
+        //    }
+        //    foreach(var market in markets) {
+        //        DateTime monthStartDate = DataTypeHelper.GetFirstDayOfMonth(market.trade_date);
+        //        DateTime monthEndDate = DataTypeHelper.GetLastDayOfMonth(market.trade_date);
+        //        DateTime weekFirstDate = DataTypeHelper.GetFirstDayOfWeek(market.trade_date);
+        //        DateTime weekLastDate = DataTypeHelper.GetLastDayOfWeek(market.trade_date);
 
-                var monthFirstTrade = (from q in markets where q.trade_date >= monthStartDate orderby q.trade_date ascending select q).FirstOrDefault();
-                var monthLastTrade = (from q in markets where q.trade_date <= monthEndDate orderby q.trade_date descending select q).FirstOrDefault();
-                if(monthFirstTrade != null && monthLastTrade != null) {
-                    //if (monthLastTrade.trade_date.Day >= 15)
-                    //{
-                    decimal openPrice = (monthFirstTrade.open_price ?? 0);
-                    decimal lastPrice = (monthLastTrade.close_price ?? 0);
-                    CreateAVGRecord(symbol,"M",openPrice,lastPrice,monthStartDate);
-                    //}
-                }
+        //        var monthFirstTrade = (from q in markets where q.trade_date >= monthStartDate orderby q.trade_date ascending select q).FirstOrDefault();
+        //        var monthLastTrade = (from q in markets where q.trade_date <= monthEndDate orderby q.trade_date descending select q).FirstOrDefault();
+        //        if(monthFirstTrade != null && monthLastTrade != null) {
+        //            //if (monthLastTrade.trade_date.Day >= 15)
+        //            //{
+        //            decimal openPrice = (monthFirstTrade.open_price ?? 0);
+        //            decimal lastPrice = (monthLastTrade.close_price ?? 0);
+        //            CreateAVGRecord(symbol,"M",openPrice,lastPrice,monthStartDate);
+        //            //}
+        //        }
 
-                var weekFirstTrade = (from q in markets where q.trade_date >= weekFirstDate orderby q.trade_date ascending select q).FirstOrDefault();
-                var weekLastTrade = (from q in markets where q.trade_date <= weekLastDate orderby q.trade_date descending select q).FirstOrDefault();
-                if(weekFirstTrade != null && weekLastTrade != null) {
-                    decimal openPrice = (weekFirstTrade.open_price ?? 0);
-                    decimal lastPrice = (weekLastTrade.close_price ?? 0);
-                    CreateAVGRecord(symbol,"W",openPrice,lastPrice,weekFirstDate);
-                }
-            }
-        }
+        //        var weekFirstTrade = (from q in markets where q.trade_date >= weekFirstDate orderby q.trade_date ascending select q).FirstOrDefault();
+        //        var weekLastTrade = (from q in markets where q.trade_date <= weekLastDate orderby q.trade_date descending select q).FirstOrDefault();
+        //        if(weekFirstTrade != null && weekLastTrade != null) {
+        //            decimal openPrice = (weekFirstTrade.open_price ?? 0);
+        //            decimal lastPrice = (weekLastTrade.close_price ?? 0);
+        //            CreateAVGRecord(symbol,"W",openPrice,lastPrice,weekFirstDate);
+        //        }
+        //    }
+        //}
 
-        private static void CreateAVGRecord(string symbol,string type,decimal openPrice,decimal lastPrice,DateTime date) {
-            decimal profit = 0;
-            try { profit = ((lastPrice - openPrice) / openPrice) * 100; } catch { }
-            using(EcamContext context = new EcamContext()) {
-                tra_market_avg avg = (from q in context.tra_market_avg
-                                      where q.symbol == symbol
-                                      && q.avg_type == type
-                                      && q.avg_date == date
-                                      select q).FirstOrDefault();
-                if(avg == null) {
-                    avg = new tra_market_avg();
-                }
-                avg.symbol = symbol;
-                avg.avg_type = type;
-                avg.avg_date = date;
-                avg.percentage = profit;
-                if(avg.id > 0) {
-                    context.Entry(avg).State = System.Data.Entity.EntityState.Modified;
-                } else {
-                    context.tra_market_avg.Add(avg);
-                }
-                try {
-                    context.SaveChanges();
-                } catch(Exception ex) {
-                    Helper.Log(ex.Message,symbol + "_AVG_RECORD_DB_Insert_Error");
-                    if(ex.InnerException != null) {
-                        Helper.Log(ex.InnerException.Message,symbol + "_AVG_RECORD_DB_Insert_Error");
-                    }
-                }
-            }
-        }
+        //private static void CreateAVGRecord(string symbol,string type,decimal openPrice,decimal lastPrice,DateTime date) {
+        //    decimal profit = 0;
+        //    try { profit = ((lastPrice - openPrice) / openPrice) * 100; } catch { }
+        //    using(EcamContext context = new EcamContext()) {
+        //        tra_market_avg avg = (from q in context.tra_market_avg
+        //                              where q.symbol == symbol
+        //                              && q.avg_type == type
+        //                              && q.avg_date == date
+        //                              select q).FirstOrDefault();
+        //        if(avg == null) {
+        //            avg = new tra_market_avg();
+        //        }
+        //        avg.symbol = symbol;
+        //        avg.avg_type = type;
+        //        avg.avg_date = date;
+        //        avg.percentage = profit;
+        //        if(avg.id > 0) {
+        //            context.Entry(avg).State = System.Data.Entity.EntityState.Modified;
+        //        } else {
+        //            context.tra_market_avg.Add(avg);
+        //        }
+        //        try {
+        //            context.SaveChanges();
+        //        } catch(Exception ex) {
+        //            Helper.Log(ex.Message,symbol + "_AVG_RECORD_DB_Insert_Error");
+        //            if(ex.InnerException != null) {
+        //                Helper.Log(ex.InnerException.Message,symbol + "_AVG_RECORD_DB_Insert_Error");
+        //            }
+        //        }
+        //    }
+        //}
 
         public static string RemoveHTMLTag(string html) {
             Regex regex = new Regex(

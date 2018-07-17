@@ -101,6 +101,7 @@
     <Compile Include="Framework\ServiceFactory.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Helpers\FINANCIALCSVDownloadData.cs" />
     <Compile Include="Helpers\MoneyControlData.cs" />
     <Compile Include="Helpers\CSVDownloadData.cs" />
     <Compile Include="Helpers\GoogleHistoryDownloadData.cs" />
@@ -110,12 +111,14 @@
     <Compile Include="Helpers\DBHelper.cs" />
     <Compile Include="Helpers\EmailHelper.cs" />
     <Compile Include="Models\ecamtest_backupContext.cs" />
+    <Compile Include="Models\Mapping\tra_financial_categoryMap.cs" />
     <Compile Include="Models\Mapping\tra_categoryMap.cs" />
     <Compile Include="Models\Mapping\tra_category_profitMap.cs" />
     <Compile Include="Models\Mapping\tra_companyMap.cs" />
     <Compile Include="Models\Mapping\tra_company_categoryMap.cs" />
     <Compile Include="Models\Mapping\tra_daily_logMap.cs" />
     <Compile Include="Models\Mapping\tra_holdingMap.cs" />
+    <Compile Include="Models\Mapping\tra_financialMap.cs" />
     <Compile Include="Models\Mapping\tra_year_logMap.cs" />
     <Compile Include="Models\Mapping\tra_marketMap.cs" />
     <Compile Include="Models\Mapping\tra_market_avgMap.cs" />
@@ -123,12 +126,14 @@
     <Compile Include="Models\Mapping\tra_mutual_fundMap.cs" />
     <Compile Include="Models\Mapping\tra_mutual_fund_pfMap.cs" />
     <Compile Include="Models\Mapping\tra_splitMap.cs" />
+    <Compile Include="Models\tra_financial_category.cs" />
     <Compile Include="Models\tra_category.cs" />
     <Compile Include="Models\tra_category_profit.cs" />
     <Compile Include="Models\tra_company.cs" />
     <Compile Include="Models\tra_company_category.cs" />
     <Compile Include="Models\tra_daily_log.cs" />
     <Compile Include="Models\tra_holding.cs" />
+    <Compile Include="Models\tra_financial.cs" />
     <Compile Include="Models\tra_year_log.cs" />
     <Compile Include="Models\tra_market.cs" />
     <Compile Include="Models\tra_market_avg.cs" />

@@ -163,7 +163,7 @@ namespace Ecam.Models {
                   " where symbol='{0}' " + Environment.NewLine +
                   " ",this.symbol);
             MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString,sql);
-            TradeHelper.CreateAVG(this.symbol,this.split_date);
+            //TradeHelper.CreateAVG(this.symbol,this.split_date);
         }
 
         public class tra_splitMD {

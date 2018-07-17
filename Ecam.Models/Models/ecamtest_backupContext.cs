@@ -22,6 +22,8 @@ namespace Ecam.Models {
         public DbSet<tra_daily_log> tra_daily_log { get; set; }
         public DbSet<aspnetuserroles> aspnetuserroles { get; set; }
         public DbSet<tra_year_log> tra_year_log { get; set; }
+        public DbSet<tra_financial> tra_financial { get; set; }
+        public DbSet<tra_financial_category> tra_financial_category { get; set; }
 
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder) {
@@ -39,6 +41,8 @@ namespace Ecam.Models {
             modelBuilder.Configurations.Add(new aspnetuserrolesMap());
             modelBuilder.Configurations.Add(new tra_daily_logMap());
             modelBuilder.Configurations.Add(new tra_year_logMap());
+            modelBuilder.Configurations.Add(new tra_financial_categoryMap());
+            modelBuilder.Configurations.Add(new tra_financialMap());
         }
     }
 }

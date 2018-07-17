@@ -22,6 +22,7 @@ namespace Ecam.ConsoleApp {
         public static string IS_BOOK_MARK_CATEGORY = "";
         public static string IS_BOOK_MARK_SYMBOL = "";
         public static string IS_IMPORT_CSV = "";
+        public static string IS_IMPORT_FINANCIAL_CSV = "";
         public static string IS_NIFTY_FLAG_CSV = "";
         public static string IS_CATEGORY_FLAG_CSV = "";
         public static string GOOGLE_DATA = "";
@@ -39,6 +40,7 @@ namespace Ecam.ConsoleApp {
                 IS_CATEGORY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_CATEGORY_FLAG_CSV"];
                 IS_NIFTY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_FLAG_CSV"];
                 IS_IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_IMPORT_CSV"];
+                IS_IMPORT_FINANCIAL_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_IMPORT_FINANCIAL_CSV"];
                 IS_DOWNLOAD_HISTORY = System.Configuration.ConfigurationManager.AppSettings["IS_DOWNLOAD_HISTORY"];
                 IS_BOOK_MARK_CATEGORY = System.Configuration.ConfigurationManager.AppSettings["IS_BOOK_MARK_CATEGORY"];
                 IS_BOOK_MARK_SYMBOL = System.Configuration.ConfigurationManager.AppSettings["IS_BOOK_MARK_SYMBOL"];
@@ -53,7 +55,11 @@ namespace Ecam.ConsoleApp {
                 DateTime now = DateTime.Now;
                 bool isDontStart = false;
                 ScriptGenerate();
-                if(IS_DOWNLOAD_HISTORY != "true" && IS_IMPORT_CSV != "true" && IS_NIFTY_FLAG_CSV != "true" && IS_CATEGORY_FLAG_CSV != "true") {
+                if(IS_DOWNLOAD_HISTORY != "true"
+                    && IS_IMPORT_CSV != "true"
+                    && IS_IMPORT_FINANCIAL_CSV != "true"
+                    && IS_NIFTY_FLAG_CSV != "true"
+                    && IS_CATEGORY_FLAG_CSV != "true") {
                     if((now >= eveningStart && now <= eveningEnd) == false) {
                         string GOOGLE_DATA = System.Configuration.ConfigurationManager.AppSettings["GOOGLE_DATA"];
                         string[] files = System.IO.Directory.GetFiles(GOOGLE_DATA);
@@ -90,58 +96,80 @@ namespace Ecam.ConsoleApp {
                         using(EcamContext context = new EcamContext()) {
                             symbols = (from q in context.tra_company select q.symbol).ToList();
                         }
-                        foreach(string symbol in symbols) {
+                        foreach(string splitsymbol in symbols) {
                             //Console.WriteLine("Split Symbol=" + symbol);
-                            AddSplit(symbol);
+                            AddSplit(splitsymbol);
                         }
                         //}
                     } catch(Exception ex) {
                         Helper.Log(ex.Message,"AddSplit_ERROR" + "_" + (new Random()).Next(1000,10000));
                     }
-                    try {
-                        List<string> symbols;
+                    //try {
+                    //    List<string> symbols;
+                    //    using(EcamContext context = new EcamContext()) {
+                    //        symbols = (from q in context.tra_company select q.symbol).ToList();
+                    //    }
+                    //    int i;
+                    //    for(i = 0;i < 1;i++) {
+                    //        DateTime startDate = Convert.ToDateTime("01/01/" + (DateTime.Now.Year - i).ToString());
+                    //        foreach(string symbol in symbols) {
+                    //            Console.WriteLine("Symbol=" + symbol + ",Date=" + startDate.Year);
+                    //            TradeHelper.CreateYearLog(symbol,startDate);
+                    //        }
+                    //    }
+                    //} catch(Exception ex) {
+                    //    Helper.Log(ex.Message,"YearLog_ERROR" + "_" + (new Random()).Next(1000,10000));
+                    //}
+                    string symbol = "INFY";
+                    if(string.IsNullOrEmpty(symbol) == false) {
                         using(EcamContext context = new EcamContext()) {
-                            symbols = (from q in context.tra_company select q.symbol).ToList();
-                        }
-                        int i;
-                        for(i = 0;i < 1;i++) {
-                            DateTime startDate = Convert.ToDateTime("01/01/" + (DateTime.Now.Year - i).ToString());
-                            foreach(string symbol in symbols) {
-                                Console.WriteLine("Symbol=" + symbol + ",Date=" + startDate.Year);
-                                TradeHelper.CreateYearLog(symbol,startDate);
+                            List<tra_financial> traFinancials = (from q in context.tra_financial
+                                                                 where q.symbol == symbol
+                                                                 orderby q.financial_date descending, q.financial_category_id ascending
+                                                                 select q).ToList();
+                            foreach(var row in traFinancials) {
+                                tra_financial prev = (from q in traFinancials
+                                                      where q.symbol == symbol
+                                                      && q.financial_category_id == row.financial_category_id
+                                                      && q.financial_date < row.financial_date
+                                                      orderby q.financial_date descending
+                                                      select q).FirstOrDefault();
+                                if(prev != null) {
+                                    row.prev_value = prev.value;
+                                    context.Entry(row).State = System.Data.Entity.EntityState.Modified;
+                                    context.SaveChanges();
+                                }
                             }
                         }
-                    } catch(Exception ex) {
-                        Helper.Log(ex.Message,"AddSplit_ERROR" + "_" + (new Random()).Next(1000,10000));
                     }
-                    try {
-                        //int i;
-                        //int total = 0;
-                        //if(IS_DOWNLOAD_HISTORY == "true" || IS_IMPORT_CSV == "true") {
-                        //    tra_daily_log dailyLog = null;
-                        //    using(EcamContext context = new EcamContext()) {
-                        //        dailyLog = (from q in context.tra_daily_log
-                        //                    orderby q.trade_date descending
-                        //                    select q).FirstOrDefault();
-                        //    }
-                        //    if(dailyLog != null) {
-                        //        TimeSpan ts = DateTime.Now.Date - dailyLog.trade_date;
-                        //        total = (int)ts.TotalDays + 1;
-                        //    } else {
-                        //        total = (365 * 15);
-                        //    }
-                        //}
-                        //for(i = 0;i < total;i++) {
-                        //    DateTime dt = DateTime.Now.Date.AddDays(-i);
-                        //    TradeHelper.CreateDailyLog(dt.Date,"");
-                        //    TradeHelper.CreateDailyLog(dt.Date,"true");
-                        //}
-                        //MailSend(true);
-                        //MailSend(false);
-                        //MailSendDailyCSV();
-                    } catch(Exception ex) {
-                        Helper.Log(ex.Message,"MAIL_SEND_ERROR" + "_" + (new Random()).Next(1000,10000));
-                    }
+                    //try {
+                    //int i;
+                    //int total = 0;
+                    //if(IS_DOWNLOAD_HISTORY == "true" || IS_IMPORT_CSV == "true") {
+                    //    tra_daily_log dailyLog = null;
+                    //    using(EcamContext context = new EcamContext()) {
+                    //        dailyLog = (from q in context.tra_daily_log
+                    //                    orderby q.trade_date descending
+                    //                    select q).FirstOrDefault();
+                    //    }
+                    //    if(dailyLog != null) {
+                    //        TimeSpan ts = DateTime.Now.Date - dailyLog.trade_date;
+                    //        total = (int)ts.TotalDays + 1;
+                    //    } else {
+                    //        total = (365 * 15);
+                    //    }
+                    //}
+                    //for(i = 0;i < total;i++) {
+                    //    DateTime dt = DateTime.Now.Date.AddDays(-i);
+                    //    TradeHelper.CreateDailyLog(dt.Date,"");
+                    //    TradeHelper.CreateDailyLog(dt.Date,"true");
+                    //}
+                    //MailSend(true);
+                    //MailSend(false);
+                    //MailSendDailyCSV();
+                    //} catch(Exception ex) {
+                    //    Helper.Log(ex.Message,"MAIL_SEND_ERROR" + "_" + (new Random()).Next(1000,10000));
+                    //}
                 }
             } catch(Exception ex) {
                 Helper.Log(ex.Message,"MAIN_ERROR" + "_" + (new Random()).Next(1000,10000));
@@ -561,7 +589,7 @@ namespace Ecam.ConsoleApp {
                 markets = (from q in context.tra_market
                            where q.symbol == splitSymbol
                            && (q.percentage ?? 0) != 0 && (q.percentage ?? 0) <= -48
-                           orderby q.trade_date ascending,q.symbol ascending
+                           orderby q.trade_date ascending, q.symbol ascending
                            select q).ToList();
             }
             foreach(var market in markets) {
@@ -726,21 +754,24 @@ namespace Ecam.ConsoleApp {
                 UpdateNiftyFlagCSV();
             } else if(IS_CATEGORY_FLAG_CSV == "true") {
                 UpdateCategoryFlagCSV();
-            } else {
-                //if ((now >= morningStart && now <= morningEnd) || (now >= eveningStart && now <= eveningEnd))
-                //{
-                GoogleData();
-                Console.WriteLine("Completed");
-                //Helper.Log("DownloadEnd=" + DateTime.Now.ToString(), "DOWNLOAD");
-                //if ((now >= morningStart && now <= morningEnd))
-                //{
-                //    int minute1 = (1000 * 60);
-                //    Console.WriteLine("Wait till=" + DateTime.Now.AddMinutes(5).ToString());
-                //    System.Threading.Thread.Sleep((minute1 * 5));
-                //    DownloadStart();
-                //}
-                //}
+            } else if(IS_IMPORT_FINANCIAL_CSV == "true") {
+                FINANCIALCSVData();
             }
+            //else {
+            //    //if ((now >= morningStart && now <= morningEnd) || (now >= eveningStart && now <= eveningEnd))
+            //    //{
+            //    GoogleData();
+            //    Console.WriteLine("Completed");
+            //    //Helper.Log("DownloadEnd=" + DateTime.Now.ToString(), "DOWNLOAD");
+            //    //if ((now >= morningStart && now <= morningEnd))
+            //    //{
+            //    //    int minute1 = (1000 * 60);
+            //    //    Console.WriteLine("Wait till=" + DateTime.Now.AddMinutes(5).ToString());
+            //    //    System.Threading.Thread.Sleep((minute1 * 5));
+            //    //    DownloadStart();
+            //    //}
+            //    //}
+            //}
         }
 
         private static string GetString(string html,string startWord,string endWord) {
@@ -1832,6 +1863,22 @@ RegexOptions.IgnoreCase
             CSVDownloadStart();
         }
 
+        private static void FINANCIALCSVData() {
+            string isImportFINANCIALCSV = System.Configuration.ConfigurationManager.AppSettings["IS_IMPORT_FINANCIAL_CSV"];
+            string importFINANCIALCSVDirectoryPath = System.Configuration.ConfigurationManager.AppSettings["IMPORT_FINANCIAL_CSV"];
+            List<string> symbols = new List<string>();
+            if(isImportFINANCIALCSV == "true") {
+                string[] files = System.IO.Directory.GetFiles(importFINANCIALCSVDirectoryPath);
+                foreach(string fullFileName in files) {
+                    symbols.Add(System.IO.Path.GetFileNameWithoutExtension(fullFileName));
+                }
+            }
+            symbols = (from q in symbols orderby q ascending select q).ToList();
+            _COMPANIES = symbols.ToArray();
+            _INDEX = -1;
+            FINANCIALCSVDownloadStart();
+        }
+
         private static void UpdateNiftyFlagCSV() {
             string niftyFlagCSVDirectoryPath = System.Configuration.ConfigurationManager.AppSettings["NIFTY_FLAG_CSV"];
             List<string> symbols = new List<string>();
@@ -1961,6 +2008,37 @@ RegexOptions.IgnoreCase
             if(_INDEX < _COMPANIES.Length) {
                 Console.WriteLine("All calculations are complete.");
                 CSVDownloadStart();
+            }
+        }
+
+        private static void FINANCIALCSVDownloadStart() {
+            int totalCount = _COMPANIES.Length;
+            int queueCount = 64;
+            if(totalCount <= queueCount) {
+                queueCount = totalCount;
+            }
+            // One event is used for each Fibonacci object
+            ManualResetEvent[] doneEvents = new ManualResetEvent[queueCount];
+            FINANCIALCSVDownloadData[] downArray = new FINANCIALCSVDownloadData[queueCount];
+            //Random r = new Random();
+            // Configure and launch threads using ThreadPool:
+            Console.WriteLine("launching {0} tasks...",totalCount);
+            for(int i = 0;i < queueCount;i++) {
+                _INDEX += 1;
+                string symbol = "";
+                if(_INDEX < _COMPANIES.Length) {
+                    symbol = _COMPANIES[_INDEX];
+                }
+                doneEvents[i] = new ManualResetEvent(false);
+                FINANCIALCSVDownloadData f = new FINANCIALCSVDownloadData(symbol,_SYMBOLS_LIST,doneEvents[i]);
+                downArray[i] = f;
+                ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback,i);
+            }
+            // Wait for all threads in pool to calculation...
+            WaitHandle.WaitAll(doneEvents);
+            if(_INDEX < _COMPANIES.Length) {
+                Console.WriteLine("All calculations are complete.");
+                FINANCIALCSVDownloadStart();
             }
         }
     }

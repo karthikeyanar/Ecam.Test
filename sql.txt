@@ -1,0 +1,5 @@
+ select fc.category_name,tf.*,(((tf.prev_value - tf.value)/tf.prev_value) * 100)  as p from tra_financial tf
+join tra_financial_category fc on fc.financial_category_id = tf.financial_category_id
+where tf.symbol = 'INFY' and tf.financial_category_id = 27
+order by tf.symbol,tf.financial_date,fc.category_name 
+limit 0,1000

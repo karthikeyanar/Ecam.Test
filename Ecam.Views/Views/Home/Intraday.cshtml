@@ -11,9 +11,9 @@
             <div class="form-group m-r-10 m-t-10">
                 <input type="hidden" name="categories" />
             </div>
-            <div class="form-group m-r-10 m-t-10">
+            @*<div class="form-group m-r-10 m-t-10">
                 <input type="hidden" name="mf_ids" />
-            </div>
+            </div>*@
             <div class="form-group m-r-10 m-t-10">
                 <input type="text" name="from_price" class="form-control input-sm" placeholder="From Price" style="width:100px" />
             </div>
@@ -361,7 +361,7 @@
                                 <th sortname="total_last_price" class="text-right text-nowrap">
                                     Total L.P
                                 </th>
-                                <th class="text-right" sortname="total_profit">
+                                <th class="text-right text-nowrap" sortname="total_profit">
                                     Total Profit
                                 </th>
                                 @*<th sortname="monthly_avg" class="text-right">
@@ -1121,10 +1121,10 @@
 </script>
 <script type="text/html" id="detail-template">
     <div class="box-cnt">
-        <div class="rsi-box pull-left m-r-15" style="width:45%;">
+        <div class="rsi-box pull-left m-r-15">
         </div>
-        <div class="avg-month-box pull-left m-l-15" style="width:45%;">
-        </div>
+        @*<div class="avg-month-box pull-left m-l-15" style="width:45%;">
+        </div>*@
         <div class="clearfix">&nbsp;</div>
     </div>
 </script>
