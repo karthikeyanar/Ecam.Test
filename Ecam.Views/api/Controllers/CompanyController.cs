@@ -268,6 +268,8 @@ namespace Ecam.Views.Controllers {
             bool isNifty100 = (contract.is_nifty_100 ?? false);
             bool isNifty200 = (contract.is_nifty_200 ?? false);
             bool isOld = (contract.is_old ?? false);
+            string moneyControlURL = contract.money_control_url;
+            string moneyControlSymbol = contract.money_control_symbol;
             if((contract.id ?? 0) > 0) {
                 contract = _CompanyRepository.GetCompanies(new TRA_COMPANY_SEARCH { id = contract.id },new Paging { }).rows.FirstOrDefault();
                 contract.company_name = companyName;
@@ -277,6 +279,8 @@ namespace Ecam.Views.Controllers {
                 contract.is_nifty_100 = isNifty100;
                 contract.is_nifty_200 = isNifty200;
                 contract.is_old = isOld;
+                contract.money_control_url = moneyControlURL;
+                contract.money_control_symbol = moneyControlSymbol;
             }
             var saveContract = Repository.Save(contract);
             if(saveContract.Errors == null) {

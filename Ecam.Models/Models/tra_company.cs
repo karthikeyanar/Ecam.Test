@@ -33,5 +33,6 @@ namespace Ecam.Models
         public Nullable<decimal> eps { get; set; }
         public string money_control_url { get; set; }
         public Nullable<bool> is_old { get; set; }
+        public string money_control_symbol { get; set; }
     }
 }

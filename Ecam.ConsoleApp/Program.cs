@@ -104,72 +104,22 @@ namespace Ecam.ConsoleApp {
                     } catch(Exception ex) {
                         Helper.Log(ex.Message,"AddSplit_ERROR" + "_" + (new Random()).Next(1000,10000));
                     }
-                    //try {
-                    //    List<string> symbols;
-                    //    using(EcamContext context = new EcamContext()) {
-                    //        symbols = (from q in context.tra_company select q.symbol).ToList();
-                    //    }
-                    //    int i;
-                    //    for(i = 0;i < 1;i++) {
-                    //        DateTime startDate = Convert.ToDateTime("01/01/" + (DateTime.Now.Year - i).ToString());
-                    //        foreach(string symbol in symbols) {
-                    //            Console.WriteLine("Symbol=" + symbol + ",Date=" + startDate.Year);
-                    //            TradeHelper.CreateYearLog(symbol,startDate);
-                    //        }
-                    //    }
-                    //} catch(Exception ex) {
-                    //    Helper.Log(ex.Message,"YearLog_ERROR" + "_" + (new Random()).Next(1000,10000));
-                    //}
-                    string symbol = "INFY";
-                    if(string.IsNullOrEmpty(symbol) == false) {
+                    try {
+                        List<string> symbols;
                         using(EcamContext context = new EcamContext()) {
-                            List<tra_financial> traFinancials = (from q in context.tra_financial
-                                                                 where q.symbol == symbol
-                                                                 orderby q.financial_date descending, q.financial_category_id ascending
-                                                                 select q).ToList();
-                            foreach(var row in traFinancials) {
-                                tra_financial prev = (from q in traFinancials
-                                                      where q.symbol == symbol
-                                                      && q.financial_category_id == row.financial_category_id
-                                                      && q.financial_date < row.financial_date
-                                                      orderby q.financial_date descending
-                                                      select q).FirstOrDefault();
-                                if(prev != null) {
-                                    row.prev_value = prev.value;
-                                    context.Entry(row).State = System.Data.Entity.EntityState.Modified;
-                                    context.SaveChanges();
-                                }
+                            symbols = (from q in context.tra_company select q.symbol).ToList();
+                        }
+                        int i;
+                        for(i = 0;i < 1;i++) {
+                            DateTime startDate = Convert.ToDateTime("01/01/" + (DateTime.Now.Year - i).ToString());
+                            foreach(string symbol in symbols) {
+                                Console.WriteLine("Symbol=" + symbol + ",Date=" + startDate.Year);
+                                TradeHelper.CreateYearLog(symbol,startDate);
                             }
                         }
-                    }
-                    //try {
-                    //int i;
-                    //int total = 0;
-                    //if(IS_DOWNLOAD_HISTORY == "true" || IS_IMPORT_CSV == "true") {
-                    //    tra_daily_log dailyLog = null;
-                    //    using(EcamContext context = new EcamContext()) {
-                    //        dailyLog = (from q in context.tra_daily_log
-                    //                    orderby q.trade_date descending
-                    //                    select q).FirstOrDefault();
-                    //    }
-                    //    if(dailyLog != null) {
-                    //        TimeSpan ts = DateTime.Now.Date - dailyLog.trade_date;
-                    //        total = (int)ts.TotalDays + 1;
-                    //    } else {
-                    //        total = (365 * 15);
-                    //    }
-                    //}
-                    //for(i = 0;i < total;i++) {
-                    //    DateTime dt = DateTime.Now.Date.AddDays(-i);
-                    //    TradeHelper.CreateDailyLog(dt.Date,"");
-                    //    TradeHelper.CreateDailyLog(dt.Date,"true");
-                    //}
-                    //MailSend(true);
-                    //MailSend(false);
-                    //MailSendDailyCSV();
-                    //} catch(Exception ex) {
-                    //    Helper.Log(ex.Message,"MAIL_SEND_ERROR" + "_" + (new Random()).Next(1000,10000));
-                    //}
+                    } catch(Exception ex) {
+                        Helper.Log(ex.Message,"YearLog_ERROR" + "_" + (new Random()).Next(1000,10000));
+                    } 
                 }
             } catch(Exception ex) {
                 Helper.Log(ex.Message,"MAIN_ERROR" + "_" + (new Random()).Next(1000,10000));

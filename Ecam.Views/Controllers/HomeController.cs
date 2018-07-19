@@ -6,90 +6,76 @@ using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 
-namespace Ecam.Views.Controllers
-{
+namespace Ecam.Views.Controllers {
 
-    public class HomeController : Controller
-    {
+    public class HomeController:Controller {
 
 
-        public ActionResult Index()
-        {
+        public ActionResult Index() {
             return View();
         }
 
-        public ActionResult MyProfile()
-        {
+        public ActionResult MyProfile() {
             return View();
         }
 
-        public ActionResult Blank()
-        {
+        public ActionResult Blank() {
             return View();
         }
 
-        public ActionResult LoadingPage()
-        {
+        public ActionResult LoadingPage() {
             return View();
         }
 
-        public ActionResult SQLChecking()
-        {
+        public ActionResult SQLChecking() {
             return View();
         }
 
-        public ActionResult Category()
-        {
+        public ActionResult Category() {
             return View();
         }
 
-        public ActionResult Holding()
-        {
+        public ActionResult FinancialCategory() {
             return View();
         }
 
-        public ActionResult Company()
-        {
+        public ActionResult Holding() {
             return View();
         }
 
-        public ActionResult Intraday()
-        {
+        public ActionResult Company() {
             return View();
         }
 
-        public ActionResult RSI()
-        {
+        public ActionResult Intraday() {
             return View();
         }
 
-        public ActionResult MonthlyAVG()
-        {
+        public ActionResult RSI() {
             return View();
         }
 
-        public ActionResult AddCompany()
-        {
+        public ActionResult MonthlyAVG() {
             return View();
         }
 
-        public ActionResult Order()
-        {
+        public ActionResult AddCompany() {
             return View();
         }
 
-        public ActionResult Market()
-        {
+        public ActionResult Order() {
             return View();
         }
 
-        public ActionResult AddMarket()
-        {
+        public ActionResult Market() {
             return View();
         }
 
-        public ActionResult Split()
-        {
+        public ActionResult AddMarket() {
+            return View();
+        }
+
+        public ActionResult Split() {
             return View();
         }
     }

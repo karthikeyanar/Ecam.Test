@@ -20,6 +20,7 @@ namespace Ecam.Models
             this.ToTable("tra_financial_category");
             this.Property(t => t.id).HasColumnName("financial_category_id");
             this.Property(t => t.category_name).HasColumnName("category_name");
+            this.Property(t => t.is_archive).HasColumnName("is_archive");
             Ignore(t => t.created_date);
             Ignore(t => t.created_by);
             Ignore(t => t.last_updated_date);

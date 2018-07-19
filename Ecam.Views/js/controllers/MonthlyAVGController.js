@@ -386,32 +386,32 @@ define("MonthlyAVGController", ["knockout", "komapping", "helper", "service"], f
                 });
                 $categories.select2Refresh("data", arr);
             }
-            var $btn = $("#save", $frm);
-            $btn.click(function () {
-                if ($frm.valid()) {
-                    $btn.button('loading');
-                    var data = $frm.serializeArray();
-                    data.push({ "name": "company_id", "value": getGlobalCompanyID() });
-                    var url = apiUrl("/Company/Create");
-                    var type = "POST";
-                    handleBlockUI({ "target": $("body"), "message": "Save..." });
-                    $.ajax({
-                        "url": url,
-                        "cache": false,
-                        "type": type,
-                        "data": data
-                    }).done(function (json) {
-                        //jAlert("Saved");
-                        $modal.modal('hide');
-                        self.loadGrid();
-                    }).fail(function (jqxhr) {
-                        alertErrorMessage(jqxhr.responseJSON);
-                    }).always(function (jqxhr) {
-                        $btn.button('reset');
-                        unblockUI();
-                    });
-                }
-            });
+            //var $btn = $("#save", $frm);
+            //$btn.click(function () {
+            //    if ($frm.valid()) {
+            //        $btn.button('loading');
+            //        var data = $frm.serializeArray();
+            //        data.push({ "name": "company_id", "value": getGlobalCompanyID() });
+            //        var url = apiUrl("/Company/Create");
+            //        var type = "POST";
+            //        handleBlockUI({ "target": $("body"), "message": "Save..." });
+            //        $.ajax({
+            //            "url": url,
+            //            "cache": false,
+            //            "type": type,
+            //            "data": data
+            //        }).done(function (json) {
+            //            //jAlert("Saved");
+            //            $modal.modal('hide');
+            //            self.loadGrid();
+            //        }).fail(function (jqxhr) {
+            //            alertErrorMessage(jqxhr.responseJSON);
+            //        }).always(function (jqxhr) {
+            //            $btn.button('reset');
+            //            unblockUI();
+            //        });
+            //    }
+            //});
         }
 
         this.loadTradeDetailChart = function ($childTD) {

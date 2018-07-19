@@ -10,9 +10,10 @@ using System.Threading.Tasks;
 namespace Ecam.Contracts {
     public class TRA_FINANCIAL_CATEGORY:BaseContract {
         public string category_name { get; set; }
+        public Nullable<bool> is_archive { get; set; }
     }
 
-    public class TRA_FINANCIAL_CATEGORY_SEARCH:TRA_CATEGORY {
+    public class TRA_FINANCIAL_CATEGORY_SEARCH:TRA_FINANCIAL_CATEGORY {
     }
 }
 

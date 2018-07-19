@@ -310,6 +310,7 @@
     <Compile Include="api\Models\AirlineInvitationModel.cs" />
     <Compile Include="api\Models\IdentityModels.cs" />
     <Compile Include="api\Models\ImportExcelTableModel.cs" />
+    <Compile Include="api\Repository\FinancialCategoryRepository.cs" />
     <Compile Include="api\Repository\CategoryRepository.cs" />
     <Compile Include="api\Repository\SplitRepository.cs" />
     <Compile Include="api\Repository\HoldingRepository.cs" />
@@ -577,6 +578,7 @@
     <Content Include="js\bootstrap\bootstrap.js" />
     <Content Include="js\bootstrap\bootstrap.min.js" />
     <Content Include="js\bootstrap\npm.js" />
+    <Content Include="js\controllers\FinancialCategoryController.js" />
     <Content Include="js\controllers\SplitController.js" />
     <Content Include="js\controllers\HoldingController.js" />
     <Content Include="js\controllers\RSIController.js" />
@@ -1228,6 +1230,7 @@
     <Content Include="Views\Home\AddExpertsRecommend.cshtml" />
     <Content Include="Views\Home\RSI.cshtml" />
     <Content Include="Views\Home\Split.cshtml" />
+    <Content Include="Views\Home\FinancialCategory.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

@@ -283,6 +283,20 @@ $(function () {
             unload: function () { }
         });
 
+        createFinchRoute("/financial-category", {
+            setup: function (url) {
+                handleBlockUI();
+            },
+            load: function () {
+                require(['FinancialCategoryController'], function (ViewModel) {
+                    document.title = "Financial Category - Ecams";
+                    var m = new ViewModel();
+                    app.viewModel(m);
+                });
+            },
+            unload: function () { }
+        });
+
         createFinchRoute("/holding", {
             setup: function (url) {
                 handleBlockUI();

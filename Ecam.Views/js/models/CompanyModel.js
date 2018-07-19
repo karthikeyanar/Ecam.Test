@@ -81,36 +81,36 @@ define(["knockout", "komapping", "helper"], function (ko, komapping, helper) {
         this.onBeforeSave = null;
         this.onAfterSave = null;
         this.save = function (formElement) {
-            self.success_result("");
-            var $frm = $(formElement);
-            if ($frm.valid()) {
-                var data = $frm.serializeArray();
-                var url = apiUrl("/Company/create");
-                var type = "POST";
-                if (self.id() > 0) { type = "PUT"; url = apiUrl("/Company/update/") + self.id(); }
-                if (self.onBeforeSave) {
-                    self.onBeforeSave(formElement);
-                }
-                $.ajax({
-                    "url": url,
-                    "cache": false,
-                    "type": type,
-                    "data": data
-                }).done(function (json) {
-                    self.errors(null);
-                    if (json.Errors == null) {
-                        komapping.fromJS(json, {}, self);
-                        if (self.onSave) {
-                            self.onSave(json);
-                        }
-                    }
-                }).fail(function (response) {
-                    self.errors(generateErrors(response.responseJSON));
-                }).always(function (jqxhr) {
-                    if (self.onAfterSave)
-                        self.onAfterSave(formElement);
-                });
-            }
+            //self.success_result("");
+            //var $frm = $(formElement);
+            //if ($frm.valid()) {
+            //    var data = $frm.serializeArray();
+            //    var url = apiUrl("/Company/create");
+            //    var type = "POST";
+            //    if (self.id() > 0) { type = "PUT"; url = apiUrl("/Company/update/") + self.id(); }
+            //    if (self.onBeforeSave) {
+            //        self.onBeforeSave(formElement);
+            //    }
+            //    $.ajax({
+            //        "url": url,
+            //        "cache": false,
+            //        "type": type,
+            //        "data": data
+            //    }).done(function (json) {
+            //        self.errors(null);
+            //        if (json.Errors == null) {
+            //            komapping.fromJS(json, {}, self);
+            //            if (self.onSave) {
+            //                self.onSave(json);
+            //            }
+            //        }
+            //    }).fail(function (response) {
+            //        self.errors(generateErrors(response.responseJSON));
+            //    }).always(function (jqxhr) {
+            //        if (self.onAfterSave)
+            //            self.onAfterSave(formElement);
+            //    });
+            //}
         }
     }
 });

@@ -168,32 +168,35 @@ namespace Ecam.Models {
                                                              select q).FirstOrDefault();
                                         if(financialCategory == null) {
                                             financialCategory = new Models.tra_financial_category {
-                                                category_name = categoryName
+                                                category_name = categoryName,
+                                                is_archive = false
                                             };
                                             context.tra_financial_category.Add(financialCategory);
                                             context.SaveChanges();
                                         }
                                     }
                                     if(financialCategory != null) {
-                                        if(j > 0) {
-                                            DateTime financialDate = DataTypeHelper.ToDateTime(csv.FieldHeaders[j]);
-                                            using(EcamContext context = new EcamContext()) {
-                                                tra_financial traFinancial = (from q in context.tra_financial
-                                                                              where q.symbol == symbol
-                                                                              && q.financial_category_id == financialCategory.id
-                                                                              && q.financial_date == financialDate
-                                                                              select q).FirstOrDefault();
-                                                if(traFinancial == null) {
-                                                    traFinancial = new tra_financial {
-                                                        financial_category_id = financialCategory.id,
-                                                        symbol = symbol,
-                                                        financial_date = financialDate,
-                                                        value = DataTypeHelper.ToDecimal(csv.GetField(csv.FieldHeaders[j])),
-                                                        prev_value = 0
-                                                    };
-                                                    if(traFinancial.value > 0) {
-                                                        context.tra_financial.Add(traFinancial);
-                                                        context.SaveChanges();
+                                        if((financialCategory.is_archive ?? false) == false) {
+                                            if(j > 0) {
+                                                DateTime financialDate = DataTypeHelper.ToDateTime(csv.FieldHeaders[j]);
+                                                using(EcamContext context = new EcamContext()) {
+                                                    tra_financial traFinancial = (from q in context.tra_financial
+                                                                                  where q.symbol == symbol
+                                                                                  && q.financial_category_id == financialCategory.id
+                                                                                  && q.financial_date == financialDate
+                                                                                  select q).FirstOrDefault();
+                                                    if(traFinancial == null) {
+                                                        traFinancial = new tra_financial {
+                                                            financial_category_id = financialCategory.id,
+                                                            symbol = symbol,
+                                                            financial_date = financialDate,
+                                                            value = DataTypeHelper.ToDecimal(csv.GetField(csv.FieldHeaders[j])),
+                                                            prev_value = 0
+                                                        };
+                                                        if(traFinancial.value > 0) {
+                                                            context.tra_financial.Add(traFinancial);
+                                                            context.SaveChanges();
+                                                        }
                                                     }
                                                 }
                                             }
