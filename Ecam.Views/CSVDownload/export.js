@@ -34,7 +34,7 @@ var download = function (content, fileName, mimeType) {
     }
 }
 
-function exportTable() {
+function exportTable(tabid) {
     var $tbl = $("table:eq(3)");
     var symbol = '';
     try {
@@ -105,6 +105,9 @@ function exportTable() {
     }
     console.log('fileName=', fileName);
     download(csvContent, fileName, 'text/csv;encoding:utf-8');
+    setTimeout(function(){
+        chrome.runtime.sendMessage({ cmd: 'close_tab','tabid':tabid  });
+    },500);
 }
 
 function convertCSVContent(struct) {

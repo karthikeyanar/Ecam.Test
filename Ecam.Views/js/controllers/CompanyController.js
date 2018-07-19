@@ -589,6 +589,15 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
                     this.checked = that.checked;
                 });
             });
+            $("body").on("click", "#lnkMCFinUpdate", function (event) {
+                var that = this;
+                var dataFor = ko.dataFor(this);
+                console.log(dataFor);
+                var $gcb_cmd = $("#gcb_cmd");
+                $gcb_cmd.attr("cmd", "mc-quaterly");
+                $gcb_cmd.attr("symbol", dataFor.money_control_symbol);
+                $gcb_cmd.click();
+            });
         }
 
         this.offElements = function () {

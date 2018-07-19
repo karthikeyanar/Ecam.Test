@@ -193,10 +193,8 @@ namespace Ecam.Models {
                                                             value = DataTypeHelper.ToDecimal(csv.GetField(csv.FieldHeaders[j])),
                                                             prev_value = 0
                                                         };
-                                                        if(traFinancial.value > 0) {
-                                                            context.tra_financial.Add(traFinancial);
-                                                            context.SaveChanges();
-                                                        }
+                                                        context.tra_financial.Add(traFinancial);
+                                                        context.SaveChanges();
                                                     }
                                                 }
                                             }

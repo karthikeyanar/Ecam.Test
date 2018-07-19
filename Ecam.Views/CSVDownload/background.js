@@ -11,9 +11,9 @@
 //});
 
 // Called when the user clicks on the browser action.
-chrome.browserAction.onClicked.addListener(function(tab) {
-    chrome.tabs.executeScript(tab.id, { file: "jquery-3.3.1.min.js" }, function(result) {
-        chrome.tabs.executeScript(tab.id, { file: "export.js" }, function(result) {
+chrome.browserAction.onClicked.addListener(function (tab) {
+    chrome.tabs.executeScript(tab.id, { file: "jquery-3.3.1.min.js" }, function (result) {
+        chrome.tabs.executeScript(tab.id, { file: "export.js" }, function (result) {
             var code = "exportTable();"
             chrome.tabs.executeScript(tab.id, { code: code });
         });
@@ -34,4 +34,41 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 	*/
     var action_url = "javascript:window.print();";
     //chrome.tabs.update(tab.id, { url: action_url });
+});
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    if (changeInfo.status === "complete") {
+        chrome.tabs.executeScript(tabId, { file: "jquery-3.3.1.min.js" });
+        if (tab.url.indexOf('/company') > 0) {
+            chrome.tabs.executeScript(tabId, { file: "init.js" });
+        }
+        chrome.tabs.executeScript({ code: "console.log('id=','" + tab.id + "','url=','" + tab.url + "','windowId=','" + tab.windowId + "','openerTabId=','" + tab.openerTabId + "');" });
+    }
+});
+chrome.runtime.onMessage.addListener(function (msg) {
+    //alert(msg.cmd);
+    if (msg.cmd !== undefined) {
+        switch (msg.cmd) {
+            case 'mc-quaterly':
+                var symbol = msg.symbol;
+                var url = 'https://www.moneycontrol.com/stocks/company_info/print_financials.php?sc_did=' + symbol + '&type=quarterly&t=' + (new Date()).getTime();
+                var type = 'popup';
+                var width = 1200;
+                var height = 800;
+                chrome.windows.create({ 'url': url, 'type': type, 'width': width, 'height': height }, function (newWindow) {
+                    var tab = newWindow.tabs[0];
+                    chrome.tabs.executeScript(tab.id, { file: "jquery-3.3.1.min.js" }, function (result) {
+                        chrome.tabs.executeScript(tab.id, { file: "export.js" }, function (result) {
+                            var code = "exportTable(" + tab.id + ");"
+                            chrome.tabs.executeScript(tab.id, { code: code });
+                        });
+                    });
+                });
+                break;
+            case 'close_tab':
+                //alert(msg.tabid);
+                chrome.tabs.remove(parseInt(msg.tabid), function () {
+                });
+                break;
+        }
+    }
 });

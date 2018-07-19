@@ -87,39 +87,41 @@ namespace Ecam.ConsoleApp {
                     } catch(Exception ex) {
                         Helper.Log(ex.Message,"DOWNLOAD_START_ERROR" + "_" + (new Random()).Next(1000,10000));
                     }
-                    try {
-                        //int i;
-                        //for(i = 0;i < 1;i++) {
-                        //    DateTime startDate = Convert.ToDateTime("01/01/" + (DateTime.Now.Year - i).ToString());
-                        //    DateTime endDate = Convert.ToDateTime("12/31/" + (DateTime.Now.Year - i).ToString());
-                        List<string> symbols;
-                        using(EcamContext context = new EcamContext()) {
-                            symbols = (from q in context.tra_company select q.symbol).ToList();
-                        }
-                        foreach(string splitsymbol in symbols) {
-                            //Console.WriteLine("Split Symbol=" + symbol);
-                            AddSplit(splitsymbol);
-                        }
-                        //}
-                    } catch(Exception ex) {
-                        Helper.Log(ex.Message,"AddSplit_ERROR" + "_" + (new Random()).Next(1000,10000));
-                    }
-                    try {
-                        List<string> symbols;
-                        using(EcamContext context = new EcamContext()) {
-                            symbols = (from q in context.tra_company select q.symbol).ToList();
-                        }
-                        int i;
-                        for(i = 0;i < 1;i++) {
-                            DateTime startDate = Convert.ToDateTime("01/01/" + (DateTime.Now.Year - i).ToString());
-                            foreach(string symbol in symbols) {
-                                Console.WriteLine("Symbol=" + symbol + ",Date=" + startDate.Year);
-                                TradeHelper.CreateYearLog(symbol,startDate);
+                    if(IS_IMPORT_CSV == "true") {
+                        try {
+                            //int i;
+                            //for(i = 0;i < 1;i++) {
+                            //    DateTime startDate = Convert.ToDateTime("01/01/" + (DateTime.Now.Year - i).ToString());
+                            //    DateTime endDate = Convert.ToDateTime("12/31/" + (DateTime.Now.Year - i).ToString());
+                            List<string> symbols;
+                            using(EcamContext context = new EcamContext()) {
+                                symbols = (from q in context.tra_company select q.symbol).ToList();
                             }
+                            foreach(string splitsymbol in symbols) {
+                                //Console.WriteLine("Split Symbol=" + symbol);
+                                AddSplit(splitsymbol);
+                            }
+                            //}
+                        } catch(Exception ex) {
+                            Helper.Log(ex.Message,"AddSplit_ERROR" + "_" + (new Random()).Next(1000,10000));
                         }
-                    } catch(Exception ex) {
-                        Helper.Log(ex.Message,"YearLog_ERROR" + "_" + (new Random()).Next(1000,10000));
-                    } 
+                        try {
+                            List<string> symbols;
+                            using(EcamContext context = new EcamContext()) {
+                                symbols = (from q in context.tra_company select q.symbol).ToList();
+                            }
+                            int i;
+                            for(i = 0;i < 1;i++) {
+                                DateTime startDate = Convert.ToDateTime("01/01/" + (DateTime.Now.Year - i).ToString());
+                                foreach(string symbol in symbols) {
+                                    Console.WriteLine("Symbol=" + symbol + ",Date=" + startDate.Year);
+                                    TradeHelper.CreateYearLog(symbol,startDate);
+                                }
+                            }
+                        } catch(Exception ex) {
+                            Helper.Log(ex.Message,"YearLog_ERROR" + "_" + (new Random()).Next(1000,10000));
+                        }
+                    }
                 }
             } catch(Exception ex) {
                 Helper.Log(ex.Message,"MAIN_ERROR" + "_" + (new Random()).Next(1000,10000));
