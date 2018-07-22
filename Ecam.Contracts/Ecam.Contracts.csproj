@@ -70,6 +70,7 @@
   <ItemGroup>
     <Compile Include="AuthPermissions.cs" />
     <Compile Include="EnquiryResult.cs" />
+    <Compile Include="tra_quater.cs" />
     <Compile Include="tra_financial_category.cs" />
     <Compile Include="tra_split.cs" />
     <Compile Include="tra_holding.cs" />

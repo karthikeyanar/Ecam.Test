@@ -26,7 +26,7 @@ namespace Ecam.Models {
     public class CSVDownloadData {
         private List<string> _SYMBOLS_LIST = null;
         private bool _IS_NOT_SUCCESS = false;
-        public CSVDownloadData(string file_name, List<string> symbols,ManualResetEvent doneEvent) {
+        public CSVDownloadData(string file_name,List<string> symbols,ManualResetEvent doneEvent) {
             _SYMBOLS_LIST = symbols;
             _ORIGINAL_FILE_NAME = file_name;
             _FILE_NAME = file_name;
@@ -155,7 +155,7 @@ namespace Ecam.Models {
                             string close = csv.GetField<string>("Close Price");
                             string lastTrade = csv.GetField<string>("Last Price");
                             string prev = csv.GetField<string>("Prev Close");
-                            string turnOver = csv.GetField<string>("Turnover"); 
+                            string turnOver = csv.GetField<string>("Turnover");
                             DateTime dt = DataTypeHelper.ToDateTime(date);
                             if(string.IsNullOrEmpty(symbol) == false) {
                                 symbol = symbol.Replace("&amp;","&");
@@ -188,7 +188,7 @@ namespace Ecam.Models {
                             }
                         }
                     }
-                }  
+                }
             }
         }
 

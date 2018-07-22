@@ -145,8 +145,10 @@ namespace Ecam.Views.Controllers {
 
         [HttpGet]
         [ActionName("Select")]
-        public List<Select2List> GetCompanys([FromUri] string term,[FromUri] int pageSize = 50,string categories = "") {
-            return _CompanyRepository.GetCompanys(term,pageSize,categories);
+        public List<Select2List> GetCompanys([FromUri] string term,[FromUri] int pageSize = 50,string categories = ""
+            ,bool isCheckFinancial = false
+            ,string financialDate = "") {
+            return _CompanyRepository.GetCompanys(term,pageSize,categories,isCheckFinancial,financialDate);
         }
 
         [HttpPost]

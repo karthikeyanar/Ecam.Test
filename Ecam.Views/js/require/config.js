@@ -212,6 +212,19 @@ $(function () {
             unload: function () { }
         });
 
+        createFinchRoute("/quater", {
+            setup: function (url) {
+                handleBlockUI();
+            },
+            load: function () {
+                require(['QuaterController'], function (ViewModel) {
+                    document.title = "Quater - Ecams";
+                    var m = new ViewModel();
+                    app.viewModel(m);
+                });
+            },
+            unload: function () { }
+        });
 
         createFinchRoute("/intraday", {
             setup: function (url) {

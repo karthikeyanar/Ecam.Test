@@ -34,7 +34,8 @@ var download = function (content, fileName, mimeType) {
     }
 }
 
-function exportTable(tabid) {
+function exportTable(tabid,openerId) {
+    window.alert = function() {};
     var $tbl = $("table:eq(3)");
     var symbol = '';
     try {
@@ -101,13 +102,14 @@ function exportTable(tabid) {
     var csvContent = convertCSVContent(struct);
     var fileName = '';
     if (struct.cols.length > 0) {
-        fileName += struct.cols[0] + '-' + struct.cols[2] + '-' + struct.cols[struct.cols.length - 1] + '.csv';
+        fileName += struct.cols[0] + '-' + struct.cols[1] + '-' + struct.cols[struct.cols.length - 1] + '.csv';
     }
     console.log('fileName=', fileName);
     download(csvContent, fileName, 'text/csv;encoding:utf-8');
     setTimeout(function(){
-        chrome.runtime.sendMessage({ cmd: 'close_tab','tabid':tabid  });
-    },500);
+        //chrome.runtime.sendMessage({ cmd: 'mc-quaterly-downloaded','tabid':openerId  });
+        chrome.runtime.sendMessage({ cmd: 'close_tab','tabid':tabid,'openerid':openerId  });
+    },1000);
 }
 
 function convertCSVContent(struct) {

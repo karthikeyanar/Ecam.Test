@@ -9,7 +9,14 @@
 
 //}
 //});
-
+function doInCurrentTab(tabCallback) {
+    chrome.tabs.query({ currentWindow: true, active: true },
+        function (tabArray) {
+            //////////alert('tabArray[0]='+tabArray[0]);
+            tabCallback(tabArray[0]);
+        }
+    );
+}
 // Called when the user clicks on the browser action.
 chrome.browserAction.onClicked.addListener(function (tab) {
     chrome.tabs.executeScript(tab.id, { file: "jquery-3.3.1.min.js" }, function (result) {
@@ -38,7 +45,7 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo.status === "complete") {
         chrome.tabs.executeScript(tabId, { file: "jquery-3.3.1.min.js" });
-        if (tab.url.indexOf('/company') > 0) {
+        if (tab.url.indexOf('#/company') > 0 || tab.url.indexOf('#/quater') > 0) {
             chrome.tabs.executeScript(tabId, { file: "init.js" });
         }
         chrome.tabs.executeScript({ code: "console.log('id=','" + tab.id + "','url=','" + tab.url + "','windowId=','" + tab.windowId + "','openerTabId=','" + tab.openerTabId + "');" });
@@ -46,6 +53,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 });
 chrome.runtime.onMessage.addListener(function (msg) {
     //alert(msg.cmd);
+    chrome.tabs.executeScript({ code: "console.log('msg.cmd=','" + msg.cmd + "','msg.tabid=','" + msg.tabid + "');" });
     if (msg.cmd !== undefined) {
         switch (msg.cmd) {
             case 'mc-quaterly':
@@ -54,20 +62,29 @@ chrome.runtime.onMessage.addListener(function (msg) {
                 var type = 'popup';
                 var width = 1200;
                 var height = 800;
-                chrome.windows.create({ 'url': url, 'type': type, 'width': width, 'height': height }, function (newWindow) {
-                    var tab = newWindow.tabs[0];
-                    chrome.tabs.executeScript(tab.id, { file: "jquery-3.3.1.min.js" }, function (result) {
-                        chrome.tabs.executeScript(tab.id, { file: "export.js" }, function (result) {
-                            var code = "exportTable(" + tab.id + ");"
-                            chrome.tabs.executeScript(tab.id, { code: code });
+                doInCurrentTab(function (currentTab) {
+                    chrome.windows.create({ 'url': url, 'type': type, 'width': width, 'height': height }, function (newWindow) {
+                        var tab = newWindow.tabs[0];
+                        chrome.tabs.executeScript(tab.id, { file: "jquery-3.3.1.min.js" }, function (result) {
+                            chrome.tabs.executeScript(tab.id, { file: "export.js" }, function (result) {
+                                var code = "exportTable(" + tab.id + "," + currentTab.id + ");"
+                                chrome.tabs.executeScript(tab.id, { code: code });
+                            });
                         });
                     });
                 });
                 break;
             case 'close_tab':
                 //alert(msg.tabid);
-                chrome.tabs.remove(parseInt(msg.tabid), function () {
+                var code = "startMC();"
+                chrome.tabs.executeScript(parseInt(msg.openerid), { code: code }, function () {
+                    chrome.tabs.remove(parseInt(msg.tabid), function () { });
                 });
+                break;
+            case 'mc-quaterly-downloaded':
+                //alert(msg.tabid);
+                var code = "startMC();"
+                chrome.tabs.executeScript(parseInt(msg.tabid), { code: code });
                 break;
         }
     }

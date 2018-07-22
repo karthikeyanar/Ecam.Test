@@ -7,10 +7,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecam.Contracts
-{
-    public class TRA_COMPANY : BaseContract
-    {
+namespace Ecam.Contracts {
+    public class TRA_COMPANY:BaseContract {
         public string company_name { get; set; }
         public string symbol { get; set; }
         public Nullable<decimal> open_price { get; set; }
@@ -98,8 +96,7 @@ namespace Ecam.Contracts
         public Nullable<decimal> percentage_2018 { get; set; }
     }
 
-    public class TRA_COMPANY_SEARCH : TRA_COMPANY
-    {
+    public class TRA_COMPANY_SEARCH:TRA_COMPANY {
         public string symbols { get; set; }
         public string categories { get; set; }
         public decimal? from_price { get; set; }
@@ -145,10 +142,11 @@ namespace Ecam.Contracts
         public decimal? monthly_investment { get; set; }
 
         public string where_condition { get; set; }
+
+        public int? financial_category_id { get; set; }
     }
 
-    public class TRA_CATEGORY_GROUP
-    {
+    public class TRA_CATEGORY_GROUP {
         public string category_name { get; set; }
         public decimal? total_investment { get; set; }
         public decimal? total_current { get; set; }
@@ -157,20 +155,20 @@ namespace Ecam.Contracts
 
         public decimal total_profit {
             get {
-                return DataTypeHelper.SafeDivision(((total_current ?? 0) - (total_investment ?? 0)), (total_investment ?? 0)) * 100;
+                return DataTypeHelper.SafeDivision(((total_current ?? 0) - (total_investment ?? 0)),(total_investment ?? 0)) * 100;
             }
         }
         public decimal total_high_profit {
             get {
-                return DataTypeHelper.SafeDivision(((total_high ?? 0) - (total_investment ?? 0)), (total_investment ?? 0)) * 100;
+                return DataTypeHelper.SafeDivision(((total_high ?? 0) - (total_investment ?? 0)),(total_investment ?? 0)) * 100;
             }
         }
         public decimal total_low_profit {
             get {
-                return DataTypeHelper.SafeDivision(((total_low ?? 0) - (total_investment ?? 0)), (total_investment ?? 0)) * 100;
+                return DataTypeHelper.SafeDivision(((total_low ?? 0) - (total_investment ?? 0)),(total_investment ?? 0)) * 100;
             }
         }
         public List<TRA_COMPANY> companies { get; set; }
     }
-} 
+}
 

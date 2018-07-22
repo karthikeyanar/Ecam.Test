@@ -4,6 +4,8 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
         var self = this;
         this.template = "/Home/Company";
 
+        this.index = -1;
+        this.company_json = null;
         this.rows = ko.observableArray([]);
 
         this.refresh = function () {
@@ -11,6 +13,7 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
         }
 
         this.last_grid_data = null;
+
         this.loadGrid = function (callback) {
             handleBlockUI();
             var $Company = $("#Company");
@@ -453,6 +456,55 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             });
         }
 
+        this.mcDownload = function () {
+            if (self.company_json == null) {
+                handleBlockUI();
+                var dt = '01-Dec-2017';
+                var url = apiUrl("/Company/Select?pageSize=50000&isCheckFinancial=true&financialDate=" + dt + "&term=");
+                var arr = [];
+                $.ajax({
+                    "url": url,
+                    "cache": false,
+                    "type": "GET",
+                    "data": arr
+                }).done(function (json) {
+                    self.company_json = json;
+                    console.log(1);
+                    self.startMC();
+                }).always(function () {
+                    unblockUI();
+                });
+            } else {
+                console.log(2);
+                self.startMC();
+            }
+        }
+
+        this.startMC = function () {
+            console.log('self.index=', self.index);
+            var symbols = '';
+            for (var i = 0; i < self.company_json.length; i++) {
+                symbols += self.company_json[i].other + ',';
+            }
+            if (symbols != '') {
+                symbols = symbols.substring(0, symbols.length - 1);
+            }
+            if (symbols != '') {
+                console.log('call gccmd', symbols);
+                var $gcb_cmd = $("#gcb_cmd");
+                $gcb_cmd.attr("cmd", "mc-quaterly");
+                $gcb_cmd.attr("symbol", symbols);
+                $gcb_cmd.click();
+            }
+        }
+
+        this.onEventFire = function (name, event) {
+            var html = "<button type='button' id='gc_btn_routing_change' onclick='var collections=document.getElementsByName(\"" + name + "\");var i;for(i=0;i<collections.length;i++){collections[i]." + event + "();}' style='position:absolute;top:10px;display:none;'>Routing Change</button>";
+            $('body').append(html);
+            $('#gc_btn_routing_change').click();
+            $('#gc_btn_routing_change').remove();
+        }
+
         this.onElements = function () {
             self.offElements();
             $("body").on("click", "#frmCompanySearch #is_archive", function (event) {
@@ -598,6 +650,9 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
                 $gcb_cmd.attr("symbol", dataFor.money_control_symbol);
                 $gcb_cmd.click();
             });
+            $("body").on("click", "#btnMCDownload", function (event) {
+                self.mcDownload();
+            });
         }
 
         this.offElements = function () {
@@ -625,6 +680,7 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             $("body").off("click", ".is-book-mark");
             $("body").off("click", ".is-current-stock");
             $("body").off("click", "#Company .btn-export");
+            $("body").off("click", "#btnMCDownload");
         }
 
         this.unInit = function () {

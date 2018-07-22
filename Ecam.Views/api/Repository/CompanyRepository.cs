@@ -19,7 +19,8 @@ namespace Ecam.Framework.Repository {
         PaginatedListResult<TRA_MARKET_INTRA_DAY> GetIntraDay(TRA_COMPANY_SEARCH criteria,Paging paging);
         PaginatedListResult<TRA_MARKET_AVG> GetAvg(TRA_COMPANY_SEARCH criteria,Paging paging);
         PaginatedListResult<TRA_MARKET_RSI> GetRSI(TRA_COMPANY_SEARCH criteria,Paging paging);
-        List<Select2List> GetCompanys(string name,int pageSize = 50,string categories = "");
+        List<Select2List> GetCompanys(string name,int pageSize = 50,string categories = "",bool isCheckFinancial = false
+            ,string financialDate = "");
         List<Select2List> GetCategories(string name,int pageSize = 500);
         List<Select2List> GetMFFunds(string name,int pageSize = 50);
         PaginatedListResult<TRA_COMPANY> GetMonthlyAVG(TRA_COMPANY_SEARCH criteria,Paging paging);
@@ -114,7 +115,10 @@ namespace Ecam.Framework.Repository {
             return rows;
         }
 
-        public List<Select2List> GetCompanys(string name,int pageSize = 50,string categories = "") {
+        public List<Select2List> GetCompanys(string name,int pageSize = 50,string categories = ""
+            ,bool isCheckFinancial = false
+            ,string financialDate = ""
+            ) {
             StringBuilder where = new StringBuilder();
             string selectFields = "";
             string pageLimit = "";
@@ -127,26 +131,41 @@ namespace Ecam.Framework.Repository {
 
             where.AppendFormat(" comp.company_id > 0");
 
-            if(string.IsNullOrEmpty(name) == false) {
-                where.AppendFormat(" and comp.company_name like '{0}%' or comp.symbol like '{0}%' ",name);
-            }
-
-            if(string.IsNullOrEmpty(categories) == false) {
-                string categorySymbols = "-1";
+            if(isCheckFinancial == true && string.IsNullOrEmpty(financialDate) == false) {
+                DateTime dt = DataTypeHelper.ToDateTime(financialDate);
                 using(EcamContext context = new EcamContext()) {
-                    List<string> categoryList = Helper.ConvertStringList(categories);
-                    List<string> categorySymbolList = (from q in context.tra_company_category
-                                                       where categoryList.Contains(q.category_name) == true
-                                                       select q.symbol).Distinct().ToList();
-                    foreach(var str in categorySymbolList) {
-                        categorySymbols += str + ",";
-                    }
-                    if(string.IsNullOrEmpty(categorySymbols) == false) {
-                        categorySymbols = categorySymbols.Substring(0,categorySymbols.Length - 1);
+                    sql = "select symbol from tra_financial where financial_date = '" + dt.ToString("yyyy-MM-dd") + "' group by symbol";
+                    List<string> symbolsList = new List<string>();
+                    symbolsList = context.Database.SqlQuery<string>(sql).ToList();
+                    string symbols = Helper.ConvertStringIds(symbolsList);
+                    if(string.IsNullOrEmpty(symbols) == false) {
+                        where.AppendFormat(string.Format(" and comp.symbol not in({0})",Helper.ConvertStringSQLFormat(symbols)));
                     }
                 }
-                if(string.IsNullOrEmpty(categorySymbols) == false) {
-                    where.AppendFormat(" and comp.symbol in({0})",Helper.ConvertStringSQLFormat(categorySymbols));
+                where.AppendFormat(" and ifnull(comp.money_control_symbol,'')!=''");
+            } else {
+
+                if(string.IsNullOrEmpty(name) == false) {
+                    where.AppendFormat(" and comp.company_name like '{0}%' or comp.symbol like '{0}%' ",name);
+                }
+
+                if(string.IsNullOrEmpty(categories) == false) {
+                    string categorySymbols = "-1";
+                    using(EcamContext context = new EcamContext()) {
+                        List<string> categoryList = Helper.ConvertStringList(categories);
+                        List<string> categorySymbolList = (from q in context.tra_company_category
+                                                           where categoryList.Contains(q.category_name) == true
+                                                           select q.symbol).Distinct().ToList();
+                        foreach(var str in categorySymbolList) {
+                            categorySymbols += str + ",";
+                        }
+                        if(string.IsNullOrEmpty(categorySymbols) == false) {
+                            categorySymbols = categorySymbols.Substring(0,categorySymbols.Length - 1);
+                        }
+                    }
+                    if(string.IsNullOrEmpty(categorySymbols) == false) {
+                        where.AppendFormat(" and comp.symbol in({0})",Helper.ConvertStringSQLFormat(categorySymbols));
+                    }
                 }
             }
 
@@ -166,7 +185,8 @@ namespace Ecam.Framework.Repository {
 
             selectFields = "comp.symbol as id" +
                            ",comp.company_name as label" +
-                           ",comp.company_name as value";
+                           ",comp.company_name as value" +
+                           ",comp.money_control_symbol as other";
 
             sql = string.Format(sqlFormat,selectFields,joinTables,where,groupByName,orderBy,pageLimit);
 
@@ -417,7 +437,7 @@ namespace Ecam.Framework.Repository {
                 for(i = 0;i < 12;i++) {
                     int year = DateTime.Now.Year - i;
                     selectFields += string.Format(",yoy{0}.percentage as percentage_{0}",year) + Environment.NewLine;
-                } 
+                }
             }
 
             //",(select ifnull(count(*),0) from tra_holding h where h.symbol = ct.symbol) as is_holding" +

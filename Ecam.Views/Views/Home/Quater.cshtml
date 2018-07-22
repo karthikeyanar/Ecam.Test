@@ -1,0 +1,51 @@
+﻿@{ Layout = null; }
+<div class="page-header">
+    <div class="">
+        <form id="frmAgentReportSearch" class="form-inline form-validate" role="form" onsubmit="return false">
+            <div class="col-md-12 no-padding m-b-10 border-white header p-b-5r">
+                <div class="p-l-10 p-r-10">
+                    <h1 class="page-title">Quater</h1>
+                </div> 
+            </div>
+        </form>
+    </div>
+</div>
+<div class="row top-company-report">
+    <div class="col-md-12">
+        <div class="row m-b-5">
+            <div class="col-md-12">
+
+            </div>
+        </div>
+        <table id="companyQuaterTable" class="table table-bordered table-condensed table-gray">
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>Symbol</th>
+                    <!-- ko foreach: columns -->
+                    <th data-bind="text:$data,attr:{'sortname':$data}" class="text-right"></th>
+                    <!-- /ko -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- ko foreach: rows -->
+                <tr>
+                    <td data-bind="text:company_name"></td>
+                    <td data-bind="text:symbol"></td>
+                    <!-- ko foreach: cell() -->
+                    <td class="text-right">
+                        <span data-bind="text:formatPercentage(percentage())"></span>
+                        <input type="hidden" name="company_name" data-bind="value:company_name" />
+                        <input type="hidden" name="next_quater_first_date" data-bind="value:next_quater_first_date" />
+                        <input type="hidden" name="next_quater_last_date" data-bind="value:next_quater_last_date" />
+                        <input type="hidden" name="period" data-bind="value:period" />
+                        <input type="hidden" name="quater_first_date" data-bind="value:quater_first_date" />
+                        <input type="hidden" name="quater_last_date" data-bind="value:quater_last_date" />
+                    </td>
+                    <!-- /ko -->
+                </tr>
+                <!-- /ko -->
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -290,6 +290,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="api\Controllers\BaseApiController.cs" />
+    <Compile Include="api\Controllers\QuaterController.cs" />
     <Compile Include="api\Controllers\FinancialCategoryController.cs" />
     <Compile Include="api\Controllers\SplitController.cs" />
     <Compile Include="api\Controllers\HoldingController.cs" />
@@ -310,6 +311,7 @@
     <Compile Include="api\Models\AirlineInvitationModel.cs" />
     <Compile Include="api\Models\IdentityModels.cs" />
     <Compile Include="api\Models\ImportExcelTableModel.cs" />
+    <Compile Include="api\Repository\QuaterRepository.cs" />
     <Compile Include="api\Repository\FinancialCategoryRepository.cs" />
     <Compile Include="api\Repository\CategoryRepository.cs" />
     <Compile Include="api\Repository\SplitRepository.cs" />
@@ -511,21 +513,6 @@
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="Global.asax" />
-    <Content Include="GoogleChromeExtension\background.js" />
-    <Content Include="GoogleChromeExtension\bootstrap.min.css" />
-    <Content Include="GoogleChromeExtension\ext.js" />
-    <Content Include="GoogleChromeExtension\form-fill.js" />
-    <Content Include="GoogleChromeExtension\images\get_started128.png" />
-    <Content Include="GoogleChromeExtension\images\get_started16.png" />
-    <Content Include="GoogleChromeExtension\images\get_started32.png" />
-    <Content Include="GoogleChromeExtension\images\get_started48.png" />
-    <Content Include="GoogleChromeExtension\init.js" />
-    <Content Include="GoogleChromeExtension\jquery-3.3.1.min.js" />
-    <Content Include="GoogleChromeExtension\knockout-3.4.2.js" />
-    <Content Include="GoogleChromeExtension\options.html" />
-    <Content Include="GoogleChromeExtension\options.js" />
-    <Content Include="GoogleChromeExtension\popup.html" />
-    <Content Include="GoogleChromeExtension\popup.js" />
     <Content Include="img\ack-32.png" />
     <Content Include="img\avatar_default.jpg" />
     <Content Include="img\botton2-act.png" />
@@ -600,6 +587,7 @@
     <Content Include="js\bootstrap\bootstrap.min.js" />
     <Content Include="js\bootstrap\npm.js" />
     <Content Include="js\controllers\FinancialCategoryController.js" />
+    <Content Include="js\controllers\QuaterController.js" />
     <Content Include="js\controllers\SplitController.js" />
     <Content Include="js\controllers\HoldingController.js" />
     <Content Include="js\controllers\RSIController.js" />
@@ -1231,8 +1219,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="GoogleChromeExtension\manifest.json" />
-    <Content Include="GoogleChromeExtension\packages.config" />
     <Content Include="CSVDownload\manifest.json" />
     <Content Include="CSVDownload\myfile.json" />
     <Content Include="ecam_gc_ext\manifest.json" />
@@ -1254,6 +1240,7 @@
     <Content Include="Views\Home\RSI.cshtml" />
     <Content Include="Views\Home\Split.cshtml" />
     <Content Include="Views\Home\FinancialCategory.cshtml" />
+    <Content Include="Views\Home\Quater.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

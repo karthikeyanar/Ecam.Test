@@ -78,5 +78,9 @@ namespace Ecam.Views.Controllers {
         public ActionResult Split() {
             return View();
         }
+
+        public ActionResult Quater() {
+            return View();
+        }
     }
 }
