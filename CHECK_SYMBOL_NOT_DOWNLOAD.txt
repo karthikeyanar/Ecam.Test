@@ -1,0 +1,6 @@
+select symbol from tra_market m where m.symbol in(
+select symbol from tra_company_category cc
+join tra_category c on cc.category_name = c.category_name where c.is_book_mark = 1 
+group by symbol
+) and m.symbol not in (select symbol from tra_market m2 where m2.trade_date = '2018-07-20')
+group by symbol limit 0,1000

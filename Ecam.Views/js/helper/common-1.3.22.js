@@ -115,7 +115,7 @@ function randomNumber(minimum, maximum) {
 
 function getSortOrder(prop) {
     return function (a, b) {
-        //console.log('prop=', prop, 'a[prop]=', a[prop], 'b[prop]=', b[prop]);
+        console.log('getSortOrder prop=', prop, 'a[prop]=', a[prop], 'b[prop]=', b[prop]);
         if (a[prop] > b[prop]) {
             return 1;
         } else if (a[prop] < b[prop]) {
@@ -127,7 +127,7 @@ function getSortOrder(prop) {
 
 function getDescOrder(prop) {
     return function (a, b) {
-        //console.log('prop=', prop, 'a[prop]=', a[prop], 'b[prop]=', b[prop]);
+        console.log('getDescOrder prop=', prop, 'a[prop]=', a[prop], 'b[prop]=', b[prop]);
         if (a[prop] > b[prop]) {
             return -1;
         } else if (a[prop] < b[prop]) {

@@ -18,10 +18,21 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             handleBlockUI();
             var $Company = $("#Company");
             var arr = $("#frmCompanySearch").serializeArray();
+            var originalSortName = '';
+            var originalSortOrder = '';
+            var sortName = $(":input[name='sort_name']", $Company).val();
+            var sortOrder = $(":input[name='sort_order']", $Company).val();
+            originalSortName = sortName;
+            originalSortOrder = sortOrder;
+            if (sortName == 'avg' || sortName == 'positive_cnt') {
+                sortName = '';
+                sortOrder = '';
+            }
+
             arr.push({ "name": "PageSize", "value": $(":input[name='rows']", $Company).val() });
             arr.push({ "name": "PageIndex", "value": $(":input[name='page_index']", $Company).val() });
-            arr.push({ "name": "SortName", "value": $(":input[name='sort_name']", $Company).val() });
-            arr.push({ "name": "SortOrder", "value": $(":input[name='sort_order']", $Company).val() });
+            arr.push({ "name": "SortName", "value": sortName });
+            arr.push({ "name": "SortOrder", "value": sortOrder });
             var isarchive = $("#frmCompanySearch #is_archive")[0].checked;
             if (isarchive == true) {
                 arr[arr.length] = { "name": "is_archive", "value": isarchive };
@@ -89,6 +100,11 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
                 arr[arr.length] = { "name": "is_buy_to_sell", "value": is_buy_to_sell };
             }
 
+            var is_book_mark_category = $("#frmCompanySearch #is_book_mark_category")[0].checked;
+            if (is_book_mark_category == true) {
+                arr[arr.length] = { "name": "is_book_mark_category", "value": is_book_mark_category };
+            }
+
             var is_mf = $("#frmCompanySearch #is_mf")[0].checked;
             if (is_mf == true) {
                 arr[arr.length] = { "name": "is_mf", "value": is_mf };
@@ -109,7 +125,7 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
                     cnt = 0;
                     totalPercentage = 0;
                     positiveCnt = 0;
-                    var year = 2018;
+                    var year = cInt((new Date()).getFullYear());
                     for (i = 1; i <= 12; i++) {
                         //console.log('percentage_' + (year - i) + '=', cFloat(json.rows[j]['percentage_' + (year - i)]))
                         var p = cFloat(json.rows[j]['percentage_' + (year - i)]);
@@ -144,7 +160,16 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
                         arr.push(json.rows[j]);
                     }
                 }
-                arr = arr.sort(getDescOrder('avg'));
+                //console.log('originalSortName=', originalSortName, 'originalSortOrder=', originalSortOrder);
+                //console.log('json.rows=', json.rows);
+                //console.log('arr=', arr);
+                if (originalSortName == 'avg' || originalSortName == 'positive_cnt') {
+                    if (originalSortOrder == 'desc') {
+                        arr = arr.sort(getDescOrder(originalSortName));
+                    } else {
+                        arr = arr.sort(getSortOrder(originalSortName));
+                    }
+                }
                 self.rows.removeAll();
                 self.rows(arr);
                 self.last_grid_data = arr;
@@ -558,6 +583,9 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             $("body").on("click", "#frmCompanySearch #is_mf", function (event) {
                 self.loadGrid();
             });
+            $("body").on("click", "#frmCompanySearch #is_book_mark_category", function (event) {
+                self.loadGrid();
+            });
             $("body").on("click", "#Company .btn-add", function (event) {
                 self.openItem(null)
             });
@@ -673,6 +701,7 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             $("body").off("click", "#frmCompanySearch #is_sell_to_buy");
             $("body").off("click", "#frmCompanySearch #is_buy_to_sell");
             $("body").off("click", "#frmCompanySearch #is_mf");
+            $("body").off("click", "#frmCompanySearch #is_book_mark_category");
             $("body").off("click", "#Company .btn-add");
             $("body").off("click", "#Company .btn-edit");
             $("body").off("click", "#Company .btn-delete");
