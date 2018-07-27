@@ -36,6 +36,13 @@ namespace Ecam.ConsoleApp {
         private static List<string> _SYMBOLS_LIST;
         static void Main(string[] args) {
             try {
+                SupertrendUpdate();
+            } catch(Exception ex) {
+                Console.WriteLine("ex=" + ex.Message);
+            }
+            Console.Read();
+            return;
+            try {
                 //NiftyListGenerate();
                 IS_CATEGORY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_CATEGORY_FLAG_CSV"];
                 IS_NIFTY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_FLAG_CSV"];
@@ -1991,6 +1998,49 @@ RegexOptions.IgnoreCase
             if(_INDEX < _COMPANIES.Length) {
                 Console.WriteLine("All calculations are complete.");
                 FINANCIALCSVDownloadStart();
+            }
+        }
+
+        private static void SupertrendUpdate() {
+            List<string> symbols = new List<string>();
+            using(EcamContext context =new EcamContext()) {
+                symbols = (from q in context.tra_company
+                           select q.symbol).ToList();
+            }
+            symbols = (from q in symbols orderby q ascending select q).ToList();
+            _COMPANIES = symbols.ToArray();
+            _INDEX = -1;
+            SupertrendUpdateStart();
+        }
+
+        private static void SupertrendUpdateStart() {
+            int totalCount = _COMPANIES.Length;
+            int queueCount = 64;
+            if(totalCount <= queueCount) {
+                queueCount = totalCount;
+            }
+            // One event is used for each Fibonacci object
+            ManualResetEvent[] doneEvents = new ManualResetEvent[queueCount];
+            SupertrendData[] downArray = new SupertrendData[queueCount];
+            //Random r = new Random();
+            // Configure and launch threads using ThreadPool:
+            Console.WriteLine("launching {0} tasks...",totalCount);
+            for(int i = 0;i < queueCount;i++) {
+                _INDEX += 1;
+                string symbol = "";
+                if(_INDEX < _COMPANIES.Length) {
+                    symbol = _COMPANIES[_INDEX];
+                }
+                doneEvents[i] = new ManualResetEvent(false);
+                SupertrendData f = new SupertrendData(symbol,_SYMBOLS_LIST,doneEvents[i]);
+                downArray[i] = f;
+                ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback,i);
+            }
+            // Wait for all threads in pool to calculation...
+            WaitHandle.WaitAll(doneEvents);
+            if(_INDEX < _COMPANIES.Length) {
+                Console.WriteLine("All calculations are complete.");
+                SupertrendUpdateStart();
             }
         }
     }

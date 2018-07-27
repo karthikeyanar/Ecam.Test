@@ -101,6 +101,7 @@
     <Compile Include="Framework\ServiceFactory.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Helpers\SupertrendUpdate.cs" />
     <Compile Include="Helpers\FINANCIALCSVDownloadData.cs" />
     <Compile Include="Helpers\MoneyControlData.cs" />
     <Compile Include="Helpers\CSVDownloadData.cs" />
@@ -110,6 +111,9 @@
     <Compile Include="Helpers\Common.cs" />
     <Compile Include="Helpers\DBHelper.cs" />
     <Compile Include="Helpers\EmailHelper.cs" />
+    <Compile Include="Indicators\Price.cs" />
+    <Compile Include="Indicators\ATR.cs" />
+    <Compile Include="Indicators\Supertrend.cs" />
     <Compile Include="Models\ecamtest_backupContext.cs" />
     <Compile Include="Models\Mapping\tra_financial_categoryMap.cs" />
     <Compile Include="Models\Mapping\tra_categoryMap.cs" />
