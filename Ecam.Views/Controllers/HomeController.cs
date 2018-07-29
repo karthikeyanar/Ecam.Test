@@ -47,6 +47,10 @@ namespace Ecam.Views.Controllers {
             return View();
         }
 
+        public ActionResult Indicator() {
+            return View();
+        }
+
         public ActionResult Intraday() {
             return View();
         }

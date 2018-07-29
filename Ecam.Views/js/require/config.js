@@ -212,6 +212,20 @@ $(function () {
             unload: function () { }
         });
 
+        createFinchRoute("/indicator", {
+            setup: function (url) {
+                handleBlockUI();
+            },
+            load: function () {
+                require(['IndicatorController'], function (ViewModel) {
+                    document.title = "Indicator - Ecams";
+                    var m = new ViewModel();
+                    app.viewModel(m);
+                });
+            },
+            unload: function () { }
+        });
+
         createFinchRoute("/quater", {
             setup: function (url) {
                 handleBlockUI();

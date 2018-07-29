@@ -47,7 +47,7 @@ namespace Ecam.Models {
             _doneEvent.Set();
         }
 
-        private void Update(string symbol) {
+        public void Update(string symbol) {
             Price[] candles = null;
             using(EcamContext context = new EcamContext()) {
                 candles = (from q in context.tra_market
@@ -59,12 +59,7 @@ namespace Ecam.Models {
                                low_price = q.low_price,
                                open_price = q.open_price,
                                close_price = q.close_price,
-                               super_trend_signal = q.super_trend_signal,
-                               macd_signal = q.macd_signal,
-                               macd = q.macd,
-                               sp_profit = q.sp_profit,
                                is_indicator = q.is_indicator,
-                               macd_histogram = q.macd_histogram,
                            }).ToArray();
             }
             ATR atr = new ATR();
@@ -79,6 +74,9 @@ namespace Ecam.Models {
             //           select q).ToArray();
             string sql = string.Empty;
             for(int i = 0;i < candles.Length;i++) {
+                if(candles[i].trade_date.ToString("dd-MMM-yyyy") == "20-Jul-2018") {
+                    string s = string.Empty;
+                }
                 if(
                     ((candles[i].super_trend_signal == "B" || candles[i].super_trend_signal == "S" || candles[i].macd_signal == "B" || candles[i].macd_signal == "S"))
                     && (candles[i].is_indicator ?? false) == false
@@ -114,22 +112,26 @@ namespace Ecam.Models {
                             //    candles[i].sp_min_profit = (((min.close_price ?? 0) - (candles[i].close_price ?? 0)) / (candles[i].close_price ?? 0)) * 100;
                             //}
                         }
-                    } else {
-                        var candle = (from q in candles
+                        candle = (from q in candles
                                       where q.trade_date < candles[i].trade_date
-                                      && q.super_trend_signal == "B"
+                                      && (q.super_trend_signal == "B" || q.super_trend_signal == "S")
                                       orderby q.trade_date descending
                                       select q).FirstOrDefault();
                         if(candle != null) {
-                            candles[i].sp_profit = (((candles[i].close_price ?? 0) - (candle.close_price ?? 0)) / (candle.close_price ?? 0)) * 100;
+                            if(candle.super_trend_signal == "B") {
+                                candles[i].sp_profit = (((candles[i].close_price ?? 0) - (candle.close_price ?? 0)) / (candle.close_price ?? 0)) * 100;
+                            }
                         }
-                        candle = (from q in candles
+                    } else {
+                        var candle = (from q in candles
                                   where q.trade_date < candles[i].trade_date
                                   && (q.super_trend_signal == "B" || q.super_trend_signal == "S")
                                   orderby q.trade_date descending
                                   select q).FirstOrDefault();
                         if(candle != null) {
-                            candles[i].super_trend_signal = candle.super_trend_signal;
+                            if(candle.super_trend_signal == "B") {
+                                candles[i].sp_profit = (((candles[i].close_price ?? 0) - (candle.close_price ?? 0)) / (candle.close_price ?? 0)) * 100;
+                            }
                         }
                     }
                     sql = string.Format("update tra_market set super_trend_signal='{0}',macd_signal='{1}',macd={2},sp_profit={3},macd_histogram={4},is_indicator={5} " +

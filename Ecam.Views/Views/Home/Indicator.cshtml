@@ -1,0 +1,206 @@
+﻿@{ Layout = null; }
+<div class="page-header">
+    <div class="col-md-12 no-padding m-b-10 border-white header p-b-10">
+        <form id="frmCompanySearch" class="form-inline form-validate" role="form" onsubmit="return false">
+            <div class="form-group" style="margin-left:10px; margin-right:10px;float:left;">
+                <h1 class="page-title" style="margin-top:-4px;">Companies</h1>
+            </div>
+            <div class="form-group m-r-10 m-t-10">
+                <input type="hidden" name="symbols" />
+            </div>
+            <div class="form-group m-r-10 m-t-10">
+                <input type="hidden" name="categories" />
+            </div>
+            <div class="form-group m-r-10 m-t-10">
+                <button id="reportrange" type="button" class="btn btn-sm btn-default">
+                    <i class="fa fa-calendar cursor-pointer m-r-10"></i><span class="m-r-10">
+                    </span><b class="caret"></b>
+                </button>
+            </div>
+            <div class="clearfix"></div>
+            <div class="m-l-15">
+                <div class="form-group m-r-10 m-t-10">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="is_archive" /> Show Archive
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="is_book_mark" /> Show Book Mark
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="is_book_mark_category" checked /> Book Mark Category
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <div class="pull-left m-t-5">
+                        Super Trend
+                    </div>
+                    <div class="pull-left m-l-15">
+                        <select id="super_trend_signal" name="super_trend_signal" class="form-control input-sm">
+                            <option value="">All</option>
+                            <option value="B" selected>Buy</option>
+                            <option value="S">Sell</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="is_macd_check" /> MACD Check
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="m-l-15">
+                <div class="form-group m-r-10 m-t-10">
+                    <button type="button" id="btn" class="btn btn-success btn-sm" data-bind="click:refresh">Refresh</button>
+                </div>
+            </div>
+            <input type="hidden" name="start_date" data-bind="value:start_date" />
+            <input type="hidden" name="end_date" data-bind="value:end_date" />
+        </form>
+    </div>
+</div>
+<div class="row" id="Company">
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="pull-left m-r-15">
+                    <span class="pull-left p-t-5 p-r-10">Rows</span>
+                    <select id="rows" name="rows" class="pull-left form-control input-sm input-60">
+                        <option value="10">10</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="200">200</option>
+                        <option value="500">500</option>
+                        <option value="1000" selected>1000</option>
+                    </select>
+                </div>
+                <div class="pull-left">
+                    <span id="paging_status" class="pull-left m-t-5"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="pull-right">
+                    <ul class="manual-pagination no-margin"></ul>
+                </div>
+            </div>
+            <input type="hidden" name="page_index" value="1" />
+            <input type="hidden" name="sort_name" value="trade_date" />
+            <input type="hidden" name="sort_order" value="desc" />
+        </div>
+        <table id="CompanyTable" class="table table-striped table-bordered table-hover table-condensed table-gray">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" id="chkSelectAll" />
+                    </th>
+                    <th style="width: 50px" sortname="">
+                        #
+                    </th>
+                    <th style="width: 50px" sortname="is_archive">
+                        Ar
+                    </th>
+                    <th style="width: 50px" sortname="is_book_mark">
+                        BM
+                    </th>
+                    <th sortname="company_name">
+                        Company
+                    </th>
+                    <th sortname="symbol">
+                        Symbol
+                    </th>
+                    <th sortname="trade_date" class="text-nowrap">
+                        Date
+                    </th>
+                    <th sortname="close_price" class="text-right text-nowrap">
+                        Close Price
+                    </th>
+                    <th sortname="super_trend_signal" class="text-nowrap">
+                        Super Trend
+                    </th>
+                    <th sortname="macd_signal" class="text-nowrap">
+                        MACD Signal
+                    </th>
+                    <th sortname="macd" class="text-right text-nowrap">
+                        MACD
+                    </th>
+                    <th sortname="macd_histogram" class="text-right text-nowrap">
+                        Histogram
+                    </th>
+                    <th sortname="sp_profit" class="text-right text-nowrap">
+                       ST Profit
+                    </th> 
+                    <th style="width: 100px">
+                    </th>
+                    <th style="width: 5px">
+                    </th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach:rows">
+                <tr>
+                    <td style="text-align:center;width:10px;">
+                        <input type="checkbox" id="chk" class="chk-symbol" />
+                        <input type="hidden" id="symbol" data-bind="value:symbol" />
+                    </td>
+                    <td style="text-align:center;" data-bind="text:$index()+1"></td>
+                    <td style="text-align:center;">
+                        <a href="javascript:;" class="is-book-mark">
+                            <i data-bind="css:{'fa-bookmark fg-primary': cBool(is_archive)==true,'fa-bookmark-o': cBool(is_archive)==false}" class="fa fa-bookmark"></i>
+                        </a>
+                    </td>
+                    <td style="text-align:center;">
+                        <a href="javascript:;" class="is-current-stock">
+                            <i data-bind="css:{'fa-user fg-primary': cBool(is_book_mark)==true,'fa-user-o': cBool(is_book_mark)==false}" class="fa fa-user"></i>
+                        </a>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:company_name"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:symbol"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit">
+                        <div data-bind="text:formatDate(trade_date)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatNumber(close_price)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit">
+                        <div data-bind="text:(super_trend_signal=='B' ? 'BUY': (super_trend_signal == 'S' ? 'SELL':''))"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit">
+                        <div data-bind="text:(macd_signal=='B' ? 'BUY': (macd_signal == 'S' ? 'SELL':''))"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:macd"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:macd_histogram"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(sp_profit)"></div>
+                    </td> 
+                    <td style="text-align:center;white-space:nowrap;width:5px;">
+                        <button id="btnSTUpdate" class="btn btn-success btn-xs">ST Update</button>
+                    </td>
+                    <td style="text-align:center;white-space:nowrap;width:5px;">
+                        <div class="pull-left">
+                            <a data-bind="attr:{'href': money_control_url}" target="_blank"><i class="fa fa-search"></i></a>
+                        </div>
+                        <div class="clearfix"></div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal-container">
+</div>
+<!-- /ko --> 

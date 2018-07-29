@@ -144,6 +144,9 @@ namespace Ecam.Contracts {
         public string where_condition { get; set; }
 
         public int? financial_category_id { get; set; }
+        public string super_trend_signal { get; set; }
+        public string macd_signal { get; set; }
+        public bool? is_macd_check { get; set; }
     }
 
     public class TRA_CATEGORY_GROUP {

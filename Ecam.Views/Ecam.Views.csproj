@@ -586,6 +586,7 @@
     <Content Include="js\bootstrap\bootstrap.js" />
     <Content Include="js\bootstrap\bootstrap.min.js" />
     <Content Include="js\bootstrap\npm.js" />
+    <Content Include="js\controllers\IndicatorController.js" />
     <Content Include="js\controllers\FinancialCategoryController.js" />
     <Content Include="js\controllers\QuaterController.js" />
     <Content Include="js\controllers\SplitController.js" />
@@ -1241,6 +1242,7 @@
     <Content Include="Views\Home\Split.cshtml" />
     <Content Include="Views\Home\FinancialCategory.cshtml" />
     <Content Include="Views\Home\Quater.cshtml" />
+    <Content Include="Views\Home\Indicator.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
