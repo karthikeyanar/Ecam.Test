@@ -2015,7 +2015,7 @@ RegexOptions.IgnoreCase
 
         private static void SupertrendUpdateStart() {
             int totalCount = _COMPANIES.Length;
-            int queueCount = 64;
+            int queueCount = 10;
             if(totalCount <= queueCount) {
                 queueCount = totalCount;
             }

@@ -58,20 +58,92 @@ namespace Ecam.Models {
                                high_price = q.high_price,
                                low_price = q.low_price,
                                open_price = q.open_price,
-                               close_price = q.close_price
+                               close_price = q.close_price,
+                               super_trend_signal = q.super_trend_signal,
+                               macd_signal = q.macd_signal,
+                               macd = q.macd,
+                               sp_profit = q.sp_profit,
+                               is_indicator = q.is_indicator,
+                               macd_histogram = q.macd_histogram,
                            }).ToArray();
             }
             ATR atr = new ATR();
             atr.Calculate(candles);
+            MACD macd = new MACD();
+            macd.Calculate(candles);
             Supertrend supertrend = new Supertrend();
             supertrend.Calculate(candles);
-            candles = (from q in candles
-                       where string.IsNullOrEmpty(q.super_trend_signal) == false
-                       select q).ToArray();
+            DateTime minDate = Convert.ToDateTime("01/01/1900");
+            //candles = (from q in candles
+            //           where string.IsNullOrEmpty(q.super_trend_signal) == false
+            //           select q).ToArray();
             string sql = string.Empty;
             for(int i = 0;i < candles.Length;i++) {
-                sql = string.Format("update tra_market set super_trend={0},super_trend_signal='{1}' where trade_date='{2}' and symbol='{3}'",decimal.Round(candles[i].super_trend,4),candles[i].super_trend_signal,candles[i].trade_date.ToString("yyyy-MM-dd"),candles[i].symbol);
-                MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString,sql);
+                if(
+                    ((candles[i].super_trend_signal == "B" || candles[i].super_trend_signal == "S" || candles[i].macd_signal == "B" || candles[i].macd_signal == "S"))
+                    && (candles[i].is_indicator ?? false) == false
+                    ) {
+                    if(candles[i].super_trend_signal == "B") {
+                        var candle = (from q in candles
+                                      where q.trade_date > candles[i].trade_date
+                                      && q.super_trend_signal == "S"
+                                      orderby q.trade_date ascending
+                                      select q).FirstOrDefault();
+                        if(candle == null) {
+                            candle = (from q in candles
+                                      where q.trade_date > candles[i].trade_date
+                                      orderby q.trade_date ascending
+                                      select q).FirstOrDefault();
+                        }
+                        if(candle != null) {
+                            candles[i].sp_sell_date = candle.trade_date;
+                            //var max = (from q in candles
+                            //           where q.trade_date > candles[i].trade_date
+                            //           && q.trade_date <= candle.trade_date
+                            //           orderby q.close_price descending
+                            //           select q).FirstOrDefault();
+                            //if(max != null) {
+                            //    candles[i].sp_max_profit = (((max.close_price ?? 0) - (candles[i].close_price ?? 0)) / (candles[i].close_price ?? 0)) * 100;
+                            //}
+                            //var min = (from q in candles
+                            //           where q.trade_date > candles[i].trade_date
+                            //           && q.trade_date <= candle.trade_date
+                            //           orderby q.close_price ascending
+                            //           select q).FirstOrDefault();
+                            //if(min != null) {
+                            //    candles[i].sp_min_profit = (((min.close_price ?? 0) - (candles[i].close_price ?? 0)) / (candles[i].close_price ?? 0)) * 100;
+                            //}
+                        }
+                    } else {
+                        var candle = (from q in candles
+                                      where q.trade_date < candles[i].trade_date
+                                      && q.super_trend_signal == "B"
+                                      orderby q.trade_date descending
+                                      select q).FirstOrDefault();
+                        if(candle != null) {
+                            candles[i].sp_profit = (((candles[i].close_price ?? 0) - (candle.close_price ?? 0)) / (candle.close_price ?? 0)) * 100;
+                        }
+                        candle = (from q in candles
+                                  where q.trade_date < candles[i].trade_date
+                                  && (q.super_trend_signal == "B" || q.super_trend_signal == "S")
+                                  orderby q.trade_date descending
+                                  select q).FirstOrDefault();
+                        if(candle != null) {
+                            candles[i].super_trend_signal = candle.super_trend_signal;
+                        }
+                    }
+                    sql = string.Format("update tra_market set super_trend_signal='{0}',macd_signal='{1}',macd={2},sp_profit={3},macd_histogram={4},is_indicator={5} " +
+                        " where trade_date='{6}' and symbol='{7}'"
+                        ,candles[i].super_trend_signal
+                        ,candles[i].macd_signal
+                        ,(candles[i].macd ?? 0)
+                        ,(candles[i].sp_profit ?? 0)
+                        ,(candles[i].macd_histogram ?? 0)
+                        ,1
+                        ,candles[i].trade_date.ToString("yyyy-MM-dd")
+                        ,candles[i].symbol);
+                    MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString,sql);
+                }
             }
             Console.WriteLine("Completed symbol=" + symbol);
         }

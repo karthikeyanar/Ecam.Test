@@ -2,14 +2,11 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.ModelConfiguration;
 // namespace CodeFirstClassGenerate.Models.Mapping
-namespace Ecam.Models
-{
-    public partial class tra_marketMap : EntityTypeConfiguration<tra_market>
-    {
-        public tra_marketMap()
-        {
+namespace Ecam.Models {
+    public partial class tra_marketMap:EntityTypeConfiguration<tra_market> {
+        public tra_marketMap() {
             // Primary Key
-            this.HasKey(t => new { t.symbol, t.trade_date });
+            this.HasKey(t => new { t.symbol,t.trade_date });
 
             // Properties
             this.Property(t => t.symbol)
@@ -17,52 +14,58 @@ namespace Ecam.Models
                 .HasMaxLength(50);
 
             this.Property(t => t.open_price)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.high_price)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.low_price)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.ltp_price)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.close_price)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.prev_price)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.rsi)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.prev_rsi)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.upward)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.downward)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.avg_upward)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.avg_downward)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.rs)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.prev_ltp_price)
-                .HasPrecision(13, 4);
+                .HasPrecision(13,4);
 
             this.Property(t => t.turn_over)
                 .HasPrecision(13,4);
 
             this.Property(t => t.percentage)
                 .HasPrecision(13,4);
+
+            this.Property(t => t.super_trend_signal)
+              .HasMaxLength(1);
+
+            this.Property(t => t.macd_signal)
+              .HasMaxLength(1);
 
             // Table & Column Mappings
             this.ToTable("tra_market");
@@ -84,6 +87,13 @@ namespace Ecam.Models
             this.Property(t => t.prev_ltp_price).HasColumnName("prev_ltp_price");
             this.Property(t => t.turn_over).HasColumnName("turn_over");
             this.Property(t => t.percentage).HasColumnName("percentage");
+
+            this.Property(t => t.super_trend_signal).HasColumnName("super_trend_signal");
+            this.Property(t => t.macd_signal).HasColumnName("macd_signal");
+            this.Property(t => t.macd).HasColumnName("macd");
+            this.Property(t => t.sp_profit).HasColumnName("sp_profit");
+            this.Property(t => t.is_indicator).HasColumnName("is_indicator");
+            this.Property(t => t.macd_histogram).HasColumnName("macd_histogram");
         }
     }
 }

@@ -21,5 +21,11 @@ namespace Ecam.Models {
         public Nullable<decimal> prev_ltp_price { get; set; }
         public Nullable<decimal> turn_over { get; set; }
         public Nullable<decimal> percentage { get; set; }
+        public string super_trend_signal { get; set; }
+        public string macd_signal { get; set; }
+        public Nullable<decimal> macd { get; set; }
+        public Nullable<decimal> sp_profit { get; set; }
+        public Nullable<bool> is_indicator { get; set; }
+        public Nullable<decimal> macd_histogram { get; set; }
     }
 }

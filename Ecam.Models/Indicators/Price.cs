@@ -22,6 +22,11 @@ namespace Ecam.Models {
         public decimal upper_band { get; set; }
         public decimal lower_band { get; set; }
         public decimal super_trend { get; set; }
-        public string super_trend_signal { get; set; }
+        public DateTime? sp_sell_date { get; set; }
+        
+        // MACD
+        public decimal ema_12 { get; set; }
+        public decimal ema_26 { get; set; }
+        public decimal m_singal { get; set; }
     }
 }

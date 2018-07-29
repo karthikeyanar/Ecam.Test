@@ -15,7 +15,7 @@ namespace Ecam.Framework {
             if(value == null) { return "0"; }
             if((value ?? 0) == 0) { return "0"; }
             string format = "{0:C" + precision + "}";
-            string result = String.Format(format,(value ?? 0)).Replace("$","").Replace(".0000","");
+            string result = String.Format(format,(value ?? 0)).Replace("$","").Replace("₹","").Replace(".0000","");
             if(isInteger == true) {
                 result = result.Replace(".00","").Replace(".000","");
             }

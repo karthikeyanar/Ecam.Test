@@ -111,6 +111,7 @@
     <Compile Include="Helpers\Common.cs" />
     <Compile Include="Helpers\DBHelper.cs" />
     <Compile Include="Helpers\EmailHelper.cs" />
+    <Compile Include="Indicators\MACD.cs" />
     <Compile Include="Indicators\Price.cs" />
     <Compile Include="Indicators\ATR.cs" />
     <Compile Include="Indicators\Supertrend.cs" />
