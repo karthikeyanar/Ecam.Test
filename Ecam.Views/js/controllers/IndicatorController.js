@@ -174,13 +174,28 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
         }
 
         this.startNSE = function () {
+            $('#gcb_nse_cmd').attr('cmd', 'open_nse');
+            $('#gcb_nse_cmd').attr('symbol', '');
+            $('#gcb_nse_cmd').attr('start_date', '');
+            $('#gcb_nse_cmd').attr('end_date', '');
+            $('#gcb_nse_cmd').click();
+        }
+
+        this.startNSEDownload = function () {
             self.index += 1;
-            console.log('self.index=', self.index);
+            var tabid = $('#btnNSEDownloadBackground').attr('tabid');
+            console.log('startNSEDownload self.index=', self.index, 'tabid=', tabid);
             if (self.index <= self.company_json.length) {
                 console.log(self.company_json[self.index]);
-                setTimeout(function () {
-                    self.startNSE();
-                }, 2000);
+                $('#gcb_nse_cmd').attr('cmd', 'download_nse');
+                $('#gcb_nse_cmd').attr('symbol', self.company_json[self.index].symbol);
+                $('#gcb_nse_cmd').attr('start_date', self.company_json[self.index].start_date);
+                $('#gcb_nse_cmd').attr('end_date', self.company_json[self.index].end_date);
+                $('#gcb_nse_cmd').attr('tabid', tabid);
+                $('#gcb_nse_cmd').click();
+                //setTimeout(function () {
+                //    self.startNSE();
+                //}, 2000);
             }
         }
 

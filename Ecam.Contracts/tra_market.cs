@@ -37,6 +37,7 @@ namespace Ecam.Contracts {
         public Nullable<bool> is_archive { get; set; }
         public Nullable<bool> is_book_mark { get; set; }
         public Nullable<decimal> current_price { get; set; }
+        public Nullable<DateTime> last_date { get; set; }
         public string company_name { get; set; } 
         public string money_control_url { get; set; }
 
@@ -46,6 +47,13 @@ namespace Ecam.Contracts {
                     return (((this.current_price ?? 0) - (this.close_price ?? 0)) / (this.close_price ?? 0)) * 100;
                 else
                     return 0;
+            }
+        }
+        public double diff_days {
+            get {
+                DateTime minDate = Convert.ToDateTime("01/01/1900");
+                TimeSpan ts = (this.last_date ?? minDate) - (this.trade_date);
+                return ts.TotalDays;
             }
         }
     }

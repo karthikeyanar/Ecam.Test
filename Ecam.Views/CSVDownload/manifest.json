@@ -7,6 +7,7 @@
     "windows",
     "http://localhost:6868/*",
     "https://www.moneycontrol.com/*",
+    "https://www.nseindia.com/*",
     "activeTab",
     "declarativeContent",
     "storage"

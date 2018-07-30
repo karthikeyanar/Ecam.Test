@@ -146,7 +146,8 @@ namespace Ecam.Framework.Repository {
                            ",c.is_book_mark" +
                            ",c.company_name as company_name" +
                            ",c.money_control_url" +
-                           ",(select m.close_price from tra_market m where m.trade_date >= ct.trade_date and m.symbol = ct.symbol order by m.trade_date desc limit 0,1) as current_price" +
+                           ",(select m.close_price from tra_market m where m.trade_date >= ct.trade_date and m.symbol = ct.symbol and (ifnull(m.super_trend_signal,'')='S' or ifnull(m.super_trend_signal,'')='') order by m.trade_date desc limit 0,1) as current_price" +
+                           ",(select m.trade_date from tra_market m where m.trade_date >= ct.trade_date and m.symbol = ct.symbol and (ifnull(m.super_trend_signal,'')='S' or ifnull(m.super_trend_signal,'')='') order by m.trade_date desc limit 0,1) as last_date" +
                            ""
                            ;
 

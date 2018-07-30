@@ -151,6 +151,7 @@ function ForexDataGroup() {
 
 Number.prototype.zp = function (n) { return this.toString().zp(n); }
 
+
 var _COMPANY_CACHE = null;
 var _COUNTRY_CACHE = null;
 var _ZONE_CACHE = null;

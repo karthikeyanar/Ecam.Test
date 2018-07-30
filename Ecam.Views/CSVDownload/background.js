@@ -9,6 +9,34 @@
 
 //}
 //});
+
+function getHostName(url) {
+    var match = url.match(/:\/\/(www[0-9]?\.)?(.[^/:]+)/i);
+    if (match != null && match.length > 2 && typeof match[2] === 'string' && match[2].length > 0) {
+        return match[2];
+    }
+    else {
+        return null;
+    }
+}
+function getDomain(url) {
+    var hostName = getHostName(url);
+    var domain = hostName;
+
+    if (hostName != null) {
+        var parts = hostName.split('.').reverse();
+
+        if (parts != null && parts.length > 1) {
+            domain = parts[1] + '.' + parts[0];
+
+            if (hostName.toLowerCase().indexOf('.co.uk') != -1 && parts.length > 2) {
+                domain = parts[2] + '.' + domain;
+            }
+        }
+    }
+
+    return domain;
+}
 function doInCurrentTab(tabCallback) {
     chrome.tabs.query({ currentWindow: true, active: true },
         function (tabArray) {
@@ -43,49 +71,91 @@ chrome.browserAction.onClicked.addListener(function (tab) {
     //chrome.tabs.update(tab.id, { url: action_url });
 });
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    chrome.tabs.executeScript({ code: "console.log('changeInfo.status=','" + changeInfo.status + "');" });
     if (changeInfo.status === "complete") {
         chrome.tabs.executeScript(tabId, { file: "jquery-3.3.1.min.js" });
-        if (tab.url.indexOf('#/company') > 0 || tab.url.indexOf('#/quater') > 0 || tab.url.indexOf('#/indicator') > 0) {
+        if (tab.url.indexOf('#/company') > 0 || tab.url.indexOf('#/quater') > 0 || tab.url.indexOf('#/indicator') > 0 || tab.url.indexOf('#/cm-company-update') > 0) {
             chrome.tabs.executeScript(tabId, { file: "init.js" });
+        } else {
+            if (tab.url.indexOf('nseindia.com') > 0) {
+                chrome.tabs.executeScript(tabId, { file: "export.js" }, function (result) {
+                    var arr = tab.url.split('?');
+                    var openerId = arr[1].split('=')[1].toString();
+                    code = "pageLoad('" + tab.url + "'," + tabId + ",'" + openerId + "');";
+                    //alert(code);
+                    chrome.tabs.executeScript(tabId, { code: code });
+                    //chrome.tabs.executeScript({ code: "console.log('onUpdated.addListener id=','"+tab.id+"','url=','"+tab.url+"','windowId=','"+tab.windowId+"','openerTabId=','"+tab.openerTabId+"');" });
+                });
+            }
         }
         chrome.tabs.executeScript({ code: "console.log('id=','" + tab.id + "','url=','" + tab.url + "','windowId=','" + tab.windowId + "','openerTabId=','" + tab.openerTabId + "');" });
     }
 });
 chrome.runtime.onMessage.addListener(function (msg) {
-    //alert(msg.cmd);
-    chrome.tabs.executeScript({ code: "console.log('msg.cmd=','" + msg.cmd + "','msg.tabid=','" + msg.tabid + "');" });
-    if (msg.cmd !== undefined) {
-        switch (msg.cmd) {
-            case 'mc-quaterly':
-                var symbol = msg.symbol;
-                var url = 'https://www.moneycontrol.com/stocks/company_info/print_financials.php?sc_did=' + symbol + '&type=quarterly&t=' + (new Date()).getTime();
-                var type = 'popup';
-                var width = 1200;
-                var height = 800;
-                doInCurrentTab(function (currentTab) {
-                    chrome.windows.create({ 'url': url, 'type': type, 'width': width, 'height': height }, function (newWindow) {
-                        var tab = newWindow.tabs[0];
-                        chrome.tabs.executeScript(tab.id, { file: "jquery-3.3.1.min.js" }, function (result) {
-                            chrome.tabs.executeScript(tab.id, { file: "export.js" }, function (result) {
-                                var code = "exportTable(" + tab.id + "," + currentTab.id + ");"
-                                chrome.tabs.executeScript(tab.id, { code: code });
+    try {
+        chrome.tabs.executeScript({ code: "console.log('msg.cmd=','" + msg.cmd + "','msg.tabid=','" + msg.tabid + "');" });
+        if (msg.cmd !== undefined) {
+            switch (msg.cmd) {
+                case 'mc-quaterly':
+                    var symbol = msg.symbol;
+                    var url = 'https://www.moneycontrol.com/stocks/company_info/print_financials.php?sc_did=' + symbol + '&type=quarterly&t=' + (new Date()).getTime();
+                    var type = 'popup';
+                    var width = 1200;
+                    var height = 800;
+                    doInCurrentTab(function (currentTab) {
+                        chrome.windows.create({ 'url': url, 'type': type, 'width': width, 'height': height }, function (newWindow) {
+                            var tab = newWindow.tabs[0];
+                            chrome.tabs.executeScript(tab.id, { file: "jquery-3.3.1.min.js" }, function (result) {
+                                chrome.tabs.executeScript(tab.id, { file: "export.js" }, function (result) {
+                                    var code = "exportTable(" + tab.id + "," + currentTab.id + ");"
+                                    chrome.tabs.executeScript(tab.id, { code: code });
+                                });
                             });
                         });
                     });
-                });
-                break;
-            case 'close_tab':
-                //alert(msg.tabid);
-                var code = "startMC();"
-                chrome.tabs.executeScript(parseInt(msg.openerid), { code: code }, function () {
-                    chrome.tabs.remove(parseInt(msg.tabid), function () { });
-                });
-                break;
-            case 'mc-quaterly-downloaded':
-                //alert(msg.tabid);
-                var code = "startMC();"
-                chrome.tabs.executeScript(parseInt(msg.tabid), { code: code });
-                break;
+                    break;
+                case 'close_tab':
+                    //alert(msg.tabid);
+                    var code = "startMC();"
+                    chrome.tabs.executeScript(parseInt(msg.openerid), { code: code }, function () {
+                        chrome.tabs.remove(parseInt(msg.tabid), function () { });
+                    });
+                    break;
+                case 'mc-quaterly-downloaded':
+                    //alert(msg.tabid);
+                    var code = "startMC();"
+                    chrome.tabs.executeScript(parseInt(msg.tabid), { code: code });
+                    break;
+                case 'execute_code':
+                    //chrome.tabs.executeScript({ code: "console.log('onMessage.addListener tabid=','"+parseInt(msg.tabid)+"');" });
+                    if (parseInt(msg.tabid) > 0) {
+                        chrome.tabs.executeScript(parseInt(msg.tabid), { code: msg.code });
+                    }
+                    break;
+                case 'open_nse':
+                    var type = 'normal';
+                    var width = 1200;
+                    var height = 800;
+                    doInCurrentTab(function (currentTab) {
+                        var url = 'https://www.nseindia.com/products/content/equities/equities/eq_security.htm?openerTabId=' + currentTab.id;
+                        chrome.windows.create({ 'url': url, 'type': type, 'width': width, 'height': height }, function (newWindow) {
+                            //var tab = newWindow.tabs[0];
+                            ////alert(tab.id);
+                            //        var code = "nseStart(" + tab.id + "," + currentTab.id + ");"
+                            //        //alert(code);
+                            //        chrome.tabs.executeScript(tab.id, { code: code });
+                        });
+                    });
+                    break;
+                case 'download_nse':
+                    var code = "_NSE.downloadData('" + msg.symbol + "','" + msg.start_date + "','" + msg.end_date + "');";
+                    chrome.tabs.executeScript(parseInt(msg.tabid),{ code: code });
+                    break;
+                case 'page_load':
+                    break;
+            }
         }
+    } catch (e) {
+        chrome.tabs.executeScript({ code: "console.log('onMessage.addListener ex=','" + e + "');" });
     }
 });

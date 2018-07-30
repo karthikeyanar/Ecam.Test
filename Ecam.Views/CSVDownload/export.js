@@ -112,6 +112,11 @@ function exportTable(tabid,openerId) {
     },1000);
 }
 
+function pageLoad(pageUrl,tabId,openerId) {
+    console.log('pageLoad pageUrl=',pageUrl,'tabId=',pageUrl,'openerId=',openerId);
+    nseStart(pageUrl,tabId,openerId);
+}
+
 function convertCSVContent(struct) {
     var content = '';
     var cols = '';
@@ -138,4 +143,34 @@ function convertCSVContent(struct) {
     content = cols + rows;
     //console.log(content);
     return content;
+}
+
+var _NSE = null;
+/* */
+function nseStart(pageUrl,tabId,openerId){
+    console.log('nseStart tabId=',tabId,'openerId=',openerId);
+    _NSE = new NSE();
+    _NSE.init(pageUrl,tabId,openerId);
+}
+/* */
+
+function NSE(){
+
+    var self = this;
+    this.tabId = 0;
+    this.openerId = 0;
+    this.pageUrl = '';
+
+    this.init = function(pageUrl,tabId,openerId){
+        console.log('NSE init=',tabId,'openerId=',openerId);
+        self.tabId=parseInt(tabId);
+        self.openerId=parseInt(openerId);
+        self.pageUrl=pageUrl;
+        var code = "$('#btnNSEDownloadBackground').attr('tabid',"+self.tabId+");$('#btnNSEDownloadBackground').click();";
+        chrome.runtime.sendMessage({ cmd: 'execute_code','tabid':openerId,'code':code  });
+    }
+
+    this.downloadData = function(symbol,startDate,endDate) {
+        console.log('download symbol=',symbol,'startDate=',startDate,'endDate=',endDate);
+    }
 }
