@@ -753,22 +753,22 @@ namespace Ecam.Models {
                         company.prev_price = lastMarket.prev_price;
                         company.ltp_price = lastMarket.ltp_price;
                     }
-                    List<tra_market_avg> avgs = (from q in context.tra_market_avg
-                                                 where q.symbol == symbol
-                                                 select q).ToList();
-                    decimal total = 0;
+                    //List<tra_market_avg> avgs = (from q in context.tra_market_avg
+                    //                             where q.symbol == symbol
+                    //                             select q).ToList();
+                    //decimal total = 0;
 
-                    var monthly = (from q in avgs
-                                   where q.symbol == symbol && q.avg_type == "M"
-                                   select q).ToList();
-                    total = (from q in monthly select q.percentage).Sum();
-                    company.monthly_avg = DataTypeHelper.SafeDivision(total,monthly.Count());
+                    //var monthly = (from q in avgs
+                    //               where q.symbol == symbol && q.avg_type == "M"
+                    //               select q).ToList();
+                    //total = (from q in monthly select q.percentage).Sum();
+                    //company.monthly_avg = DataTypeHelper.SafeDivision(total,monthly.Count());
 
-                    var weekly = (from q in avgs
-                                  where q.symbol == symbol && q.avg_type == "W"
-                                  select q).ToList();
-                    total = (from q in monthly select q.percentage).Sum();
-                    company.weekly_avg = DataTypeHelper.SafeDivision(total,weekly.Count());
+                    //var weekly = (from q in avgs
+                    //              where q.symbol == symbol && q.avg_type == "W"
+                    //              select q).ToList();
+                    //total = (from q in monthly select q.percentage).Sum();
+                    //company.weekly_avg = DataTypeHelper.SafeDivision(total,weekly.Count());
 
                     context.Entry(company).State = System.Data.Entity.EntityState.Modified;
                     context.SaveChanges();

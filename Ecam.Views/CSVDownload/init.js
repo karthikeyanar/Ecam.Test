@@ -16,6 +16,18 @@ $gcb_cmd.unbind('click').click(function () {
     startMC();
 });
 
+
+var $gcb_nse_cmd = $('#gcb_nse_cmd');
+if (!$gcb_nse_cmd[0]) {
+    $gcb_nse_cmd = $("<button id='gcb_nse_cmd' name='gcb_nse_cmd' class='hide1'>NSE Init</button>");
+    $("body").append($gcb_nse_cmd);
+}
+$gcb_nse_cmd.unbind('click').click(function () {
+    var cmd = $(this).attr('cmd');
+    var symbol = $(this).attr('symbol');
+    console.log('cmd=', cmd, 'symbol=', symbol);
+});
+
 function startMC() {
     self.index += 1;
     console.log('_SYMBOLS.length=', _SYMBOLS.length, 'self.index=', self.index);
@@ -25,4 +37,3 @@ function startMC() {
         }, 500);
     }
 }
- 

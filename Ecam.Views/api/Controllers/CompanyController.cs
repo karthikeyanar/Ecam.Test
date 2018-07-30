@@ -151,6 +151,47 @@ namespace Ecam.Views.Controllers {
             return _CompanyRepository.GetCompanys(term,pageSize,categories,isCheckFinancial,financialDate);
         }
 
+        [HttpGet]
+        [ActionName("GetNSEUpdate")]
+        public List<TRA_NSE_UPDATE> GetNSEUpdate() {
+            List<TRA_NSE_UPDATE> companies = new List<TRA_NSE_UPDATE>();
+            DateTime last_trade_date = DataTypeHelper.ToDateTime(HttpContext.Current.Request["last_trade_date"]);
+            bool is_book_mark_category = DataTypeHelper.ToBoolean(HttpContext.Current.Request["is_book_mark_category"]);
+            if(last_trade_date.Year > 0) {
+                using(EcamContext context = new EcamContext()) {
+                    List<string> categorySymbols = new List<string>();
+                    IQueryable<tra_company> query = context.tra_company;
+                    if(is_book_mark_category == true) {
+                        categorySymbols = (from q in context.tra_company_category
+                                           join c in context.tra_category on q.category_name equals c.category_name
+                                           where c.is_book_mark == true
+                                           select q.symbol).ToList();
+                        query = (from q in query
+                                 where categorySymbols.Contains(q.symbol) == true
+                                 select q);
+                    }
+                    List<string> symbols = (from q in query
+                                            select q.symbol).ToList();
+                    foreach(string symbol in symbols) {
+                        var lastMarket = (from q in context.tra_market
+                                          where q.symbol == symbol
+                                          && q.trade_date <= last_trade_date.Date
+                                          select q).FirstOrDefault();
+                        if(lastMarket != null) {
+                            if(lastMarket.trade_date.Date != last_trade_date.Date) {
+                                companies.Add(new TRA_NSE_UPDATE {
+                                    symbol = lastMarket.symbol,
+                                    start_date = lastMarket.trade_date.Date,
+                                    end_date = last_trade_date.Date
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            return companies;
+        }
+
         [HttpPost]
         [ActionName("UpdateArchive")]
         public IHttpActionResult UpdateArchive() {

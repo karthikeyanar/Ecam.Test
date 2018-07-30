@@ -173,5 +173,11 @@ namespace Ecam.Contracts {
         }
         public List<TRA_COMPANY> companies { get; set; }
     }
+
+    public class TRA_NSE_UPDATE {
+        public string symbol { get; set; }
+        public DateTime start_date { get; set; }
+        public DateTime end_date { get; set; }
+    }
 }
 

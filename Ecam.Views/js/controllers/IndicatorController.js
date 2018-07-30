@@ -75,7 +75,6 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
             });
         }
 
-
         this.applyPlugins = function () {
             var $frmCompanySearch = $("#frmCompanySearch");
             var $symbols = $(":input[name='symbols']", $frmCompanySearch);
@@ -150,6 +149,40 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
             helper.changeDateRangeLabel($('span', $reportRange), start, end, self.start_date(), self.end_date());
         }
 
+        this.nseDownload = function () {
+            if (self.company_json == null) {
+                handleBlockUI();
+                var dt = '27-Jul-2018';
+                var url = apiUrl("/Company/GetNSEUpdate?last_trade_date=" + dt + "&is_book_mark_category=" + $("#is_book_mark_category")[0].checked);
+                var arr = [];
+                $.ajax({
+                    "url": url,
+                    "cache": false,
+                    "type": "GET",
+                    "data": arr
+                }).done(function (json) {
+                    self.index = -1;
+                    self.company_json = json;
+                    self.startNSE();
+                }).always(function () {
+                    unblockUI();
+                });
+            } else {
+                console.log(2);
+                self.startNSE();
+            }
+        }
+
+        this.startNSE = function () {
+            self.index += 1;
+            console.log('self.index=', self.index);
+            if (self.index <= self.company_json.length) {
+                console.log(self.company_json[self.index]);
+                setTimeout(function () {
+                    self.startNSE();
+                }, 2000);
+            }
+        }
 
         this.onElements = function () {
             self.offElements();
@@ -240,6 +273,9 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
                     self.loadGrid();
                 });
             });
+            $("body").on("click", "#btnNSEDownload", function (event) {
+                self.nseDownload();
+            });
         }
 
         this.offElements = function () {
@@ -252,6 +288,7 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
             $("body").off("click", ".is-current-stock");
             $("body").off("change", "#super_trend_signal");
             $("body").off("click", "#btnSTUpdate");
+            $("body").off("click", "#btnNSEDownload");
         }
 
         this.unInit = function () {

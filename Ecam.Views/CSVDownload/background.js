@@ -45,7 +45,7 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo.status === "complete") {
         chrome.tabs.executeScript(tabId, { file: "jquery-3.3.1.min.js" });
-        if (tab.url.indexOf('#/company') > 0 || tab.url.indexOf('#/quater') > 0) {
+        if (tab.url.indexOf('#/company') > 0 || tab.url.indexOf('#/quater') > 0 || tab.url.indexOf('#/indicator') > 0) {
             chrome.tabs.executeScript(tabId, { file: "init.js" });
         }
         chrome.tabs.executeScript({ code: "console.log('id=','" + tab.id + "','url=','" + tab.url + "','windowId=','" + tab.windowId + "','openerTabId=','" + tab.openerTabId + "');" });
