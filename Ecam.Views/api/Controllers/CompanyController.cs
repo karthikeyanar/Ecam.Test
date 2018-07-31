@@ -176,13 +176,14 @@ namespace Ecam.Views.Controllers {
                         var lastMarket = (from q in context.tra_market
                                           where q.symbol == symbol
                                           && q.trade_date <= last_trade_date.Date
+                                          orderby q.trade_date descending
                                           select q).FirstOrDefault();
                         if(lastMarket != null) {
                             if(lastMarket.trade_date.Date != last_trade_date.Date) {
                                 companies.Add(new TRA_NSE_UPDATE {
                                     symbol = lastMarket.symbol,
-                                    start_date = lastMarket.trade_date.Date,
-                                    end_date = last_trade_date.Date
+                                    start_date = lastMarket.trade_date.Date.ToString("dd-MM-yyyy"),
+                                    end_date = last_trade_date.Date.ToString("dd-MM-yyyy")
                                 });
                             }
                         }

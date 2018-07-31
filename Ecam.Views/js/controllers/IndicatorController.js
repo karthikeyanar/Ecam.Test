@@ -174,29 +174,16 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
         }
 
         this.startNSE = function () {
-            $('#gcb_nse_cmd').attr('cmd', 'open_nse');
-            $('#gcb_nse_cmd').attr('symbol', '');
-            $('#gcb_nse_cmd').attr('start_date', '');
-            $('#gcb_nse_cmd').attr('end_date', '');
-            $('#gcb_nse_cmd').click();
-        }
-
-        this.startNSEDownload = function () {
-            self.index += 1;
-            var tabid = $('#btnNSEDownloadBackground').attr('tabid');
-            console.log('startNSEDownload self.index=', self.index, 'tabid=', tabid);
-            if (self.index <= self.company_json.length) {
-                console.log(self.company_json[self.index]);
-                $('#gcb_nse_cmd').attr('cmd', 'download_nse');
-                $('#gcb_nse_cmd').attr('symbol', self.company_json[self.index].symbol);
-                $('#gcb_nse_cmd').attr('start_date', self.company_json[self.index].start_date);
-                $('#gcb_nse_cmd').attr('end_date', self.company_json[self.index].end_date);
-                $('#gcb_nse_cmd').attr('tabid', tabid);
-                $('#gcb_nse_cmd').click();
-                //setTimeout(function () {
-                //    self.startNSE();
-                //}, 2000);
+            var symbols = '';
+            for (var i = 0; i < self.company_json.length; i++) {
+                symbols += self.company_json[i].symbol + '|' + self.company_json[i].start_date + '|' + self.company_json[i].end_date + ',';
             }
+            if (symbols != '') {
+                symbols = symbols.substring(0, symbols.length - 1);
+            }
+            $('#gcb_cmd').attr('cmd', 'open_nse');
+            $('#gcb_cmd').attr('symbol', symbols);
+            $('#gcb_cmd').click();
         }
 
         this.onElements = function () {
@@ -291,6 +278,26 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
             $("body").on("click", "#btnNSEDownload", function (event) {
                 self.nseDownload();
             });
+            $("body").on("click", "#btnNSEUpdateCSV", function (event) {
+                var $nse_csv = $("#nse_csv");
+                //console.log('nse_csv=', $nse_csv.val());
+                var url = apiUrl("/Market/UpdateCSV");
+                var arr = [];
+                arr.push({ 'name': 'csv', 'value': $nse_csv.val() });
+                handleBlockUI({ "target": $("body"), "message": "Update..." });
+                $.ajax({
+                    "url": url,
+                    "cache": false,
+                    "type": "POST",
+                    "data": arr
+                }).done(function (json) {
+                    var html = $("#nse_index").val() + ' of ' + $("#nse_total").val() + " - " + json.symbol;
+                    $("#nse_csv_log").html(html);
+                    unblockUI();
+                }).always(function () {
+                    unblockUI();
+                });
+            });
         }
 
         this.offElements = function () {
@@ -304,6 +311,7 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
             $("body").off("change", "#super_trend_signal");
             $("body").off("click", "#btnSTUpdate");
             $("body").off("click", "#btnNSEDownload");
+            $("body").off("click", "#btnNSEUpdateCSV");
         }
 
         this.unInit = function () {

@@ -9,149 +9,121 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Ecam.Framework
-{
-    public class ServerFileUpload : ConfigurationSection, IFileUpload
-    {
+namespace Ecam.Framework {
+    public class ServerFileUpload:ConfigurationSection, IFileUpload {
 
         [ConfigurationProperty("UploadPathKeys")]
         public UploadPathKeyCollection UploadPathKeys {
             get { return ((UploadPathKeyCollection)(base["UploadPathKeys"])); }
         }
 
-        public bool DeleteFile(UploadFileModel file)
-        {
+        public bool DeleteFile(UploadFileModel file) {
             bool result = false;
-            try
-            {
-                if (file != null)
-                {
+            try {
+                if(file != null) {
                     string rootPath = this.ServerMapPath();
-                    string fileName = Path.Combine(rootPath, file.FilePath, file.FileName);
-                    if (File.Exists(fileName))
-                    {
+                    string fileName = Path.Combine(rootPath,file.FilePath,file.FileName);
+                    if(File.Exists(fileName)) {
                         File.Delete(fileName);
                         result = true;
                     }
                 }
-            }
-            catch { }
+            } catch { }
             return result;
         }
 
-        public UploadFileModel UploadFile(HttpPostedFileBase uploadFile, string appSettingName, params object[] args)
-        {
+        public UploadFileModel UploadFile(HttpPostedFileBase uploadFile,string appSettingName,params object[] args) {
             string rootPath = this.ServerMapPath();
-            string uploadFilePath = Path.Combine(rootPath, string.Format(this.UploadPathKeys[appSettingName].Value, args));
+            string uploadFilePath = Path.Combine(rootPath,string.Format(this.UploadPathKeys[appSettingName].Value,args));
             string directoryName = Path.GetDirectoryName(uploadFilePath);
             UploadFileModel uploadFileModel = null;
-            if (Directory.Exists(directoryName) == false)
-            {
+            if(Directory.Exists(directoryName) == false) {
                 Directory.CreateDirectory(directoryName);
             }
-            if (File.Exists(uploadFilePath))
-            {
+            if(File.Exists(uploadFilePath)) {
                 File.Delete(uploadFilePath);
             }
             uploadFile.SaveAs(uploadFilePath);
             FileInfo fileInfo = new FileInfo(uploadFilePath);
-            uploadFileModel = new UploadFileModel
-            {
+            uploadFileModel = new UploadFileModel {
                 FileName = fileInfo.Name,
-                FilePath = directoryName.Replace(rootPath, ""),
+                FilePath = directoryName.Replace(rootPath,""),
                 Size = fileInfo.Length
             };
             return uploadFileModel;
         }
 
-        public UploadFileModel UploadImageFile(Image imageFile, string appSettingName, params object[] args)
-        {
+        public UploadFileModel UploadImageFile(Image imageFile,string appSettingName,params object[] args) {
             string rootPath = this.ServerMapPath();
-            string uploadFilePath = Path.Combine(rootPath, string.Format(this.UploadPathKeys[appSettingName].Value, args));
+            string uploadFilePath = Path.Combine(rootPath,string.Format(this.UploadPathKeys[appSettingName].Value,args));
             string directoryName = Path.GetDirectoryName(uploadFilePath);
             UploadFileModel uploadFileModel = null;
-            if (Directory.Exists(directoryName) == false)
-            {
+            if(Directory.Exists(directoryName) == false) {
                 Directory.CreateDirectory(directoryName);
             }
-            if (File.Exists(uploadFilePath))
-            {
+            if(File.Exists(uploadFilePath)) {
                 File.Delete(uploadFilePath);
             }
             imageFile.Save(uploadFilePath);
             FileInfo fileInfo = new FileInfo(uploadFilePath);
-            uploadFileModel = new UploadFileModel
-            {
+            uploadFileModel = new UploadFileModel {
                 FileName = fileInfo.Name,
-                FilePath = directoryName.Replace(rootPath, ""),
+                FilePath = directoryName.Replace(rootPath,""),
                 Size = fileInfo.Length
             };
             return uploadFileModel;
         }
 
-        public FileModel UploadFile(HttpPostedFile uploadFile, string appSettingName, params object[] args)
-        {
+        public FileModel UploadFile(HttpPostedFile uploadFile,string appSettingName,params object[] args) {
             string rootPath = this.ServerMapPath();
-            string uploadFilePath = Path.Combine(rootPath, string.Format(this.UploadPathKeys[appSettingName].Value, args));
+            string uploadFilePath = Path.Combine(rootPath,string.Format(this.UploadPathKeys[appSettingName].Value,args));
             string directoryName = Path.GetDirectoryName(uploadFilePath);
             FileModel uploadFileModel = null;
-            if (Directory.Exists(directoryName) == false)
-            {
+            if(Directory.Exists(directoryName) == false) {
                 Directory.CreateDirectory(directoryName);
             }
-            if (File.Exists(uploadFilePath))
-            {
+            if(File.Exists(uploadFilePath)) {
                 File.Delete(uploadFilePath);
             }
             uploadFile.SaveAs(uploadFilePath);
             FileInfo fileInfo = new FileInfo(uploadFilePath);
-            uploadFileModel = new FileModel
-            {
+            uploadFileModel = new FileModel {
                 FileName = fileInfo.Name,
-                FilePath = directoryName.Replace(rootPath, ""),
+                FilePath = directoryName.Replace(rootPath,""),
                 Size = fileInfo.Length
             };
             return uploadFileModel;
         }
 
-        public string GetDirectoryPath(string appSettingName)
-        {
+        public string GetDirectoryPath(string appSettingName) {
             string url = string.Empty;
-            if (string.IsNullOrEmpty(appSettingName) == false)
-            {
+            if(string.IsNullOrEmpty(appSettingName) == false) {
                 string rootPath = this.ServerMapPath();
-                url = Path.Combine(rootPath, string.Format(this.UploadPathKeys[appSettingName].Value, ""));
+                url = Path.Combine(rootPath,string.Format(this.UploadPathKeys[appSettingName].Value,""));
             }
             return url;
         }
 
-        public string GetPath(string appSettingName)
-        {
+        public string GetPath(string appSettingName) {
             string url = string.Empty;
-            if (string.IsNullOrEmpty(appSettingName) == false)
-            {
-                url = string.Format(this.UploadPathKeys[appSettingName].Value, "");
+            if(string.IsNullOrEmpty(appSettingName) == false) {
+                url = string.Format(this.UploadPathKeys[appSettingName].Value,"");
             }
             return url;
         }
 
-        private string ServerMapPath()
-        {
+        private string ServerMapPath() {
             string path = string.Empty;
-            try
-            {
+            try {
                 path = HttpContext.Current.Server.MapPath("~/");
-            }
-            catch
-            {
-                if (System.Configuration.ConfigurationManager.AppSettings.AllKeys.Contains("file_path"))
+            } catch {
+                if(System.Configuration.ConfigurationManager.AppSettings.AllKeys.Contains("file_path"))
                     path = System.Configuration.ConfigurationManager.AppSettings["file_path"].ToString();
             }
             return path;
         }
 
-        public FileInfo WriteFileText(string appSettingName, string fileName, string contents, bool isAppend)
-        {
+        public FileInfo WriteFileText(string appSettingName,string fileName,string contents,bool isAppend) {
             try {
                 string rootPath = this.ServerMapPath();
                 string tempFileName = Path.Combine(rootPath,string.Format(this.UploadPathKeys[appSettingName].Value,fileName));
@@ -182,8 +154,7 @@ namespace Ecam.Framework
             }
         }
 
-        public FileInfo WriteFileAllBytes(string appSettingName, string fileName, byte[] bytes)
-        {
+        public FileInfo WriteFileAllBytes(string appSettingName,string fileName,byte[] bytes) {
             try {
                 string rootPath = this.ServerMapPath();
                 string tempFileName = Path.Combine(rootPath,string.Format(this.UploadPathKeys[appSettingName].Value,fileName));
@@ -198,170 +169,137 @@ namespace Ecam.Framework
             }
         }
 
-        public bool FileExist(string appSettingName, string fileName)
-        {
+        public bool FileExist(string appSettingName,string fileName) {
             string rootPath = this.ServerMapPath();
-            string tempFileName = Path.Combine(rootPath, string.Format(this.UploadPathKeys[appSettingName].Value, fileName));
+            string tempFileName = Path.Combine(rootPath,string.Format(this.UploadPathKeys[appSettingName].Value,fileName));
             return File.Exists(tempFileName);
         }
 
-        public bool FileCopy(string sourceAppSettingName, string sourceFileName, string destAppSettingName, string destFileName)
-        {
+        public bool FileCopy(string sourceAppSettingName,string sourceFileName,string destAppSettingName,string destFileName) {
             string rootPath = this.ServerMapPath();
-            string tempFileName = Path.Combine(rootPath, string.Format(this.UploadPathKeys[sourceAppSettingName].Value, sourceFileName));
-            bool isSourceFileExist =  File.Exists(tempFileName);
-            if (isSourceFileExist == true)
-            {
-                string dest = Path.Combine(rootPath, string.Format(this.UploadPathKeys[destAppSettingName].Value, destFileName));
-                if (File.Exists(dest) == true)
-                {
+            string tempFileName = Path.Combine(rootPath,string.Format(this.UploadPathKeys[sourceAppSettingName].Value,sourceFileName));
+            bool isSourceFileExist = File.Exists(tempFileName);
+            if(isSourceFileExist == true) {
+                string dest = Path.Combine(rootPath,string.Format(this.UploadPathKeys[destAppSettingName].Value,destFileName));
+                if(File.Exists(dest) == true) {
                     File.Delete(dest);
                 }
-                File.Copy(tempFileName, dest);
+                File.Copy(tempFileName,dest);
                 return File.Exists(dest);
             }
             return false;
         }
 
-        public bool DeleteFile(string appSettingName, string fileName)
-        {
+        public bool DeleteFile(string appSettingName,string fileName) {
             string rootPath = this.ServerMapPath();
-            string deleteFileName = Path.Combine(rootPath, string.Format(this.UploadPathKeys[appSettingName].Value, fileName));
+            string deleteFileName = Path.Combine(rootPath,string.Format(this.UploadPathKeys[appSettingName].Value,fileName));
             bool result = false;
-            if (File.Exists(deleteFileName))
-            {
+            if(File.Exists(deleteFileName)) {
                 File.Delete(deleteFileName);
                 result = true;
             }
             return result;
         }
 
-        public bool DeleteDirectory(string appSettingName, string directoryName)
-        {
+        public bool DeleteDirectory(string appSettingName,string directoryName) {
             string rootPath = this.ServerMapPath();
-            string deleteDirectoryName = Path.Combine(rootPath, string.Format(this.UploadPathKeys[appSettingName].Value, directoryName));
+            string deleteDirectoryName = Path.Combine(rootPath,string.Format(this.UploadPathKeys[appSettingName].Value,directoryName));
             bool result = false;
-            if (Directory.Exists(deleteDirectoryName))
-            {
+            if(Directory.Exists(deleteDirectoryName)) {
                 Directory.Delete(deleteDirectoryName);
                 result = true;
             }
             return result;
         }
 
-        public void DeleteAllFiles(string appSettingName)
-        {
-            try
-            {
+        public void DeleteAllFiles(string appSettingName) {
+            try {
                 string rootPath = this.ServerMapPath();
-                string directoryPath = Path.Combine(rootPath, string.Format(this.UploadPathKeys[appSettingName].Value, ""));
+                string directoryPath = Path.Combine(rootPath,string.Format(this.UploadPathKeys[appSettingName].Value,""));
                 DirectoryInfo dirInfo = new DirectoryInfo(directoryPath);
                 FileInfo[] files = dirInfo.GetFiles();
-                foreach (FileInfo fle in files)
-                {
-                    try
-                    {
-                        if (File.Exists(fle.FullName))
-                        {
+                foreach(FileInfo fle in files) {
+                    try {
+                        if(File.Exists(fle.FullName)) {
                             File.Delete(fle.FullName);
                         }
-                    }
-                    catch { }
+                    } catch { }
                 }
-            }
-            catch { }
+            } catch { }
         }
 
-        public string GetFullFileName(string appSettingName, string fileName)
-        {
+        public string GetFullFileName(string appSettingName,string fileName) {
             string url = string.Empty;
-            if (string.IsNullOrEmpty(fileName) == false && string.IsNullOrEmpty(appSettingName) == false)
-            {
+            if(string.IsNullOrEmpty(fileName) == false && string.IsNullOrEmpty(appSettingName) == false) {
                 string rootPath = this.ServerMapPath();
-                url = Path.Combine(rootPath, string.Format(this.UploadPathKeys[appSettingName].Value, fileName));
+                url = Path.Combine(rootPath,string.Format(this.UploadPathKeys[appSettingName].Value,fileName));
             }
             return url;
         }
 
-        public Stream GetFileContentStream(string appSettingName, string fileName)
-        {
+        public Stream GetFileContentStream(string appSettingName,string fileName) {
             string rootPath = this.ServerMapPath();
-            string tempFileName = Path.Combine(rootPath, string.Format(this.UploadPathKeys[appSettingName].Value, fileName));
-            if (File.Exists(tempFileName) == true)
-            {
+            string tempFileName = Path.Combine(rootPath,string.Format(this.UploadPathKeys[appSettingName].Value,fileName));
+            if(File.Exists(tempFileName) == true) {
                 byte[] bytes = System.IO.File.ReadAllBytes(tempFileName);
                 MemoryStream stream = new MemoryStream(bytes);
                 return stream; // new FileStream(tempFileName,FileMode.Open,FileAccess.Read);
-            }
-            else if (File.Exists(fileName) == true)
-            {
+            } else if(File.Exists(fileName) == true) {
                 byte[] bytes = System.IO.File.ReadAllBytes(fileName);
                 MemoryStream stream = new MemoryStream(bytes);
                 return stream;
-            }
-            else
-            {
+            } else {
                 return null;
             }
         }
 
 
 
-        public bool ConvertImageFile(string appSettingName, string fileName, string convertName, string imageFormat)
-        {
+        public bool ConvertImageFile(string appSettingName,string fileName,string convertName,string imageFormat) {
             string rootPath = this.ServerMapPath();
-            string processFileName = Path.Combine(rootPath, string.Format(this.UploadPathKeys[appSettingName].Value, fileName));
+            string processFileName = Path.Combine(rootPath,string.Format(this.UploadPathKeys[appSettingName].Value,fileName));
             bool result = false;
-            try
-            {
-                if (File.Exists(processFileName))
-                {
+            try {
+                if(File.Exists(processFileName)) {
                     FileInfo fileInfo = new FileInfo(processFileName);
-                    string imageFileName = Path.Combine(fileInfo.DirectoryName, convertName);
-                    using (Bitmap map = new Bitmap(processFileName))
-                    {
-                        switch (imageFormat)
-                        {
+                    string imageFileName = Path.Combine(fileInfo.DirectoryName,convertName);
+                    using(Bitmap map = new Bitmap(processFileName)) {
+                        switch(imageFormat) {
                             case "png":
-                                map.Save(imageFileName, ImageFormat.Png);
+                                map.Save(imageFileName,ImageFormat.Png);
                                 break;
                             case "bmp":
-                                map.Save(imageFileName, ImageFormat.Bmp);
+                                map.Save(imageFileName,ImageFormat.Bmp);
                                 break;
                             case "tiff":
-                                map.Save(imageFileName, ImageFormat.Tiff);
+                                map.Save(imageFileName,ImageFormat.Tiff);
                                 break;
                             default:
-                                map.Save(imageFileName, ImageFormat.Jpeg);
+                                map.Save(imageFileName,ImageFormat.Jpeg);
                                 break;
                         }
 
                     }
                     result = true;
                 }
-            }
-            catch { }
+            } catch { }
             return result;
         }
 
-        public string GetTempFolderPath()
-        {
+        public string GetTempFolderPath() {
             string rootPath = this.ServerMapPath();
-            string tempFileName = Path.Combine(rootPath, string.Format(this.UploadPathKeys["TempPath"].Value, string.Empty));
+            string tempFileName = Path.Combine(rootPath,string.Format(this.UploadPathKeys["TempPath"].Value,string.Empty));
             string directoryName = Path.GetDirectoryName(tempFileName);
-            if (Directory.Exists(directoryName) == false)
-            {
+            if(Directory.Exists(directoryName) == false) {
                 Directory.CreateDirectory(directoryName);
             }
             return directoryName;
         }
 
-        public string CreateFolderOnTempPath(string directoryName)
-        {
+        public string CreateFolderOnTempPath(string directoryName) {
             string tempDirectoryPath = this.GetTempFolderPath();
-            directoryName = Path.Combine(tempDirectoryPath, directoryName);
-            if (Directory.Exists(directoryName) == false)
-            {
+            directoryName = Path.Combine(tempDirectoryPath,directoryName);
+            if(Directory.Exists(directoryName) == false) {
                 Directory.CreateDirectory(directoryName);
             }
             return directoryName;

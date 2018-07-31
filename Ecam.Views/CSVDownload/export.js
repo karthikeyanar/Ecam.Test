@@ -45,9 +45,9 @@ function exportTable(tabid,openerId) {
         var match = myRegexp.exec(html);
         symbol = match[1];
     } catch (e) {
-        console.log(e);
+        ////console.log(e);
     }
-    //console.log($tbl[0]);
+    //////console.log($tbl[0]);
     var colRowIndex = 0;
     var cols = '';
     var struct = new tableStructure();
@@ -78,9 +78,9 @@ function exportTable(tabid,openerId) {
             return false;
         }
     });
-    //console.log('colRowIndex=', colRowIndex);
+    //////console.log('colRowIndex=', colRowIndex);
     $("tbody > tr", $tbl).each(function (j) {
-        //console.log('j=', j);
+        //////console.log('j=', j);
         if (colRowIndex < j) {
             var $tr = $(this);
             var row = [];
@@ -88,7 +88,7 @@ function exportTable(tabid,openerId) {
                 var $td = $(this);
                 var value = removeHTML($td.html());
                 value = value.replace('--', '').replace('&amp;', '&');
-                ////console.log('i=', i, 'value=', value);
+                ////////console.log('i=', i, 'value=', value);
                 if (i < struct.cols.length) {
                     row.push(value);
                 }
@@ -98,13 +98,13 @@ function exportTable(tabid,openerId) {
             }
         }
     });
-    //console.log(struct);
+    //////console.log(struct);
     var csvContent = convertCSVContent(struct);
     var fileName = '';
     if (struct.cols.length > 0) {
         fileName += struct.cols[0] + '-' + struct.cols[1] + '-' + struct.cols[struct.cols.length - 1] + '.csv';
     }
-    console.log('fileName=', fileName);
+    ////console.log('fileName=', fileName);
     download(csvContent, fileName, 'text/csv;encoding:utf-8');
     setTimeout(function(){
         //chrome.runtime.sendMessage({ cmd: 'mc-quaterly-downloaded','tabid':openerId  });
@@ -112,9 +112,9 @@ function exportTable(tabid,openerId) {
     },1000);
 }
 
-function pageLoad(pageUrl,tabId,openerId) {
-    console.log('pageLoad pageUrl=',pageUrl,'tabId=',pageUrl,'openerId=',openerId);
-    nseStart(pageUrl,tabId,openerId);
+function pageLoad(pageUrl,tabId,openerId,symbol) {
+    ////console.log('pageLoad pageUrl=',pageUrl,'tabId=',pageUrl,'openerId=',openerId);
+    nseStart(pageUrl,tabId,openerId,symbol);
 }
 
 function convertCSVContent(struct) {
@@ -141,16 +141,16 @@ function convertCSVContent(struct) {
     }
 
     content = cols + rows;
-    //console.log(content);
+    //////console.log(content);
     return content;
 }
 
 var _NSE = null;
 /* */
-function nseStart(pageUrl,tabId,openerId){
-    console.log('nseStart tabId=',tabId,'openerId=',openerId);
+function nseStart(pageUrl,tabId,openerId,symbol){
+    ////console.log('nseStart tabId=',tabId,'openerId=',openerId,'symbol=',symbol);
     _NSE = new NSE();
-    _NSE.init(pageUrl,tabId,openerId);
+    _NSE.init(pageUrl,tabId,openerId,symbol);
 }
 /* */
 
@@ -160,17 +160,97 @@ function NSE(){
     this.tabId = 0;
     this.openerId = 0;
     this.pageUrl = '';
+    this.symbol = '';
+    this.symbolsArray = [];
+    this.index = -1;
+    this.check_data_timer = null;
+    this.check_data_count = 0;
 
-    this.init = function(pageUrl,tabId,openerId){
-        console.log('NSE init=',tabId,'openerId=',openerId);
+    this.init = function(pageUrl,tabId,openerId,symbol){
+        ////console.log('NSE init tabId=',tabId,'openerId=',openerId,'symbol=',symbol);
         self.tabId=parseInt(tabId);
         self.openerId=parseInt(openerId);
         self.pageUrl=pageUrl;
-        var code = "$('#btnNSEDownloadBackground').attr('tabid',"+self.tabId+");$('#btnNSEDownloadBackground').click();";
-        chrome.runtime.sendMessage({ cmd: 'execute_code','tabid':openerId,'code':code  });
+        self.symbol=symbol;
+        self.symbolsArray = self.symbol.split(',');
+        self.index=-1;
+        self.check_data_timer = null;
+        self.check_data_count = 0;
+        self.downloadData();
+        //var code = "$('#btnNSEDownloadBackground').attr('tabid',"+self.tabId+");$('#btnNSEDownloadBackground').click();";
+        //chrome.runtime.sendMessage({ cmd: 'execute_code','tabid':openerId,'code':code  });
     }
 
-    this.downloadData = function(symbol,startDate,endDate) {
-        console.log('download symbol=',symbol,'startDate=',startDate,'endDate=',endDate);
+    this.downloadData = function() {
+        var symbol = '';var startDate = '';var endDate = '';
+        self.index+=1;
+        if(self.check_data_timer!=null){
+            clearInterval(self.check_data_timer);
+        }
+        console.log('self.index=',self.index,',total=',self.symbolsArray.length);
+        if(self.index<=self.symbolsArray.length){
+            var arr = self.symbolsArray[self.index].split('|');
+            symbol = arr[0];
+            startDate = arr[1];
+            endDate = arr[2];
+            console.log('download symbol=',symbol,'startDate=',startDate,'endDate=',endDate);
+            var $frm = $("#histForm");
+            var $dataType = $("#dataType",$frm);
+            var $symbol = $("#symbol",$frm);
+            var $series = $("#series",$frm);
+            var $rdDateToDate = $("#rdDateToDate",$frm);
+            var $csvFileName=$('#csvFileName');
+            var $csvContentDiv=$('#csvContentDiv');
+
+            $csvFileName.val('');
+            $csvContentDiv.val('');
+
+            $dataType.val('priceVolume');
+            $symbol.val(symbol);
+            $series.val("EQ");
+            $rdDateToDate[0].checked=true;
+
+            var $fromDate = $("#fromDate",$frm);
+            $fromDate.val(startDate);
+            var $toDate = $("#toDate",$frm);
+            $toDate.val(endDate);
+
+            var $btn = $(".getdata-button",$frm);
+            $btn.click();
+            self.check_data_timer = setInterval(function(){
+                ////console.log('self.check_data_count=',self.check_data_count);
+                if(self.check_data_count>=50) {
+                    clearInterval(self.check_data_timer);
+                    self.downloadData();
+                } else {
+                    self.check_data_count+=1;
+                    $csvFileName=$('#csvFileName');
+                    $csvContentDiv=$('#csvContentDiv');
+                    var csv='';
+                    var fileName = '';
+                    ////console.log('$csvFileName=',$csvFileName[0]);
+                    ////console.log('$csvContentDiv=',$csvContentDiv[0]);
+                    if($csvFileName[0]) {
+                        if($csvFileName.val()!='') {
+                            fileName=$csvFileName.val();
+                            csv=$csvContentDiv.html();
+                        }
+                    } 
+                    //console.log('fileName=',fileName);
+                    //console.log('csv=',csv);
+                    if(csv!='') {
+                        //csv=csv.replace(/:/g,"\n");
+                        var code = "$('#nse_index').val('"+(self.index+1)+"');$('#nse_total').val('"+self.symbolsArray.length+"');$('#nse_csv').val('"+csv+"');$('#btnNSEUpdateCSV').click();";
+                        chrome.runtime.sendMessage({ cmd: 'execute_code','tabid':self.openerId,'code':code  });
+                        clearInterval(self.check_data_timer);
+                        self.downloadData();
+                    } else {
+                        clearInterval(self.check_data_timer);
+                        self.downloadData();
+                    }
+                }
+            }, 5000);
+        }
     }
+     
 }

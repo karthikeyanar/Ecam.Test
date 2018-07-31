@@ -24,7 +24,7 @@ using CsvHelper;
 
 namespace Ecam.Models {
     public class CSVDownloadData {
-        private List<string> _SYMBOLS_LIST = null;
+        public List<string> _SYMBOLS_LIST = null;
         private bool _IS_NOT_SUCCESS = false;
         public CSVDownloadData(string file_name,List<string> symbols,ManualResetEvent doneEvent) {
             _SYMBOLS_LIST = symbols;
@@ -65,7 +65,8 @@ namespace Ecam.Models {
             _doneEvent.Set();
         }
 
-        private void CSVDataDownload(string tempfilename) {
+        public string CSVDataDownload(string tempfilename,bool isTakeTempFileName = false) {
+            string lastSymbol = "";
             List<OldSymbol> oldSymbolList = new List<Models.OldSymbol> {
                 new OldSymbol { old_symbol = "PFRL", new_symbol = "ABFRL" },
                 new OldSymbol { old_symbol = "SKSMICRO", new_symbol = "BHARATFIN" },
@@ -138,6 +139,9 @@ namespace Ecam.Models {
                 string html = string.Empty;
                 string IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IMPORT_CSV"];
                 string fileName = IMPORT_CSV + "\\" + tempfilename + ".csv";
+                if(isTakeTempFileName == true) {
+                    fileName = tempfilename;
+                }
                 CsvReader csv = null;
                 int i = 0;
                 if(File.Exists(fileName) == true) {
@@ -184,12 +188,14 @@ namespace Ecam.Models {
                                         turn_over = DataTypeHelper.ToDecimal(turnOver),
                                         is_prev_price_exist = true
                                     });
+                                    lastSymbol = symbol;
                                 }
                             }
                         }
                     }
                 }
             }
+            return lastSymbol;
         }
 
         public string file_name { get { return _FILE_NAME; } }

@@ -43,5 +43,29 @@ namespace Ecam.Views.Controllers {
             return Ok();
         }
 
+        [HttpPost]
+        [ActionName("UpdateCSV")]
+        public IHttpActionResult UpdateCSV() {
+            string csv = Convert.ToString(HttpContext.Current.Request["csv"]);
+            string symbol = string.Empty;
+            if(string.IsNullOrEmpty(csv) == false) {
+                csv = csv.Replace(":",Environment.NewLine);
+                Random rnd = new Random();
+                string randomNumber = rnd.Next(10000,1000000).ToString();
+                string fileName = randomNumber + ".csv";
+                UploadFileHelper.WriteFileText("TempPath",fileName,csv,true);
+                string fullFileName = UploadFileHelper.GetFullFileName("TempPath",fileName);
+                CSVDownloadData csvDownload = new CSVDownloadData();
+                using(EcamContext context = new EcamContext()) {
+                    csvDownload._SYMBOLS_LIST = (from q in context.tra_company
+                                                 select q.symbol).ToList();
+                }
+                symbol = csvDownload.CSVDataDownload(fullFileName,true);
+                SupertrendData superTrendData = new SupertrendData();
+                superTrendData.Update(symbol);
+            }
+            return Ok(new { symbol = symbol });
+        }
+
     }
 }

@@ -45,6 +45,17 @@ function doInCurrentTab(tabCallback) {
         }
     );
 }
+function setLocalStorage(key, value) {
+    localStorage[key] = value;
+}
+function getLocalStorage(key, callback) {
+    var retValue = '';
+    if (typeof (localStorage[key]) === 'string') {
+        retValue = localStorage[key];
+    }
+    if (callback)
+        callback(retValue);
+}
 // Called when the user clicks on the browser action.
 chrome.browserAction.onClicked.addListener(function (tab) {
     chrome.tabs.executeScript(tab.id, { file: "jquery-3.3.1.min.js" }, function (result) {
@@ -81,7 +92,12 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
                 chrome.tabs.executeScript(tabId, { file: "export.js" }, function (result) {
                     var arr = tab.url.split('?');
                     var openerId = arr[1].split('=')[1].toString();
-                    code = "pageLoad('" + tab.url + "'," + tabId + ",'" + openerId + "');";
+                    var hostname = getHostName(tab.url);
+                    var symbol = '';
+                    getLocalStorage(hostname, function (data) {
+                        symbol = data;
+                    });
+                    code = "pageLoad('" + tab.url + "','" + tabId + "','" + openerId + "','" + symbol + "');";
                     //alert(code);
                     chrome.tabs.executeScript(tabId, { code: code });
                     //chrome.tabs.executeScript({ code: "console.log('onUpdated.addListener id=','"+tab.id+"','url=','"+tab.url+"','windowId=','"+tab.windowId+"','openerTabId=','"+tab.openerTabId+"');" });
@@ -139,6 +155,9 @@ chrome.runtime.onMessage.addListener(function (msg) {
                     doInCurrentTab(function (currentTab) {
                         var url = 'https://www.nseindia.com/products/content/equities/equities/eq_security.htm?openerTabId=' + currentTab.id;
                         chrome.windows.create({ 'url': url, 'type': type, 'width': width, 'height': height }, function (newWindow) {
+                            var hostName = getHostName(url);
+                            setLocalStorage(hostName, msg.symbol);
+                            chrome.tabs.executeScript({ code: "console.log('setSymbol=','" + msg.symbol + "');" });
                             //var tab = newWindow.tabs[0];
                             ////alert(tab.id);
                             //        var code = "nseStart(" + tab.id + "," + currentTab.id + ");"
@@ -146,10 +165,6 @@ chrome.runtime.onMessage.addListener(function (msg) {
                             //        chrome.tabs.executeScript(tab.id, { code: code });
                         });
                     });
-                    break;
-                case 'download_nse':
-                    var code = "_NSE.downloadData('" + msg.symbol + "','" + msg.start_date + "','" + msg.end_date + "');";
-                    chrome.tabs.executeScript(parseInt(msg.tabid),{ code: code });
                     break;
                 case 'page_load':
                     break;
