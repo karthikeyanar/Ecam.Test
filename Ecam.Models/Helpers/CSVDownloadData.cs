@@ -185,8 +185,6 @@ namespace Ecam.Models {
                                         open_price = DataTypeHelper.ToDecimal(open),
                                         ltp_price = DataTypeHelper.ToDecimal(lastTrade),
                                         prev_price = DataTypeHelper.ToDecimal(prev),
-                                        turn_over = DataTypeHelper.ToDecimal(turnOver),
-                                        is_prev_price_exist = true
                                     });
                                     lastSymbol = symbol;
                                 }

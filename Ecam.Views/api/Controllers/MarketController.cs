@@ -35,9 +35,9 @@ namespace Ecam.Views.Controllers {
         public IHttpActionResult UpdateSuperTrend() {
             string symbol = Convert.ToString(HttpContext.Current.Request["symbol"]);
             if(string.IsNullOrEmpty(symbol) == false) {
-                string sql = string.Format("update tra_market set is_indicator=0,super_trend_signal='',macd_signal='' where symbol='{0}'",symbol);
+                string sql = string.Format("update tra_market set is_indicator=0,super_trend_signal='',ema_signal='' where symbol='{0}'",symbol);
                 MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString,sql);
-                SupertrendData sp = new SupertrendData();
+                IndicatorHelper sp = new IndicatorHelper();
                 sp.Update(symbol);
             }
             return Ok();
@@ -61,11 +61,71 @@ namespace Ecam.Views.Controllers {
                                                  select q.symbol).ToList();
                 }
                 symbol = csvDownload.CSVDataDownload(fullFileName,true);
-                SupertrendData superTrendData = new SupertrendData();
-                superTrendData.Update(symbol);
+                UploadFileHelper.FileCopy("TempPath",fileName,"TempPath",symbol + "_" + randomNumber + ".csv");
+                UploadFileHelper.DeleteFile("TempPath",fileName);
+                IndicatorHelper indicator = new IndicatorHelper();
+                indicator.Update(symbol);
+                AddSplit(symbol);
+                YearLog(symbol);
             }
             return Ok(new { symbol = symbol });
         }
 
+        private void AddSplit(string splitSymbol) {
+            List<tra_market> markets = null;
+            using(EcamContext context = new EcamContext()) {
+                markets = (from q in context.tra_market
+                           where q.symbol == splitSymbol
+                           && ((((q.close_price ?? 0) - (q.prev_price ?? 0)) / (q.prev_price ?? 0)) * 100) != 0
+                           && ((((q.close_price ?? 0) - (q.prev_price ?? 0)) / (q.prev_price ?? 0)) * 100) <= -48
+                           //&& (q.percentage ?? 0) != 0 && (q.percentage ?? 0) <= -48
+                           where (q.prev_price ?? 0) > 0
+                           orderby q.trade_date ascending, q.symbol ascending
+                           select q).ToList();
+            }
+            foreach(var market in markets) {
+                string symbol = market.symbol;
+                DateTime tradeDate = market.trade_date;
+                decimal factor = DataTypeHelper.SafeDivision((market.prev_price ?? 0),(market.open_price ?? 0));
+                tra_split split = null;
+
+                using(EcamContext context = new EcamContext()) {
+                    split = (from q in context.tra_split
+                             where q.symbol == symbol
+                             && q.split_date == tradeDate
+                             select q).FirstOrDefault();
+                    bool isNew = false;
+                    if(split == null) {
+                        split = new tra_split();
+                        isNew = true;
+                    } else {
+                        split._prev_split = (from q in context.tra_split
+                                             where
+                                             q.id == split.id
+                                             select q).FirstOrDefault();
+                    }
+                    if(isNew == true) {
+                        split.symbol = symbol;
+                        split.split_date = tradeDate;
+                        split.split_factor = factor;
+                        if(split.id > 0) {
+                            context.Entry(split).State = System.Data.Entity.EntityState.Modified;
+                        } else {
+                            context.tra_split.Add(split);
+                        }
+                        context.SaveChanges();
+                    }
+                }
+                if(split != null) {
+                    split.UpdatePrice();
+                    Console.WriteLine("Split Completed symbol=" + split.symbol + ",Date=" + split.split_date);
+                }
+            }
+        }
+
+        private void YearLog(string symbol) {
+            DateTime startDate = Convert.ToDateTime("01/01/" + (DateTime.Now.Year).ToString());
+            TradeHelper.CreateYearLog(symbol,startDate);
+        }
     }
 }

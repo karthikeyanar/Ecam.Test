@@ -42,10 +42,10 @@
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <div class="pull-left m-t-5">
-                        Super Trend
+                        EMA Signal
                     </div>
                     <div class="pull-left m-l-15">
-                        <select id="super_trend_signal" name="super_trend_signal" class="form-control input-sm">
+                        <select id="ema_signal" name="ema_signal" class="form-control input-sm">
                             <option value="">All</option>
                             <option value="B" selected>Buy</option>
                             <option value="S">Sell</option>
@@ -53,12 +53,24 @@
                     </div>
                 </div>
                 <div class="form-group m-r-10 m-t-10">
+                    <div class="pull-left m-t-5">
+                        Super Trend
+                    </div>
+                    <div class="pull-left m-l-15">
+                        <select id="super_trend_signal" name="super_trend_signal" class="form-control input-sm">
+                            <option value="" selected>All</option>
+                            <option value="B">Buy</option>
+                            <option value="S">Sell</option>
+                        </select>
+                    </div>
+                </div>
+                @*<div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" id="is_macd_check" /> MACD Check
                         </label>
                     </div>
-                </div>
+                </div>*@
             </div>
             <div class="clearfix"></div>
             <div class="m-l-15">
@@ -68,6 +80,9 @@
                 <div class="form-group m-r-10 m-t-10">
                     <button type="button" id="btnNSEDownload" class="btn btn-danger btn-sm">NSE Downloaded</button>
                     <button type="button" id="btnNSEUpdateCSV" class="btn btn-danger btn-sm hide">NSE CSV UPDATE</button>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <input type="text" class="form-control input-sm" name="last_trade_date" data-provide="datepicker" data-date-format="dd/M/yyyy" data-date-autoclose="true" placeholder="Date" data-rule-required="true" data-msg-required="Required" />
                 </div>
                 <div class="form-group m-r-10 m-t-10">
                     <div id="nse_csv_log" style="font-size:50px;"></div>
@@ -135,25 +150,28 @@
                     </th>
                     <th sortname="close_price" class="text-right text-nowrap">
                         Close Price
+                    </th> 
+                    <th sortname="ema_signal" class="text-nowrap">
+                        EMA Signal
+                    </th>
+                    <th sortname="ema_cross" class="text-right text-nowrap">
+                        EMA Cross
+                    </th>
+                    <th sortname="ema_profit" class="text-right text-nowrap">
+                        EMA Profit
+                    </th>
+                    <th sortname="ema_min_profit" class="text-right text-nowrap">
+                        EMA Min Profit
+                    </th>
+                    <th sortname="ema_max_profit" class="text-right text-nowrap">
+                        EMA Max Profit
+                    </th>
+                    <th sortname="ema_cnt" class="text-right text-nowrap">
+                        EMA Days
                     </th>
                     <th sortname="super_trend_signal" class="text-nowrap">
                         Super Trend
-                    </th>
-                    <th sortname="sp_profit" class="text-right text-nowrap">
-                        ST Profit
-                    </th>
-                    <th sortname="current_price" class="text-right text-nowrap">
-                        Close Price
-                    </th>
-                    <th sortname="" class="text-right text-nowrap">
-                        Current Profit
-                    </th>
-                    <th sortname="" class="text-left text-nowrap">
-                        Current Date
-                    </th>
-                    <th sortname="" class="text-right text-nowrap">
-                        Diff Days
-                    </th>
+                    </th> 
                     <th style="width: 100px">
                     </th>
                     <th style="width: 5px">
@@ -180,29 +198,32 @@
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:company_name"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:symbol"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit">
-                        <div data-bind="text:formatDate(trade_date)"></div>
+                        <div data-bind="text:formatDate(trade_date,'MM/DD/YYYY')"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(close_price)"></div>
+                    </td> 
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit">
+                        <div data-bind="text:(ema_signal=='B' ? 'BUY': (ema_signal == 'S' ? 'SELL':''))"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:ema_cross"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(ema_profit)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(ema_min_profit)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(ema_max_profit)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:ema_cnt"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit">
                         <div data-bind="text:(super_trend_signal=='B' ? 'BUY': (super_trend_signal == 'S' ? 'SELL':''))"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(sp_profit)"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(current_price)"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:formatPercentage(current_profit)"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit">
-                        <div data-bind="text:formatDate(last_date)"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:diff_days"></div>
-                    </td>
+                    </td>  
                     <td style="text-align:center;white-space:nowrap;width:5px;">
                         <button id="btnSTUpdate" class="btn btn-success btn-xs">ST Update</button>
                     </td>

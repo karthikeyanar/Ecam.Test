@@ -38,6 +38,7 @@ namespace Ecam.Contracts {
         public string money_control_url { get; set; }
         public Nullable<bool> is_old { get; set; }
         public string money_control_symbol { get; set; }
+        public string nse_type { get; set; }
 
         public string category_name { get; set; }
         public Nullable<decimal> ltp_percentage { get; set; }
@@ -144,6 +145,7 @@ namespace Ecam.Contracts {
         public string where_condition { get; set; }
 
         public int? financial_category_id { get; set; }
+        public string ema_signal { get; set; }
         public string super_trend_signal { get; set; }
         public string macd_signal { get; set; }
         public bool? is_macd_check { get; set; }
@@ -178,6 +180,7 @@ namespace Ecam.Contracts {
         public string symbol { get; set; }
         public string start_date { get; set; }
         public string end_date { get; set; }
+        public string nse_type { get; set; }
     }
 }
 

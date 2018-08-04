@@ -31,41 +31,29 @@ namespace Ecam.Models {
             this.Property(t => t.prev_price)
                 .HasPrecision(13,4);
 
-            this.Property(t => t.rsi)
-                .HasPrecision(13,4);
-
-            this.Property(t => t.prev_rsi)
-                .HasPrecision(13,4);
-
-            this.Property(t => t.upward)
-                .HasPrecision(13,4);
-
-            this.Property(t => t.downward)
-                .HasPrecision(13,4);
-
-            this.Property(t => t.avg_upward)
-                .HasPrecision(13,4);
-
-            this.Property(t => t.avg_downward)
-                .HasPrecision(13,4);
-
-            this.Property(t => t.rs)
-                .HasPrecision(13,4);
-
-            this.Property(t => t.prev_ltp_price)
-                .HasPrecision(13,4);
-
-            this.Property(t => t.turn_over)
-                .HasPrecision(13,4);
-
-            this.Property(t => t.percentage)
-                .HasPrecision(13,4);
-
             this.Property(t => t.super_trend_signal)
               .HasMaxLength(1);
 
-            this.Property(t => t.macd_signal)
-              .HasMaxLength(1);
+            this.Property(t => t.ema_5)
+                .HasPrecision(13,8);
+
+            this.Property(t => t.ema_20)
+                .HasPrecision(13,8);
+
+            this.Property(t => t.ema_cross)
+                .HasPrecision(13,8);
+
+            this.Property(t => t.ema_profit)
+               .HasPrecision(13,4);
+
+            this.Property(t => t.ema_signal)
+             .HasMaxLength(1);
+
+            this.Property(t => t.ema_min_profit)
+              .HasPrecision(13,4);
+
+            this.Property(t => t.ema_max_profit)
+              .HasPrecision(13,4);
 
             // Table & Column Mappings
             this.ToTable("tra_market");
@@ -77,23 +65,17 @@ namespace Ecam.Models {
             this.Property(t => t.ltp_price).HasColumnName("ltp_price");
             this.Property(t => t.close_price).HasColumnName("close_price");
             this.Property(t => t.prev_price).HasColumnName("prev_price");
-            this.Property(t => t.rsi).HasColumnName("rsi");
-            this.Property(t => t.prev_rsi).HasColumnName("prev_rsi");
-            this.Property(t => t.upward).HasColumnName("upward");
-            this.Property(t => t.downward).HasColumnName("downward");
-            this.Property(t => t.avg_upward).HasColumnName("avg_upward");
-            this.Property(t => t.avg_downward).HasColumnName("avg_downward");
-            this.Property(t => t.rs).HasColumnName("rs");
-            this.Property(t => t.prev_ltp_price).HasColumnName("prev_ltp_price");
-            this.Property(t => t.turn_over).HasColumnName("turn_over");
-            this.Property(t => t.percentage).HasColumnName("percentage");
 
             this.Property(t => t.super_trend_signal).HasColumnName("super_trend_signal");
-            this.Property(t => t.macd_signal).HasColumnName("macd_signal");
-            this.Property(t => t.macd).HasColumnName("macd");
-            this.Property(t => t.sp_profit).HasColumnName("sp_profit");
             this.Property(t => t.is_indicator).HasColumnName("is_indicator");
-            this.Property(t => t.macd_histogram).HasColumnName("macd_histogram");
+            this.Property(t => t.ema_5).HasColumnName("ema_5");
+            this.Property(t => t.ema_20).HasColumnName("ema_20");
+            this.Property(t => t.ema_cross).HasColumnName("ema_cross");
+            this.Property(t => t.ema_profit).HasColumnName("ema_profit");
+            this.Property(t => t.ema_signal).HasColumnName("ema_signal");
+            this.Property(t => t.ema_min_profit).HasColumnName("ema_min_profit");
+            this.Property(t => t.ema_max_profit).HasColumnName("ema_max_profit");
+            this.Property(t => t.ema_cnt).HasColumnName("ema_cnt");
         }
     }
 }

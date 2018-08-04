@@ -38,10 +38,10 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
             if (is_book_mark_category == true) {
                 arr[arr.length] = { "name": "is_book_mark_category", "value": is_book_mark_category };
             }
-            var is_macd_check = $("#frmCompanySearch #is_macd_check")[0].checked;
-            if (is_macd_check == true) {
-                arr[arr.length] = { "name": "is_macd_check", "value": is_macd_check };
-            }
+            //var is_macd_check = $("#frmCompanySearch #is_macd_check")[0].checked;
+            //if (is_macd_check == true) {
+            //    arr[arr.length] = { "name": "is_macd_check", "value": is_macd_check };
+            //}
             var url = apiUrl("/Market/List");
             $.ajax({
                 "url": url,
@@ -151,22 +151,24 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
 
         this.nseDownload = function () {
             if (self.company_json == null) {
-                handleBlockUI();
-                var dt = '27-Jul-2018';
-                var url = apiUrl("/Company/GetNSEUpdate?last_trade_date=" + dt + "&is_book_mark_category=" + $("#is_book_mark_category")[0].checked);
-                var arr = [];
-                $.ajax({
-                    "url": url,
-                    "cache": false,
-                    "type": "GET",
-                    "data": arr
-                }).done(function (json) {
-                    self.index = -1;
-                    self.company_json = json;
-                    self.startNSE();
-                }).always(function () {
-                    unblockUI();
-                });
+                var dt = $(":input[name='last_trade_date']").val();
+                if (cString(dt) != '') {
+                    handleBlockUI();
+                    var url = apiUrl("/Company/GetNSEUpdate?last_trade_date=" + dt + "&is_book_mark_category=" + $("#is_book_mark_category")[0].checked);
+                    var arr = [];
+                    $.ajax({
+                        "url": url,
+                        "cache": false,
+                        "type": "GET",
+                        "data": arr
+                    }).done(function (json) {
+                        self.index = -1;
+                        self.company_json = json;
+                        self.startNSE();
+                    }).always(function () {
+                        unblockUI();
+                    });
+                }
             } else {
                 console.log(2);
                 self.startNSE();
@@ -176,7 +178,7 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
         this.startNSE = function () {
             var symbols = '';
             for (var i = 0; i < self.company_json.length; i++) {
-                symbols += self.company_json[i].symbol + '|' + self.company_json[i].start_date + '|' + self.company_json[i].end_date + ',';
+                symbols += self.company_json[i].symbol + '|' + self.company_json[i].start_date + '|' + self.company_json[i].end_date + '|' + cString(self.company_json[i].nse_type) + ',';
             }
             if (symbols != '') {
                 symbols = symbols.substring(0, symbols.length - 1);
@@ -197,9 +199,9 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
             $("body").on("click", "#frmCompanySearch #is_book_mark_category", function (event) {
                 self.loadGrid();
             });
-            $("body").on("click", "#frmCompanySearch #is_macd_check", function (event) {
-                self.loadGrid();
-            });
+            //$("body").on("click", "#frmCompanySearch #is_macd_check", function (event) {
+            //    self.loadGrid();
+            //});
             $("body").on("change", "#Company #rows", function (event) {
                 self.loadGrid();
             });
@@ -258,6 +260,9 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
             $("body").on("change", "#super_trend_signal", function (event) {
                 self.loadGrid();
             });
+            $("body").on("change", "#ema_signal", function (event) {
+                self.loadGrid();
+            });
             $("body").on("click", "#btnSTUpdate", function (event) {
                 handleBlockUI({ "target": $("body"), "message": "Update..." });
                 var that = this;
@@ -304,11 +309,12 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
             $("body").off("click", "#frmCompanySearch #is_archive");
             $("body").off("click", "#frmCompanySearch #is_book_mark");
             $("body").off("click", "#frmCompanySearch #is_book_mark_category");
-            $("body").off("click", "#frmCompanySearch #is_macd_check");
+            //$("body").off("click", "#frmCompanySearch #is_macd_check");
             $("body").off("change", "#Company #rows");
             $("body").off("click", ".is-book-mark");
             $("body").off("click", ".is-current-stock");
             $("body").off("change", "#super_trend_signal");
+            $("body").off("change", "#ema_signal");
             $("body").off("click", "#btnSTUpdate");
             $("body").off("click", "#btnNSEDownload");
             $("body").off("click", "#btnNSEUpdateCSV");

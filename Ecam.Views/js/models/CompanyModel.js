@@ -16,6 +16,7 @@ define(["knockout", "komapping", "helper"], function (ko, komapping, helper) {
         this.months_3_high = ko.observable();
         this.months_1_high = ko.observable();
         this.day_5_high = ko.observable();
+        this.nse_type = ko.observable();
 
         this.category_name = ko.observable();
 

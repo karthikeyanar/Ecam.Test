@@ -182,7 +182,7 @@ function NSE(){
     }
 
     this.downloadData = function() {
-        var symbol = '';var startDate = '';var endDate = '';
+        var symbol = '';var startDate = '';var endDate = '';var nseType = '';
         self.index+=1;
         if(self.check_data_timer!=null){
             clearInterval(self.check_data_timer);
@@ -193,7 +193,11 @@ function NSE(){
             symbol = arr[0];
             startDate = arr[1];
             endDate = arr[2];
-            console.log('download symbol=',symbol,'startDate=',startDate,'endDate=',endDate);
+            nseType = arr[3];
+            if(nseType==''){
+                nseType='EQ';
+            }
+            console.log('download symbol=',symbol,'startDate=',startDate,'endDate=',endDate,'nseType=',nseType);
             var $frm = $("#histForm");
             var $dataType = $("#dataType",$frm);
             var $symbol = $("#symbol",$frm);
@@ -207,7 +211,7 @@ function NSE(){
 
             $dataType.val('priceVolume');
             $symbol.val(symbol);
-            $series.val("EQ");
+            $series.val(nseType);
             $rdDateToDate[0].checked=true;
 
             var $fromDate = $("#fromDate",$frm);

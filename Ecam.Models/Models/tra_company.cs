@@ -34,5 +34,6 @@ namespace Ecam.Models
         public string money_control_url { get; set; }
         public Nullable<bool> is_old { get; set; }
         public string money_control_symbol { get; set; }
+        public string nse_type { get; set; }
     }
 }

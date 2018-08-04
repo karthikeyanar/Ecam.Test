@@ -80,6 +80,9 @@ namespace Ecam.Models
             this.Property(t => t.money_control_symbol)
                 .HasMaxLength(20);
 
+            this.Property(t => t.nse_type)
+                .HasMaxLength(20);
+
             // Table & Column Mappings
             this.ToTable("tra_company");
             this.Property(t => t.id).HasColumnName("company_id");
@@ -112,6 +115,7 @@ namespace Ecam.Models
             this.Property(t => t.money_control_url).HasColumnName("money_control_url");
             this.Property(t => t.is_old).HasColumnName("is_old");
             this.Property(t => t.money_control_symbol).HasColumnName("money_control_symbol");
+            this.Property(t => t.nse_type).HasColumnName("nse_type");
             Ignore(t => t.created_date);
             Ignore(t => t.created_by);
             Ignore(t => t.last_updated_date);

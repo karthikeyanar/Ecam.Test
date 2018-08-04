@@ -153,7 +153,6 @@ namespace Ecam.Models {
                                      select q).FirstOrDefault();
                 if(market != null) {
                     market.prev_price = prevPrice;
-                    market.percentage = DataTypeHelper.SafeDivision(((market.ltp_price ?? 0) - (market.prev_price ?? 0)),(market.prev_price ?? 0)) * 100;
                     context.Entry(market).State = System.Data.Entity.EntityState.Modified;
                     context.SaveChanges();
                 }

@@ -11,21 +11,15 @@ namespace Ecam.Models {
         public Nullable<decimal> ltp_price { get; set; }
         public Nullable<decimal> close_price { get; set; }
         public Nullable<decimal> prev_price { get; set; }
-        public Nullable<decimal> rsi { get; set; }
-        public Nullable<decimal> prev_rsi { get; set; }
-        public Nullable<decimal> upward { get; set; }
-        public Nullable<decimal> downward { get; set; }
-        public Nullable<decimal> avg_upward { get; set; }
-        public Nullable<decimal> avg_downward { get; set; }
-        public Nullable<decimal> rs { get; set; }
-        public Nullable<decimal> prev_ltp_price { get; set; }
-        public Nullable<decimal> turn_over { get; set; }
-        public Nullable<decimal> percentage { get; set; }
         public string super_trend_signal { get; set; }
-        public string macd_signal { get; set; }
-        public Nullable<decimal> macd { get; set; }
-        public Nullable<decimal> sp_profit { get; set; }
         public Nullable<bool> is_indicator { get; set; }
-        public Nullable<decimal> macd_histogram { get; set; }
+        public Nullable<decimal> ema_5 { get; set; }
+        public Nullable<decimal> ema_20 { get; set; }
+        public Nullable<decimal> ema_cross { get; set; }
+        public Nullable<decimal> ema_profit { get; set; }
+        public string ema_signal { get; set; }
+        public Nullable<decimal> ema_min_profit { get; set; }
+        public Nullable<decimal> ema_max_profit { get; set; }
+        public Nullable<int> ema_cnt { get; set; }
     }
 }

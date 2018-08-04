@@ -35,11 +35,12 @@ namespace Ecam.ConsoleApp {
         private static List<string> _URLS;
         private static List<string> _SYMBOLS_LIST;
         static void Main(string[] args) {
-            try {
-                SupertrendUpdate();
-            } catch(Exception ex) {
-                Console.WriteLine("ex=" + ex.Message);
-            }
+            //try {
+            //    SupertrendUpdate();
+            //} catch(Exception ex) {
+            //    Console.WriteLine("ex=" + ex.Message);
+            //}
+            BackTestSuperTrend();
             Console.Read();
             return;
             try {
@@ -2001,9 +2002,198 @@ RegexOptions.IgnoreCase
             }
         }
 
+        private static List<tra_market> _Markets;
+        private static decimal _TotalAmount = 1000000;
+        private static decimal _TotalEquity = 10;
+        private static int _TotalBuyCount = 0;
+        private static int _SuccessCount = 0;
+
+        private static void BackTestSuperTrend() {
+            _TotalBuyCount = 0;
+            _SuccessCount = 0;
+            _Markets = null;
+            List<tra_holding> holdings;
+            decimal perEquity = _TotalAmount / _TotalEquity;
+            using(EcamContext context = new EcamContext()) {
+                List<string> bookmarkSymbols = (from q in context.tra_company_category
+                                                join c in context.tra_category on q.category_name equals c.category_name
+                                                where
+                                                (c.is_book_mark ?? false) == true
+                                                //&& 
+                                                //c.category_name == "LONGTERM"
+                                                //|| c.category_name == "HIGH_MARKET_VALUE"
+                                                select q.symbol).ToList();
+                _Markets = (from q in context.tra_market
+                            where bookmarkSymbols.Contains(q.symbol) == true
+                            orderby q.trade_date ascending
+                            select q).ToList();
+            }
+            DateTime startDate = Convert.ToDateTime("01/01/2016");
+            for(int i = 0;i < 1095;i++) {
+                DateTime tradeDate = startDate.AddDays(i);
+                Console.WriteLine(tradeDate.ToString("dd/MMM/yyyy"));
+                var markets = (from q in _Markets
+                               where q.trade_date.Date == tradeDate.Date
+                               select q).ToList();
+                if(markets.Count > 0) {
+                    holdings = GetHoldings();
+
+                    for(int z = 0;z < holdings.Count;z++) {
+                        if(holdings[z].symbol == "CROMPTON") {
+                            string s = string.Empty;
+                        }
+                        var sellMarket = (from q in _Markets
+                                          where q.symbol == holdings[z].symbol
+                                          && q.trade_date > holdings[z].trade_date
+                                          && q.trade_date == tradeDate
+                                          select q).FirstOrDefault();
+                        if(sellMarket != null) {
+                            holdings[z].sell_date = sellMarket.trade_date;
+                            holdings[z].sell_price = sellMarket.close_price;
+                        }
+                    }
+                    var sellHoldings = (from q in holdings
+                                        where q.profit <= 0
+                                        select q).ToList();
+                    foreach(var sellHolding in sellHoldings) {
+                        if(sellHolding.profit <= -3) {
+                            using(EcamContext context = new EcamContext()) {
+                                var h = (from q in context.tra_holding
+                                         where q.id == sellHolding.id
+                                         select q).FirstOrDefault();
+                                if(h != null) {
+                                    h.sell_date = sellHolding.sell_date;
+                                    h.sell_price = (sellHolding.sell_price ?? 0);
+                                    context.Entry(h).State = System.Data.Entity.EntityState.Modified;
+                                    context.SaveChanges();
+                                }
+                            }
+                        }
+                    }
+                    sellHoldings = (from q in holdings
+                                    where q.profit >= 3
+                                    select q).ToList();
+                    foreach(var sellHolding in sellHoldings) {
+                        using(EcamContext context = new EcamContext()) {
+                            var h = (from q in context.tra_holding
+                                     where q.id == sellHolding.id
+                                     select q).FirstOrDefault();
+                            if(h != null) {
+                                h.sell_date = sellHolding.sell_date;
+                                h.sell_price = (sellHolding.sell_price ?? 0);
+                                context.Entry(h).State = System.Data.Entity.EntityState.Modified;
+                                context.SaveChanges();
+                            }
+                        }
+                    }
+                }
+                for(int j = 0;j < markets.Count;j++) {
+                    var market = markets[j];
+                    if(market.super_trend_signal == "B") {
+                        _TotalBuyCount += 1;
+                        tra_market lastMarket = null;
+                        bool isSuccess = GetIsSuccess(i,market,ref lastMarket);
+                        if(isSuccess == true) {
+                            _SuccessCount += 1;
+                            //Console.WriteLine("Date=" + market.trade_date.ToString("dd/MMM/yyyy") + ",Symbol=" + market.symbol + "," + _SuccessCount + " of " + _TotalBuyCount);
+                            //holdings = GetHoldings();
+                            //if(holdings.Count() >= _TotalEquity) {
+                            //    for(int z = 0;z < holdings.Count;z++) {
+                            //        var sellMarket = (from q in _Markets
+                            //                          where q.symbol == holdings[z].symbol
+                            //                          && q.trade_date > holdings[z].trade_date
+                            //                          && q.trade_date >= market.trade_date
+                            //                          select q).FirstOrDefault();
+                            //        if(sellMarket != null) {
+                            //            holdings[z].sell_date = sellMarket.trade_date;
+                            //            holdings[z].sell_price = sellMarket.close_price;
+                            //        }
+                            //    }
+                            //    var sellHolding = (from q in holdings
+                            //                       where q.profit <= 0
+                            //                       orderby q.profit ascending
+                            //                       select q).FirstOrDefault();
+                            //    if(sellHolding == null) {
+                            //        sellHolding = (from q in holdings
+                            //                       orderby q.profit descending, q.trade_date ascending
+                            //                       select q).FirstOrDefault();
+                            //    }
+                            //    if(sellHolding != null) {
+                            //        using(EcamContext context = new EcamContext()) {
+                            //            var h = (from q in context.tra_holding
+                            //                     where q.id == sellHolding.id
+                            //                     select q).FirstOrDefault();
+                            //            if(h != null) {
+                            //                h.sell_date = sellHolding.sell_date;
+                            //                h.sell_price = (sellHolding.sell_price ?? 0);
+                            //                context.Entry(h).State = System.Data.Entity.EntityState.Modified;
+                            //                context.SaveChanges();
+                            //            }
+                            //        }
+                            //    }
+                            //}
+                            holdings = GetHoldings();
+                            if(holdings.Count() < _TotalEquity) {
+                                if(lastMarket != null) {
+                                    using(EcamContext context = new EcamContext()) {
+                                        tra_holding holding = new tra_holding {
+                                            symbol = lastMarket.symbol,
+                                            trade_date = lastMarket.trade_date,
+                                            quantity = (int)(perEquity / (lastMarket.close_price ?? 0)),
+                                        };
+                                        holding.buy_price = (lastMarket.close_price ?? 0);
+                                        context.tra_holding.Add(holding);
+                                        context.SaveChanges();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private static bool GetIsSuccess(int i,tra_market root,ref tra_market lastMarket) {
+            bool isSuccess = false;
+            DateTime tradeDate;
+            DateTime startDate = Convert.ToDateTime("01/01/2016");
+            int cnt = 0;
+            decimal? lastPrice = root.close_price;
+            for(int j = 0;j < 2;j++) {
+                int z = (i + 1) + j;
+                tradeDate = startDate.AddDays(z);
+                var market = (from q in _Markets
+                              where q.trade_date >= tradeDate
+                              && q.symbol == root.symbol
+                              orderby q.trade_date ascending
+                              select q).FirstOrDefault();
+                if(market != null) {
+                    if((lastPrice ?? 0) < (market.close_price ?? 0)) {
+                        lastPrice = market.close_price;
+                        cnt += 1;
+                        lastMarket = market;
+                        break;
+                    }
+                }
+            }
+            if(cnt >= 1) {
+                isSuccess = true;
+            }
+            return isSuccess;
+        }
+
+        private static List<tra_holding> GetHoldings() {
+            using(EcamContext context = new EcamContext()) {
+                return (from q in context.tra_holding
+                        where (q.sell_price ?? 0) <= 0
+                        orderby q.trade_date ascending
+                        select q).ToList();
+            }
+        }
+
         private static void SupertrendUpdate() {
             List<string> symbols = new List<string>();
-            using(EcamContext context =new EcamContext()) {
+            using(EcamContext context = new EcamContext()) {
                 symbols = (from q in context.tra_company
                            select q.symbol).ToList();
             }

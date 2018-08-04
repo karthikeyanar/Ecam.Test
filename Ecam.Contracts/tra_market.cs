@@ -33,6 +33,16 @@ namespace Ecam.Contracts {
         public Nullable<decimal> sp_profit { get; set; }
         public Nullable<bool> is_indicator { get; set; }
         public Nullable<decimal> macd_histogram { get; set; }
+        public string heikin_ashi_signal { get; set; }
+        public Nullable<decimal> heikin_ashi_profit { get; set; }
+        public Nullable<decimal> ema_5 { get; set; }
+        public Nullable<decimal> ema_20 { get; set; }
+        public Nullable<decimal> ema_cross { get; set; }
+        public Nullable<decimal> ema_profit { get; set; }
+        public string ema_signal { get; set; }
+        public Nullable<decimal> ema_min_profit { get; set; }
+        public Nullable<decimal> ema_max_profit { get; set; }
+        public Nullable<int> ema_cnt { get; set; }
 
         public Nullable<bool> is_archive { get; set; }
         public Nullable<bool> is_book_mark { get; set; }

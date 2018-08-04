@@ -28,5 +28,30 @@ namespace Ecam.Models {
         public decimal ema_12 { get; set; }
         public decimal ema_26 { get; set; }
         public decimal m_singal { get; set; }
+
+        // EMA
+
+        //HeikinAshi
+        public decimal heikin_ashi { get; set; }
+        public decimal? heikin_ashi_open {
+            get {
+                return ((this.open_price ?? 0) + (this.low_price ?? 0)) / 2;
+            }
+        }
+        public decimal? heikin_ashi_close {
+            get {
+                return ((this.open_price ?? 0) + (this.high_price ?? 0) + (this.low_price ?? 0) + (this.close_price ?? 0)) / 4;
+            }
+        }
+        public decimal? heikin_ashi_high {
+            get {
+                return new[] { (this.high_price ?? 0),(this.heikin_ashi_open ?? 0),(this.heikin_ashi_close ?? 0) }.Max();
+            }
+        }
+        public decimal? heikin_ashi_low {
+            get {
+                return new[] { (this.low_price ?? 0),(this.heikin_ashi_open ?? 0),(this.heikin_ashi_close ?? 0) }.Max();
+            }
+        }
     }
 }

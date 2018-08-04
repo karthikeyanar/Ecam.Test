@@ -174,23 +174,29 @@ namespace Ecam.Views.Controllers {
                                             select q.symbol).ToList();
                     foreach(string symbol in symbols) {
                         var lastMarket = (from q in context.tra_market
+                                          join c in context.tra_company on q.symbol equals c.symbol
                                           where q.symbol == symbol
                                           && q.trade_date <= last_trade_date.Date
                                           orderby q.trade_date descending
-                                          select q).FirstOrDefault();
+                                          select new {
+                                               q.trade_date,
+                                               q.symbol,
+                                               c.nse_type
+                                          }).FirstOrDefault();
                         if(lastMarket != null) {
                             if(lastMarket.trade_date.Date != last_trade_date.Date) {
                                 companies.Add(new TRA_NSE_UPDATE {
                                     symbol = lastMarket.symbol,
                                     start_date = lastMarket.trade_date.Date.ToString("dd-MM-yyyy"),
-                                    end_date = last_trade_date.Date.ToString("dd-MM-yyyy")
+                                    end_date = last_trade_date.Date.ToString("dd-MM-yyyy"),
+                                    nse_type = lastMarket.nse_type
                                 });
                             }
                         }
                     }
                 }
             }
-            return companies;
+            return companies.Take(1).ToList();
         }
 
         [HttpPost]
@@ -314,6 +320,7 @@ namespace Ecam.Views.Controllers {
             bool isOld = (contract.is_old ?? false);
             string moneyControlURL = contract.money_control_url;
             string moneyControlSymbol = contract.money_control_symbol;
+            string nseType = contract.nse_type;
             if((contract.id ?? 0) > 0) {
                 contract = _CompanyRepository.GetCompanies(new TRA_COMPANY_SEARCH { id = contract.id },new Paging { }).rows.FirstOrDefault();
                 contract.company_name = companyName;
@@ -325,6 +332,7 @@ namespace Ecam.Views.Controllers {
                 contract.is_old = isOld;
                 contract.money_control_url = moneyControlURL;
                 contract.money_control_symbol = moneyControlSymbol;
+                contract.nse_type = nseType;
             }
             var saveContract = Repository.Save(contract);
             if(saveContract.Errors == null) {

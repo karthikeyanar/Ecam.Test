@@ -23,17 +23,17 @@ using Ecam.Framework.ExcelHelper;
 using CsvHelper;
 
 namespace Ecam.Models {
-    public class SupertrendData {
+    public class IndicatorHelper {
         private List<string> _SYMBOLS_LIST = null;
         private bool _IS_NOT_SUCCESS = false;
-        public SupertrendData(string file_name,List<string> symbols,ManualResetEvent doneEvent) {
+        public IndicatorHelper(string file_name,List<string> symbols,ManualResetEvent doneEvent) {
             _SYMBOLS_LIST = symbols;
             _ORIGINAL_SYMBOL = file_name;
             _SYMBOL = file_name;
             _doneEvent = doneEvent;
         }
 
-        public SupertrendData() {
+        public IndicatorHelper() {
         }
 
         // Wrapper method for use with thread pool.
@@ -64,24 +64,32 @@ namespace Ecam.Models {
             }
             ATR atr = new ATR();
             atr.Calculate(candles);
-            MACD macd = new MACD();
-            macd.Calculate(candles);
+            //MACD macd = new MACD();
+            //macd.Calculate(candles);
             Supertrend supertrend = new Supertrend();
             supertrend.Calculate(candles);
+            HeikinAshi heikinashi = new HeikinAshi();
+            heikinashi.Calculate(candles);
+            EMA ema5 = new EMA();
+            ema5.Calculate(candles,5);
+            EMA ema20 = new EMA();
+            ema20.Calculate(candles,20);
+            EMAProfit p = new EMAProfit();
+            p.Calculate(candles);
             DateTime minDate = Convert.ToDateTime("01/01/1900");
             //candles = (from q in candles
             //           where string.IsNullOrEmpty(q.super_trend_signal) == false
             //           select q).ToArray();
             string sql = string.Empty;
             for(int i = 0;i < candles.Length;i++) {
-                if(candles[i].trade_date.ToString("dd-MMM-yyyy") == "20-Jul-2018") {
+                if(candles[i].trade_date.ToString("dd-MMM-yyyy") == "14-Feb-2017") {
                     string s = string.Empty;
                 }
                 if(
-                    ((candles[i].super_trend_signal == "B" || candles[i].super_trend_signal == "S" || candles[i].macd_signal == "B" || candles[i].macd_signal == "S"))
+                    ((candles[i].super_trend_signal == "B" || candles[i].super_trend_signal == "S" || candles[i].heikin_ashi_signal == "B" || candles[i].heikin_ashi_signal == "S"))
                     && (candles[i].is_indicator ?? false) == false
                     ) {
-                    if(candles[i].super_trend_signal == "B") {
+                    if(candles[i].super_trend_signal == "B" || candles[i].heikin_ashi_signal == "B") {
                         var candle = (from q in candles
                                       where q.trade_date > candles[i].trade_date
                                       && q.super_trend_signal == "S"
@@ -95,35 +103,8 @@ namespace Ecam.Models {
                         }
                         if(candle != null) {
                             candles[i].sp_sell_date = candle.trade_date;
-                            //var max = (from q in candles
-                            //           where q.trade_date > candles[i].trade_date
-                            //           && q.trade_date <= candle.trade_date
-                            //           orderby q.close_price descending
-                            //           select q).FirstOrDefault();
-                            //if(max != null) {
-                            //    candles[i].sp_max_profit = (((max.close_price ?? 0) - (candles[i].close_price ?? 0)) / (candles[i].close_price ?? 0)) * 100;
-                            //}
-                            //var min = (from q in candles
-                            //           where q.trade_date > candles[i].trade_date
-                            //           && q.trade_date <= candle.trade_date
-                            //           orderby q.close_price ascending
-                            //           select q).FirstOrDefault();
-                            //if(min != null) {
-                            //    candles[i].sp_min_profit = (((min.close_price ?? 0) - (candles[i].close_price ?? 0)) / (candles[i].close_price ?? 0)) * 100;
-                            //}
                         }
                         candle = (from q in candles
-                                      where q.trade_date < candles[i].trade_date
-                                      && (q.super_trend_signal == "B" || q.super_trend_signal == "S")
-                                      orderby q.trade_date descending
-                                      select q).FirstOrDefault();
-                        if(candle != null) {
-                            if(candle.super_trend_signal == "B") {
-                                candles[i].sp_profit = (((candles[i].close_price ?? 0) - (candle.close_price ?? 0)) / (candle.close_price ?? 0)) * 100;
-                            }
-                        }
-                    } else {
-                        var candle = (from q in candles
                                   where q.trade_date < candles[i].trade_date
                                   && (q.super_trend_signal == "B" || q.super_trend_signal == "S")
                                   orderby q.trade_date descending
@@ -133,19 +114,54 @@ namespace Ecam.Models {
                                 candles[i].sp_profit = (((candles[i].close_price ?? 0) - (candle.close_price ?? 0)) / (candle.close_price ?? 0)) * 100;
                             }
                         }
+                        candle = (from q in candles
+                                  where q.trade_date < candles[i].trade_date
+                                  && (q.heikin_ashi_signal == "B" || q.heikin_ashi_signal == "S")
+                                  orderby q.trade_date descending
+                                  select q).FirstOrDefault();
+                        if(candle != null) {
+                            if(candle.heikin_ashi_signal == "B") {
+                                candles[i].heikin_ashi_profit = (((candles[i].close_price ?? 0) - (candle.close_price ?? 0)) / (candle.close_price ?? 0)) * 100;
+                            }
+                        }
                     }
-                    sql = string.Format("update tra_market set super_trend_signal='{0}',macd_signal='{1}',macd={2},sp_profit={3},macd_histogram={4},is_indicator={5} " +
-                        " where trade_date='{6}' and symbol='{7}'"
-                        ,candles[i].super_trend_signal
-                        ,candles[i].macd_signal
-                        ,(candles[i].macd ?? 0)
-                        ,(candles[i].sp_profit ?? 0)
-                        ,(candles[i].macd_histogram ?? 0)
-                        ,1
-                        ,candles[i].trade_date.ToString("yyyy-MM-dd")
-                        ,candles[i].symbol);
-                    MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString,sql);
+                } else {
+
+                    var candle = (from q in candles
+                                  where q.trade_date < candles[i].trade_date
+                                  && (q.super_trend_signal == "B" || q.super_trend_signal == "S")
+                                  orderby q.trade_date descending
+                                  select q).FirstOrDefault();
+                    if(candle != null) {
+                        if(candle.super_trend_signal == "B") {
+                            candles[i].sp_profit = (((candles[i].close_price ?? 0) - (candle.close_price ?? 0)) / (candle.close_price ?? 0)) * 100;
+                        }
+                    }
+
+                    candle = (from q in candles
+                              where q.trade_date < candles[i].trade_date
+                              && (q.heikin_ashi_signal == "B" || q.heikin_ashi_signal == "S")
+                              orderby q.trade_date descending
+                              select q).FirstOrDefault();
+                    if(candle != null) {
+                        if(candle.heikin_ashi_signal == "B") {
+                            candles[i].heikin_ashi_profit = (((candles[i].close_price ?? 0) - (candle.close_price ?? 0)) / (candle.close_price ?? 0)) * 100;
+                        }
+                    }
+
                 }
+                sql = string.Format("update tra_market set super_trend_signal='{0}',sp_profit={1},heikin_ashi_signal='{2}',heikin_ashi_profit={3},ema_5={4},ema_20={5},is_indicator={6} " +
+                    " where trade_date='{7}' and symbol='{8}'"
+                    ,candles[i].super_trend_signal
+                    ,(candles[i].sp_profit ?? 0)
+                    ,candles[i].heikin_ashi_signal
+                    ,(candles[i].heikin_ashi_profit ?? 0)
+                    ,(candles[i].ema_5 ?? 0)
+                    ,(candles[i].ema_20 ?? 0)
+                    ,1
+                    ,candles[i].trade_date.ToString("yyyy-MM-dd")
+                    ,candles[i].symbol);
+                MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString,sql);
             }
             Console.WriteLine("Completed symbol=" + symbol);
         }

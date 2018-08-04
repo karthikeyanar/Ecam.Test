@@ -33,8 +33,6 @@ namespace Ecam.Models {
         public Nullable<decimal> close_price { get; set; }
         public Nullable<decimal> ltp_price { get; set; }
         public Nullable<decimal> prev_price { get; set; }
-        public Nullable<decimal> turn_over { get; set; }
-        public bool is_prev_price_exist { get; set; }
     }
 
     public class TradeHelper {
@@ -978,20 +976,7 @@ namespace Ecam.Models {
                     row.low_price = import.low_price;
                     row.close_price = import.close_price;
                     row.ltp_price = import.ltp_price;
-                    if(import.is_prev_price_exist == false) {
-                        tra_market market = (from q in context.tra_market
-                                             where q.symbol == import.symbol
-                                             && q.trade_date < row.trade_date
-                                             orderby q.trade_date descending
-                                             select q).FirstOrDefault();
-                        if(market != null) {
-                            row.prev_price = market.close_price;
-                        }
-                    } else {
-                        row.prev_price = import.prev_price;
-                    }
-                    row.percentage = DataTypeHelper.SafeDivision(((row.ltp_price ?? 0) - (row.prev_price ?? 0)),(row.prev_price ?? 0)) * 100;
-                    //row.turn_over = import.turn_over;
+                    row.prev_price = import.prev_price;
                     if(isNew == true) {
                         context.tra_market.Add(row);
                     } else {
@@ -1237,8 +1222,8 @@ RegexOptions.IgnoreCase
             //string html = client.DownloadString(url);
             //GoogleDownloadData gd = new GoogleDownloadData();
             //return gd.GetPrice(html);
-            GoogleDownloadData gd = new GoogleDownloadData();
-            gd.GoogleDataDownload(symbol);
+            //GoogleDownloadData gd = new GoogleDownloadData();
+            //gd.GoogleDataDownload(symbol);
         }
 
         //private static void CalculatedPrice(TempClass import)

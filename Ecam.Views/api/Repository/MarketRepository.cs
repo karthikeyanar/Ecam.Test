@@ -34,6 +34,10 @@ namespace Ecam.Framework.Repository {
                 where.AppendFormat(" and ct.symbol in({0})",Helper.ConvertStringSQLFormat(criteria.symbols));
             }
 
+            if(string.IsNullOrEmpty(criteria.ema_signal) == false) {
+                where.AppendFormat(" and ct.ema_signal='{0}' ",criteria.ema_signal);
+            }
+
             if(string.IsNullOrEmpty(criteria.super_trend_signal) == false) {
                 where.AppendFormat(" and ct.super_trend_signal='{0}' ",criteria.super_trend_signal);
             }
