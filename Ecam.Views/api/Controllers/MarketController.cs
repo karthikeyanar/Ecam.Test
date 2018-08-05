@@ -61,7 +61,7 @@ namespace Ecam.Views.Controllers {
                                                  select q.symbol).ToList();
                 }
                 symbol = csvDownload.CSVDataDownload(fullFileName,true);
-                UploadFileHelper.FileCopy("TempPath",fileName,"TempPath",symbol + "_" + randomNumber + ".csv");
+                UploadFileHelper.FileCopy("TempPath",fileName,"TempPath",symbol + "_" + DateTime.Now.Date.ToString("yyyy-MM-dd").ToString() + "_" + randomNumber + ".csv");
                 UploadFileHelper.DeleteFile("TempPath",fileName);
                 IndicatorHelper indicator = new IndicatorHelper();
                 indicator.Update(symbol);

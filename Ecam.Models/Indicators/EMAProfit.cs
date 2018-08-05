@@ -28,6 +28,9 @@ namespace Ecam.Models {
                         }
                     }
                     if(last != null) {
+                        if(last.trade_date.ToString("MM/dd/yyyy") == "09-30-2016") {
+                            string s = string.Empty;
+                        }
                         last.ema_min_profit = ((from q in candles
                                                 where q.trade_date > last.trade_date
                                                 && q.trade_date < candles[i].trade_date
@@ -47,7 +50,9 @@ namespace Ecam.Models {
                 } else {
                     if(last != null && (candles[i].ema_cross ?? 0) > 0) {
                         last.ema_signal = "B";
+                        last.ema_cnt = cnt;
                         candles[i].ema_profit = (((candles[i].close_price ?? 0) - (last.close_price ?? 0)) / (last.close_price ?? 0)) * 100;
+                        last.ema_profit = candles[i].ema_profit;
                     }
                 }
             }

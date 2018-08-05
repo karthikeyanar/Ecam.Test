@@ -38,10 +38,10 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
             if (is_book_mark_category == true) {
                 arr[arr.length] = { "name": "is_book_mark_category", "value": is_book_mark_category };
             }
-            //var is_macd_check = $("#frmCompanySearch #is_macd_check")[0].checked;
-            //if (is_macd_check == true) {
-            //    arr[arr.length] = { "name": "is_macd_check", "value": is_macd_check };
-            //}
+            var is_ema_check = $("#frmCompanySearch #is_ema_check")[0].checked;
+            if (is_ema_check == true) {
+                arr[arr.length] = { "name": "is_ema_check", "value": is_ema_check };
+            }
             var url = apiUrl("/Market/List");
             $.ajax({
                 "url": url,
@@ -49,6 +49,9 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
                 "type": "GET",
                 "data": arr
             }).done(function (json) {
+                for (var i = 0; i < json.rows.length; i++) {
+                    json.rows[i].id = i;
+                }
                 self.rows.removeAll();
                 self.rows(json.rows);
                 self.last_grid_data = json.rows;
@@ -71,6 +74,52 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
                 if (callback)
                     callback();
             }).always(function () {
+                unblockUI();
+            });
+        }
+
+        this.loadTradeDetail = function ($childTD, dataFor) {
+            $childTD.addClass("loading");
+            $childTD.empty();
+            $("#detail-template").tmpl({}).appendTo($childTD);
+            $childTD.css("padding-left", "25px").css("background-color", "#F2F2F2");
+            $childTD.removeClass("loading");
+
+            var symbol = dataFor.symbol;// $childTD.attr("symbol");
+            var startDate = moment(cDateObj(dataFor.trade_date)).subtract('month', 12).format('MM/DD/YYYY');
+            var endDate = moment(cDateObj(dataFor.trade_date)).add('month', 1).format('MM/DD/YYYY');
+            var $rsiBox = $(".rsi-box", $childTD);
+            var $avgMonthBox = $(".avg-month-box", $childTD);
+            self.loadRSI(symbol, startDate, endDate, $rsiBox, function () {
+                //self.loadAVG(symbol, $avgMonthBox, function () {
+                //});
+            });
+        }
+
+        this.loadRSI = function (symbol, startDate, endDate, $box, callback) {
+            $box.html('loading...');
+            handleBlockUI();
+            var url = apiUrl("/Market/List");
+            var arr = [];
+            arr[arr.length] = { "name": "symbols", "value": symbol };
+            arr[arr.length] = { "name": "start_date", "value": startDate };
+            arr[arr.length] = { "name": "end_date", "value": endDate };
+            arr[arr.length] = { "name": "SortName", "value": "ct.trade_date" };
+            arr[arr.length] = { "name": "SortOrder", "value": "desc" };
+            arr[arr.length] = { "name": "PageSize", "value": "0" };
+            $.ajax({
+                "url": url,
+                "cache": false,
+                "type": "GET",
+                "data": arr
+            }).done(function (json) {
+                $box.empty();
+                $("#detail-rsi-template").tmpl(json).appendTo($box);
+                $box.removeClass("loading");
+                if (callback)
+                    callback();
+            })
+            .always(function () {
                 unblockUI();
             });
         }
@@ -199,9 +248,9 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
             $("body").on("click", "#frmCompanySearch #is_book_mark_category", function (event) {
                 self.loadGrid();
             });
-            //$("body").on("click", "#frmCompanySearch #is_macd_check", function (event) {
-            //    self.loadGrid();
-            //});
+            $("body").on("click", "#frmCompanySearch #is_ema_check", function (event) {
+                self.loadGrid();
+            });
             $("body").on("change", "#Company #rows", function (event) {
                 self.loadGrid();
             });
@@ -303,13 +352,50 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
                     unblockUI();
                 });
             });
+            $("body").on("click", "#CompanyTable > tbody > tr > td.cls-symbol", function (event) {
+                var $this = $(this);
+                var dataFor = ko.dataFor($this[0]);
+                var fbJson = JSON.parse(ko.toJSON(dataFor));
+                var $tr = $this.parents("tr:first");
+                var $tbl = $this.parents("table:first");
+                var $tbody = $("tbody", $tbl);
+                var companyId = cInt(dataFor.id);
+                var childTRId = "child_" + companyId;
+                var $childTR = $("#" + childTRId, $tbody);
+                var $treeExpand = $(".tree-expand", this);
+                $("#cargoTable .child-rows[cid!='" + companyId + "']").addClass("hide");
+                $("#cargoTable .tree-expand[cid!='" + companyId + "']").removeClass("ex-minus").addClass("ex-plus");
+                if ($treeExpand.hasClass("ex-plus")) {
+                    $treeExpand.removeClass("ex-minus").removeClass("ex-plus");
+                    if (!$childTR[0]) {
+                        $treeExpand.addClass("ex-minus");
+                        $childTR = $("<tr class='child-rows' cid='" + companyId + "'><td symbol='" + dataFor.symbol + "' company_id='" + companyId + "' colspan='" + $("thead > tr > th", $tbl).length + "' class='child-row-cnt'></td></tr>");
+                        $childTR.attr("id", childTRId).attr("row-key", companyId);
+                        var $childTD = $("td", $childTR);
+                        $tr.after($childTR);
+                        $childTD.data("fbjson", fbJson);
+                        self.loadTradeDetail($childTD, dataFor);
+                    } else {
+                        if ($childTR.hasClass('hide')) {
+                            $childTR.removeClass("hide");
+                            $treeExpand.addClass("ex-minus");
+                        } else {
+                            $childTR.addClass("hide");
+                            $treeExpand.addClass("ex-plus");
+                        }
+                    }
+                } else {
+                    $childTR.addClass("hide");
+                    $treeExpand.removeClass("ex-minus").addClass("ex-plus");
+                }
+            });
         }
 
         this.offElements = function () {
             $("body").off("click", "#frmCompanySearch #is_archive");
             $("body").off("click", "#frmCompanySearch #is_book_mark");
             $("body").off("click", "#frmCompanySearch #is_book_mark_category");
-            //$("body").off("click", "#frmCompanySearch #is_macd_check");
+            $("body").off("click", "#frmCompanySearch #is_ema_check");
             $("body").off("change", "#Company #rows");
             $("body").off("click", ".is-book-mark");
             $("body").off("click", ".is-current-stock");

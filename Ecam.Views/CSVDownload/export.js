@@ -223,36 +223,52 @@ function NSE(){
             $btn.click();
             self.check_data_timer = setInterval(function(){
                 ////console.log('self.check_data_count=',self.check_data_count);
-                if(self.check_data_count>=50) {
+                //if(self.check_data_count>=50) {
+                //clearInterval(self.check_data_timer);
+                //self.downloadData();
+                //} else {
+                self.check_data_count+=1;
+                $csvFileName=$('#csvFileName');
+                $csvContentDiv=$('#csvContentDiv');
+                var csv='';
+                var fileName = '';
+                ////console.log('$csvFileName=',$csvFileName[0]);
+                ////console.log('$csvContentDiv=',$csvContentDiv[0]);
+                if($csvFileName[0]) {
+                    if($csvFileName.val()!='') {
+                        fileName=$csvFileName.val();
+                        csv=$csvContentDiv.html();
+                    }
+                } 
+                //console.log('fileName=',fileName);
+                //console.log('csv=',csv);
+                if(csv!='') {
+                    //csv=csv.replace(/:/g,"\n");
+                    var code = "$('#nse_index').val('"+(self.index+1)+"');$('#nse_total').val('"+self.symbolsArray.length+"');$('#nse_csv').val('"+csv+"');$('#btnNSEUpdateCSV').click();";
+                    chrome.runtime.sendMessage({ cmd: 'execute_code','tabid':self.openerId,'code':code  });
+                    setTimeout(function(){
+                        csv=csv.replace(/:/g,"\n");
+                        var csvFile;
+                        var downloadLink;
+                        csvFile=new Blob([csv],{
+                            type: "text/csv"
+                        });
+                        downloadLink=document.createElement("a");
+                        downloadLink.download=fileName;
+                        downloadLink.href=window.URL.createObjectURL(csvFile);
+                        downloadLink.style.display="none";
+                        document.body.appendChild(downloadLink);
+                        downloadLink.click();
+                    },500);
+                    setTimeout(function(){
+                        clearInterval(self.check_data_timer);
+                        self.downloadData();
+                    },2000);
+                } else {
                     clearInterval(self.check_data_timer);
                     self.downloadData();
-                } else {
-                    self.check_data_count+=1;
-                    $csvFileName=$('#csvFileName');
-                    $csvContentDiv=$('#csvContentDiv');
-                    var csv='';
-                    var fileName = '';
-                    ////console.log('$csvFileName=',$csvFileName[0]);
-                    ////console.log('$csvContentDiv=',$csvContentDiv[0]);
-                    if($csvFileName[0]) {
-                        if($csvFileName.val()!='') {
-                            fileName=$csvFileName.val();
-                            csv=$csvContentDiv.html();
-                        }
-                    } 
-                    //console.log('fileName=',fileName);
-                    //console.log('csv=',csv);
-                    if(csv!='') {
-                        //csv=csv.replace(/:/g,"\n");
-                        var code = "$('#nse_index').val('"+(self.index+1)+"');$('#nse_total').val('"+self.symbolsArray.length+"');$('#nse_csv').val('"+csv+"');$('#btnNSEUpdateCSV').click();";
-                        chrome.runtime.sendMessage({ cmd: 'execute_code','tabid':self.openerId,'code':code  });
-                        clearInterval(self.check_data_timer);
-                        self.downloadData();
-                    } else {
-                        clearInterval(self.check_data_timer);
-                        self.downloadData();
-                    }
                 }
+                //}
             }, 5000);
         }
     }

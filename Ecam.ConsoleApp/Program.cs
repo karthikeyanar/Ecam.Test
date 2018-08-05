@@ -35,13 +35,7 @@ namespace Ecam.ConsoleApp {
         private static List<string> _URLS;
         private static List<string> _SYMBOLS_LIST;
         static void Main(string[] args) {
-            //try {
-            //    SupertrendUpdate();
-            //} catch(Exception ex) {
-            //    Console.WriteLine("ex=" + ex.Message);
-            //}
-            BackTestSuperTrend();
-            Console.Read();
+            BackTestEMA();
             return;
             try {
                 //NiftyListGenerate();
@@ -548,7 +542,9 @@ namespace Ecam.ConsoleApp {
             using(EcamContext context = new EcamContext()) {
                 markets = (from q in context.tra_market
                            where q.symbol == splitSymbol
-                           && (q.percentage ?? 0) != 0 && (q.percentage ?? 0) <= -48
+                           && ((((q.close_price ?? 0) - (q.prev_price ?? 0)) / (q.prev_price ?? 0)) * 100) != 0
+                           && ((((q.close_price ?? 0) - (q.prev_price ?? 0)) / (q.prev_price ?? 0)) * 100) <= -48
+                           //&& (q.percentage ?? 0) != 0 && (q.percentage ?? 0) <= -48
                            orderby q.trade_date ascending, q.symbol ascending
                            select q).ToList();
             }
@@ -655,7 +651,7 @@ namespace Ecam.ConsoleApp {
 
         private static void UpdatePrevPrice() {
 
-            GoogleHistoryDownloadData history = new GoogleHistoryDownloadData();
+            //GoogleHistoryDownloadData history = new GoogleHistoryDownloadData();
             List<tra_company> companies;
             using(EcamContext context = new EcamContext()) {
                 companies = (from q in context.tra_company
@@ -1436,7 +1432,7 @@ RegexOptions.IgnoreCase
             int queueCount = 64;
             // One event is used for each Fibonacci object
             ManualResetEvent[] doneEvents = new ManualResetEvent[queueCount];
-            GoogleDownloadData[] downArray = new GoogleDownloadData[queueCount];
+            //GoogleDownloadData[] downArray = new GoogleDownloadData[queueCount];
             //Random r = new Random();
             // Configure and launch threads using ThreadPool:
             Console.WriteLine("launching {0} tasks...",totalCount);
@@ -1447,9 +1443,9 @@ RegexOptions.IgnoreCase
                     symbol = _COMPANIES[_INDEX];
                 }
                 doneEvents[i] = new ManualResetEvent(false);
-                GoogleDownloadData f = new GoogleDownloadData(symbol,doneEvents[i]);
-                downArray[i] = f;
-                ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback,i);
+                //GoogleDownloadData f = new GoogleDownloadData(symbol,doneEvents[i]);
+                //downArray[i] = f;
+                //ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback,i);
             }
             // Wait for all threads in pool to calculation...
             WaitHandle.WaitAll(doneEvents);
@@ -1467,7 +1463,7 @@ RegexOptions.IgnoreCase
             }
             // One event is used for each Fibonacci object
             ManualResetEvent[] doneEvents = new ManualResetEvent[queueCount];
-            GoogleHistoryDownloadData[] downArray = new GoogleHistoryDownloadData[queueCount];
+            //GoogleHistoryDownloadData[] downArray = new GoogleHistoryDownloadData[queueCount];
             //Random r = new Random();
             // Configure and launch threads using ThreadPool:
             Console.WriteLine("launching {0} tasks...",totalCount);
@@ -1478,9 +1474,9 @@ RegexOptions.IgnoreCase
                     symbol = _COMPANIES[_INDEX];
                 }
                 doneEvents[i] = new ManualResetEvent(false);
-                GoogleHistoryDownloadData f = new GoogleHistoryDownloadData(symbol,doneEvents[i]);
-                downArray[i] = f;
-                ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback,i);
+                //GoogleHistoryDownloadData f = new GoogleHistoryDownloadData(symbol,doneEvents[i]);
+                //downArray[i] = f;
+                //ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback,i);
             }
             // Wait for all threads in pool to calculation...
             WaitHandle.WaitAll(doneEvents);
@@ -2003,8 +1999,8 @@ RegexOptions.IgnoreCase
         }
 
         private static List<tra_market> _Markets;
-        private static decimal _TotalAmount = 1000000;
-        private static decimal _TotalEquity = 10;
+        private static decimal _TotalAmount = 308450;
+        private static decimal _TotalEquity = 20;
         private static int _TotalBuyCount = 0;
         private static int _SuccessCount = 0;
 
@@ -2191,6 +2187,109 @@ RegexOptions.IgnoreCase
             }
         }
 
+
+        private static void BackTestEMA() {
+            _TotalBuyCount = 0;
+            _SuccessCount = 0;
+            _Markets = null;
+            List<tra_holding> holdings;
+            decimal perEquity = _TotalAmount / _TotalEquity;
+            using(EcamContext context = new EcamContext()) {
+                List<string> bookmarkSymbols = (from q in context.tra_company_category
+                                                join c in context.tra_category on q.category_name equals c.category_name
+                                                where
+                                                (c.is_book_mark ?? false) == true
+                                                select q.symbol).ToList();
+                _Markets = (from q in context.tra_market
+                            where bookmarkSymbols.Contains(q.symbol) == true
+                            orderby q.trade_date ascending
+                            select q).ToList();
+            }
+            DateTime startDate = Convert.ToDateTime("01/01/2018");
+            for(int i = 0;i < 1095;i++) {
+                DateTime tradeDate = startDate.AddDays(i);
+                Console.WriteLine(tradeDate.ToString("dd/MMM/yyyy"));
+                var markets = (from q in _Markets
+                               where q.trade_date.Date == tradeDate.Date
+                               select q).ToList();
+                markets = (from q in markets
+                           orderby ((((q.close_price ?? 0) - (q.prev_price ?? 0)) / (q.prev_price ?? 0)) * 100) descending
+                           select q).ToList();
+                if(markets.Count > 0) {
+                    holdings = GetHoldings();
+
+                    for(int z = 0;z < holdings.Count;z++) {
+                        var sellMarket = (from q in _Markets
+                                          where q.symbol == holdings[z].symbol
+                                          && q.trade_date > holdings[z].trade_date
+                                          && q.trade_date == tradeDate
+                                          select q).FirstOrDefault();
+                        if(sellMarket != null) {
+                            holdings[z].sell_date = sellMarket.trade_date;
+                            holdings[z].sell_price = sellMarket.close_price;
+                        }
+                    }
+                    var sellHoldings = (from q in holdings
+                                        //where q.profit <= 0
+                                        select q).ToList();
+                    foreach(var sellHolding in sellHoldings) {
+                        //if(sellHolding.profit <= -3) {
+                            using(EcamContext context = new EcamContext()) {
+                                var h = (from q in context.tra_holding
+                                         where q.id == sellHolding.id
+                                         select q).FirstOrDefault();
+                                if(h != null) {
+                                    h.sell_date = sellHolding.sell_date;
+                                    h.sell_price = (sellHolding.sell_price ?? 0);
+                                    context.Entry(h).State = System.Data.Entity.EntityState.Modified;
+                                    context.SaveChanges();
+                                }
+                            }
+                        //}
+                    }
+                    //sellHoldings = (from q in holdings
+                    //                where q.profit >= 3
+                    //                select q).ToList();
+                    //foreach(var sellHolding in sellHoldings) {
+                    //    using(EcamContext context = new EcamContext()) {
+                    //        var h = (from q in context.tra_holding
+                    //                 where q.id == sellHolding.id
+                    //                 select q).FirstOrDefault();
+                    //        if(h != null) {
+                    //            h.sell_date = sellHolding.sell_date;
+                    //            h.sell_price = (sellHolding.sell_price ?? 0);
+                    //            context.Entry(h).State = System.Data.Entity.EntityState.Modified;
+                    //            context.SaveChanges();
+                    //        }
+                    //    }
+                    //}
+                }
+                for(int j = 0;j < markets.Count;j++) {
+                    var market = markets[j];
+                    market.ema_profit = (((market.close_price ?? 0) - (market.prev_price ?? 0)) / (market.prev_price ?? 0)) * 100;
+                    if(market.ema_signal == "B" && market.ema_profit > 0) {
+                        _TotalBuyCount += 1;
+                        _SuccessCount += 1;
+                        holdings = GetHoldings();
+                        if(holdings.Count() < _TotalEquity) {
+                            using(EcamContext context = new EcamContext()) {
+                                tra_holding holding = new tra_holding {
+                                    symbol = market.symbol,
+                                    trade_date = market.trade_date,
+                                    quantity = (int)(perEquity / (market.close_price ?? 0)),
+                                };
+                                if(holding.quantity >= 1) {
+                                    holding.buy_price = (market.close_price ?? 0);
+                                    context.tra_holding.Add(holding);
+                                    context.SaveChanges();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         private static void SupertrendUpdate() {
             List<string> symbols = new List<string>();
             using(EcamContext context = new EcamContext()) {
@@ -2211,7 +2310,7 @@ RegexOptions.IgnoreCase
             }
             // One event is used for each Fibonacci object
             ManualResetEvent[] doneEvents = new ManualResetEvent[queueCount];
-            SupertrendData[] downArray = new SupertrendData[queueCount];
+            IndicatorHelper[] downArray = new IndicatorHelper[queueCount];
             //Random r = new Random();
             // Configure and launch threads using ThreadPool:
             Console.WriteLine("launching {0} tasks...",totalCount);
@@ -2222,7 +2321,7 @@ RegexOptions.IgnoreCase
                     symbol = _COMPANIES[_INDEX];
                 }
                 doneEvents[i] = new ManualResetEvent(false);
-                SupertrendData f = new SupertrendData(symbol,_SYMBOLS_LIST,doneEvents[i]);
+                IndicatorHelper f = new IndicatorHelper(symbol,_SYMBOLS_LIST,doneEvents[i]);
                 downArray[i] = f;
                 ThreadPool.QueueUserWorkItem(f.ThreadPoolCallback,i);
             }

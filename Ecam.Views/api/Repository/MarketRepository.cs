@@ -42,8 +42,8 @@ namespace Ecam.Framework.Repository {
                 where.AppendFormat(" and ct.super_trend_signal='{0}' ",criteria.super_trend_signal);
             }
 
-            if(string.IsNullOrEmpty(criteria.macd_signal) == false) {
-                where.AppendFormat(" and ct.macd_signal='{0}' ",criteria.macd_signal);
+            if((criteria.is_ema_check ?? false) == true) {
+                where.Append(" and (ifnull(ct.ema_cross,0)>=-6 and ifnull(ct.ema_cross,0)<=0)");
             }
 
             List<string> categoryList = null;
@@ -113,13 +113,7 @@ namespace Ecam.Framework.Repository {
             if(criteria.is_book_mark.HasValue) {
                 where.AppendFormat(" and ifnull(c.is_book_mark,0)={0}",((criteria.is_book_mark ?? false) == true ? "1" : "0"));
             }
-
-            if(criteria.is_macd_check.HasValue) {
-                if((criteria.is_macd_check ?? false) == true) {
-                    where.Append(" and ifnull(ct.macd,0)<=0 and ifnull(ct.macd_histogram,0)<=0 ");
-                }
-            }
-
+             
             joinTables += " join tra_company c on c.symbol = ct.symbol ";
 
             selectFields = "count(*) as cnt";
@@ -146,6 +140,7 @@ namespace Ecam.Framework.Repository {
             }
 
             selectFields = "ct.*" +
+                           ",(((ifnull(ct.close_price,0) - ifnull(ct.prev_price,0))/ifnull(ct.prev_price,0)) * 100) as percentage" +
                            ",c.is_archive" +
                            ",c.is_book_mark" +
                            ",c.company_name as company_name" +
@@ -157,7 +152,7 @@ namespace Ecam.Framework.Repository {
 
             sql = string.Format(sqlFormat,selectFields,joinTables,where,groupByName,orderBy,pageLimit);
 
-            Helper.Log(sql);
+            //Helper.Log(sql);
 
             List<TRA_MARKET> rows = new List<TRA_MARKET>();
             using(EcamContext context = new EcamContext()) {

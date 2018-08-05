@@ -82,10 +82,8 @@ namespace Ecam.Models {
             //           select q).ToArray();
             string sql = string.Empty;
             for(int i = 0;i < candles.Length;i++) {
-                if(candles[i].trade_date.ToString("dd-MMM-yyyy") == "14-Feb-2017") {
-                    string s = string.Empty;
-                }
-                if((candles[i].is_indicator ?? false) == false) {
+                
+                if((candles[i].is_indicator ?? false) == false || candles[i].ema_signal == "B") {
                     sql = string.Format("update tra_market set " +
                         " super_trend_signal='{0}'" +
                         ",ema_5={1},ema_20={2},ema_profit={3},ema_cross={4},ema_signal='{5}',ema_cnt={6},ema_min_profit={7},ema_max_profit={8},is_indicator={9} " +

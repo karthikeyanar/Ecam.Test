@@ -196,7 +196,7 @@ namespace Ecam.Views.Controllers {
                     }
                 }
             }
-            return companies.Take(1).ToList();
+            return companies;//.Take(5).ToList();
         }
 
         [HttpPost]

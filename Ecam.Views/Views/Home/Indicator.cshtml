@@ -64,13 +64,13 @@
                         </select>
                     </div>
                 </div>
-                @*<div class="form-group m-r-10 m-t-10">
+                <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" id="is_macd_check" /> MACD Check
+                            <input type="checkbox" id="is_ema_check" /> EMA Check
                         </label>
                     </div>
-                </div>*@
+                </div>
             </div>
             <div class="clearfix"></div>
             <div class="m-l-15">
@@ -90,7 +90,6 @@
             </div>
             <input type="hidden" name="start_date" data-bind="value:start_date" />
             <input type="hidden" name="end_date" data-bind="value:end_date" />
-            <input type="hidden" name="nse_csv" id="nse_csv" value="" />
             <input type="hidden" name="nse_total" id="nse_total" value="" />
             <input type="hidden" name="nse_index" id="nse_index" value="" />
         </form>
@@ -105,10 +104,10 @@
                     <select id="rows" name="rows" class="pull-left form-control input-sm input-60">
                         <option value="10">10</option>
                         <option value="50">50</option>
-                        <option value="100">100</option>
+                        <option value="100"  selected>100</option>
                         <option value="200">200</option>
                         <option value="500">500</option>
-                        <option value="1000" selected>1000</option>
+                        <option value="1000">1000</option>
                     </select>
                 </div>
                 <div class="pull-left">
@@ -133,6 +132,9 @@
                     <th style="width: 50px" sortname="">
                         #
                     </th>
+                    <th style="width: 30px">
+                        &nbsp;
+                    </th>
                     <th style="width: 50px" sortname="is_archive">
                         Ar
                     </th>
@@ -150,6 +152,9 @@
                     </th>
                     <th sortname="close_price" class="text-right text-nowrap">
                         Close Price
+                    </th> 
+                    <th sortname="percentage" class="text-right text-nowrap">
+                        Percentage
                     </th> 
                     <th sortname="ema_signal" class="text-nowrap">
                         EMA Signal
@@ -185,6 +190,13 @@
                         <input type="hidden" id="symbol" data-bind="value:symbol" />
                     </td>
                     <td style="text-align:center;" data-bind="text:$index()+1"></td>
+                    <td class="cls-symbol">
+                        <div style="width:5px;">
+                            <a href="javascript:;" data-bind="attr:{'cid':id}" class="tree-expand ex-plus pull-left">
+                                <span>&nbsp;</span>
+                            </a>
+                        </div>
+                    </td>
                     <td style="text-align:center;">
                         <a href="javascript:;" class="is-book-mark">
                             <i data-bind="css:{'fa-bookmark fg-primary': cBool(is_archive)==true,'fa-bookmark-o': cBool(is_archive)==false}" class="fa fa-bookmark"></i>
@@ -202,7 +214,10 @@
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatNumber(close_price)"></div>
-                    </td> 
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(percentage)"></div>
+                    </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit">
                         <div data-bind="text:(ema_signal=='B' ? 'BUY': (ema_signal == 'S' ? 'SELL':''))"></div>
                     </td>
@@ -238,6 +253,59 @@
         </table>
     </div>
 </div>
+<input type="hidden" name="nse_csv" id="nse_csv" value="" />
 <div class="modal-container">
 </div>
 <!-- /ko --> 
+
+<script type="text/html" id="detail-template">
+    <div class="box-cnt">
+        <div class="rsi-box pull-left m-r-15">
+        </div>
+        @*<div class="avg-month-box pull-left m-l-15" style="width:45%;">
+            </div>*@
+        <div class="clearfix">&nbsp;</div>
+    </div>
+</script>
+<script type="text/html" id="detail-rsi-template">
+    <table cellpadding="0" cellspacing="0" class="table table-striped table-bordered table-hover table-condensed table-gray">
+        <thead>
+            <tr>
+                <th>
+                    Symbol
+                </th>
+                <th>
+                    Date
+                </th> 
+                <th class="text-right">
+                    Close
+                </th>
+                <th>
+                    EMA Signal
+                </th>
+                <th class="text-right">
+                    EMA Cross
+                </th>
+                <th class="text-right">
+                    EMA Profit
+                </th>
+                <th class="text-right">
+                    EMA Days
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {{each(j,row) rows}}
+            <tr>
+                <td>${row.symbol}</td>
+                <td>${formatDate(row.trade_date,'MM/DD/YYYY')}</td>
+                <td class="text-right">${formatNumber(row.close_price)}</td>
+                <td>{{if ema_signal=='B'}}Buy{{else}}{{if ema_signal=='S'}}Sell{{/if}}{{/if}}</td>
+                <td class="text-right">${ema_cross}</td>
+                <td class="text-right">${formatPercentage(row.ema_profit)}</td>
+                <td class="text-right">${ema_cnt}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</script>

@@ -11,7 +11,7 @@ if (!$gcb_cmd[0]) {
 $gcb_cmd.unbind('click').click(function () {
     var cmd = $(this).attr('cmd');
     var symbol = $(this).attr('symbol');
-    console.log('cmd=', cmd, 'symbol=', symbol);
+    //console.log('cmd=', cmd, 'symbol=', symbol);
     _SYMBOL = symbol;
     _SYMBOLS = symbol.split(',');
     _CMD = cmd;
