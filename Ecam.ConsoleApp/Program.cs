@@ -35,7 +35,8 @@ namespace Ecam.ConsoleApp {
         private static List<string> _URLS;
         private static List<string> _SYMBOLS_LIST;
         static void Main(string[] args) {
-            BackTestEMA();
+            //BackTestEMA();
+            SupertrendUpdate();
             return;
             try {
                 //NiftyListGenerate();
@@ -2000,7 +2001,7 @@ RegexOptions.IgnoreCase
 
         private static List<tra_market> _Markets;
         private static decimal _TotalAmount = 308450;
-        private static decimal _TotalEquity = 20;
+        private static int _TotalEquity = 10;
         private static int _TotalBuyCount = 0;
         private static int _SuccessCount = 0;
 
@@ -2223,28 +2224,33 @@ RegexOptions.IgnoreCase
                                           where q.symbol == holdings[z].symbol
                                           && q.trade_date > holdings[z].trade_date
                                           && q.trade_date == tradeDate
+                                          orderby q.trade_date ascending
                                           select q).FirstOrDefault();
                         if(sellMarket != null) {
+                            //holdings[z].buy_price = sellMarket.open_price;
+                            //holdings[z].trade_date = sellMarket.trade_date;
                             holdings[z].sell_date = sellMarket.trade_date;
                             holdings[z].sell_price = sellMarket.close_price;
                         }
                     }
                     var sellHoldings = (from q in holdings
-                                        //where q.profit <= 0
+                                            //where q.profit <= 0
                                         select q).ToList();
                     foreach(var sellHolding in sellHoldings) {
                         //if(sellHolding.profit <= -3) {
-                            using(EcamContext context = new EcamContext()) {
-                                var h = (from q in context.tra_holding
-                                         where q.id == sellHolding.id
-                                         select q).FirstOrDefault();
-                                if(h != null) {
-                                    h.sell_date = sellHolding.sell_date;
-                                    h.sell_price = (sellHolding.sell_price ?? 0);
-                                    context.Entry(h).State = System.Data.Entity.EntityState.Modified;
-                                    context.SaveChanges();
-                                }
+                        using(EcamContext context = new EcamContext()) {
+                            var h = (from q in context.tra_holding
+                                     where q.id == sellHolding.id
+                                     select q).FirstOrDefault();
+                            if(h != null) {
+                                //h.buy_price = (sellHolding.buy_price + (((sellHolding.buy_price ?? 0) * (decimal)0.5)/100));
+                                //h.trade_date = sellHolding.trade_date;
+                                h.sell_date = sellHolding.sell_date;
+                                h.sell_price = (sellHolding.sell_price ?? 0);
+                                context.Entry(h).State = System.Data.Entity.EntityState.Modified;
+                                context.SaveChanges();
                             }
+                        }
                         //}
                     }
                     //sellHoldings = (from q in holdings
@@ -2264,24 +2270,35 @@ RegexOptions.IgnoreCase
                     //    }
                     //}
                 }
-                for(int j = 0;j < markets.Count;j++) {
-                    var market = markets[j];
-                    market.ema_profit = (((market.close_price ?? 0) - (market.prev_price ?? 0)) / (market.prev_price ?? 0)) * 100;
-                    if(market.ema_signal == "B" && market.ema_profit > 0) {
-                        _TotalBuyCount += 1;
-                        _SuccessCount += 1;
-                        holdings = GetHoldings();
-                        if(holdings.Count() < _TotalEquity) {
-                            using(EcamContext context = new EcamContext()) {
-                                tra_holding holding = new tra_holding {
-                                    symbol = market.symbol,
-                                    trade_date = market.trade_date,
-                                    quantity = (int)(perEquity / (market.close_price ?? 0)),
-                                };
-                                if(holding.quantity >= 1) {
-                                    holding.buy_price = (market.close_price ?? 0);
-                                    context.tra_holding.Add(holding);
-                                    context.SaveChanges();
+                int equityCount = _TotalEquity;
+                //for(int j = 0;j < markets.Count;j++) {
+                //    var market = markets[j];
+                //    market.ema_profit = (((market.close_price ?? 0) - (market.prev_price ?? 0)) / (market.prev_price ?? 0)) * 100;
+                //    if(market.ema_signal == "B" && market.ema_profit > 0) {
+                //        equityCount += 1; 
+                //    }
+                //}
+                if(equityCount > 0) {
+                    perEquity = _TotalAmount / equityCount;
+                    for(int j = 0;j < markets.Count;j++) {
+                        var market = markets[j];
+                        market.ema_profit = (((market.close_price ?? 0) - (market.prev_price ?? 0)) / (market.prev_price ?? 0)) * 100;
+                        if(market.ema_signal == "B" && market.ema_profit > 0) {
+                            _TotalBuyCount += 1;
+                            _SuccessCount += 1;
+                            holdings = GetHoldings();
+                            if(holdings.Count() < _TotalEquity) {
+                                using(EcamContext context = new EcamContext()) {
+                                    tra_holding holding = new tra_holding {
+                                        symbol = market.symbol,
+                                        trade_date = market.trade_date,
+                                        quantity = (int)(perEquity / (market.close_price ?? 0)),
+                                    };
+                                    if(holding.quantity >= 1) {
+                                        holding.buy_price = (market.close_price ?? 0);
+                                        context.tra_holding.Add(holding);
+                                        context.SaveChanges();
+                                    }
                                 }
                             }
                         }

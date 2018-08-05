@@ -15,6 +15,9 @@ namespace Ecam.Models {
             Price last = null;
             int cnt = 0;
             for(int i = 0;i < candles.Count();i++) {
+                if(candles[i].trade_date.ToString("MM-dd-yyyy") == "01-31-2018") {
+                    string s = string.Empty;
+                }
                 if((candles[i].ema_cross ?? 0) >= -3 && (candles[i].ema_cross ?? 0) <= 0) {
                     if(last != null) {
                         last.ema_cnt = cnt;
@@ -53,6 +56,8 @@ namespace Ecam.Models {
                         last.ema_cnt = cnt;
                         candles[i].ema_profit = (((candles[i].close_price ?? 0) - (last.close_price ?? 0)) / (last.close_price ?? 0)) * 100;
                         last.ema_profit = candles[i].ema_profit;
+                    } else {
+                        last = null;
                     }
                 }
             }
