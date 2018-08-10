@@ -42,6 +42,10 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
             if (is_ema_check == true) {
                 arr[arr.length] = { "name": "is_ema_check", "value": is_ema_check };
             }
+            var is_ema_positive_check = $("#frmCompanySearch #is_ema_positive_check")[0].checked;
+            if (is_ema_positive_check == true) {
+                arr[arr.length] = { "name": "is_ema_positive_check", "value": is_ema_positive_check };
+            }
             var url = apiUrl("/Market/List");
             $.ajax({
                 "url": url,
@@ -90,13 +94,13 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
             var endDate = moment(cDateObj(dataFor.trade_date)).add('month', 1).format('MM/DD/YYYY');
             var $rsiBox = $(".rsi-box", $childTD);
             var $avgMonthBox = $(".avg-month-box", $childTD);
-            self.loadRSI(symbol, startDate, endDate, $rsiBox, function () {
+            self.loadRSI(symbol, startDate, endDate, moment(cDateObj(dataFor.trade_date)).format('MM/DD/YYYY'), $rsiBox, function () {
                 //self.loadAVG(symbol, $avgMonthBox, function () {
                 //});
             });
         }
 
-        this.loadRSI = function (symbol, startDate, endDate, $box, callback) {
+        this.loadRSI = function (symbol, startDate, endDate, tradeDate, $box, callback) {
             $box.html('loading...');
             handleBlockUI();
             var url = apiUrl("/Market/List");
@@ -113,9 +117,155 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
                 "type": "GET",
                 "data": arr
             }).done(function (json) {
+                for (var i = 0; i < json.rows.length; i++) {
+                    json.rows[i].is_trade_date = 'false';
+                    if (formatDate(json.rows[i].trade_date, 'MM/DD/YYYY') == tradeDate) {
+                        json.rows[i].is_trade_date = 'true';
+                    }
+                }
                 $box.empty();
                 $("#detail-rsi-template").tmpl(json).appendTo($box);
                 $box.removeClass("loading");
+                if (callback)
+                    callback();
+            })
+            .always(function () {
+                unblockUI();
+            });
+        }
+
+        this.loadChart = function (dataFor, callback) {
+            var symbol = dataFor.symbol;// $childTD.attr("symbol");
+            var startDate = moment(cDateObj(dataFor.trade_date)).subtract('month', 1).format('MM/DD/YYYY');
+            var endDate = moment(cDateObj(dataFor.trade_date)).add('month', 1).format('MM/DD/YYYY');
+            var tradeDate = moment(cDateObj(dataFor.trade_date)).format('MM/DD/YYYY');
+            $('#temp-chart-modal-container').remove();
+            var $cnt = $("<div id='temp-chart-modal-container'></div>");
+            $('body').append($cnt);
+
+            handleBlockUI();
+            var url = apiUrl("/Market/List");
+            var arr = [];
+            arr[arr.length] = { "name": "symbols", "value": symbol };
+            arr[arr.length] = { "name": "start_date", "value": startDate };
+            arr[arr.length] = { "name": "end_date", "value": endDate };
+            arr[arr.length] = { "name": "SortName", "value": "ct.trade_date" };
+            arr[arr.length] = { "name": "SortOrder", "value": "asc" };
+            arr[arr.length] = { "name": "PageSize", "value": "0" };
+            $.ajax({
+                "url": url,
+                "cache": false,
+                "type": "GET",
+                "data": arr
+            }).done(function (json) {
+                var arrDates = [];
+                var arrClosePrice = [];
+                var arrEMA20 = [];
+                var arrEMA5 = [];
+                var arrEMACross = [];
+                var arrEMAIncrease = [];
+                for (var i = 0; i < json.rows.length; i++) {
+                    json.rows[i].is_trade_date = 'false';
+                    if (formatDate(json.rows[i].trade_date, 'MM/DD/YYYY') == tradeDate) {
+                        json.rows[i].is_trade_date = 'true';
+                    }
+                    arrDates.push(formatDate(json.rows[i].trade_date, 'MM/DD/YYYY'));
+                    arrClosePrice.push(cFloat(json.rows[i].close_price));
+                    arrEMA20.push(cFloat(json.rows[i].ema_20));
+                    arrEMA5.push(cFloat(json.rows[i].ema_5));
+                    arrEMACross.push(cFloat(json.rows[i].ema_cross));
+                    arrEMAIncrease.push(cFloat(json.rows[i].ema_increase_profit));
+                }
+
+                var data = {
+                    "name": "chart"
+                   , "title": dataFor.company_name
+                   , "is_modal_full": false
+                   , "position": "top"
+                   , "width": $(window).width() - 50
+                };
+                //////console.log(data);
+                $("#modal-chart-template").tmpl(data).appendTo($cnt);
+                var $modal = $("#modal-investment-" + data.name, $cnt);
+                $modal.modal('show');
+
+                Highcharts.chart('trade_chart', {
+                    title: {
+                        text: dataFor.company_name
+                    },
+                    xAxis: {
+                        categories: arrDates
+                    },
+                    labels: {
+                        items: [{
+                            html: symbol,
+                            style: {
+                                left: '50px',
+                                top: '18px',
+                                color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
+                            }
+                        }]
+                    },
+                    series: [{
+                        type: 'spline',
+                        name: 'Close Price',
+                        data: arrClosePrice,
+                        color: 'blue',
+                        marker: {
+                            enabled: false
+                        }
+                    }, {
+                        type: 'spline',
+                        name: 'EMA 20',
+                        data: arrEMA20,
+                        color: 'red',
+                        marker: {
+                            enabled: false
+                        }
+                    }, {
+                        type: 'spline',
+                        name: 'EMA 5',
+                        data: arrEMA5,
+                        color: 'green',
+                        marker: {
+                            enabled: false
+                        }
+                    }]
+                });
+
+                Highcharts.chart('trade_column_chart', {
+                    title: {
+                        text: dataFor.company_name
+                    },
+                    xAxis: {
+                        categories: arrDates
+                    },
+                    labels: {
+                        items: [{
+                            html: symbol,
+                            style: {
+                                left: '50px',
+                                top: '18px',
+                                color: (Highcharts.theme && Highcharts.theme.textColor) || 'black'
+                            }
+                        }]
+                    },
+                    series: [{
+                        type: 'column',
+                        name: 'EMA Cross',
+                        data: arrEMACross,
+                        color: 'lightgray'
+                    }, {
+                        type: 'spline',
+                        name: 'Profit',
+                        data: arrEMAIncrease,
+                        color: 'green',
+                        marker: {
+                            enabled: false
+                        }
+                    }]
+                });
+
                 if (callback)
                     callback();
             })
@@ -203,7 +353,8 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
                 var dt = $(":input[name='last_trade_date']").val();
                 if (cString(dt) != '') {
                     handleBlockUI();
-                    var url = apiUrl("/Company/GetNSEUpdate?last_trade_date=" + dt + "&is_book_mark_category=" + $("#is_book_mark_category")[0].checked);
+                    var categories = $(":input[name='categories']").val();
+                    var url = apiUrl("/Company/GetNSEUpdate?categories=" + categories + "&last_trade_date=" + dt + "&is_book_mark_category=" + $("#is_book_mark_category")[0].checked);
                     var arr = [];
                     $.ajax({
                         "url": url,
@@ -237,6 +388,8 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
             $('#gcb_cmd').click();
         }
 
+
+
         this.onElements = function () {
             self.offElements();
             $("body").on("click", "#frmCompanySearch #is_archive", function (event) {
@@ -249,6 +402,9 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
                 self.loadGrid();
             });
             $("body").on("click", "#frmCompanySearch #is_ema_check", function (event) {
+                self.loadGrid();
+            });
+            $("body").on("click", "#frmCompanySearch #is_ema_positive_check", function (event) {
                 self.loadGrid();
             });
             $("body").on("change", "#Company #rows", function (event) {
@@ -352,6 +508,12 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
                     unblockUI();
                 });
             });
+            $("body").on("click", "#CompanyTable > tbody > tr > td.btn-open-chart", function (event) {
+                var $this = $(this);
+                var dataFor = ko.dataFor($this[0]);
+                self.loadChart(dataFor, function () {
+                });
+            });
             $("body").on("click", "#CompanyTable > tbody > tr > td.cls-symbol", function (event) {
                 var $this = $(this);
                 var dataFor = ko.dataFor($this[0]);
@@ -396,6 +558,7 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
             $("body").off("click", "#frmCompanySearch #is_book_mark");
             $("body").off("click", "#frmCompanySearch #is_book_mark_category");
             $("body").off("click", "#frmCompanySearch #is_ema_check");
+            $("body").off("click", "#frmCompanySearch #is_ema_positive_check");
             $("body").off("change", "#Company #rows");
             $("body").off("click", ".is-book-mark");
             $("body").off("click", ".is-current-stock");
@@ -404,6 +567,7 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
             $("body").off("click", "#btnSTUpdate");
             $("body").off("click", "#btnNSEDownload");
             $("body").off("click", "#btnNSEUpdateCSV");
+            $("body").off("click", "#CompanyTable > tbody > tr > td.btn-open-chart");
         }
 
         this.unInit = function () {

@@ -1,0 +1,1 @@
+select m.symbol,m.trade_date,m.close_price,m.ema_5,m.ema_20,m.ema_cross  from tra_market m where m.trade_date = '2018-08-09' and m.ema_cross <= 0 order by m.ema_cross desc limit 0,10000

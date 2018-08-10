@@ -43,6 +43,9 @@ namespace Ecam.Contracts {
         public Nullable<decimal> ema_min_profit { get; set; }
         public Nullable<decimal> ema_max_profit { get; set; }
         public Nullable<int> ema_cnt { get; set; }
+        public Nullable<int> ema_increase { get; set; }
+        public Nullable<decimal> ema_increase_profit { get; set; }
+        public Nullable<decimal> ema_min_cross { get; set; }
 
         public Nullable<bool> is_archive { get; set; }
         public Nullable<bool> is_book_mark { get; set; }

@@ -163,9 +163,7 @@ function NSE(){
     this.symbol = '';
     this.symbolsArray = [];
     this.index = -1;
-    this.check_data_timer = null;
-    this.check_data_count = 0;
-
+    
     this.init = function(pageUrl,tabId,openerId,symbol){
         ////console.log('NSE init tabId=',tabId,'openerId=',openerId,'symbol=',symbol);
         self.tabId=parseInt(tabId);
@@ -174,8 +172,6 @@ function NSE(){
         self.symbol=symbol;
         self.symbolsArray = self.symbol.split(',');
         self.index=-1;
-        self.check_data_timer = null;
-        self.check_data_count = 0;
         self.downloadData();
         //var code = "$('#btnNSEDownloadBackground').attr('tabid',"+self.tabId+");$('#btnNSEDownloadBackground').click();";
         //chrome.runtime.sendMessage({ cmd: 'execute_code','tabid':openerId,'code':code  });
@@ -183,10 +179,7 @@ function NSE(){
 
     this.downloadData = function() {
         var symbol = '';var startDate = '';var endDate = '';var nseType = '';
-        self.index+=1;
-        if(self.check_data_timer!=null){
-            clearInterval(self.check_data_timer);
-        }
+        self.index+=1; 
         console.log('self.index=',self.index,',total=',self.symbolsArray.length);
         if(self.index<=self.symbolsArray.length){
             var arr = self.symbolsArray[self.index].split('|');
@@ -221,13 +214,8 @@ function NSE(){
 
             var $btn = $(".getdata-button",$frm);
             $btn.click();
-            self.check_data_timer = setInterval(function(){
-                ////console.log('self.check_data_count=',self.check_data_count);
-                //if(self.check_data_count>=50) {
-                //clearInterval(self.check_data_timer);
-                //self.downloadData();
-                //} else {
-                self.check_data_count+=1;
+            
+            setTimeout(function(){
                 $csvFileName=$('#csvFileName');
                 $csvContentDiv=$('#csvContentDiv');
                 var csv='';
@@ -261,15 +249,18 @@ function NSE(){
                         downloadLink.click();
                     },500);
                     setTimeout(function(){
-                        clearInterval(self.check_data_timer);
                         self.downloadData();
-                    },2000);
+                    },1000);
                 } else {
-                    clearInterval(self.check_data_timer);
+                    var $missingSymbols = $("#missing_symbols");
+                    if(!$missingSymbols[0]){
+                        $("body").append("<div id='missing_symbols' style='position:absolute;left:100px;top:100px;font-size:18px;'></div>");
+                    }
+                    $missingSymbols.html($missingSymbols.html() + symbol + "</br>");
                     self.downloadData();
                 }
-                //}
-            }, 5000);
+            },10000);
+            //}
         }
     }
      

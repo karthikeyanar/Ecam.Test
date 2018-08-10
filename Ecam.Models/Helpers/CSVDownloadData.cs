@@ -52,6 +52,7 @@ namespace Ecam.Models {
             //    File.Delete(fileName);
             //}
             if(this._IS_NOT_SUCCESS == false) {
+            
                 if(string.IsNullOrEmpty(_ORIGINAL_FILE_NAME) == false) {
                     if(Directory.Exists(IMPORT_BACKUP_CSV) == false) {
                         Directory.CreateDirectory(IMPORT_BACKUP_CSV);
@@ -64,6 +65,8 @@ namespace Ecam.Models {
             }
             _doneEvent.Set();
         }
+
+      
 
         public string CSVDataDownload(string tempfilename,bool isTakeTempFileName = false) {
             string lastSymbol = "";
@@ -193,7 +196,68 @@ namespace Ecam.Models {
                     }
                 }
             }
+            AddSplit(lastSymbol);
+            IndicatorHelper indicator = new IndicatorHelper();
+            indicator.Update(lastSymbol);
+            YearLog(lastSymbol);
             return lastSymbol;
+        }
+
+        private void AddSplit(string splitSymbol) {
+            List<tra_market> markets = null;
+            using(EcamContext context = new EcamContext()) {
+                markets = (from q in context.tra_market
+                           where q.symbol == splitSymbol
+                           && ((((q.close_price ?? 0) - (q.prev_price ?? 0)) / (q.prev_price ?? 0)) * 100) != 0
+                           && ((((q.close_price ?? 0) - (q.prev_price ?? 0)) / (q.prev_price ?? 0)) * 100) <= -48
+                           //&& (q.percentage ?? 0) != 0 && (q.percentage ?? 0) <= -48
+                           where (q.prev_price ?? 0) > 0
+                           orderby q.trade_date ascending, q.symbol ascending
+                           select q).ToList();
+            }
+            foreach(var market in markets) {
+                string symbol = market.symbol;
+                DateTime tradeDate = market.trade_date;
+                decimal factor = DataTypeHelper.SafeDivision((market.prev_price ?? 0),(market.open_price ?? 0));
+                tra_split split = null;
+
+                using(EcamContext context = new EcamContext()) {
+                    split = (from q in context.tra_split
+                             where q.symbol == symbol
+                             && q.split_date == tradeDate
+                             select q).FirstOrDefault();
+                    bool isNew = false;
+                    if(split == null) {
+                        split = new tra_split();
+                        isNew = true;
+                    } else {
+                        split._prev_split = (from q in context.tra_split
+                                             where
+                                             q.id == split.id
+                                             select q).FirstOrDefault();
+                    }
+                    if(isNew == true) {
+                        split.symbol = symbol;
+                        split.split_date = tradeDate;
+                        split.split_factor = factor;
+                        if(split.id > 0) {
+                            context.Entry(split).State = System.Data.Entity.EntityState.Modified;
+                        } else {
+                            context.tra_split.Add(split);
+                        }
+                        context.SaveChanges();
+                    }
+                }
+                if(split != null) {
+                    split.UpdatePrice();
+                    Console.WriteLine("Split Completed symbol=" + split.symbol + ",Date=" + split.split_date);
+                }
+            }
+        }
+
+        private void YearLog(string symbol) {
+            DateTime startDate = Convert.ToDateTime("01/01/" + (DateTime.Now.Year).ToString());
+            TradeHelper.CreateYearLog(symbol,startDate);
         }
 
         public string file_name { get { return _FILE_NAME; } }

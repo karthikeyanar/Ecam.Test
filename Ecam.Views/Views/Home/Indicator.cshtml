@@ -67,7 +67,14 @@
                 <div class="form-group m-r-10 m-t-10">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" id="is_ema_check" /> EMA Check
+                            <input type="checkbox" id="is_ema_check" /> EMA Negative Check
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group m-r-10 m-t-10">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="is_ema_positive_check" /> EMA Positive Check
                         </label>
                     </div>
                 </div>
@@ -97,12 +104,19 @@
 </div>
 <div class="row" id="Company">
     <div class="col-md-12">
+        <div id="underlyingfund_economics3">
+
+        </div>
+    </div>
+    <div class="col-md-12">
         <div class="row">
             <div class="col-md-6">
                 <div class="pull-left m-r-15">
                     <span class="pull-left p-t-5 p-r-10">Rows</span>
                     <select id="rows" name="rows" class="pull-left form-control input-sm input-60">
                         <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="25">25</option>
                         <option value="50">50</option>
                         <option value="100"  selected>100</option>
                         <option value="200">200</option>
@@ -162,6 +176,18 @@
                     <th sortname="ema_cross" class="text-right text-nowrap">
                         EMA Cross
                     </th>
+                    <th sortname="ema_min_cross" class="text-right text-nowrap">
+                        EMA Min Cross
+                    </th>
+                    <th sortname="ema_increase" class="text-right text-nowrap">
+                        EMA Increase
+                    </th>
+                    <th sortname="ema_increase_profit" class="text-right text-nowrap">
+                        EMA Increase %
+                    </th>
+                    <th sortname="ema_cnt" class="text-right text-nowrap">
+                        EMA Days
+                    </th>
                     <th sortname="ema_profit" class="text-right text-nowrap">
                         EMA Profit
                     </th>
@@ -170,9 +196,6 @@
                     </th>
                     <th sortname="ema_max_profit" class="text-right text-nowrap">
                         EMA Max Profit
-                    </th>
-                    <th sortname="ema_cnt" class="text-right text-nowrap">
-                        EMA Days
                     </th>
                     <th sortname="super_trend_signal" class="text-nowrap">
                         Super Trend
@@ -207,7 +230,7 @@
                             <i data-bind="css:{'fa-user fg-primary': cBool(is_book_mark)==true,'fa-user-o': cBool(is_book_mark)==false}" class="fa fa-user"></i>
                         </a>
                     </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:company_name"></td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit btn-open-chart" data-bind="text:company_name"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit" data-bind="text:symbol"></td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit">
                         <div data-bind="text:formatDate(trade_date,'MM/DD/YYYY')"></div>
@@ -225,6 +248,18 @@
                         <div data-bind="text:ema_cross"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:ema_min_cross"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:ema_increase"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:formatPercentage(ema_increase_profit)"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
+                        <div data-bind="text:ema_cnt"></div>
+                    </td>
+                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(ema_profit)"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
@@ -232,9 +267,6 @@
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
                         <div data-bind="text:formatPercentage(ema_max_profit)"></div>
-                    </td>
-                    <td style="vertical-align:top;" class="cursor-pointer btn-edit text-right">
-                        <div data-bind="text:ema_cnt"></div>
                     </td>
                     <td style="vertical-align:top;" class="cursor-pointer btn-edit">
                         <div data-bind="text:(super_trend_signal=='B' ? 'BUY': (super_trend_signal == 'S' ? 'SELL':''))"></div>
@@ -287,25 +319,61 @@
                     EMA Cross
                 </th>
                 <th class="text-right">
-                    EMA Profit
+                    EMA Min Cross
+                </th>
+                <th class="text-right text-nowrap">
+                    EMA Increase
+                </th>
+                <th class="text-right text-nowrap">
+                    EMA Increase %
                 </th>
                 <th class="text-right">
                     EMA Days
                 </th>
+                <th class="text-right">
+                    EMA Profit
+                </th>
+                <th class="text-right text-nowrap">
+                    EMA Min Profit
+                </th>
+                <th class="text-right text-nowrap">
+                    EMA Max Profit
+                </th>
+                <th class="text-nowrap">
+                    Super Trend
+                </th> 
             </tr>
         </thead>
         <tbody>
             {{each(j,row) rows}}
-            <tr>
+            <tr {{if row.is_trade_date == 'true'}}style='background:red !important;color:white !important;'{{/if}}>
                 <td>${row.symbol}</td>
                 <td>${formatDate(row.trade_date,'MM/DD/YYYY')}</td>
                 <td class="text-right">${formatNumber(row.close_price)}</td>
                 <td>{{if ema_signal=='B'}}Buy{{else}}{{if ema_signal=='S'}}Sell{{/if}}{{/if}}</td>
                 <td class="text-right">${ema_cross}</td>
-                <td class="text-right">${formatPercentage(row.ema_profit)}</td>
+                <td class="text-right">${ema_min_cross}</td>
+                <td class="text-right">${ema_increase}</td>
+                <td class="text-right">${formatPercentage(row.ema_increase_profit)}</td>
                 <td class="text-right">${ema_cnt}</td>
+                <td class="text-right">${formatPercentage(row.ema_profit)}</td>
+                <td class="text-right">${formatPercentage(row.ema_min_profit)}</td>
+                <td class="text-right">${formatPercentage(row.ema_max_profit)}</td>
+                <td>{{if super_trend_signal=='B'}}Buy{{else}}{{if super_trend_signal=='S'}}Sell{{/if}}{{/if}}</td>
             </tr>
             {{/each}}
         </tbody>
     </table>
+</script>
+<script type="text/html" id="modal-chart-template">
+    <div id="modal-investment-${name}" class="modal {{if is_modal_full==true}}container{{/if}} {{if position=='top'}}modal-top{{/if}}" tabindex="-1" data-focus-on="input:first" data-width="${width}" style="display: none;">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">${title}</h4>
+        </div>
+        <div class="modal-body">
+            <div id="trade_chart" style="height:500px;"></div>
+            <div id="trade_column_chart" style="height:500px;"></div>
+        </div>
+    </div>
 </script>

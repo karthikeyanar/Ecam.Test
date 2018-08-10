@@ -63,9 +63,9 @@ namespace Ecam.Views.Controllers {
                 symbol = csvDownload.CSVDataDownload(fullFileName,true);
                 UploadFileHelper.FileCopy("TempPath",fileName,"TempPath",symbol + "_" + DateTime.Now.Date.ToString("yyyy-MM-dd").ToString() + "_" + randomNumber + ".csv");
                 UploadFileHelper.DeleteFile("TempPath",fileName);
+                AddSplit(symbol);
                 IndicatorHelper indicator = new IndicatorHelper();
                 indicator.Update(symbol);
-                AddSplit(symbol);
                 YearLog(symbol);
             }
             return Ok(new { symbol = symbol });

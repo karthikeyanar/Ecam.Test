@@ -86,8 +86,8 @@ namespace Ecam.Models {
                 if((candles[i].is_indicator ?? false) == false || candles[i].ema_signal == "B") {
                     sql = string.Format("update tra_market set " +
                         " super_trend_signal='{0}'" +
-                        ",ema_5={1},ema_20={2},ema_profit={3},ema_cross={4},ema_signal='{5}',ema_cnt={6},ema_min_profit={7},ema_max_profit={8},is_indicator={9} " +
-                   " where trade_date='{10}' and symbol='{11}'"
+                        ",ema_5={1},ema_20={2},ema_profit={3},ema_cross={4},ema_signal='{5}',ema_cnt={6},ema_min_profit={7},ema_max_profit={8},ema_min_cross={9},ema_increase={10},ema_increase_profit={11},is_indicator={12} " +
+                   " where trade_date='{13}' and symbol='{14}'"
                    ,candles[i].super_trend_signal
                    ,(candles[i].ema_5 ?? 0)
                    ,(candles[i].ema_20 ?? 0)
@@ -97,6 +97,9 @@ namespace Ecam.Models {
                    ,(candles[i].ema_cnt ?? 0)
                    ,(candles[i].ema_min_profit ?? 0)
                    ,(candles[i].ema_max_profit ?? 0)
+                   ,(candles[i].ema_min_cross ?? 0)
+                   ,(candles[i].ema_increase ?? 0)
+                   ,(candles[i].ema_increase_profit ?? 0)
                    ,1
                    ,candles[i].trade_date.ToString("yyyy-MM-dd")
                    ,candles[i].symbol);

@@ -55,6 +55,12 @@ namespace Ecam.Models {
             this.Property(t => t.ema_max_profit)
               .HasPrecision(13,4);
 
+            this.Property(t => t.ema_increase_profit)
+             .HasPrecision(13,4);
+
+            this.Property(t => t.ema_min_cross)
+            .HasPrecision(13,8);
+
             // Table & Column Mappings
             this.ToTable("tra_market");
             this.Property(t => t.symbol).HasColumnName("symbol");
@@ -76,6 +82,9 @@ namespace Ecam.Models {
             this.Property(t => t.ema_min_profit).HasColumnName("ema_min_profit");
             this.Property(t => t.ema_max_profit).HasColumnName("ema_max_profit");
             this.Property(t => t.ema_cnt).HasColumnName("ema_cnt");
+            this.Property(t => t.ema_increase).HasColumnName("ema_increase");
+            this.Property(t => t.ema_increase_profit).HasColumnName("ema_increase_profit");
+            this.Property(t => t.ema_min_cross).HasColumnName("ema_min_cross");
         }
     }
 }

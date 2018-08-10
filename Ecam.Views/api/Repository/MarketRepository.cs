@@ -43,7 +43,12 @@ namespace Ecam.Framework.Repository {
             }
 
             if((criteria.is_ema_check ?? false) == true) {
-                where.Append(" and (ifnull(ct.ema_cross,0)>=-6 and ifnull(ct.ema_cross,0)<=0)");
+                //where.Append(" and (ifnull(ct.ema_increase,0)>0 and ifnull(ct.ema_increase_profit,0)>0)");
+                where.Append(" and ifnull(ct.ema_cross,0)<=0 and ifnull(ct.ema_cnt,0)>0");
+            }
+
+            if((criteria.is_ema_positive_check ?? false) == true) {
+                where.Append(" and ifnull(ct.ema_cross,0)>0");
             }
 
             List<string> categoryList = null;

@@ -45,11 +45,6 @@ function doDownload() {
 			$('#series').val(d.type);
 		}
 		$('#symbol').val(symbol);
-		if($('#rdDateToDate')[0]) {
-			$('#rdDateToDate')[0].checked=true;
-		}
-		$('#fromDate').val(d.from_date);
-		$('#toDate').val(d.to_date);
 		$log.html($log.html()+'symbol='+symbol+',type='+type+'<br/>');
 		var $csvFileName=$('#csvFileName');
 		$csvFileName.val('');
@@ -95,15 +90,15 @@ function checkCSVContent(symbol) {
 			if(isDone==true) {
 				doDownload();
 			} else {
-				//if(checkCSVCount<=1){
-				//	arr[index].type='ALL';
-				//	index=index-1;
-				//	doDownload();
-				//} else {
+				if(checkCSVCount<=3){
+					arr[index].type='ALL';
+					index=index-1;
+					doDownload();
+				} else {
 					checkCSVCount=0;
 					$error.append("<li style='margin:5px 0;list-style-type:number;'>"+symbol+"</li>");
 					doDownload();
-				//}
+				}
 			}
 		} catch(e) {
 			checkCSVCount=0;

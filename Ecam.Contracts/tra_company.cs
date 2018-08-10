@@ -149,6 +149,7 @@ namespace Ecam.Contracts {
         public string super_trend_signal { get; set; }
 
         public bool? is_ema_check { get; set; }
+        public bool? is_ema_positive_check { get; set; }
     }
 
     public class TRA_CATEGORY_GROUP {

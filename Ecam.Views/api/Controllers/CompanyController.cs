@@ -157,6 +157,7 @@ namespace Ecam.Views.Controllers {
             List<TRA_NSE_UPDATE> companies = new List<TRA_NSE_UPDATE>();
             DateTime last_trade_date = DataTypeHelper.ToDateTime(HttpContext.Current.Request["last_trade_date"]);
             bool is_book_mark_category = DataTypeHelper.ToBoolean(HttpContext.Current.Request["is_book_mark_category"]);
+            string categories = HttpContext.Current.Request["categories"];
             if(last_trade_date.Year > 0) {
                 using(EcamContext context = new EcamContext()) {
                     List<string> categorySymbols = new List<string>();
@@ -168,26 +169,38 @@ namespace Ecam.Views.Controllers {
                                            select q.symbol).ToList();
                         query = (from q in query
                                  where categorySymbols.Contains(q.symbol) == true
+                                 && (q.is_archive ?? false) == false
                                  select q);
                     }
-                    List<string> symbols = (from q in query
+                    if(string.IsNullOrEmpty(categories) == false) {
+                        List<string> list = Helper.ConvertStringList(categories);
+                        List<string> categorySymbolList = (from q in context.tra_company_category
+                                           join c in context.tra_category on q.category_name equals c.category_name
+                                           where list.Contains(q.category_name) == true
+                                           select q.symbol).ToList();
+                        query = (from q in query
+                                 where categorySymbolList.Contains(q.symbol) == true
+                                 && (q.is_archive ?? false) == false
+                                 select q);
+                    }
+                    List<string> symbolsList = (from q in query
                                             select q.symbol).ToList();
-                    foreach(string symbol in symbols) {
+                    foreach(string symbol in symbolsList) {
                         var lastMarket = (from q in context.tra_market
                                           join c in context.tra_company on q.symbol equals c.symbol
                                           where q.symbol == symbol
                                           && q.trade_date <= last_trade_date.Date
                                           orderby q.trade_date descending
                                           select new {
-                                               q.trade_date,
-                                               q.symbol,
-                                               c.nse_type
+                                              q.trade_date,
+                                              q.symbol,
+                                              c.nse_type
                                           }).FirstOrDefault();
                         if(lastMarket != null) {
                             if(lastMarket.trade_date.Date != last_trade_date.Date) {
                                 companies.Add(new TRA_NSE_UPDATE {
                                     symbol = lastMarket.symbol,
-                                    start_date = lastMarket.trade_date.Date.ToString("dd-MM-yyyy"),
+                                    start_date = lastMarket.trade_date.Date.AddDays(1).ToString("dd-MM-yyyy"),
                                     end_date = last_trade_date.Date.ToString("dd-MM-yyyy"),
                                     nse_type = lastMarket.nse_type
                                 });
@@ -196,7 +209,27 @@ namespace Ecam.Views.Controllers {
                     }
                 }
             }
-            return companies;//.Take(5).ToList();
+            //companies = companies.Take(5).ToList();
+            var symbols = "";
+            if(companies != null) {
+                foreach(var company in companies) {
+                    symbols += "{'symbol':'" + company.symbol + "','type':'" + company.nse_type + "','from_date':'" + company.start_date + "','to_date':'" + company.end_date + "'},";
+                }
+            }
+            if(string.IsNullOrEmpty(symbols) == false) {
+                symbols = symbols.Substring(0,symbols.Length - 1);
+            }
+            string script = System.IO.File.ReadAllText("E:\\Projects\\Ecam.Test2\\Ecam.Test\\ORI_CSV_SCRIPT.txt");
+            script = script.Replace("{{SYMBOLS}}",symbols);
+            string p = "";
+            p += string.Format("p.data_type='{0}';",System.Configuration.ConfigurationManager.AppSettings["DATA_TYPE"]);
+            p += string.Format("p.date_range='{0}';",System.Configuration.ConfigurationManager.AppSettings["DATA_RANGE"]);
+            p += string.Format("p.period_type='{0}';",System.Configuration.ConfigurationManager.AppSettings["PERIOD_TYPE"]);
+            p += string.Format("p.from_date='{0}';",System.Configuration.ConfigurationManager.AppSettings["FROM_DATE"]);
+            p += string.Format("p.to_date='{0}';",System.Configuration.ConfigurationManager.AppSettings["TO_DATE"]);
+            script = script.Replace("{{PARAMS}}",p);
+            System.IO.File.WriteAllText("E:\\Projects\\Ecam.Test2\\Ecam.Test\\CSV_SCRIPT.txt",script);
+            return companies;
         }
 
         [HttpPost]
