@@ -136,8 +136,8 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
 
         this.loadChart = function (dataFor, callback) {
             var symbol = dataFor.symbol;// $childTD.attr("symbol");
-            var startDate = moment(cDateObj(dataFor.trade_date)).subtract('month', 1).format('MM/DD/YYYY');
-            var endDate = moment(cDateObj(dataFor.trade_date)).add('month', 1).format('MM/DD/YYYY');
+            var startDate = moment(cDateObj(dataFor.trade_date)).subtract('month', 6).format('MM/DD/YYYY');
+            var endDate = moment(cDateObj(dataFor.trade_date)).add('month', 6).format('MM/DD/YYYY');
             var tradeDate = moment(cDateObj(dataFor.trade_date)).format('MM/DD/YYYY');
             $('#temp-chart-modal-container').remove();
             var $cnt = $("<div id='temp-chart-modal-container'></div>");
@@ -255,14 +255,6 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
                         name: 'EMA Cross',
                         data: arrEMACross,
                         color: 'lightgray'
-                    }, {
-                        type: 'spline',
-                        name: 'Profit',
-                        data: arrEMAIncrease,
-                        color: 'green',
-                        marker: {
-                            enabled: false
-                        }
                     }]
                 });
 
@@ -354,7 +346,9 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
                 if (cString(dt) != '') {
                     handleBlockUI();
                     var categories = $(":input[name='categories']").val();
-                    var url = apiUrl("/Company/GetNSEUpdate?categories=" + categories + "&last_trade_date=" + dt + "&is_book_mark_category=" + $("#is_book_mark_category")[0].checked);
+                    var url = apiUrl("/Company/GetNSEUpdate?categories=" + categories + "&last_trade_date=" + dt
+                        + "&is_book_mark=" + $("#is_book_mark")[0].checked
+                        + "&is_book_mark_category=" + $("#is_book_mark_category")[0].checked);
                     var arr = [];
                     $.ajax({
                         "url": url,
@@ -583,6 +577,10 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
             pushGCEvent(function (e, ui) {
                 self.loadGrid();
             });
+
+            var $symbols = $(":input[name='symbols']");
+            $symbols.select2Refresh("data", [{ id: 'NIFTY500', text: 'NIFTY500' }]);
+
             self.loadGrid(function () {
                 self.onElements();
 

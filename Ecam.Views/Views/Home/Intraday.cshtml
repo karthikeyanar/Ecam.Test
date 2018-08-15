@@ -1084,14 +1084,10 @@
                                     <th class="text-right">CMV</th>
                                     <th class="text-right">High.CMV</th>
                                     <th class="text-right">Low.CMV</th>
-                                    <th class="text-right">Positive</th>
-                                    <th class="text-right">Negative</th>
-                                    <th class="text-right">Ratio</th>
-                                    @*<th class="text-right">Diff</th>*@
+                                    <th class="text-right">Nifty500</th>
+                                    <th class="text-right">Nifty500 Change</th>
                                     <th class="text-right">Indicator</th>
                                     <th class="text-right">Percentage</th>
-                                    @*<th class="text-right">High.Percentage</th>
-                                    <th class="text-right">Low.Percentage</th>*@
                                 </tr>
                             </thead>
                             <tbody>
@@ -1101,14 +1097,10 @@
                                     <td class="text-right">${formatNumber(row.cmv)}</td>
                                     <td class="text-right">${formatNumber(row.cmv_high)}</td>
                                     <td class="text-right">${formatNumber(row.cmv_low)}</td>
-                                    <td class="text-right">${formatNumber(row.positive_count)}</td>
-                                    <td class="text-right">${formatNumber(row.negative_count)}</td>
-                                    <td class="text-right">${formatNumber(cFloat(row.positive_count)/cFloat(row.negative_count))}</td>
-                                    @*<td class="text-right">${formatInteger(row.positive_count - row.negative_count)}</td>*@
+                                    <td class="text-right">${formatNumber(row.nifty500_close)}</td>
+                                    <td class="text-right">${formatPercentage(row.nifty500_change)}</td>
                                     <td class="text-right">{{if row.indicator==true}}<i class="fa fa-check"></i>{{/if}}</td>
                                     <td class="text-right">${formatPercentage(row.percentage)}</td>
-                                    @*<td class="text-right">${formatPercentage(row.percentage_high)}</td>
-                                    <td class="text-right">${formatPercentage(row.percentage_low)}</td>*@
                                 </tr>
                                 {{/each}}
                             </tbody>

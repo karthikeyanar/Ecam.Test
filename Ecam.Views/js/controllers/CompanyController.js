@@ -317,6 +317,9 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
                     , 'symbol': ''
                     , 'category_name': ''
                     , 'id': 0
+                    , 'money_control_url': ''
+                    , 'money_control_symbol': ''
+                    , 'nse_type': ''
                     , 'category_list': []
                 };
             }

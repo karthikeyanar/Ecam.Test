@@ -566,6 +566,7 @@ namespace Ecam.Models {
             List<string> symbols = (from q in list
                                     select q.symbol).Distinct().ToList();
             List<tra_market> markets;
+            List<tra_market> nifty500;
             List<tra_daily_log> dailyLogs;
             using(EcamContext context = new EcamContext()) {
                 markets = (from q in context.tra_market
@@ -573,6 +574,11 @@ namespace Ecam.Models {
                            && q.trade_date >= criteria.start_date
                            && q.trade_date <= criteria.end_date
                            select q).ToList();
+                nifty500 = (from q in context.tra_market
+                            where q.symbol == "NIFTY500"
+                            && q.trade_date >= criteria.start_date
+                            && q.trade_date <= criteria.end_date
+                            select q).ToList();
                 dailyLogs = (from q in context.tra_daily_log
                              where q.trade_date >= criteria.start_date
                              && q.trade_date <= criteria.end_date
@@ -668,6 +674,15 @@ namespace Ecam.Models {
                             if(dailylog != null) {
                                 log.positive_count = dailylog.positive;
                                 log.negative_count = dailylog.negative;
+                            }
+                        }
+                        if(nifty500 != null) {
+                            var nif = (from q in nifty500
+                                       where q.trade_date == dt
+                                            select q).FirstOrDefault();
+                            if(nif != null) {
+                                log.nifty500_close = nif.close_price;
+                                log.nifty500_prev_close = nif.prev_price;
                             }
                         }
                     }
@@ -956,7 +971,7 @@ namespace Ecam.Models {
         }
         public bool? indicator {
             get {
-                return (this.positive_count ?? 0) > (this.negative_count ?? 0);
+                return (this.nifty500_change ?? 0) > 0; //(this.positive_count ?? 0) > (this.negative_count ?? 0);
             }
         }
         public decimal percentage {
@@ -972,6 +987,17 @@ namespace Ecam.Models {
         public decimal percentage_low {
             get {
                 return DataTypeHelper.SafeDivision((this.cmv_low - this.investment),this.investment) * 100;
+            }
+        }
+        public decimal? nifty500_close { get; set; }
+        public decimal? nifty500_prev_close { get; set; }
+        public decimal? nifty500_change {
+            get {
+                try {
+                    return (((this.nifty500_close ?? 0) - (this.nifty500_prev_close ?? 0)) / (this.nifty500_prev_close ?? 0)) * 100;
+                } catch {
+                    return 0;
+                }
             }
         }
         public int? total {

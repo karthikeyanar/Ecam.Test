@@ -157,6 +157,7 @@ namespace Ecam.Views.Controllers {
             List<TRA_NSE_UPDATE> companies = new List<TRA_NSE_UPDATE>();
             DateTime last_trade_date = DataTypeHelper.ToDateTime(HttpContext.Current.Request["last_trade_date"]);
             bool is_book_mark_category = DataTypeHelper.ToBoolean(HttpContext.Current.Request["is_book_mark_category"]);
+            bool is_book_mark = DataTypeHelper.ToBoolean(HttpContext.Current.Request["is_book_mark"]);
             string categories = HttpContext.Current.Request["categories"];
             if(last_trade_date.Year > 0) {
                 using(EcamContext context = new EcamContext()) {
@@ -181,6 +182,11 @@ namespace Ecam.Views.Controllers {
                         query = (from q in query
                                  where categorySymbolList.Contains(q.symbol) == true
                                  && (q.is_archive ?? false) == false
+                                 select q);
+                    }
+                    if(is_book_mark) {
+                        query = (from q in query
+                                 where q.is_book_mark == is_book_mark
                                  select q);
                     }
                     List<string> symbolsList = (from q in query
