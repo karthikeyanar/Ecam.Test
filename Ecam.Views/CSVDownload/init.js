@@ -1,5 +1,9 @@
 var _CMD = '';
 var _SYMBOL = '';
+var _COMPANY_ID = '';
+var _URL = '';
+var _START_DATE = '';
+var _END_DATE = '';
 var _SYMBOLS = [];
 var index = -1;
 
@@ -15,6 +19,10 @@ $gcb_cmd.unbind('click').click(function () {
     _SYMBOL = symbol;
     _SYMBOLS = symbol.split(',');
     _CMD = cmd;
+    _COMPANY_ID = $(this).attr('company_id');
+    _URL = $(this).attr('url');
+    _START_DATE = $(this).attr('start_date');
+    _END_DATE = $(this).attr('end_date');
     startMC();
 });
 
@@ -27,6 +35,8 @@ function startMC() {
                 chrome.runtime.sendMessage({ cmd: _CMD, symbol: _SYMBOLS[self.index] });
             }, 500);
         }
+    } else if (_CMD == 'investing-history') {
+        chrome.runtime.sendMessage({ cmd: _CMD, symbol: '', company_id: _COMPANY_ID, url: _URL, start_date: _START_DATE, end_date: _END_DATE });
     } else {
         chrome.runtime.sendMessage({ cmd: _CMD, symbol: _SYMBOL });
     }

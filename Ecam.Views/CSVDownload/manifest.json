@@ -1,16 +1,19 @@
 {
   "name": "Money Control CSV Download",
   "description": "Adds a print button to the browser.",
-  "version": "1.2",
+  "version": "1.3",
   "permissions": [
     "tabs",
     "windows",
     "http://localhost:6868/*",
+    "http://localhost:5000/*",
     "https://www.moneycontrol.com/*",
     "https://www.nseindia.com/*",
+    "https://in.investing.com/*",
     "activeTab",
     "declarativeContent",
-    "storage"
+    "storage",
+    "input"
   ],
   "background": {
     "scripts": [ "background.js" ],

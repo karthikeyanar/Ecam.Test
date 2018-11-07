@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.Entity.Validation;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -128,6 +129,62 @@ namespace Ecam.ConsoleApp {
                 }
             } catch(Exception ex) {
                 Helper.Log(ex.Message,"MAIN_ERROR" + "_" + (new Random()).Next(1000,10000));
+            }
+        }
+
+        private static void CreateCompanyCategory() {
+            List<tra_company_category> categoryies;
+            using(EcamContext context = new EcamContext()) {
+                categoryies = (from q in context.tra_company_category select q).ToList();
+            }
+            string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["InvestmentContext"].ConnectionString;
+            foreach(var row in categoryies) {
+                string sql = "";
+                int categoryID = 0;
+                int companyID = 0;
+
+                sql = "select categoryid from category where categoryname='" + row.category_name + "'";
+
+                try {
+                    using(SqlConnection connection = new SqlConnection(
+                       connectionString)) {
+                        SqlCommand command = new SqlCommand(sql,connection);
+                        command.Connection.Open();
+                        categoryID = (int)command.ExecuteScalar();
+                    }
+                } catch { }
+
+                sql = "select companyid from company where symbol='" + row.symbol + "'";
+
+                try {
+                    using(SqlConnection connection = new SqlConnection(
+                       connectionString)) {
+                        SqlCommand command = new SqlCommand(sql,connection);
+                        command.Connection.Open();
+                        companyID = (int)command.ExecuteScalar();
+                    }
+                } catch { }
+
+                if(companyID > 0 && categoryID > 0) {
+                    sql = "INSERT INTO [dbo].[CompanyCategory]" + Environment.NewLine +
+                                   "([CategoryID]" + Environment.NewLine +
+                                   ",[CompanyID])" + Environment.NewLine +
+                                   " VALUES " + Environment.NewLine +
+                                   " (" + Environment.NewLine +
+                                   "'" + categoryID + "'" + Environment.NewLine +
+                                   ",'" + companyID + "'" + Environment.NewLine +
+                                   ")" + Environment.NewLine +
+                        "";
+                    //Console.WriteLine("dt=" + dt.ToString("MM/dd/yyyy"));
+                    try {
+                        using(SqlConnection connection = new SqlConnection(
+                       connectionString)) {
+                            SqlCommand command = new SqlCommand(sql,connection);
+                            command.Connection.Open();
+                            command.ExecuteNonQuery();
+                        }
+                    } catch { }
+                }
             }
         }
 
@@ -407,6 +464,72 @@ namespace Ecam.ConsoleApp {
                 Helper.Log("Mail Send Exception=" + ex.Message,"MAIL_SEND_" + (new Random()).Next(1000,10000));
                 if(ex.InnerException != null) {
                     Helper.Log("Mail Send InnerException=" + ex.Message,"MAIL_SEND_" + (new Random()).Next(1000,10000));
+                }
+            }
+        }
+
+        private static void DailyCSV() {
+            try {
+                int rowSize = 10;
+                string FILES_PATH = System.Configuration.ConfigurationManager.AppSettings["FilesPath"];
+
+                List<Ecam.Framework.CSVColumn> columnFormats = new List<Ecam.Framework.CSVColumn>();
+                columnFormats.Add(new Ecam.Framework.CSVColumn { PropertyName = "date" });
+                columnFormats.Add(new Ecam.Framework.CSVColumn { PropertyName = "daily_percentage" });
+                int months = 200;
+                int i;
+                List<DailySummary> dailyList = new List<DailySummary>();
+                for(i = 0;i < months;i++) {
+                    DateTime dt = DateTime.Now.Date.AddMonths(-i);
+                    DateTime monthStartDate = DataTypeHelper.GetFirstDayOfMonth(dt);
+                    DateTime monthLastDate = DataTypeHelper.GetLastDayOfMonth(dt);
+                    DateTime totalEndDate = DataTypeHelper.GetLastDayOfMonth(monthStartDate.AddMonths(-1).AddDays(7));
+                    DateTime totalStartDate = DataTypeHelper.GetFirstDayOfMonth(totalEndDate.AddMonths(-6).AddDays(7));
+
+                    Console.WriteLine("monthStartDate=" + monthStartDate.ToString("dd/MMM/yyyy"));
+                    Console.WriteLine("monthLastDate=" + monthLastDate.ToString("dd/MMM/yyyy"));
+                    Console.WriteLine("totalStartDate=" + totalStartDate.ToString("dd/MMM/yyyy"));
+                    Console.WriteLine("totalEndDate=" + totalEndDate.ToString("dd/MMM/yyyy"));
+
+                    List<DailySummary> templist = Ecam.Models.Common.GetDailySummary(new Contracts.TRA_COMPANY_SEARCH {
+                        categories = "",
+                        end_date = monthLastDate,
+                        is_book_mark_category = true,
+                        monthly_investment = 20000,
+                        start_date = monthStartDate,
+                        total_amount = 1000000,
+                        total_end_date = totalEndDate,
+                        total_start_date = totalStartDate,
+                    },new Paging {
+                        PageIndex = 1,
+                        PageSize = rowSize,
+                        SortName = "total_profit",
+                        SortOrder = "desc",
+                    },false);
+                    if(templist != null) {
+                        dailyList = dailyList.Concat(templist).ToList();
+                    }
+                }
+
+                dailyList = (from q in dailyList
+                             orderby q.date descending
+                             select q).ToList();
+
+                string csv = Ecam.Framework.CSVHelper.CreateCSVFromGenericList(dailyList,columnFormats,true);
+                string tempFileName = "DailyCSV_" + rowSize + "_" + (new Random()).Next(1000,100000) + "_" + DateTime.Now.ToString("dd_MMM_yyyy") + ".csv";
+
+                System.IO.File.WriteAllText("E:\\" + tempFileName,csv);
+
+                MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(csv ?? ""));
+
+                //if(File.Exists(tempFileName) == true) {
+                //    byte[] bytes = System.IO.File.ReadAllBytes(tempFileName);
+                //    stream = new MemoryStream(bytes);
+                //}
+            } catch(Exception ex) {
+                Helper.Log("Mail Send Exception=" + ex.Message,"DailyCSV" + (new Random()).Next(1000,10000));
+                if(ex.InnerException != null) {
+                    Helper.Log("Mail Send InnerException=" + ex.Message,"DailyCSV" + (new Random()).Next(1000,10000));
                 }
             }
         }
@@ -2254,8 +2377,8 @@ RegexOptions.IgnoreCase
                     //    //}
                     //}
                     var sellHoldings = (from q in holdings
-                                    where q.profit >= 3
-                                    select q).ToList();
+                                        where q.profit >= 3
+                                        select q).ToList();
                     foreach(var sellHolding in sellHoldings) {
                         using(EcamContext context = new EcamContext()) {
                             var h = (from q in context.tra_holding

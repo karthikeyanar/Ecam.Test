@@ -79,6 +79,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common - Copy.cs" />
     <Compile Include="Common.cs" />
     <Compile Include="CalculateRSISuccess.cs" />
     <Compile Include="Program.cs" />

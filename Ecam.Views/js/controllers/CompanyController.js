@@ -105,6 +105,11 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
                 arr[arr.length] = { "name": "is_book_mark_category", "value": is_book_mark_category };
             }
 
+            var is_all_category = $("#frmCompanySearch #is_all_category")[0].checked;
+            if (is_all_category == true) {
+                arr[arr.length] = { "name": "is_all_category", "value": is_all_category };
+            }
+
             var is_mf = $("#frmCompanySearch #is_mf")[0].checked;
             if (is_mf == true) {
                 arr[arr.length] = { "name": "is_mf", "value": is_mf };
@@ -526,6 +531,26 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             }
         }
 
+        this.startNifty500 = function () {
+            console.log('startNifty500 start');
+            var $gcb_cmd = $("#gcb_cmd");
+            $gcb_cmd.attr("cmd", "investing-company");
+            $gcb_cmd.attr("symbol", "");
+            $gcb_cmd.click();
+        }
+
+        this.startInvestingUpdate = function () {
+            console.log('startInvestingUpdate start');
+            var $gcb_cmd = $("#gcb_cmd");
+            $gcb_cmd.attr("cmd", "investing-history");
+            $gcb_cmd.attr("company_id", "234");
+            $gcb_cmd.attr("url", "/equities/infosys");
+            $gcb_cmd.attr("start_date", "01/04/2007");
+            $gcb_cmd.attr("end_date", "05/11/2018");
+            $gcb_cmd.attr("symbol", "");
+            $gcb_cmd.click();
+        }
+
         this.onEventFire = function (name, event) {
             var html = "<button type='button' id='gc_btn_routing_change' onclick='var collections=document.getElementsByName(\"" + name + "\");var i;for(i=0;i<collections.length;i++){collections[i]." + event + "();}' style='position:absolute;top:10px;display:none;'>Routing Change</button>";
             $('body').append(html);
@@ -587,6 +612,9 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
                 self.loadGrid();
             });
             $("body").on("click", "#frmCompanySearch #is_book_mark_category", function (event) {
+                self.loadGrid();
+            });
+            $("body").on("click", "#frmCompanySearch #is_all_category", function (event) {
                 self.loadGrid();
             });
             $("body").on("click", "#Company .btn-add", function (event) {
@@ -684,6 +712,9 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             $("body").on("click", "#btnMCDownload", function (event) {
                 self.mcDownload();
             });
+            $("body").on("click", "#btnInvestingNifty500", function (event) {
+                self.startInvestingUpdate();
+            });
         }
 
         this.offElements = function () {
@@ -705,6 +736,7 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             $("body").off("click", "#frmCompanySearch #is_buy_to_sell");
             $("body").off("click", "#frmCompanySearch #is_mf");
             $("body").off("click", "#frmCompanySearch #is_book_mark_category");
+            $("body").off("click", "#frmCompanySearch #is_all_category");
             $("body").off("click", "#Company .btn-add");
             $("body").off("click", "#Company .btn-edit");
             $("body").off("click", "#Company .btn-delete");
@@ -713,6 +745,7 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             $("body").off("click", ".is-current-stock");
             $("body").off("click", "#Company .btn-export");
             $("body").off("click", "#btnMCDownload");
+            $("body").off("click", "#btnInvestingNifty500");
         }
 
         this.unInit = function () {

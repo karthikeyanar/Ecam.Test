@@ -246,6 +246,7 @@ $(function () {
             },
             load: function () {
                 require(['IntradayController'], function (ViewModel) {
+                    console.log(1);
                     document.title = "Intraday - Ecams";
                     var m = new ViewModel();
                     app.viewModel(m);

@@ -176,7 +176,7 @@ define("CategoryController", ["knockout", "komapping", "helper", "service"], fun
                 var dataFor = ko.dataFor(this);
                 jConfirm({
                     "message": "Are you sure?", "ok": function () {
-                        var url = apiUrl("/Category/Delete/" + dataFor.id);
+                        var url = apiUrl("/Category/Delete/" + dataFor.id());
                         $.ajax({
                             "url": url,
                             "cache": false,

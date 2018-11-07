@@ -10,12 +10,9 @@
         string _Version = string.Empty;
         string isLocal = Ecam.Framework.Helper.IsLocal;
         string _IsUseMinifier = Ecam.Framework.Helper.IsUseMinifier;
-        if (isLocal == "false")
-        {
+        if(isLocal == "false") {
             _Version = Ecam.Framework.Helper.Version;
-        }
-        else
-        {
+        } else {
             _Version = DateTime.Now.ToString("yyyyMMddhhmmss");
         }
     }
@@ -24,39 +21,33 @@
         var SITE_URL = '@Ecam.Framework.Helper.SiteUrl';
     </script>
     @{
-        if (isLocal == "false")
-        {
+        if(isLocal == "false") {
             <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
             <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,900' rel='stylesheet' type='text/css'>
             <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
             <script>window.jQuery || document.write('<script src="/js/jquery/jquery-1.11.2.min.js">\x3C/script>')</script>
-                <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+            <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
                 <script>window.$.validator || document.write('<script src="/js/jquery/jquery.validate.min.js">\x3C/script>')</script>
                 <script src="//ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
                 <script>window.$.tmpl || document.write('<script src="/js/jquery/jquery.tmpl.min.js">\x3C/script>')</script>
-        }
-        else
-        {
+        } else {
             <script src="/js/jquery/jquery-1.11.2.min.js"></script>
             <script src="/js/jquery/jquery.validate.min.js"></script>
-                <script src="/js/jquery/jquery.tmpl.min.js"></script>
+            <script src="/js/jquery/jquery.tmpl.min.js"></script>
         }
     }
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="/js/plugins/date/date.js"></script>
     <script src="/js/plugins/sticky-header/jquery.fixedheadertable.js"></script>
     @{
-        if (isLocal == "false")
-        {
+        if(isLocal == "false") {
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
             <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
             <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-        }
-        else
-        {
+        } else {
             <script src="/js/bootstrap/bootstrap.js"></script>
             <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css" />
-                <link type="text/css" rel="stylesheet" href="/css/bootstrap-theme.min.css" />
+            <link type="text/css" rel="stylesheet" href="/css/bootstrap-theme.min.css" />
         }
     }
     <link type="text/css" rel="stylesheet" href="/css/plugins/font-awesome/font-awesome.min.css" />
@@ -70,13 +61,12 @@
     <script src="/js/plugins/marquee/jquery.marquee.js"></script>
     @Html.JavascriptInclueTag("/js/require/config.js")
     @{
-        if (isLocal == "false")
-        {
+        if(isLocal == "false") {
             <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBLxSI2OHpn9AlGxpQk7zP9MSi8tWyYMSo&signed_in=true&libraries=geometry,places"></script>
             @*<script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerwithlabel/src/markerwithlabel.js"></script>
                 <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js"></script>*@
             <script src="/js/plugins/map/markerwithlabel.js"></script>
-                <script src="/js/plugins/map/infobox.js"></script>
+            <script src="/js/plugins/map/infobox.js"></script>
         }
     }
     <script src="/Scripts/jquery.signalR-2.2.0.min.js"></script>
@@ -110,7 +100,6 @@
     <link type='text/css' rel='stylesheet' href='/css/new-theme.css?v=@_Version' />
     <link type='text/css' rel='stylesheet' href='/css/ecam2/agent-page-gui.css?v=@_Version' />
     <link href="/js/plugins/bootstrap-tour/css/bootstrap-tour.css?v=@_Version" rel="stylesheet" />
-    <script src="https://code.highcharts.com/highcharts.src.js"></script>
 </head>
 
 <body class="header-fixed sidebar-animation sidebar-fixed ecam2 top-menu-view @(Ecam.Framework.Helper.IsDVL == true ? " is_dvl " : " ")" style="padding-top:10px;">
@@ -183,7 +172,7 @@
         </div>
     </div>
     <script src="/js/plugins/slimscroll/jquery.slimscroll.js?v=@_Version"></script>
-    @RenderSection("scripts", required: false)
+    @RenderSection("scripts",required: false)
     <script type='text/javascript' src='/js/ecam2/ecam2-app.js?v=@_Version'></script>
     <script type="text/html" id="error-display-template">
         <div class="alert alert-danger error-alert" style="width:100%;">

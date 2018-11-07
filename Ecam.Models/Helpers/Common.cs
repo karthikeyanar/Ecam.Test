@@ -664,6 +664,7 @@ namespace Ecam.Models {
                                     daily.ltp_price = (market.ltp_price ?? 0);
                                     daily.high_price = (market.high_price ?? 0);
                                     daily.low_price = (market.low_price ?? 0);
+                                    daily.prev_price = (market.prev_price ?? 0);
                                 }
                             }
                         }
@@ -679,7 +680,7 @@ namespace Ecam.Models {
                         if(nifty500 != null) {
                             var nif = (from q in nifty500
                                        where q.trade_date == dt
-                                            select q).FirstOrDefault();
+                                       select q).FirstOrDefault();
                             if(nif != null) {
                                 log.nifty500_close = nif.close_price;
                                 log.nifty500_prev_close = nif.prev_price;
@@ -974,6 +975,15 @@ namespace Ecam.Models {
                 return (this.nifty500_change ?? 0) > 0; //(this.positive_count ?? 0) > (this.negative_count ?? 0);
             }
         }
+        public decimal daily_percentage {
+            get {
+                decimal result = 0;
+                try {
+                    result = this.logs.Sum(q => q.percentage) / this.logs.Count();
+                } catch { }
+                return result;
+            }
+        }
         public decimal percentage {
             get {
                 return DataTypeHelper.SafeDivision((this.cmv - this.investment),this.investment) * 100;
@@ -1033,6 +1043,17 @@ namespace Ecam.Models {
         public decimal low_price { get; set; }
         public decimal close_price { get; set; }
         public decimal ltp_price { get; set; }
+        public decimal prev_price { get; set; }
+
+        public decimal percentage {
+            get {
+                decimal result = 0;
+                try {
+                    result = ((this.close_price - this.prev_price) / this.prev_price) * 100;
+                } catch { }
+                return result;
+            }
+        }
 
         public decimal cmv {
             get {

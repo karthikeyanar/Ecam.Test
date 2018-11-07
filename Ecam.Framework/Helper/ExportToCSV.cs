@@ -296,7 +296,7 @@ namespace Ecam.Framework {
         /// <typeparam name="T"></typeparam>;
         /// <param name="list">The list.</param>;
         /// <param name="csvNameWithExt">Name of CSV (w/ path) w/ file ext.</param>;
-        public static string CreateCSVFromGenericList(IList list,List<CSVColumn> columnFormats = null) {
+        public static string CreateCSVFromGenericList(IList list,List<CSVColumn> columnFormats = null, bool isColumnsOnly = false) {
             StringBuilder sb = new StringBuilder();
             AddColumnFormats(ref columnFormats);
             if(list.Count > 0) {
@@ -312,7 +312,18 @@ namespace Ecam.Framework {
                 foreach(PropertyInfo pi in props) {
                     if(pi.CanRead && pi.PropertyType.Name != "List`1"
                          && pi.PropertyType.FullName.Contains("Pepper.") == false) {
-                        if(CSVHelper.IsIgNoreColumn(pi.Name,columnFormats) == false) {
+
+                        bool isAppend = false;
+                        if(isColumnsOnly == true) {
+                            if(CSVHelper.IsExist(pi.Name, columnFormats) == true) {
+                                isAppend = true;
+                            }
+                        } else {
+                            if(CSVHelper.IsIgNoreColumn(pi.Name,columnFormats) == false) {
+                                isAppend = true;
+                            }
+                        }
+                        if(isAppend == true) {
                             displayName = CSVHelper.GetDisplayName(pi.Name,columnFormats);
                             sb.Append("\"").Append(displayName).Append("\"").Append(",");
                         }
@@ -326,11 +337,23 @@ namespace Ecam.Framework {
                     foreach(PropertyInfo pi in props) {
                         if(pi.CanRead && pi.PropertyType.Name != "List`1"
                         && pi.PropertyType.FullName.Contains("Pepper.") == false) {
-                            if(CSVHelper.IsIgNoreColumn(pi.Name,columnFormats) == false) {
+                            bool isAppend = false;
+
+                            if(isColumnsOnly == true) {
+                                if(CSVHelper.IsExist(pi.Name,columnFormats) == true) {
+                                    isAppend = true;
+                                }
+                            } else {
+                                if(CSVHelper.IsIgNoreColumn(pi.Name,columnFormats) == false) {
+                                    isAppend = true;
+                                }
+                            }
+
+                            if(isAppend == true) {
                                 //this is the row+col intersection (the value)
                                 var value = item.GetType()
-                                            .GetProperty(pi.Name)
-                                            .GetValue(item,null);
+                                        .GetProperty(pi.Name)
+                                        .GetValue(item,null);
                                 string whatToWrite = Convert.ToString(value);
                                 if(CSVHelper.IsNoFormatColumn(pi.Name,columnFormats) == false) {
                                     string propertyType = item.GetType().GetProperty(pi.Name).PropertyType.FullName;
@@ -658,6 +681,15 @@ namespace Ecam.Framework {
                 precision = 4;
             }
             return precision;
+        }
+
+        public static bool IsExist(string propertyName,List<CSVColumn> columnFormats) {
+            if(columnFormats == null)
+                return false;
+            else
+                return (from c in columnFormats
+                        where c.PropertyName.ToLower() == propertyName.ToLower()
+                        select c).Count() > 0;
         }
 
         public static bool IsIgNoreColumn(string propertyName,List<CSVColumn> columnFormats) {

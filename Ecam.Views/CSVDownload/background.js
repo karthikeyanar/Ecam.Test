@@ -84,27 +84,41 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     chrome.tabs.executeScript({ code: "console.log('changeInfo.status=','" + changeInfo.status + "');" });
     if (changeInfo.status === "complete") {
-        chrome.tabs.executeScript(tabId, { file: "jquery-3.3.1.min.js" });
-        if (tab.url.indexOf('#/company') > 0 || tab.url.indexOf('#/quater') > 0 || tab.url.indexOf('#/indicator') > 0 || tab.url.indexOf('#/cm-company-update') > 0) {
-            chrome.tabs.executeScript(tabId, { file: "init.js" });
-        } else {
-            if (tab.url.indexOf('nseindia.com') > 0) {
-                chrome.tabs.executeScript(tabId, { file: "export.js" }, function (result) {
-                    var arr = tab.url.split('?');
-                    var openerId = arr[1].split('=')[1].toString();
-                    var hostname = getHostName(tab.url);
-                    var symbol = '';
-                    getLocalStorage(hostname, function (data) {
-                        symbol = data;
-                    });
-                    code = "pageLoad('" + tab.url + "','" + tabId + "','" + openerId + "','" + symbol + "');";
-                    //alert(code);
-                    chrome.tabs.executeScript(tabId, { code: code });
-                    //chrome.tabs.executeScript({ code: "console.log('onUpdated.addListener id=','"+tab.id+"','url=','"+tab.url+"','windowId=','"+tab.windowId+"','openerTabId=','"+tab.openerTabId+"');" });
+        chrome.tabs.executeScript(tabId, { file: "jquery-3.3.1.min.js" }, function (result1) {
+            //alert('result1='+result1);
+            chrome.tabs.executeScript(tabId, { file: "bililiteRange.js" }, function (result2) {
+                //alert('result2='+result2);
+                chrome.tabs.executeScript(tabId, { file: "jquery.sendkeys.js" }, function (result3) {
+                    //alert('result3='+result3);
+
+                    if (tab.url.indexOf('#/company') > 0
+                        || tab.url.indexOf('#/quater') > 0
+                        || tab.url.indexOf('#/indicator') > 0
+                        || tab.url.indexOf('#/cm-company-update') > 0
+                        || tab.url.indexOf('/Monthly') > 0) {
+                        chrome.tabs.executeScript(tabId, { file: "init.js" });
+                    } else {
+                        if (tab.url.indexOf('nseindia.com') > 0) {
+                            chrome.tabs.executeScript(tabId, { file: "export.js" }, function (result) {
+                                var arr = tab.url.split('?');
+                                var openerId = arr[1].split('=')[1].toString();
+                                var hostname = getHostName(tab.url);
+                                var symbol = '';
+                                getLocalStorage(hostname, function (data) {
+                                    symbol = data;
+                                });
+                                code = "pageLoad('" + tab.url + "','" + tabId + "','" + openerId + "','" + symbol + "');";
+                                //alert(code);
+                                chrome.tabs.executeScript(tabId, { code: code });
+                                //chrome.tabs.executeScript({ code: "console.log('onUpdated.addListener id=','"+tab.id+"','url=','"+tab.url+"','windowId=','"+tab.windowId+"','openerTabId=','"+tab.openerTabId+"');" });
+                            });
+                        }
+                    }
+                    chrome.tabs.executeScript({ code: "console.log('id=','" + tab.id + "','url=','" + tab.url + "','windowId=','" + tab.windowId + "','openerTabId=','" + tab.openerTabId + "');" });
+
                 });
-            }
-        }
-        chrome.tabs.executeScript({ code: "console.log('id=','" + tab.id + "','url=','" + tab.url + "','windowId=','" + tab.windowId + "','openerTabId=','" + tab.openerTabId + "');" });
+            });
+        });
     }
 });
 chrome.runtime.onMessage.addListener(function (msg) {
@@ -125,6 +139,50 @@ chrome.runtime.onMessage.addListener(function (msg) {
                                 chrome.tabs.executeScript(tab.id, { file: "export.js" }, function (result) {
                                     var code = "exportTable(" + tab.id + "," + currentTab.id + ");"
                                     chrome.tabs.executeScript(tab.id, { code: code });
+                                });
+                            });
+                        });
+                    });
+                    break;
+                case 'investing-company':
+                    var symbol = msg.symbol;
+                    var url = 'https://in.investing.com/indices/s-p-cnx-500-components';
+                    var type = 'popup';
+                    var width = 1200;
+                    var height = 800;
+                    doInCurrentTab(function (currentTab) {
+                        chrome.windows.create({ 'url': url, 'type': type, 'width': width, 'height': height }, function (newWindow) {
+                            var tab = newWindow.tabs[0];
+                            chrome.tabs.executeScript(tab.id, { file: "jquery-3.3.1.min.js" }, function (result) {
+                                chrome.tabs.executeScript(tab.id, { file: "export.js" }, function (result) {
+                                    var code = "investingNifty500(" + tab.id + "," + currentTab.id + ");"
+                                    chrome.tabs.executeScript(tab.id, { code: code });
+                                });
+                            });
+                        });
+                    });
+                    break;
+                case 'investing-history':
+                    var symbol = msg.symbol;
+                    var url = 'https://in.investing.com' + msg.url + '-historical-data';
+                    var type = '';
+                    var width = 20000;
+                    var height = 1000;
+                    doInCurrentTab(function (currentTab) {
+                        chrome.windows.create({ 'url': url }, function (newWindow) {
+                            var tab = newWindow.tabs[0];
+                            var tabId = tab.id;
+                            chrome.tabs.executeScript(tabId, { file: "jquery-3.3.1.min.js" }, function (result1) {
+                                //alert('result1='+result1);
+                                chrome.tabs.executeScript(tabId, { file: "bililiteRange.js" }, function (result2) {
+                                    //alert('result2='+result2);
+                                    chrome.tabs.executeScript(tabId, { file: "jquery.sendkeys.js" }, function (result3) {
+                                        //alert('result3='+result3);
+                                        chrome.tabs.executeScript(tab.id, { file: "export.js" }, function (result) {
+                                            var code = "investingHistory(" + tab.id + "," + currentTab.id + "," + msg.company_id + ",'" + msg.start_date + "','" + msg.end_date + "');"
+                                            chrome.tabs.executeScript(tab.id, { code: code });
+                                        });
+                                    });
                                 });
                             });
                         });

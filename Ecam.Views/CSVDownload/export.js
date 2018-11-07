@@ -112,6 +112,138 @@ function exportTable(tabid,openerId) {
     },1000);
 }
 
+function investingNifty500(tabid,openerId) {
+    window.alert = function() {};
+    var $tbl = $("#cr1");
+    var symbol = '';
+    try {
+        var $title = $("title");
+        var html = $title.html();
+        var myRegexp = /NSE:\s*(?<symbol>.*)/g;
+        var match = myRegexp.exec(html);
+        symbol = match[1];
+    } catch (e) {
+        ////console.log(e);
+    }
+    console.log($tbl[0]);
+    var colRowIndex = 0;
+    var cols = '';
+    var struct = new tableStructure();
+    struct.cols.push("CompanyName");
+    struct.cols.push("URL");
+    var isStop = false;
+    $("tbody > tr", $tbl).each(function (i) {
+         var row = [];
+         var $tr = $(this);
+         var $td2 = $("td:eq(1)",$tr);
+         var $a = $("a",$td2);
+         var companyName = $.trim($a.html());
+         var url = $.trim($a.attr('href'));
+         row.push(companyName);
+         row.push(url);
+
+         struct.rows.push(row);
+    }); 
+    console.log(struct);
+    var csvContent = convertCSVContent(struct);
+    var fileName = 'Nifty500_Investing.csv';
+    ////console.log('fileName=', fileName);
+    download(csvContent, fileName, 'text/csv;encoding:utf-8');
+    //setTimeout(function(){
+        //chrome.runtime.sendMessage({ cmd: 'mc-quaterly-downloaded','tabid':openerId  });
+    //    chrome.runtime.sendMessage({ cmd: 'close_tab','tabid':tabid,'openerid':openerId  });
+    //},1000);
+}
+
+function investingHistory(tabid,openerId,companyId,startDate,endDate) {
+    window.alert = function() {};
+    var $flatDatePickerCanvasHol = $("#flatDatePickerCanvasHol");
+    var $picker = $("#picker",$flatDatePickerCanvasHol);
+    console.log('$picker=',$picker[0]);
+    $picker[0].value = startDate.toString() + ' - ' + endDate.toString();
+    setTimeout(function(){
+        var $historicalDataTimeRange = $(".historicalDataTimeRange");
+        var $datePickerIconWrap = $("#datePickerIconWrap",$historicalDataTimeRange);
+        console.log('datePickerIconWrap=',$datePickerIconWrap[0]);
+        $datePickerIconWrap.click();
+        setTimeout(function(){
+            var $uiDatepickerDiv = $("#ui-datepicker-div");
+            var $startDate = $("#startDate",$uiDatepickerDiv);
+            var $endDate = $("#endDate",$uiDatepickerDiv);
+            var $applyBtn = $("#applyBtn",$uiDatepickerDiv);
+            console.log('uiDatepickerDiv=',$uiDatepickerDiv[0]);
+            console.log('startDate=',$startDate[0]);
+            console.log('endDate=',$endDate[0]);
+            console.log('applyBtn=',$applyBtn[0]);
+            simulateClick($applyBtn[0]);
+
+            setTimeout(function(){
+
+                var $curr_table = $("#curr_table");
+                var $tbody = $("tbody",$curr_table);
+
+                var struct = new tableStructure();
+                struct.cols.push("CompanyID");
+                struct.cols.push("Date");
+                struct.cols.push("Close Price");
+                struct.cols.push("Open Price");
+                struct.cols.push("High Price");
+                struct.cols.push("Low Price");
+                struct.cols.push("Volume");
+                struct.cols.push("Change");
+
+                $("tr", $tbody).each(function (i) {
+                    var row = [];
+                    var $tr = $(this);
+                    row.push(companyId);
+                    row.push($("td:eq(0)",$tr).text()); // date
+                    row.push($("td:eq(1)",$tr).text()); // close price
+                    row.push($("td:eq(2)",$tr).text()); // open price
+                    row.push($("td:eq(3)",$tr).text()); // high price
+                    row.push($("td:eq(4)",$tr).text()); // low price
+                    row.push($("td:eq(5)",$tr).text()); // volume
+                    row.push($("td:eq(6)",$tr).text()); // change
+           
+                    struct.rows.push(row);
+               }); 
+
+               var csvContent = convertCSVContent(struct);
+                var fileName = $.trim($('.float_lang_base_1.relativeAttr').text()) + '-' + companyId + '-' + startDate.toString() + '-' + endDate.toString() + '.csv';
+                ////console.log('fileName=', fileName);
+                download(csvContent, fileName, 'text/csv;encoding:utf-8');
+
+            },5000);
+        },2000);
+    },2000);
+}
+
+function simulateClick(element) {
+    // DOM 2 Events
+    var dispatchMouseEvent = function(target,var_args) {
+        try {
+            var e = document.createEvent("MouseEvents");
+            // If you need clientX, clientY, etc., you can call
+            // initMouseEvent instead of initEvent
+            e.initEvent.apply(e,Array.prototype.slice.call(arguments,1));
+            target.dispatchEvent(e);
+        } catch(exc) {
+            console.log('simulateClick exc=',exc);
+        }
+    };
+    dispatchMouseEvent(element,'mouseover',true,true);
+    dispatchMouseEvent(element,'mousedown',true,true);
+    dispatchMouseEvent(element,'click',true,true);
+    dispatchMouseEvent(element,'mouseup',true,true);
+}
+
+function sendKeys($txt,value,isfocus) {
+    //console.log('$txt=', $txt[0], 'value=', value);
+    if(isfocus == true) {
+        $txt.focus();
+    }
+    $txt.sendkeys(value);
+}
+
 function pageLoad(pageUrl,tabId,openerId,symbol) {
     ////console.log('pageLoad pageUrl=',pageUrl,'tabId=',pageUrl,'openerId=',openerId);
     nseStart(pageUrl,tabId,openerId,symbol);
