@@ -543,11 +543,7 @@ define("CompanyController", ["knockout", "komapping", "helper", "service"], func
             console.log('startInvestingUpdate start');
             var $gcb_cmd = $("#gcb_cmd");
             $gcb_cmd.attr("cmd", "investing-history");
-            $gcb_cmd.attr("company_id", "234");
-            $gcb_cmd.attr("url", "/equities/infosys");
-            $gcb_cmd.attr("start_date", "01/04/2007");
-            $gcb_cmd.attr("end_date", "05/11/2018");
-            $gcb_cmd.attr("symbol", "");
+            $gcb_cmd.attr("symbol", "234|/equities/infosys|01/04/2007|05/11/2018");
             $gcb_cmd.click();
         }
 
