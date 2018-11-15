@@ -229,6 +229,34 @@ function investingHistory(tabid, openerId, companyId, startDate, endDate, index,
     }, 2000);
 }
 
+function screenerHistory(tabid, openerId, companyId, index, total) {
+    window.alert = function () { };
+    console.log('tabid=',tabid,'openerId=',openerId,'companyId=',companyId,'index=',index,'total=',total);
+    setTimeout(function () { 
+        var values = '';
+        $("li.four.columns").each(function(){
+            var $li = $(this);
+            $("i",$li).remove();
+            var $b1 = $("b:eq(0)",$li);
+            var $b2 = $("b:eq(1)",$li);
+            var b1Value = '';
+            var b2Value = '';
+            if($b1[0]){
+                b1Value = $b1.html();
+            }
+            if($b2[0]){
+                b2Value = $b2.html();
+            }
+            $b1.remove();
+            $b2.remove();
+            var name = $.trim($li.html());
+            values += name + '~' + b1Value + '~' + b2Value + '|';
+        });
+        console.log('values=',values);
+    }, 5000);
+}
+
+
 function simulateClick(element) {
     // DOM 2 Events
     var dispatchMouseEvent = function (target, var_args) {
