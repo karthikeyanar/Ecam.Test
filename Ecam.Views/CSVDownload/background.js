@@ -197,7 +197,7 @@ chrome.runtime.onMessage.addListener(function (msg) {
                     break;
                 case 'screener-history':
                     var symbol = msg.symbol;
-                    var url = 'https://www.screener.in' + msg.url;
+                    var url = 'https://www.screener.in/' + msg.url;
                     var type = '';
                     var width = 20000;
                     var height = 1000;
@@ -206,10 +206,16 @@ chrome.runtime.onMessage.addListener(function (msg) {
                             var tab = newWindow.tabs[0];
                             var tabId = tab.id;
                             chrome.tabs.executeScript(tabId, { file: "jquery-3.3.1.min.js" }, function (result1) {
-                                //alert('result3='+result3);
-                                chrome.tabs.executeScript(tab.id, { file: "export.js" }, function (result) {
-                                    var code = "screenerHistory(" + tab.id + "," + currentTab.id + "," + msg.company_id + "'," + msg.index + "," + msg.total + ");"
-                                    chrome.tabs.executeScript(tab.id, { code: code });
+                                //alert('result1='+result1);
+                                chrome.tabs.executeScript(tabId, { file: "bililiteRange.js" }, function (result2) {
+                                    //alert('result2='+result2);
+                                    chrome.tabs.executeScript(tabId, { file: "jquery.sendkeys.js" }, function (result3) {
+                                        //alert('result3='+result3);
+                                        chrome.tabs.executeScript(tab.id, { file: "export.js" }, function (result) {
+                                            var code = "screenerHistory(" + tab.id + "," + currentTab.id + "," + msg.company_id + "," + msg.index + "," + msg.total + ");"
+                                            chrome.tabs.executeScript(tab.id, { code: code });
+                                        });
+                                    });
                                 });
                             });
                         });

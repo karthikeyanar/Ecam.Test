@@ -99,7 +99,7 @@ function exportTable(tabid, openerId) {
         }
     });
     //////console.log(struct);
-    var csvContent = convertCSVContent(struct,'\n');
+    var csvContent = convertCSVContent(struct, '\n');
     var fileName = '';
     if (struct.cols.length > 0) {
         fileName += struct.cols[0] + '-' + struct.cols[1] + '-' + struct.cols[struct.cols.length - 1] + '.csv';
@@ -145,7 +145,7 @@ function investingNifty500(tabid, openerId) {
         struct.rows.push(row);
     });
     console.log(struct);
-    var csvContent = convertCSVContent(struct,'\n');
+    var csvContent = convertCSVContent(struct, '\n');
     var fileName = 'Nifty500_Investing.csv';
     ////console.log('fileName=', fileName);
     download(csvContent, fileName, 'text/csv;encoding:utf-8');
@@ -161,7 +161,7 @@ function investingHistory(tabid, openerId, companyId, startDate, endDate, index,
     var $picker = $("#picker", $flatDatePickerCanvasHol);
     console.log('$picker=', $picker[0]);
     $picker[0].value = startDate.toString() + ' - ' + endDate.toString();
-    console.log('tabid=',tabid,'openerId=',openerId,'companyId=',companyId,'startDate=',startDate,'endDate=',endDate,'index=',index,'total=',total);
+    console.log('tabid=', tabid, 'openerId=', openerId, 'companyId=', companyId, 'startDate=', startDate, 'endDate=', endDate, 'index=', index, 'total=', total);
     setTimeout(function () {
         var $historicalDataTimeRange = $(".historicalDataTimeRange");
         var $datePickerIconWrap = $("#datePickerIconWrap", $historicalDataTimeRange);
@@ -208,9 +208,9 @@ function investingHistory(tabid, openerId, companyId, startDate, endDate, index,
                     struct.rows.push(row);
                 });
 
-                var csvContent = convertCSVContent(struct,'\n');
+                var csvContent = convertCSVContent(struct, '\n');
 
-                var csv = convertCSVContent(struct,'|');
+                var csv = convertCSVContent(struct, '|');
 
 
                 var code = "$('#investing_index').val('" + (index + 1) + "');$('#investing_total').val('" + total + "');$('#investing_csv').val('" + csv + "');$('#btnInvestingUpdateCSV').click();";
@@ -231,20 +231,21 @@ function investingHistory(tabid, openerId, companyId, startDate, endDate, index,
 
 function screenerHistory(tabid, openerId, companyId, index, total) {
     window.alert = function () { };
-    console.log('tabid=',tabid,'openerId=',openerId,'companyId=',companyId,'index=',index,'total=',total);
-    setTimeout(function () { 
+    alert(1);
+    console.log('tabid=', tabid, 'openerId=', openerId, 'companyId=', companyId, 'index=', index, 'total=', total);
+    setTimeout(function () {
         var values = '';
-        $("li.four.columns").each(function(){
+        $("li.four.columns").each(function () {
             var $li = $(this);
-            $("i",$li).remove();
-            var $b1 = $("b:eq(0)",$li);
-            var $b2 = $("b:eq(1)",$li);
+            $("i", $li).remove();
+            var $b1 = $("b:eq(0)", $li);
+            var $b2 = $("b:eq(1)", $li);
             var b1Value = '';
             var b2Value = '';
-            if($b1[0]){
+            if ($b1[0]) {
                 b1Value = $b1.html();
             }
-            if($b2[0]){
+            if ($b2[0]) {
                 b2Value = $b2.html();
             }
             $b1.remove();
@@ -252,7 +253,21 @@ function screenerHistory(tabid, openerId, companyId, index, total) {
             var name = $.trim($li.html());
             values += name + '~' + b1Value + '~' + b2Value + '|';
         });
-        console.log('values=',values);
+        console.log('values=', values);
+
+        var csv = values;
+
+        //var code = "$('#screener_index').val('" + (index + 1) + "');$('#screener_total').val('" + total + "');$('#screener_csv').val('" + csv + "');$('#btnInvestingUpdateCSV').click();";
+        //chrome.runtime.sendMessage({ cmd: 'execute_code', 'tabid': openerId, 'code': code });
+
+        //var fileName = $.trim($('.float_lang_base_1.relativeAttr').text()) + '-' + companyId + '-' + startDate.toString() + '-' + endDate.toString() + '.csv';
+        ////console.log('fileName=', fileName);
+        //download(csvContent, fileName, 'text/csv;encoding:utf-8');
+
+        //setTimeout(function () {
+        //    chrome.runtime.sendMessage({ cmd: 'screener_close_tab', 'tabid': tabid, 'openerid': openerId });
+        //}, 1000);
+
     }, 5000);
 }
 
@@ -289,7 +304,7 @@ function pageLoad(pageUrl, tabId, openerId, symbol) {
     nseStart(pageUrl, tabId, openerId, symbol);
 }
 
-function convertCSVContent(struct,newlinechar) {
+function convertCSVContent(struct, newlinechar) {
     var content = '';
     var cols = '';
     var rows = '';
