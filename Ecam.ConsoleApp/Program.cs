@@ -36,11 +36,7 @@ namespace Ecam.ConsoleApp {
         private static List<string> _URLS;
         private static List<string> _SYMBOLS_LIST;
         static void Main(string[] args) {
-            //BackTestEMA();
-            //SupertrendUpdate();
-            //return;
             try {
-                //NiftyListGenerate();
                 IS_CATEGORY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_CATEGORY_FLAG_CSV"];
                 IS_NIFTY_FLAG_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_NIFTY_FLAG_CSV"];
                 IS_IMPORT_CSV = System.Configuration.ConfigurationManager.AppSettings["IS_IMPORT_CSV"];
@@ -109,22 +105,22 @@ namespace Ecam.ConsoleApp {
                         } catch(Exception ex) {
                             Helper.Log(ex.Message,"AddSplit_ERROR" + "_" + (new Random()).Next(1000,10000));
                         }
-                        try {
-                            List<string> symbols;
-                            using(EcamContext context = new EcamContext()) {
-                                symbols = (from q in context.tra_company select q.symbol).ToList();
-                            }
-                            int i;
-                            for(i = 0;i < 1;i++) {
-                                DateTime startDate = Convert.ToDateTime("01/01/" + (DateTime.Now.Year - i).ToString());
-                                foreach(string symbol in symbols) {
-                                    Console.WriteLine("Symbol=" + symbol + ",Date=" + startDate.Year);
-                                    TradeHelper.CreateYearLog(symbol,startDate);
-                                }
-                            }
-                        } catch(Exception ex) {
-                            Helper.Log(ex.Message,"YearLog_ERROR" + "_" + (new Random()).Next(1000,10000));
-                        }
+                        //try {
+                        //    List<string> symbols;
+                        //    using(EcamContext context = new EcamContext()) {
+                        //        symbols = (from q in context.tra_company select q.symbol).ToList();
+                        //    }
+                        //    int i;
+                        //    for(i = 0;i < 1;i++) {
+                        //        DateTime startDate = Convert.ToDateTime("01/01/" + (DateTime.Now.Year - i).ToString());
+                        //        foreach(string symbol in symbols) {
+                        //            Console.WriteLine("Symbol=" + symbol + ",Date=" + startDate.Year);
+                        //            TradeHelper.CreateYearLog(symbol,startDate);
+                        //        }
+                        //    }
+                        //} catch(Exception ex) {
+                        //    Helper.Log(ex.Message,"YearLog_ERROR" + "_" + (new Random()).Next(1000,10000));
+                        //}
                     }
                 }
             } catch(Exception ex) {

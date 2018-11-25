@@ -164,7 +164,7 @@ chrome.runtime.onMessage.addListener(function (msg) {
                     break;
                 case 'investing-history':
                     var symbol = msg.symbol;
-                    var url = 'https://in.investing.com' + msg.url + '-historical-data';
+                    var url = 'https://in.investing.com' + msg.url; // + '-historical-data';
                     var type = '';
                     var width = 20000;
                     var height = 1000;

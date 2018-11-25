@@ -231,10 +231,10 @@ function investingHistory(tabid, openerId, companyId, startDate, endDate, index,
 
 function screenerHistory(tabid, openerId, companyId, index, total) {
     window.alert = function () { };
-    alert(1);
     console.log('tabid=', tabid, 'openerId=', openerId, 'companyId=', companyId, 'index=', index, 'total=', total);
     setTimeout(function () {
         var values = '';
+        values += 'CompanyID' + '~' + companyId + '~' + '' + '|';
         $("li.four.columns").each(function () {
             var $li = $(this);
             $("i", $li).remove();
@@ -243,32 +243,33 @@ function screenerHistory(tabid, openerId, companyId, index, total) {
             var b1Value = '';
             var b2Value = '';
             if ($b1[0]) {
-                b1Value = $b1.html();
+                b1Value = $.trim($b1.html());
             }
             if ($b2[0]) {
-                b2Value = $b2.html();
+                b2Value = $.trim($b2.html());
             }
             $b1.remove();
             $b2.remove();
             var name = $.trim($li.html());
             values += name + '~' + b1Value + '~' + b2Value + '|';
         });
-        console.log('values=', values);
-
         var csv = values;
+        csv = csv.replace(/\n/g, "");
+        csv = csv.replace(/\r/g, "");
+        csv = csv.replace(/' '/g, "");
+        console.log('csv=', csv);
+        var code = "$('#screener_index').val('" + (index + 1) + "');$('#screener_total').val('" + total + "');$('#screener_csv').val('" + csv + "');$('#btnScreenerUpdateCSV').click();";
+        chrome.runtime.sendMessage({ cmd: 'execute_code', 'tabid': openerId, 'code': code });
 
-        //var code = "$('#screener_index').val('" + (index + 1) + "');$('#screener_total').val('" + total + "');$('#screener_csv').val('" + csv + "');$('#btnInvestingUpdateCSV').click();";
-        //chrome.runtime.sendMessage({ cmd: 'execute_code', 'tabid': openerId, 'code': code });
+        var fileName = 'Screener_' + companyId + '_Fundamental.txt';
+        console.log('fileName=', fileName);
+        download(csv, fileName, 'text/csv;encoding:utf-8');
 
-        //var fileName = $.trim($('.float_lang_base_1.relativeAttr').text()) + '-' + companyId + '-' + startDate.toString() + '-' + endDate.toString() + '.csv';
-        ////console.log('fileName=', fileName);
-        //download(csvContent, fileName, 'text/csv;encoding:utf-8');
+        setTimeout(function () {
+            chrome.runtime.sendMessage({ cmd: 'screener_close_tab', 'tabid': tabid, 'openerid': openerId });
+        }, 1000);
 
-        //setTimeout(function () {
-        //    chrome.runtime.sendMessage({ cmd: 'screener_close_tab', 'tabid': tabid, 'openerid': openerId });
-        //}, 1000);
-
-    }, 5000);
+    }, 10000);
 }
 
 
