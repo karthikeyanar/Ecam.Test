@@ -16,17 +16,35 @@ namespace ConsoleApplication1 {
         private static string[] _COMPANIES;
         private static int _INDEX = -1;
 
+        public static List<Company> _CompanyList = null;
+
         static void Main(string[] args) {
-            //while(true) {
-            //InvestingCSVData();
-            //Nifty500Update();
-            //System.Threading.Thread.Sleep(10000);
-            //Console.WriteLine("Time=" + DateTime.Now);
-            //Console.WriteLine("Recheck the folder");
-            //}
-            UpdateCategorySymbol();
+            FillCompany();
+            CSVData();
             Console.WriteLine("Press any key to exit");
             Console.ReadLine();
+        }
+
+        private static void FillCompany() {
+            _CompanyList = new List<Company>();
+            string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MyInvestmentContext"].ConnectionString;
+            string sql = "select companyid,symbol from company";
+            int companyId;
+            string symbol;
+            using(SqlConnection connection = new SqlConnection(connectionString)) {
+                SqlCommand command = new SqlCommand(sql,connection);
+                command.Connection.Open();
+                SqlDataReader dr = command.ExecuteReader();
+                while(dr.Read()) {
+                    companyId = (int)dr["companyid"];
+                    symbol = dr["symbol"].ToString();
+                    _CompanyList.Add(new Company {
+                        CompanyID = companyId,
+                        Symbol = symbol
+                    });
+                }
+                dr.Close();
+            }
         }
 
         private static void UpdateCompanySymbol() {
@@ -349,6 +367,12 @@ namespace ConsoleApplication1 {
         }
     }
 
+
+    public class Company {
+        public int CompanyID { get; set; }
+        public string Symbol { get; set; }
+    }
+
     public class InvestmentPrice {
         public int CompanyID { get; set; }
         public DateTime Date { get; set; }
@@ -405,9 +429,9 @@ namespace ConsoleApplication1 {
             _doneEvent.Set();
         }
 
-
-
         public string CSVDataDownload(string tempfilename,bool isTakeTempFileName = false) {
+            string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MyInvestmentContext"].ConnectionString;
+            string logPath = System.Configuration.ConfigurationManager.AppSettings["LOGPATH"];
             string lastSymbol = "";
             List<OldSymbol> oldSymbolList = new List<OldSymbol> {
                 new OldSymbol { old_symbol = "PFRL", new_symbol = "ABFRL" },
@@ -504,6 +528,8 @@ namespace ConsoleApplication1 {
                             string turnOver = csv.GetField<string>("Turnover");
                             DateTime dt = DataTypeHelper.ToDateTime(date);
                             if(string.IsNullOrEmpty(symbol) == false) {
+
+
                                 symbol = symbol.Replace("&amp;","&");
                                 OldSymbol oldSymbol = (from q in oldSymbolList
                                                        where q.old_symbol == symbol
@@ -511,10 +537,13 @@ namespace ConsoleApplication1 {
                                 if(oldSymbol != null) {
                                     symbol = oldSymbol.new_symbol;
                                 }
-                                string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["InvestmentContext"].ConnectionString;
+                                int companyId = (from q in ConsoleApplication1.Program._CompanyList
+                                                 where q.Symbol == symbol
+                                                 select q.CompanyID
+                                               ).FirstOrDefault();
                                 string sql = "";
-                                sql = "INSERT INTO [dbo].[EquityPriceHistory]" + Environment.NewLine +
-                               " ([Symbol]" + Environment.NewLine +
+                                sql = "INSERT INTO [dbo].[CompanyPriceHistory]" + Environment.NewLine +
+                               " ([CompanyID]" + Environment.NewLine +
                                ",[Date]" + Environment.NewLine +
                                ",[Open]" + Environment.NewLine +
                                ",[Low]" + Environment.NewLine +
@@ -527,7 +556,7 @@ namespace ConsoleApplication1 {
                                ",[OriginalClose]" + Environment.NewLine +
                                ",[OriginalPrevClose])" + Environment.NewLine +
                                " VALUES " + Environment.NewLine +
-                               "('" + symbol + "'" + Environment.NewLine +
+                               "('" + companyId + "'" + Environment.NewLine +
                                ",'" + dt.ToString("MM/dd/yyyy") + "'" + Environment.NewLine +
                                ",'" + open + "'" + Environment.NewLine +
                                ",'" + low + "'" + Environment.NewLine +
@@ -541,6 +570,9 @@ namespace ConsoleApplication1 {
                                ",'" + prev + "'" + Environment.NewLine +
                                ")";
                                 //Console.WriteLine("dt=" + dt.ToString("MM/dd/yyyy"));
+                                if(companyId <= 0) {
+                                    System.IO.File.WriteAllText(logPath + "\\" + symbol + "_companyid" + ".txt","companyId does not exist symbol=" + symbol);
+                                }
                                 try {
                                     using(SqlConnection connection = new SqlConnection(
                                        connectionString)) {
@@ -549,7 +581,10 @@ namespace ConsoleApplication1 {
                                         command.ExecuteNonQuery();
                                     }
                                 } catch(Exception ex) {
-                                    Console.WriteLine("ex=" + ex.Message);
+                                    if(ex.Message.Contains("PRIMARY KEY") == false) {
+                                        Console.WriteLine("ex=" + ex.Message);
+                                        System.IO.File.WriteAllText(logPath + "\\" + symbol + "_ex" + ".txt","companyId does not exist ex=" + ex.Message);
+                                    }
                                 }
                                 lastSymbol = symbol;
                             }

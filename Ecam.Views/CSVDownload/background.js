@@ -95,7 +95,8 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
                 || tab.url.indexOf('#/quater') > 0
                 || tab.url.indexOf('#/indicator') > 0
                 || tab.url.indexOf('#/cm-company-update') > 0
-                || tab.url.indexOf('/Company') > 0) {
+                || tab.url.indexOf('/Company') > 0
+                || tab.url.indexOf('/Monthly') > 0) {
                 chrome.tabs.executeScript(tabId, { file: "init.js" });
             } else {
                 if (tab.url.indexOf('nseindia.com') > 0) {
@@ -241,7 +242,7 @@ chrome.runtime.onMessage.addListener(function (msg) {
                     chrome.tabs.executeScript(parseInt(msg.tabid), { code: code });
                     break;
                 case 'execute_code':
-                    //chrome.tabs.executeScript({ code: "console.log('onMessage.addListener tabid=','"+parseInt(msg.tabid)+"');" });
+                    chrome.tabs.executeScript({ code: "console.log('execute_code onMessage.addListener tabid=','"+parseInt(msg.tabid)+"');" });
                     if (parseInt(msg.tabid) > 0) {
                         chrome.tabs.executeScript(parseInt(msg.tabid), { code: msg.code });
                     }
