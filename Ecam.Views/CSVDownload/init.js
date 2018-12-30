@@ -51,6 +51,17 @@ function startMC() {
                 chrome.runtime.sendMessage({ cmd: _CMD, symbol: '', company_id: companyId, url: screenerUrl, index: self.index, total: _SYMBOLS.length });
             }, 500);
         }
+    } else if (_CMD == 'moneycontrol-history') {
+        self.index += 1;
+        console.log('_SYMBOLS.length=', _SYMBOLS.length, 'self.index=', self.index);
+        if (_SYMBOLS.length > self.index) {
+            setTimeout(function () {
+                var arr = _SYMBOLS[self.index].split('|');
+                var companyId = arr[0];
+                var moneycontrolUrl = arr[1];
+                chrome.runtime.sendMessage({ cmd: _CMD, symbol: '', company_id: companyId, url: moneycontrolUrl, index: self.index, total: _SYMBOLS.length });
+            }, 500);
+        }
     } else {
         chrome.runtime.sendMessage({ cmd: _CMD, symbol: _SYMBOL });
     }

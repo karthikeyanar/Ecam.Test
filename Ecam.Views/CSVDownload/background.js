@@ -229,6 +229,39 @@ chrome.runtime.onMessage.addListener(function (msg) {
                         chrome.tabs.remove(parseInt(msg.tabid), function () { });
                     });
                     break;
+                case 'moneycontrol-history':
+                    var symbol = msg.symbol;
+                    var url = 'https://www.moneycontrol.com' + msg.url;
+                    var type = '';
+                    var width = 20000;
+                    var height = 1000;
+                    doInCurrentTab(function (currentTab) {
+                        chrome.windows.create({ 'url': url }, function (newWindow) {
+                            var tab = newWindow.tabs[0];
+                            var tabId = tab.id;
+                            chrome.tabs.executeScript(tabId, { file: "jquery-3.3.1.min.js" }, function (result1) {
+                                //alert('result1='+result1);
+                                chrome.tabs.executeScript(tabId, { file: "bililiteRange.js" }, function (result2) {
+                                    //alert('result2='+result2);
+                                    chrome.tabs.executeScript(tabId, { file: "jquery.sendkeys.js" }, function (result3) {
+                                        //alert('result3='+result3);
+                                        chrome.tabs.executeScript(tab.id, { file: "export.js" }, function (result) {
+                                            var code = "moneycontrolHistory(" + tab.id + "," + currentTab.id + "," + msg.company_id + "," + msg.index + "," + msg.total + ");"
+                                            chrome.tabs.executeScript(tab.id, { code: code });
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                    break;
+                case 'moneycontrol_close_tab':
+                    //alert(msg.tabid);
+                    var code = "startMC();"
+                    chrome.tabs.executeScript(parseInt(msg.openerid), { code: code }, function () {
+                        chrome.tabs.remove(parseInt(msg.tabid), function () { });
+                    });
+                    break;
                 case 'close_tab':
                     //alert(msg.tabid);
                     var code = "startMC();"
@@ -242,7 +275,7 @@ chrome.runtime.onMessage.addListener(function (msg) {
                     chrome.tabs.executeScript(parseInt(msg.tabid), { code: code });
                     break;
                 case 'execute_code':
-                    chrome.tabs.executeScript({ code: "console.log('execute_code onMessage.addListener tabid=','"+parseInt(msg.tabid)+"');" });
+                    chrome.tabs.executeScript({ code: "console.log('execute_code onMessage.addListener tabid=','" + parseInt(msg.tabid) + "');" });
                     if (parseInt(msg.tabid) > 0) {
                         chrome.tabs.executeScript(parseInt(msg.tabid), { code: msg.code });
                     }

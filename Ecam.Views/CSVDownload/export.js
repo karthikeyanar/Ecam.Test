@@ -161,6 +161,8 @@ function investingHistory(tabid, openerId, companyId, startDate, endDate, index,
     var $picker = $("#picker", $flatDatePickerCanvasHol);
     console.log('$picker=', $picker[0]);
     $picker[0].value = startDate.toString() + ' - ' + endDate.toString();
+    var $data_interval = $("#data_interval");
+    $data_interval[0].value = 'Monthly';
     console.log('tabid=', tabid, 'openerId=', openerId, 'companyId=', companyId, 'startDate=', startDate, 'endDate=', endDate, 'index=', index, 'total=', total);
     setTimeout(function () {
         var $historicalDataTimeRange = $(".historicalDataTimeRange");
@@ -197,7 +199,10 @@ function investingHistory(tabid, openerId, companyId, startDate, endDate, index,
                     var row = [];
                     var $tr = $(this);
                     row.push(companyId);
-                    row.push($("td:eq(0)", $tr).text()); // date
+                    var dtext = $("td:eq(0)", $tr).text();
+                    var arr = dtext.split(' ');
+                    var dt = '01/' + arr[0] + '/' + arr[1];
+                    row.push(dt); // date
                     row.push($("td:eq(1)", $tr).text()); // close price
                     row.push($("td:eq(2)", $tr).text()); // open price
                     row.push($("td:eq(3)", $tr).text()); // high price
@@ -269,7 +274,86 @@ function screenerHistory(tabid, openerId, companyId, index, total) {
             chrome.runtime.sendMessage({ cmd: 'screener_close_tab', 'tabid': tabid, 'openerid': openerId });
         }, 1000);
 
-    }, 10000);
+    }, 3000);
+}
+
+function removeHTMLTags(content) {
+    var cleanText = '';
+    cleanText = $.trim(content.replace(/>\s*</g, "> <").toString());
+    //console.log('cleanText 1=', cleanText);
+    cleanText = $.trim(cleanText.replace(/<\/?[^>]+(>|$)/g, '').toString());
+    //cleanText = $.trim(cleanText.replace(/\n/g, "").toString());
+    //console.log('cleanText 2=', cleanText);
+    return cleanText;
+}
+
+function moneycontrolHistory(tabid, openerId, companyId, index, total) {
+    window.alert = function () { };
+    console.log('tabid=', tabid, 'openerId=', openerId, 'companyId=', companyId, 'index=', index, 'total=', total);
+    setTimeout(function () {
+        var $tbldata24 = $(".tbldata24");
+        var $tbl = $("table", $tbldata24);
+        var totalCol = 8;
+        var csv = '';
+        var isStart = false;
+        $("tbody > tr", $tbl).each(function () {
+            var $tr = $(this);
+            var cols = '';
+            var isNotAppend = false;
+            for (var i = 0; i < totalCol; i++) {
+                var value = '';
+                var $td = $("td:eq(" + i + ")", $tr);
+                if (!$td[0]) {
+                    $td = $("th:eq(" + i + ")", $tr);
+                }
+                if ($td[0]) {
+                    value = removeHTMLTags($td.html());
+                } else {
+                    value = '';
+                }
+                if (value.indexOf('(C) Shares held by Custodians and against which Depository') > -1 ||
+                    value.indexOf('(2) Non-Institutions') > -1) {
+                    isStart = false;
+                }
+                if (isStart == true) {
+                    if (value.indexOf('(1) Institutions') > -1
+                        || value.indexOf('Sub Total') > -1) {
+                        isNotAppend = true;
+                    }
+                }
+                if (isStart == true && isNotAppend == false) {
+                    cols += value + '|';
+                }
+                if (value.indexOf('(B) Public Shareholding') > -1) {
+                    isStart = true;
+                    isNotAppend = true;
+                }
+            }
+            if (isStart == true) {
+                if (cols != '') {
+                    csv += companyId + '|' + cols + ';'
+                }
+            }
+        });
+        if (csv != '') {
+            csv = csv.substring(0, csv.length - 1);
+        }
+        console.log('csv=', csv);
+
+
+        var fileName = 'MoneyControl_Share_Holding_' + companyId + '.txt';
+        console.log('fileName=', fileName);
+        download(csv, fileName, 'text/csv;encoding:utf-8');
+
+        setTimeout(function () {
+            chrome.runtime.sendMessage({ cmd: 'moneycontrol_close_tab', 'tabid': tabid, 'openerid': openerId });
+        }, 1000);
+
+
+        var code = "$('#moneycontrol_index').val('" + (index + 1) + "');$('#moneycontrol_total').val('" + total + "');$('#moneycontrol_csv').val('" + csv + "');$('#btnMoneyControlUpdateCSV').click();";
+        chrome.runtime.sendMessage({ cmd: 'execute_code', 'tabid': openerId, 'code': code });
+
+    }, 2000);
 }
 
 
