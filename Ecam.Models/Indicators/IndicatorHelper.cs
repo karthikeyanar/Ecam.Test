@@ -62,20 +62,20 @@ namespace Ecam.Models {
                                is_indicator = q.is_indicator,
                            }).ToArray();
             }
-            ATR atr = new ATR();
-            atr.Calculate(candles);
+            //ATR atr = new ATR();
+            //atr.Calculate(candles);
             //MACD macd = new MACD();
             //macd.Calculate(candles);
-            Supertrend supertrend = new Supertrend();
-            supertrend.Calculate(candles);
+            //Supertrend supertrend = new Supertrend();
+            //supertrend.Calculate(candles);
             //HeikinAshi heikinashi = new HeikinAshi();
             //heikinashi.Calculate(candles);
-            EMA ema5 = new EMA();
-            ema5.Calculate(candles,5);
-            EMA ema20 = new EMA();
-            ema20.Calculate(candles,20);
-            EMAProfit p = new EMAProfit();
-            p.Calculate(candles);
+            //EMA ema50 = new EMA();
+            //ema50.Calculate(candles,50);
+            //EMA ema200 = new EMA();
+            //ema200.Calculate(candles,200);
+            //EMAProfit p = new EMAProfit();
+            //p.Calculate(candles);
             DateTime minDate = Convert.ToDateTime("01/01/1900");
             //candles = (from q in candles
             //           where string.IsNullOrEmpty(q.super_trend_signal) == false
@@ -86,11 +86,11 @@ namespace Ecam.Models {
                 if((candles[i].is_indicator ?? false) == false || candles[i].ema_signal == "B") {
                     sql = string.Format("update tra_market set " +
                         " super_trend_signal='{0}'" +
-                        ",ema_5={1},ema_20={2},ema_profit={3},ema_cross={4},ema_signal='{5}',ema_cnt={6},ema_min_profit={7},ema_max_profit={8},ema_min_cross={9},ema_increase={10},ema_increase_profit={11},is_indicator={12} " +
+                        ",ema_50={1},ema_200={2},ema_profit={3},ema_cross={4},ema_signal='{5}',ema_cnt={6},ema_min_profit={7},ema_max_profit={8},ema_min_cross={9},ema_increase={10},ema_increase_profit={11},is_indicator={12} " +
                    " where trade_date='{13}' and symbol='{14}'"
                    ,candles[i].super_trend_signal
-                   ,(candles[i].ema_5 ?? 0)
-                   ,(candles[i].ema_20 ?? 0)
+                   ,(candles[i].ema_50 ?? 0)
+                   ,(candles[i].ema_200 ?? 0)
                    ,(candles[i].ema_profit ?? 0)
                    ,(candles[i].ema_cross ?? 0)
                    ,candles[i].ema_signal

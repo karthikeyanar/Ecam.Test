@@ -96,6 +96,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
                 || tab.url.indexOf('#/indicator') > 0
                 || tab.url.indexOf('#/cm-company-update') > 0
                 || tab.url.indexOf('/Company') > 0
+                || tab.url.indexOf('/Average') > 0
                 || tab.url.indexOf('/Monthly') > 0) {
                 chrome.tabs.executeScript(tabId, { file: "init.js" });
             } else {
@@ -196,6 +197,42 @@ chrome.runtime.onMessage.addListener(function (msg) {
                         chrome.tabs.remove(parseInt(msg.tabid), function () { });
                     });
                     break;
+
+
+                case 'technical-history':
+                    var symbol = msg.symbol;
+                    var url = 'https://in.investing.com' + msg.url; // + '-historical-data';
+                    var type = '';
+                    var width = 20000;
+                    var height = 1000;
+                    doInCurrentTab(function (currentTab) {
+                        chrome.windows.create({ 'url': url }, function (newWindow) {
+                            var tab = newWindow.tabs[0];
+                            var tabId = tab.id;
+                            chrome.tabs.executeScript(tabId, { file: "jquery-3.3.1.min.js" }, function (result1) {
+                                //alert('result1='+result1);
+                                chrome.tabs.executeScript(tabId, { file: "bililiteRange.js" }, function (result2) {
+                                    //alert('result2='+result2);
+                                    chrome.tabs.executeScript(tabId, { file: "jquery.sendkeys.js" }, function (result3) {
+                                        //alert('result3='+result3);
+                                        chrome.tabs.executeScript(tab.id, { file: "export.js" }, function (result) {
+                                            var code = "technicalHistory(" + tab.id + "," + currentTab.id + "," + msg.company_id + ",'" + msg.start_date + "','" + msg.end_date + "'," + msg.index + "," + msg.total + ");"
+                                            chrome.tabs.executeScript(tab.id, { code: code });
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                    break;
+                case 'technical_close_tab':
+                    //alert(msg.tabid);
+                    var code = "startMC();"
+                    chrome.tabs.executeScript(parseInt(msg.openerid), { code: code }, function () {
+                        chrome.tabs.remove(parseInt(msg.tabid), function () { });
+                    });
+                    break;
+                    
                 case 'screener-history':
                     var symbol = msg.symbol;
                     var url = 'https://www.screener.in/' + msg.url;

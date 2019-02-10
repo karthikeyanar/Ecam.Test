@@ -735,7 +735,7 @@ define("IntradayController", ["knockout", "komapping", "helper", "service"], fun
             var $selYear = $("#selYear", $modal);
             var index = self.start_index; // totalCount - self.start_index;
             console.log('index=', index, 'monthCount=', monthCount);
-            var finYearStart = moment('04/01/' + $selYear.val()).format('MM/DD/YYYY');
+            var finYearStart = moment('01/01/' + $selYear.val()).format('MM/DD/YYYY');
             console.log('finYearStart=', finYearStart);
             var startDate = moment(finYearStart).add('month', index).startOf('month').format('MM/DD/YYYY');
             var endDate = moment(finYearStart).add('month', index).endOf('month').format('MM/DD/YYYY');

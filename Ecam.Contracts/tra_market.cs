@@ -35,8 +35,8 @@ namespace Ecam.Contracts {
         public Nullable<decimal> macd_histogram { get; set; }
         public string heikin_ashi_signal { get; set; }
         public Nullable<decimal> heikin_ashi_profit { get; set; }
-        public Nullable<decimal> ema_5 { get; set; }
-        public Nullable<decimal> ema_20 { get; set; }
+        public Nullable<decimal> ema_50 { get; set; }
+        public Nullable<decimal> ema_200 { get; set; }
         public Nullable<decimal> ema_cross { get; set; }
         public Nullable<decimal> ema_profit { get; set; }
         public string ema_signal { get; set; }

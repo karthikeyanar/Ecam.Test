@@ -197,9 +197,9 @@ namespace Ecam.Models {
                 }
             }
             AddSplit(lastSymbol);
-            IndicatorHelper indicator = new IndicatorHelper();
-            indicator.Update(lastSymbol);
-            YearLog(lastSymbol);
+            //IndicatorHelper indicator = new IndicatorHelper();
+            //indicator.Update(lastSymbol);
+            //YearLog(lastSymbol);
             return lastSymbol;
         }
 

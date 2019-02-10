@@ -157,11 +157,11 @@ namespace Ecam.Models {
                     context.SaveChanges();
                 }
             }
-            sql = string.Format("update tra_market set " + Environment.NewLine +
-                  " percentage = ((ifnull(ltp_price,0)-ifnull(prev_price,0))/ifnull(prev_price,0))*100 " + Environment.NewLine +
-                  " where symbol='{0}' " + Environment.NewLine +
-                  " ",this.symbol);
-            MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString,sql);
+            //sql = string.Format("update tra_market set " + Environment.NewLine +
+            //      " percentage = ((ifnull(ltp_price,0)-ifnull(prev_price,0))/ifnull(prev_price,0))*100 " + Environment.NewLine +
+            //      " where symbol='{0}' " + Environment.NewLine +
+            //      " ",this.symbol);
+            //MySqlHelper.ExecuteNonQuery(Ecam.Framework.Helper.ConnectionString,sql);
             //TradeHelper.CreateAVG(this.symbol,this.split_date);
         }
 

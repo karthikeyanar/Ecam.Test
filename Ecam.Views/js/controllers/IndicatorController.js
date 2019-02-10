@@ -171,8 +171,8 @@ define("IndicatorController", ["knockout", "komapping", "helper", "service"], fu
                     }
                     arrDates.push(formatDate(json.rows[i].trade_date, 'MM/DD/YYYY'));
                     arrClosePrice.push(cFloat(json.rows[i].close_price));
-                    arrEMA20.push(cFloat(json.rows[i].ema_20));
-                    arrEMA5.push(cFloat(json.rows[i].ema_5));
+                    arrEMA20.push(cFloat(json.rows[i].ema_200));
+                    arrEMA5.push(cFloat(json.rows[i].ema_50));
                     arrEMACross.push(cFloat(json.rows[i].ema_cross));
                     arrEMAIncrease.push(cFloat(json.rows[i].ema_increase_profit));
                 }

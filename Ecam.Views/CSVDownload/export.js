@@ -162,7 +162,7 @@ function investingHistory(tabid, openerId, companyId, startDate, endDate, index,
     console.log('$picker=', $picker[0]);
     $picker[0].value = startDate.toString() + ' - ' + endDate.toString();
     var $data_interval = $("#data_interval");
-    $data_interval[0].value = 'Monthly';
+    //$data_interval[0].value = 'Monthly';
     console.log('tabid=', tabid, 'openerId=', openerId, 'companyId=', companyId, 'startDate=', startDate, 'endDate=', endDate, 'index=', index, 'total=', total);
     setTimeout(function () {
         var $historicalDataTimeRange = $(".historicalDataTimeRange");
@@ -202,7 +202,7 @@ function investingHistory(tabid, openerId, companyId, startDate, endDate, index,
                     var dtext = $("td:eq(0)", $tr).text();
                     var arr = dtext.split(' ');
                     var dt = '01/' + arr[0] + '/' + arr[1];
-                    row.push(dt); // date
+                    row.push(dtext); // date
                     row.push($("td:eq(1)", $tr).text()); // close price
                     row.push($("td:eq(2)", $tr).text()); // open price
                     row.push($("td:eq(3)", $tr).text()); // high price
@@ -234,6 +234,70 @@ function investingHistory(tabid, openerId, companyId, startDate, endDate, index,
     }, 2000);
 }
 
+function technicalHistory(tabid, openerId, companyId, startDate, endDate, index, total) {
+    window.alert = function () { };
+    setTimeout(function () {
+        var $timePeriodsWidget = $("#timePeriodsWidget");
+        if ($timePeriodsWidget[0]) {
+            $("li", $timePeriodsWidget).each(function () {
+                var html = $("a", this).html();
+                if (html == 'Daily') {
+                    $(this).click();
+                    setTimeout(function () {
+                        var $tbl = $(".movingAvgsTbl");
+                        var $tbody = $("tbody", $tbl);
+                        var $last_last = $("#last_last");
+                        var content = companyId + '^' + $last_last.html() + '^';
+                        $("tr", $tbody).each(function (i) {
+                            var $tr = $(this);
+                            var $td0 = $("td:eq(0)", $tr);
+                            var $td1 = $("td:eq(1)", $tr);
+                            var $td2 = $("td:eq(2)", $tr);
+                            if ($td0[0] && $td1[0] && $td2[0]) {
+                                var content1 = removeHTML($td0.html());
+                                var content2 = removeHTML($td1.html());
+                                //var content3 = removeHTML($td2.html());
+                                //console.log('content1=', content1, 'content2=', content2);//, 'content3=', content3);
+                                content += content1 + '|' + content2 + '~'; // + content3 + '~';
+                            }
+                        });
+                        content = content.replace(/\n/g, "");
+                        content = content.replace(/\r/g, "");
+                        content = content.replace(/' '/g, "");
+                        if (content != '') {
+                            content = content.substring(0, content.length - 1);
+                        }
+                        console.log('content=', content);
+                        var code = "$('#technical_index').val('" + (index + 1) + "');$('#technical_total').val('" + total + "');$('#technical_csv').val('" + content + "');$('#btnTechnicalUpdateCSV').click();";
+                        chrome.runtime.sendMessage({ cmd: 'execute_code', 'tabid': openerId, 'code': code });
+
+                        //var fileName = $.trim($('.float_lang_base_1.relativeAttr').text()) + '-' + companyId + '-' + startDate.toString() + '-' + endDate.toString() + '.csv';
+                        ////console.log('fileName=', fileName);
+                        //download(csvContent, fileName, 'text/csv;encoding:utf-8');
+
+                        setTimeout(function () {
+                            chrome.runtime.sendMessage({ cmd: 'technical_close_tab', 'tabid': tabid, 'openerid': openerId });
+                        }, 1000);
+
+                    }, 3000);
+                }
+            });
+        } else {
+            var content = '';
+            var code = "$('#technical_index').val('" + (index + 1) + "');$('#technical_total').val('" + total + "');$('#technical_csv').val('" + content + "');$('#btnTechnicalUpdateCSV').click();";
+            chrome.runtime.sendMessage({ cmd: 'execute_code', 'tabid': openerId, 'code': code });
+
+            //var fileName = $.trim($('.float_lang_base_1.relativeAttr').text()) + '-' + companyId + '-' + startDate.toString() + '-' + endDate.toString() + '.csv';
+            ////console.log('fileName=', fileName);
+            //download(csvContent, fileName, 'text/csv;encoding:utf-8');
+
+            setTimeout(function () {
+                chrome.runtime.sendMessage({ cmd: 'technical_close_tab', 'tabid': tabid, 'openerid': openerId });
+            }, 1000);
+        }
+    }, 2000);
+}
+
 function screenerHistory(tabid, openerId, companyId, index, total) {
     window.alert = function () { };
     console.log('tabid=', tabid, 'openerId=', openerId, 'companyId=', companyId, 'index=', index, 'total=', total);
@@ -258,6 +322,15 @@ function screenerHistory(tabid, openerId, companyId, index, total) {
             var name = $.trim($li.html());
             values += name + '~' + b1Value + '~' + b2Value + '|';
         });
+        var $section = $("section[id='quarters']");
+        var $tbl = $("table", $section);
+        values += getCells($tbl, 'Net Profit', 'quater_profit');
+        values += getCells($tbl, 'Sales', 'quater_sales');
+        $section = $("section[id='profit-loss']");
+        var $tbl = $("table", $section);
+        values += getCells($tbl, 'Net Profit', 'year_profit');
+        values += getCells($tbl, 'Sales', 'year_sales');
+
         var csv = values;
         csv = csv.replace(/\n/g, "");
         csv = csv.replace(/\r/g, "");
@@ -274,7 +347,35 @@ function screenerHistory(tabid, openerId, companyId, index, total) {
             chrome.runtime.sendMessage({ cmd: 'screener_close_tab', 'tabid': tabid, 'openerid': openerId });
         }, 1000);
 
-    }, 3000);
+    }, 2000);
+}
+
+function getCells($tbl, key, name) {
+    var values = '';
+    $("tbody > tr", $tbl).each(function () {
+        var $tr = $(this);
+        var $tdFirst = $("td:eq(0)", $tr);
+        var profits = '';
+        console.log('tdFirst', $tdFirst[0]);
+        if ($tdFirst[0]) {
+            if ($tdFirst.html().indexOf(key) > -1) {
+                $("td", $tr).each(function (i) {
+                    console.log('i=', i);
+                    if (i > 0) {
+                        profits += $(this).text() + ';';
+                    }
+                });
+            }
+            if (profits != '') {
+                profits = profits.substring(0, profits.length - 1);
+            }
+            if (profits != '') {
+                values += name + '~' + profits + '~' + '' + '|';
+            }
+        }
+    });
+    console.log('values=', values);
+    return values;
 }
 
 function removeHTMLTags(content) {

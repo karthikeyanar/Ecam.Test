@@ -100,6 +100,9 @@ namespace Ecam.ConsoleApp {
                             foreach(string splitsymbol in symbols) {
                                 //Console.WriteLine("Split Symbol=" + symbol);
                                 AddSplit(splitsymbol);
+                                //IndicatorHelper indicator = new IndicatorHelper();
+                                //indicator.Update(splitsymbol);
+                                Console.WriteLine("Symbol=" + splitsymbol);
                             }
                             //}
                         } catch(Exception ex) {

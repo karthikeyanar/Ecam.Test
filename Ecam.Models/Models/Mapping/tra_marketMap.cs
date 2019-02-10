@@ -34,10 +34,10 @@ namespace Ecam.Models {
             this.Property(t => t.super_trend_signal)
               .HasMaxLength(1);
 
-            this.Property(t => t.ema_5)
+            this.Property(t => t.ema_50)
                 .HasPrecision(13,8);
 
-            this.Property(t => t.ema_20)
+            this.Property(t => t.ema_200)
                 .HasPrecision(13,8);
 
             this.Property(t => t.ema_cross)
@@ -74,8 +74,8 @@ namespace Ecam.Models {
 
             this.Property(t => t.super_trend_signal).HasColumnName("super_trend_signal");
             this.Property(t => t.is_indicator).HasColumnName("is_indicator");
-            this.Property(t => t.ema_5).HasColumnName("ema_5");
-            this.Property(t => t.ema_20).HasColumnName("ema_20");
+            this.Property(t => t.ema_50).HasColumnName("ema_50");
+            this.Property(t => t.ema_200).HasColumnName("ema_200");
             this.Property(t => t.ema_cross).HasColumnName("ema_cross");
             this.Property(t => t.ema_profit).HasColumnName("ema_profit");
             this.Property(t => t.ema_signal).HasColumnName("ema_signal");
